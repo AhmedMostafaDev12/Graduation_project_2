@@ -1,6 +1,6 @@
-# MemoryOS
+# Remori
 
-**AI memory assistant smart glasses with AR support for Alzheimer's care.**
+**AI memory assistant smart glasses for Alzheimer's care.**
 
 Graduation project · Artificial Intelligence Engineering · Faculty of Engineering, Mansoura University
 
@@ -8,62 +8,61 @@ Graduation project · Artificial Intelligence Engineering · Faculty of Engineer
 
 ## Overview
 
-MemoryOS pairs AI smart glasses with a companion mobile app to help people living with Alzheimer's disease recognize the people around them, recall context, and stay safely independent.
+Remori pairs AI smart glasses with a cross-platform companion app (Flutter, Android + iOS) to help people living with Alzheimer's disease recognize the people around them, remember their day, and stay safely independent.
 
-- **On the glasses:** face recognition and reminders run fully offline on the device. The name and relationship of a known person appear on the AR display in real time.
-- **On the phone:** a Flutter app with two modes. Patient Mode is a simple interface for reminders and questions. Caregiver Mode is a dashboard for enrolling people and monitoring activity.
-- **In the cloud:** speech recognition, large language models, and retrieval-augmented generation (RAG) turn daily events into a searchable memory ("Who is this?", "What did I do this morning?"), plus activity summaries for caregivers.
+- **On the glasses:** face recognition, voice answers and speech capture run fully offline on the device. The name and relationship of a known person are spoken once per encounter.
+- **Artificial memory:** what is said during the day is transcribed into a searchable journal ("What did Ahmed tell me this morning?"). Raw audio is deleted once transcribed.
+- **On the phone:** a Flutter app with two modes. Patient Mode is a simple interface for the day, reminders, recall and mind games. Caregiver Mode is a dashboard for enrolling people, managing reminders and places, and monitoring activity.
+- **In the cloud:** speech recognition, large language models, and retrieval-augmented generation (RAG) turn daily events into answers and caregiver summaries.
 
-Raw video is never streamed. The glasses extract what they need on the device and discard the rest.
+Video is never streamed. The glasses keep only what matters and discard the rest.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-  A["Glasses<br/>capture + on-device<br/>face match (offline)"] -->|BLE| B["Phone<br/>relay + local buffer"]
-  B -->|"WiFi / cellular<br/>when available"| C["Cloud<br/>LLM + RAG"]
-  B --> D["AR / voice output<br/>to the patient"]
-  C --> D
+  A["Glasses<br/>recognition, voice, speech capture<br/>(offline)"] <-->|"BLE / Wi-Fi burst"| B["Patient's phone (Android relay)<br/>buffer, reminders, GPS"]
+  B <-->|"HTTPS when available"| C["Cloud<br/>STT + LLM + RAG + storage"]
+  D["Caregiver app"] <-->|HTTPS| C
 ```
 
 | Tier | Role | Needs internet? |
 | --- | --- | --- |
-| Glasses | Capture, voice activity detection, face detection and matching, AR overlay | No |
-| Phone | Relay over Bluetooth, offline buffer, patient and caregiver apps | No (syncs when online) |
-| Cloud | Speech-to-text, LLM + RAG memory, caregiver summaries | Yes, opportunistic |
+| Glasses | Capture, face recognition, voice activity detection, intent recognition, speech output | No |
+| Phone | Relay and offline buffer (Android), reminder sync and notifications, location, patient and caregiver apps (Android + iOS) | No (syncs when online) |
+| Cloud | Transcription, LLM + RAG memory, smart media review, caregiver summaries | Yes, opportunistic |
 
-The glasses never depend on a network. The phone buffers events while offline. The cloud adds long-term memory when a connection is available.
+Full specification: [`REMORI_SPEC.md`](REMORI_SPEC.md) · Diagrams: [`docs/diagrams/`](docs/diagrams/README.md)
 
 ## Tech stack
 
 | Hardware | Software | Tools |
 | --- | --- | --- |
-| Raspberry Pi Zero 2W + ESP32 | Python, C++, Dart | GitHub (monorepo) |
-| Camera module (1080p) | TFLite / ONNX Runtime | Figma |
-| Microphone array | Whisper (speech-to-text) | Notion |
-| OLED / waveguide AR display | LangChain + vector DB (RAG) | PostgreSQL, SQLite |
-| IMU, GPS, touch | Flutter | Docker, AWS |
-| Rechargeable battery | FastAPI | |
+| Raspberry Pi Zero 2W + ESP32-S3 | Python, C++, Dart | GitHub (monorepo) |
+| OV5647 5MP camera | TFLite / ONNX Runtime (INT8) | Figma |
+| I²S microphone + speaker | Whisper (speech-to-text), Piper (TTS) | Notion |
+| Button, status LED, Li-Po battery | Hybrid RAG on pgvector, LLM APIs | PostgreSQL, SQLite (drift) |
+| OLED AR display (stretch goal) | Flutter (Android + iOS), FastAPI | Docker, AWS |
 
-**On-device AI:** Ultra-Light face detector, MobileFaceNet embeddings, Silero VAD, INT8-quantized models.
-**Connectivity:** Bluetooth Low Energy between glasses and phone. The phone's own WiFi or cellular link reaches the cloud.
+**On-device AI:** Ultra-Light face detector, MobileFaceNet embeddings, Silero VAD, a custom Arabic/English intent classifier.
+**Connectivity:** Bluetooth Low Energy between glasses and phone, Wi-Fi bursts for video. The phone's own Wi-Fi or cellular link reaches the cloud.
 
 ## Repository structure
 
 ```
-memoryos/
-├── flutter/       # Patient Mode and Caregiver Mode app
-├── backend-ai/    # FastAPI, PostgreSQL, RAG pipeline, model training and quantization
-├── hardware/      # Raspberry Pi and ESP32 firmware: capture, inference, BLE
-└── docs/          # Architecture notes, interface contracts, proposal materials
+├── flutter/       # Patient Mode and Caregiver Mode app (Android + iOS)
+├── backend-ai/    # FastAPI, PostgreSQL, worker jobs, RAG pipeline
+├── ml/            # Shared face pipeline, intent classifier, training and evaluation
+├── hardware/      # Raspberry Pi runtime and ESP32 firmware
+└── docs/          # Spec review, diagrams, interface contracts
 ```
 
 ## Plan
 
 | Semester | Goal |
 | --- | --- |
-| 1 | A working offline device: face recognition, AR overlay, enrollment, BLE link to the phone, and a real Flutter caregiver app |
-| 2 | Cloud memory pipeline (LLM + RAG), Arabic language support, AI summaries for caregivers, full evaluation |
+| 1 | A working offline device: face recognition with spoken names, voice assistant (button), reminders, BLE link to the phone, and a real Flutter caregiver app |
+| 2 | Artificial memory pipeline (transcription + journal), LLM + RAG in Arabic and English, AI summaries for caregivers, full evaluation. AR overlay and wake word as stretch goals |
 
 ## Team
 
@@ -77,6 +76,7 @@ memoryos/
 | 6 | ملك محمد حسن الشرقاوي |
 | 7 | آية وليد محمد محمد شحاتة |
 | 8 | محمد هشام احمد الشربيني |
+
 ## Supervisors
 
 - د/ دعاء الطنطاوي
