@@ -10,16 +10,16 @@ Tables: spec §6 (the ERD is in `docs/diagrams/02-database-erd.md`). Hosting dec
 |---|---|---|
 | What | Docker `pgvector/pgvector:pg17` | Supabase project, PostgreSQL 17 + pgvector 0.8, EU (Frankfurt) |
 | Who uses it | every developer, every test run | the deployed API and workers on EC2 |
-| Connection | `postgresql://remori:remori@localhost:5432/remori` | Supabase **session pooler** (IPv4): host `aws-1-eu-central-1.pooler.supabase.com`, port 5432, user `postgres.<project-ref>`, `sslmode=require`. The direct host (`db.<ref>.supabase.co`) is **IPv6-only** and doesn't work from home networks or EC2. Not the transaction pooler |
+| Connection | `postgresql://remori:remori@localhost:5434/remori` (Docker host port 5434; 5432/5433 are taken by Windows PostgreSQL) | Supabase **session pooler** (IPv4): host `aws-1-eu-central-1.pooler.supabase.com`, port 5432, user `postgres.<project-ref>`, `sslmode=require`. The direct host (`db.<ref>.supabase.co`) is **IPv6-only** and doesn't work from home networks or EC2. Not the transaction pooler |
 | Data | seed script (the UI brief's sample data) | real data |
 
 `DATABASE_URL` in `config.py` is the **only** difference. Never develop or run tests against Supabase.
 
 Start local Postgres (outside Compose):
 ```bash
-docker run -d --name remori-db -p 5432:5432 -e POSTGRES_USER=remori -e POSTGRES_PASSWORD=remori -e POSTGRES_DB=remori pgvector/pgvector:pg17
+docker run -d --name remori-db -p 5434:5432 -e POSTGRES_USER=remori -e POSTGRES_PASSWORD=remori -e POSTGRES_DB=remori pgvector/pgvector:pg17
 ```
-pgAdmin: connect to `localhost:5432` with the same credentials.
+pgAdmin: connect to `localhost:5434` with the same credentials.
 
 ---
 

@@ -85,7 +85,7 @@ html{scroll-behavior:smooth}
     <ul>
       <li><b>Mock data = seeded database.</b> CRUD endpoints are real and read/write the live database, filled with the UI board's sample data. Only AI-dependent endpoints return fixed answers ("AI stubs") until the AI layer exists.</li>
       <li><b>Real auth from the first deploy:</b> login, JWT, device token and patient-link authorization.</li>
-      <li><b>HTTPS from day 1:</b> a free DuckDNS subdomain pointing at EC2, with Caddy in front of FastAPI handling certificates.</li>
+      <li><b>Production as in the course</b> (<a href="https://github.com/Sanjeev-Thiyagarajan/fastapi-course">fastapi-course repo</a>): <b>nginx</b> + <b>certbot</b> (HTTPS) + <b>ufw</b> on the Ubuntu host, <b>gunicorn</b> with 2 uvicorn workers serving the app. The app runs in Docker bound to <code>127.0.0.1:8000</code>. Domain: <code>remori-ai.duckdns.org</code>.</li>
       <li><b>Manual deploy:</b> SSH into EC2 → <code>git pull</code> → <code>docker compose up -d --build</code>. CI stays "PR checks only".</li>
     </ul>
     <div class="links"><span>Related, in <code>backend-ai/docs/</code>:</span><span>ARCHITECTURE.md</span><span>DATABASE.md</span><span>CELERY_REDIS.md</span><span>AI_LAYER.md</span><span>· spec §6 tables · §7.2 endpoints</span></div>
@@ -155,7 +155,7 @@ html{scroll-behavior:smooth}
     <tr><td class="chk"><input type="checkbox" id="p0-6" aria-label="0.6 done"></td><td class="name">0.6 Local tools</td><td class="det">Python 3.12, Docker Desktop, pgAdmin, ruff, AWS CLI.</td></tr>
   </tbody></table></div>
   <div class="done"><b>Done when:</b> you can SSH into EC2, the DuckDNS name resolves to it, and the Supabase dashboard opens.</div>
-  <div class="note">Small instances have about 1 GB RAM. That's enough for Phases 4–5 (API + Caddy). Before Phase 6 adds Redis and workers, check memory and add swap or resize. That's a lead decision at that point.</div>
+  <div class="note">Small instances have about 1 GB RAM. That's enough for Phases 4–5 (API + nginx). Before Phase 6 adds Redis and workers, check memory and add swap or resize. That's a lead decision at that point.</div>
 </section>
 
 <!-- Phase 1 -->
@@ -186,6 +186,7 @@ html{scroll-behavior:smooth}
     <tr><td class="chk"><input type="checkbox" id="p2-5" aria-label="2.5 done"></td><td class="name">2.5 Apply to Supabase</td><td class="det"><code>alembic upgrade head</code> with the Supabase URL, then run the seed.</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p2-6" aria-label="2.6 done"></td><td class="name">2.6 Database users</td><td class="det">Supabase SQL editor: <code>remori_app</code> (read/write, no DDL) and <code>remori_readonly</code> (SELECT). The app uses <code>remori_app</code>.</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p2-7" aria-label="2.7 done"></td><td class="name">2.7 Team access</td><td class="det">Give teammates the readonly connection string or dashboard access.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p2-8" aria-label="2.8 done"></td><td class="name">2.8 CI database</td><td class="det">Add a <code>pgvector/pgvector:pg17</code> <b>service container</b> to the CI backend job, as in the course's <code>build-deploy.yml</code>, plus a test-database fixture in <code>tests/conftest.py</code>, so tests run against a real Postgres.</td></tr>
   </tbody></table></div>
   <div class="done"><b>Done when (M1):</b> every §6 table exists on Supabase with seed data, it's visible in pgAdmin and the dashboard, and the app connects as <code>remori_app</code>.</div>
 </section>
@@ -208,15 +209,18 @@ html{scroll-behavior:smooth}
 <!-- Phase 4 -->
 <section class="phase" id="p4" data-phase="p4">
   <div class="phase-head"><span class="num">Phase 4</span><h2>First deploy</h2><span class="ms">M2</span><span class="prog" data-prog="p4"></span></div>
-  <p class="course">Course: Ubuntu VM deployment + Docker (12:05–14:08), with Caddy instead of nginx and Docker Compose instead of systemd.</p>
+  <p class="course">Course: Ubuntu VM deployment (12:05–13:23: gunicorn, nginx, domain, SSL, firewall) + Docker (13:26–14:08). Same production pieces as the course repo (<code>nginx</code>, <code>gunicorn.service</code>), except the app runs in Docker instead of a systemd venv.</p>
   <div class="scroll"><table class="steps"><tbody>
-    <tr><td class="chk"><input type="checkbox" id="p4-1" aria-label="4.1 done"></td><td class="name">4.1 docker-compose.yml</td><td class="det"><code>api</code> + <code>caddy</code>. Caddy terminates HTTPS for the DuckDNS name and proxies to <code>api:8000</code>.</td></tr>
-    <tr><td class="chk"><input type="checkbox" id="p4-2" aria-label="4.2 done"></td><td class="name">4.2 Server .env</td><td class="det">Supabase URL (as <code>remori_app</code>), JWT secret, S3 bucket name. Created by hand on the server, never committed.</td></tr>
-    <tr><td class="chk"><input type="checkbox" id="p4-3" aria-label="4.3 done"></td><td class="name">4.3 Deploy procedure</td><td class="det"><code>ssh</code> → <code>cd ~/remori</code> → <code>git pull</code> → <code>docker compose up -d --build</code> → <code>alembic upgrade head</code> (in the api container) → smoke test. Document it in <code>backend-ai/README.md</code>.</td></tr>
-    <tr><td class="chk"><input type="checkbox" id="p4-4" aria-label="4.4 done"></td><td class="name">4.4 Smoke test</td><td class="det"><code>https://&lt;name&gt;.duckdns.org/health</code> and <code>/docs</code>, plus a login with a seeded account.</td></tr>
-    <tr><td class="chk"><input type="checkbox" id="p4-5" aria-label="4.5 done"></td><td class="name">4.5 Hand-over</td><td class="det">Give Flutter the base URL, test accounts and the seed's fixed IDs.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p4-1" aria-label="4.1 done"></td><td class="name">4.1 Firewall (ufw)</td><td class="det"><code>sudo ufw allow OpenSSH</code> → <code>sudo ufw allow 'Nginx Full'</code> → <code>sudo ufw enable</code>. The AWS security group stays as a second layer.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p4-2" aria-label="4.2 done"></td><td class="name">4.2 nginx</td><td class="det"><code>sudo apt install nginx</code>. Site config = the course's <code>nginx</code> file with <code>server_name remori-ai.duckdns.org;</code> and <code>proxy_pass http://127.0.0.1:8000;</code>, keeping its forwarded headers.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p4-3" aria-label="4.3 done"></td><td class="name">4.3 HTTPS (certbot)</td><td class="det"><code>sudo apt install certbot python3-certbot-nginx</code> → <code>sudo certbot --nginx -d remori-ai.duckdns.org</code> (also sets the HTTP → HTTPS redirect). Check renewal with <code>sudo certbot renew --dry-run</code>.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p4-4" aria-label="4.4 done"></td><td class="name">4.4 docker-compose.yml</td><td class="det"><code>api</code> from the Dockerfile, running <b>gunicorn with 2 uvicorn workers</b>. Ports <code>"127.0.0.1:8000:8000"</code> only (Docker bypasses ufw). <code>restart: unless-stopped</code>, <code>env_file: .env</code>.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p4-5" aria-label="4.5 done"></td><td class="name">4.5 Server .env</td><td class="det">Supabase session-pooler URL (as <code>remori_app</code>, <code>sslmode=require</code>), JWT secret, S3 bucket name. Created by hand on the server, never committed.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p4-6" aria-label="4.6 done"></td><td class="name">4.6 Deploy procedure</td><td class="det"><code>ssh</code> → <code>cd ~/remori</code> → <code>git pull</code> → <code>docker compose up -d --build</code> → <code>alembic upgrade head</code> (in the api container) → smoke test. Documented in <code>backend-ai/README.md</code>.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p4-7" aria-label="4.7 done"></td><td class="name">4.7 Smoke test</td><td class="det"><code>https://remori-ai.duckdns.org/health</code> and <code>/docs</code>, <code>http://</code> redirects to <code>https://</code>, port 8000 <b>not</b> reachable from outside, and a login with a seeded account.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p4-8" aria-label="4.8 done"></td><td class="name">4.8 Hand-over</td><td class="det">Give Flutter <code>https://remori-ai.duckdns.org/api/v1</code>, test accounts and the seed's fixed IDs.</td></tr>
   </tbody></table></div>
-  <div class="done"><b>Done when (M2):</b> the API answers over HTTPS and Flutter switches its auth repository to real.</div>
+  <div class="done"><b>Done when (M2):</b> the API answers over HTTPS through nginx, and Flutter switches its auth repository to real.</div>
 </section>
 
 <!-- Phase 5 -->
