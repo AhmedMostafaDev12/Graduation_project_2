@@ -17,7 +17,7 @@ The lead learned FastAPI from the freeCodeCamp course *"Python API Development â
 
 | From the course (keep as taught) | Added for Remori (course doesn't cover it) |
 |---|---|
-| `main.py`, `config.py`, `database.py`, `models.py`, `schemas.py`, `oauth2.py`, `utils.py`, `routers/`, Alembic, pytest, Docker | `services/` (logic shared by routes and workers), `errors.py`, `ai/` (AI as software), `workers/` (Celery), `integrations/` (S3, FCM) |
+| `main.py`, `config.py`, `database.py`, `models` + `schemas` (split into folders by domain), `oauth2.py`, `utils.py`, `routers/`, Alembic, pytest, Docker | `services/` (logic shared by routes and workers), `errors.py`, `ai/` (AI as software), `workers/` (Celery), `integrations/` (S3, FCM) |
 
 Use **current library versions**, not the course's 2021 ones: Pydantic v2, SQLAlchemy 2.0 style, PyJWT, pwdlib. Details are in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 

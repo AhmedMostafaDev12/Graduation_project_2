@@ -14,8 +14,12 @@ backend-ai/
 │   ├── main.py            # [course] create app, include routers, CORS, exception handlers (errors.py)
 │   ├── config.py          # [course] Settings via pydantic-settings (.env): DATABASE_URL, JWT, Redis, S3, AI keys
 │   ├── database.py        # [course] engine, SessionLocal, Base, get_db
-│   ├── models.py          # [course] SQLAlchemy tables, exactly spec §6
-│   ├── schemas.py         # [course] Pydantic request/response models, exactly spec §7.2
+│   ├── models/            # [course models.py, split by domain] SQLAlchemy tables, exactly spec §6
+│   │   ├── __init__.py    #   re-exports every model: `from app import models` / `from app.models import User`
+│   │   ├── _columns.py    #   shared column helpers (pk, fk, timestamps), vector sizes
+│   │   └── accounts.py  people.py  places.py  journal.py  media.py  reminders.py  activity.py  privacy.py
+│   ├── schemas/           # [course schemas.py, split by domain] Pydantic request/response, exactly spec §7.2
+│   │   └── accounts.py  people.py  places.py  journal.py  media.py  reminders.py  activity.py  privacy.py
 │   ├── oauth2.py          # [course] JWT create/verify, get_current_user
 │   │                      #   + [added] get_current_device (device token), require_patient_link
 │   ├── utils.py           # [course] password hashing (pwdlib)
@@ -44,7 +48,7 @@ backend-ai/
 └── docker-compose.dev.yml # [added] local: + postgres (pgvector/pgvector:pg16)
 ```
 
-`models.py` and `schemas.py` start as single files, as in the course. Splitting them into packages later is the lead's call.
+The course keeps `models.py` and `schemas.py` as single files. With 22 tables, Remori splits both into packages by domain, with the **same file names in both** (lead decision, 12 Oct 2026). A model and its schemas live in files with the same name: `models/reminders.py` ↔ `schemas/reminders.py`.
 
 ---
 
@@ -53,8 +57,8 @@ backend-ai/
 | You are writing… | Put it in |
 |---|---|
 | A new endpoint from spec §7.2 | `routers/<resource>.py` (thin) + logic in `services/<resource>_service.py` |
-| Validation of request/response JSON | `schemas.py` |
-| A table or column (spec §6 only) | `models.py` + an Alembic migration. See DATABASE.md |
+| Validation of request/response JSON | `schemas/<domain>.py` |
+| A table or column (spec §6 only) | `models/<domain>.py` + export it in `models/__init__.py` + an Alembic migration. See DATABASE.md |
 | "Is this caller allowed to see this patient?" | `oauth2.py` → `require_patient_link` dependency |
 | An error the client should see | a domain exception in `errors.py`, raised from a service |
 | A call to Whisper / an LLM / a vision model / embeddings | `ai/clients/` |
