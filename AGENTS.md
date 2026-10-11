@@ -1,0 +1,78 @@
+# Remori — Orchestrator (read this first)
+
+Instructions for every AI coding agent and every human contributor working in this repository.
+Each area has its own `AGENTS.md` with the details. This file says **how the areas fit together** and **which rules apply everywhere**.
+
+Remori is a graduation project: AI memory-assistant smart glasses for people living with Alzheimer's, with a Flutter companion app and a cloud backend. Team lead and owner of architecture, backend and AI: **Ahmed Mostafa**.
+
+---
+
+## 1. Repository map
+
+| Folder | What lives there | Detailed rules |
+|---|---|---|
+| `backend-ai/` | FastAPI API, database models + migrations, background workers (Celery + Redis), and **all software that uses AI**: AI API clients, RAG, vector search, local model inference wrappers | [`backend-ai/AGENTS.md`](backend-ai/AGENTS.md) |
+| `flutter/` | The companion app: Patient Mode + Caregiver Mode, Android + iOS, glasses relay (Android) | [`flutter/AGENTS.md`](flutter/AGENTS.md) |
+| `ml/` | **Low-level ML only**: training, datasets, notebooks, evaluation, model export, and the trained/exported model files | [`ml/README.md`](ml/README.md) |
+| `hardware/` | Raspberry Pi runtime + ESP32 firmware for the glasses | spec §5, §7.1 |
+| `docs/` | Spec companions: review, diagrams, UI brief, team workflow, API contract, study guide | below |
+| `.github/` | CI workflow (pull-request checks) | [`docs/TEAM_WORKFLOW.md`](docs/TEAM_WORKFLOW.md) |
+
+---
+
+## 2. Sources of truth (in priority order)
+
+1. [`REMORI_SPEC.md`](REMORI_SPEC.md): **the** source of truth. Decision log (§0), data model (§6), contracts (§7). If code and spec disagree, the spec wins, or the spec gets changed first by the lead.
+2. Area docs: `backend-ai/AGENTS.md` + `backend-ai/docs/*`, `flutter/AGENTS.md` + `flutter/docs/*`, `ml/README.md`.
+3. Shared docs:
+   - [`docs/API_CONTRACT.md`](docs/API_CONTRACT.md): how backend and Flutter work together
+   - [`docs/TEAM_WORKFLOW.md`](docs/TEAM_WORKFLOW.md): branches, pull requests, CI, resolving conflicts
+   - [`docs/UI_SCREENS_BRIEF.md`](docs/UI_SCREENS_BRIEF.md): the 40 screens, nothing more and nothing less
+   - [`docs/diagrams/`](docs/diagrams/README.md): architecture, ERD, sequences, state machines
+   - [`docs/BACKEND_STUDY_GUIDE.md`](docs/BACKEND_STUDY_GUIDE.md): what the backend needs beyond the freeCodeCamp FastAPI course
+
+---
+
+## 3. Rules for everyone
+
+1. **Ask before deciding.** Anything the spec doesn't already decide goes to the lead *before* it's built. That includes new libraries, folders, endpoints, tables, columns, screens, settings, and changes to a contract. Write the question down and propose 2–3 options with a recommendation; don't pick silently.
+2. **Stay in your area.** A change touches one area: `backend-ai/`, `flutter/`, `ml/` or `hardware/`. If you need something from another area, ask its owner; don't edit their folder. Shared docs and the spec are edited only with the lead's approval.
+3. **Build what's specified, nothing more.** Endpoints come from spec §7.2, screens from the UI brief, and tables from spec §6. No extra features, fields or "nice to haves".
+4. **One branch and one pull request per change.** Never push to `main`, and keep PRs small. CI must be green before merging. GitHub doesn't block red merges on this private repo, so this rule is enforced by the team. See [`docs/TEAM_WORKFLOW.md`](docs/TEAM_WORKFLOW.md).
+5. **Contracts are shared property.** The REST API (spec §7.2) and the BLE protocol (spec §7.1) are changed **contract-first**: spec PR approved by the lead → implementation → consumer update. See [`docs/API_CONTRACT.md`](docs/API_CONTRACT.md).
+6. **Privacy is a requirement, not a feature.** Never log transcripts, names, faces or embeddings. Never commit secrets or connection strings. Never expose data outside the API's authorization (spec §9).
+7. **Run your area's checks locally before pushing**, the same ones CI runs (listed in each `AGENTS.md`).
+
+---
+
+## 4. How the areas talk to each other
+
+```
+glasses (hardware/) ──BLE §7.1──> flutter/ (relay + UI) ──REST §7.2──> backend-ai/ ──> Supabase Postgres, S3, AI APIs
+                                                                            │
+                                                     loads exported models  ▼
+                                                                          ml/models/
+```
+
+| Boundary | Contract | Owner of the contract |
+|---|---|---|
+| Flutter ↔ backend | REST `/api/v1` (spec §7.2), error shape §7.5, OpenAPI at `/docs` once the API runs | lead (backend) |
+| Glasses ↔ Flutter | BLE GATT messages (spec §7.1) | lead + hardware + Flutter together |
+| backend ↔ ml | Exported model files + model cards in `ml/models/`; shared preprocessing for the face pipeline (spec D14) | lead (AI) |
+
+---
+
+## 5. Open decisions (do not decide these, ask the lead)
+
+| Topic | Question |
+|---|---|
+| ml ↔ backend packaging | How `backend-ai` imports the shared face preprocessing from `ml/` (local package install, copied module, or published wheel) |
+| Model files in git | Whether exported models (`*.onnx`, `*.tflite`) use Git LFS or are downloaded from S3 at build time |
+| Pagination | The journal and lists have no pagination rule in the spec yet |
+| Team assignment | Names per track (spec §11) |
+
+---
+
+## 6. Status
+
+Pre-code. Folders contain placeholders. Build order: spec §12. The current step for each area is in its `AGENTS.md`.

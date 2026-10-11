@@ -1,0 +1,361 @@
+<title>Remori Backend Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f4f6f7; --surface:#ffffff; --ink:#17212b; --muted:#56636f; --rule:#d8dee3;
+  --accent:#0e7c72; --accent-soft:#e2f1ef; --mile:#9a5207; --mile-soft:#fbefe0;
+  --done:#1f7a4d; --code-bg:#eef2f4;
+  --display:'Bricolage Grotesque',Georgia,serif;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1519; --surface:#162027; --ink:#e3e9ec; --muted:#9aa8b3; --rule:#2a363f;
+    --accent:#4cc3b2; --accent-soft:#163631; --mile:#f0a54f; --mile-soft:#3a2a14;
+    --done:#5cc98e; --code-bg:#1d2a32; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1519; --surface:#162027; --ink:#e3e9ec; --muted:#9aa8b3; --rule:#2a363f;
+  --accent:#4cc3b2; --accent-soft:#163631; --mile:#f0a54f; --mile-soft:#3a2a14;
+  --done:#5cc98e; --code-bg:#1d2a32; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:32px 64px}
+.wrap{max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(30px,5vw,44px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:24px;font-weight:600}
+h3{font-size:16px;font-weight:600;font-family:var(--sans)}
+p{margin:0;max-width:68ch}
+a{color:var(--accent)}
+a:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+code,.mono{font-family:var(--mono);font-size:.88em}
+code{background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.lead{font-size:17px;color:var(--muted)}
+header{display:flex;flex-direction:column;gap:12px}
+.decisions{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.decisions ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.links{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:left;padding:8px 10px;border-bottom:2px solid var(--rule)}
+td{padding:9px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.ov td:first-child{font-family:var(--mono);color:var(--muted);width:44px}
+.ov a{font-weight:600;text-decoration:none}
+.ov a:hover{text-decoration:underline}
+.prog{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.prog.full{color:var(--done);font-weight:500}
+.ms{display:inline-block;font-family:var(--mono);font-size:12px;font-weight:500;color:var(--mile);background:var(--mile-soft);border-radius:999px;padding:1px 9px;white-space:nowrap}
+.phase{display:flex;flex-direction:column;gap:14px;scroll-margin-top:16px}
+.phase-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;border-top:1px solid var(--rule);padding-top:22px}
+.phase-head .num{font-family:var(--mono);font-size:13px;color:var(--accent)}
+.course{font-size:13px;color:var(--muted)}
+.steps td.chk{width:34px;padding-right:0}
+.steps input{width:18px;height:18px;accent-color:var(--accent);margin:2px 0 0;cursor:pointer}
+.steps td.name{font-weight:600;white-space:nowrap;width:1%}
+.steps tr.is-done td.name,.steps tr.is-done td.det{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--rule)}
+.done{border-left:3px solid var(--done);background:var(--surface);padding:10px 14px;border-radius:0 8px 8px 0;font-size:14px}
+.done b{color:var(--done)}
+.note{background:var(--mile-soft);border-radius:8px;padding:10px 14px;font-size:14px}
+.owner{font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:2px 10px}
+.track .phase-head{border-top:2px solid var(--accent)}
+.ov tr.track-row td{background:var(--accent-soft)}
+ul.rules{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:14px}
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.toolbar button{font:inherit;font-size:13px;color:var(--accent);background:none;border:1px solid var(--rule);border-radius:6px;padding:4px 10px;cursor:pointer}
+.toolbar button:hover{border-color:var(--accent)}
+footer{font-size:13px;color:var(--muted);border-top:1px solid var(--rule);padding-top:18px}
+@media (max-width:560px){ .steps td.name{white-space:normal;width:auto} }
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+html{scroll-behavior:smooth}
+</style>
+
+<div class="wrap">
+
+<header>
+  <span class="eyebrow">backend-ai · development plan</span>
+  <h1>Remori backend plan</h1>
+  <p class="lead">The order the backend gets built in: the database goes live first, and the API is deployed early with seeded data, so Flutter and the phone relay integrate from the start instead of at the end.</p>
+  <div class="decisions">
+    <h3>Decisions this plan follows (lead, 11 Oct 2026)</h3>
+    <ul>
+      <li><b>Mock data = seeded database.</b> CRUD endpoints are real and read/write the live database, filled with the UI board's sample data. Only AI-dependent endpoints return fixed answers ("AI stubs") until the AI layer exists.</li>
+      <li><b>Real auth from the first deploy:</b> login, JWT, device token and patient-link authorization.</li>
+      <li><b>HTTPS from day 1:</b> a free DuckDNS subdomain pointing at EC2, with Caddy in front of FastAPI handling certificates.</li>
+      <li><b>Manual deploy:</b> SSH into EC2 → <code>git pull</code> → <code>docker compose up -d --build</code>. CI stays "PR checks only".</li>
+    </ul>
+    <div class="links"><span>Related, in <code>backend-ai/docs/</code>:</span><span>ARCHITECTURE.md</span><span>DATABASE.md</span><span>CELERY_REDIS.md</span><span>AI_LAYER.md</span><span>· spec §6 tables · §7.2 endpoints</span></div>
+  </div>
+</header>
+
+<section aria-labelledby="ov-title" style="display:flex;flex-direction:column;gap:12px">
+  <h2 id="ov-title">Overview</h2>
+  <div class="toolbar"><span id="total-prog">0 of 0 steps done</span><button type="button" id="reset">Clear my checkmarks</button><span>Checkmarks are saved in this browser only.</span></div>
+  <div class="scroll">
+  <table class="ov">
+    <thead><tr><th>#</th><th>Phase</th><th>Milestone</th><th>Who can integrate after it</th><th>Progress</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td><a href="#p0">Accounts and infrastructure</a></td><td></td><td></td><td class="prog" data-prog="p0"></td></tr>
+      <tr><td>1</td><td><a href="#p1">Project skeleton</a></td><td>CI green, <code>/health</code> locally</td><td></td><td class="prog" data-prog="p1"></td></tr>
+      <tr><td>2</td><td><a href="#p2">Database live</a></td><td><span class="ms">M1</span> schema + seed data on Supabase</td><td>Anyone can browse the data</td><td class="prog" data-prog="p2"></td></tr>
+      <tr><td>3</td><td><a href="#p3">Auth and security core</a></td><td></td><td></td><td class="prog" data-prog="p3"></td></tr>
+      <tr><td>4</td><td><a href="#p4">First deploy</a></td><td><span class="ms">M2</span> API live over HTTPS</td><td>Flutter: real login and tokens</td><td class="prog" data-prog="p4"></td></tr>
+      <tr><td>5</td><td><a href="#p5">All CRUD endpoints + AI stubs</a></td><td><span class="ms">M3</span> every §7.2 endpoint live</td><td>Flutter: every screen. Phone relay: real sync</td><td class="prog" data-prog="p5"></td></tr>
+      <tr><td>6</td><td><a href="#p6">Celery + Redis foundation</a></td><td><span class="ms">M4</span> workers in production</td><td></td><td class="prog" data-prog="p6"></td></tr>
+      <tr><td>7</td><td><a href="#p7">Ambient memory pipeline</a></td><td><span class="ms">M5</span> real transcripts</td><td></td><td class="prog" data-prog="p7"></td></tr>
+      <tr><td>8</td><td><a href="#p8">Media AI + face enrollment</a></td><td><span class="ms">M6</span> real review, OCR, embeddings</td><td>Glasses: real enrolled faces</td><td class="prog" data-prog="p8"></td></tr>
+      <tr><td>9</td><td><a href="#p9">Phase 2 AI: replace the stubs</a></td><td><span class="ms">M7</span> no AI stubs left</td><td></td><td class="prog" data-prog="p9"></td></tr>
+      <tr><td>10</td><td><a href="#p10">Hardening for the demo</a></td><td><span class="ms">M8</span> demo-ready</td><td></td><td class="prog" data-prog="p10"></td></tr>
+      <tr class="track-row"><td>R</td><td><a href="#r">RAG track · Abdelrahman</a></td><td>runs in parallel, feeds 5.9, 9.1, 9.2</td><td></td><td class="prog" data-prog="r"></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="course">Every phase ends with: PR → CI green → merge → deploy (from Phase 4 on) → tell the team what's new.</p>
+</section>
+
+<!-- Track R -->
+<section class="phase track" id="r" data-phase="r">
+  <div class="phase-head"><span class="num">Track R</span><h2>RAG, in parallel</h2><span class="owner">Abdelrahman</span><span class="prog" data-prog="r"></span></div>
+  <p class="course">Abdelrahman builds the RAG pipeline alongside Phases 0–8. It needs no backend skeleton: everything runs on synthetic data and a local <code>pgvector/pgvector:pg17</code> database. His work plugs into the plan at <b>5.9</b> (stub fixtures), <b>9.1</b> (real <code>/assist</code>) and <b>9.2</b> (daily summaries).</p>
+  <div class="scroll"><table class="steps">
+    <thead><tr><th></th><th>Step</th><th>Output</th><th>Plugs into</th></tr></thead>
+    <tbody>
+    <tr><td class="chk"><input type="checkbox" id="r-1" aria-label="R1 done"></td><td class="name">R1 Evaluation set</td><td class="det"><code>ml/rag_eval/</code>: synthetic journal days based on the UI board's Fatma data + <b>50–100 questions</b> in Egyptian Arabic and English, each with its expected answer and the event IDs that prove it. Includes questions with <b>no</b> answer.</td><td class="mono">R4 R5</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="r-2" aria-label="R2 done"></td><td class="name">R2 Event → sentence</td><td class="det"><code>ai/rag/render.py</code>: one template per <code>event_type</code> (spec §6), Arabic + English, with unit tests.</td><td class="mono">7.3</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="r-3" aria-label="R3 done"></td><td class="name">R3 Time + person</td><td class="det">"الصبح", "امبارح", "الأسبوع اللي فات" → a time window in the patient's timezone. "أحمد" / "ابني" → a person.</td><td class="mono">R4</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="r-4" aria-label="R4 done"></td><td class="name">R4 Hybrid retriever</td><td class="det"><code>ai/rag/retriever.py</code>: SQL time + person filter first, then pgvector ranking (spec D22). Reports retrieval quality on R1.</td><td class="mono">9.1</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="r-5" aria-label="R5 done"></td><td class="name">R5 Answer prompt</td><td class="det"><code>ai/prompts/assist_answer.v1.txt</code> + <code>ai/rag/answer.py</code>: short answers for a person with dementia, <b>diacritized Arabic</b> for Piper, answers only from retrieved events, "I don't remember that happening" when nothing matches, returns <code>source_event_ids</code>.</td><td class="mono">9.1</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="r-6" aria-label="R6 done"></td><td class="name">R6 /assist fixtures</td><td class="det">The fixed answers the stub returns, in the exact spec §7.2 shape.</td><td class="mono">5.9</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="r-7" aria-label="R7 done"></td><td class="name">R7 Daily summary</td><td class="det"><code>ai/prompts/daily_summary.v1.txt</code> + adherence / visits / talk-time calculations.</td><td class="mono">9.2</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="rules">
+    <li>Works only in <code>backend-ai/app/ai/rag/</code>, <code>backend-ai/app/ai/prompts/</code> and <code>ml/rag_eval/</code>, on his own branch with PRs.</li>
+    <li>Follows AI_LAYER.md: versioned prompt files, a timeout on every LLM call, LLM mocked with <code>respx</code> in tests, nothing private in logs.</li>
+    <li><b>Synthetic data only.</b> No real people's conversations.</li>
+    <li>Asks the lead before any decision the spec doesn't make. See the R questions at the end.</li>
+  </ul>
+  <div class="done"><b>Done when:</b> R4 + R5 reach the agreed score on the R1 evaluation set, and <code>/assist</code> (9.1) and summaries (9.2) use them on the live API.</div>
+</section>
+
+<!-- Phase 0 -->
+<section class="phase" id="p0" data-phase="p0">
+  <div class="phase-head"><span class="num">Phase 0</span><h2>Accounts and infrastructure</h2><span class="prog" data-prog="p0"></span></div>
+  <div class="done"><b>Status, 11 Oct 2026:</b> Supabase on PostgreSQL 17.11 with pgvector 0.8.2 available, reached through the IPv4 session pooler <code>aws-1-eu-central-1.pooler.supabase.com</code>. AWS Frankfurt: EC2 <code>remori-api</code> (t3.small, Ubuntu 24.04, Docker + Compose) at Elastic IP <b>18.184.27.33</b>, security group <code>remori-api-sg</code>, SSH key <code>remori-ec2</code>, private S3 bucket <code>remori-media-090413359449</code>, IAM role <code>remori-ec2-role</code> attached. Domain <b>remori-ai.duckdns.org</b> → 18.184.27.33. <b>Still manual:</b> turning off Supabase's Data API.</div>
+  <div class="scroll"><table class="steps"><tbody>
+    <tr><td class="chk"><input type="checkbox" id="p0-1" aria-label="0.1 done"></td><td class="name">0.1 Supabase project</td><td class="det">EU (Frankfurt) region. <b>Turn off the Data API.</b> Keep the direct / session-pooler connection strings in a password manager, never in git.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p0-2" aria-label="0.2 done"></td><td class="name">0.2 AWS EC2</td><td class="det">Ubuntu, free-tier-eligible size, Elastic IP attached. Security group: 22 from your IP only, 80 + 443 from anywhere. Install Docker + the Compose plugin.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p0-3" aria-label="0.3 done"></td><td class="name">0.3 DuckDNS</td><td class="det">Create e.g. <code>remori-ai.duckdns.org</code> → the Elastic IP.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p0-4" aria-label="0.4 done"></td><td class="name">0.4 S3 bucket</td><td class="det">Private, block all public access. Needed from Phase 5 for photos.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p0-5" aria-label="0.5 done"></td><td class="name">0.5 IAM role</td><td class="det">Attach a role to the EC2 instance with access to that bucket only. No AWS keys in <code>.env</code>.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p0-6" aria-label="0.6 done"></td><td class="name">0.6 Local tools</td><td class="det">Python 3.12, Docker Desktop, pgAdmin, ruff, AWS CLI.</td></tr>
+  </tbody></table></div>
+  <div class="done"><b>Done when:</b> you can SSH into EC2, the DuckDNS name resolves to it, and the Supabase dashboard opens.</div>
+  <div class="note">Small instances have about 1 GB RAM. That's enough for Phases 4–5 (API + Caddy). Before Phase 6 adds Redis and workers, check memory and add swap or resize. That's a lead decision at that point.</div>
+</section>
+
+<!-- Phase 1 -->
+<section class="phase" id="p1" data-phase="p1">
+  <div class="phase-head"><span class="num">Phase 1</span><h2>Project skeleton</h2><span class="prog" data-prog="p1"></span></div>
+  <p class="course">Course: setup, virtual env, FastAPI basics, routers (0:00–2:21, 6:17).</p>
+  <div class="scroll"><table class="steps"><tbody>
+    <tr><td class="chk"><input type="checkbox" id="p1-1" aria-label="1.1 done"></td><td class="name">1.1 Folder layout</td><td class="det">Exactly ARCHITECTURE.md §1: <code>app/main.py</code>, <code>config.py</code>, <code>database.py</code>, <code>routers/</code>, <code>services/</code>, <code>errors.py</code>…</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p1-2" aria-label="1.2 done"></td><td class="name">1.2 requirements.txt</td><td class="det">FastAPI, uvicorn, SQLAlchemy 2.0, psycopg, Alembic, pydantic-settings, PyJWT, pwdlib, pgvector, boto3, python-multipart, pytest, httpx, ruff.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p1-3" aria-label="1.3 done"></td><td class="name">1.3 config.py</td><td class="det">pydantic-settings. <code>.env.example</code> committed, <code>.env</code> gitignored.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p1-4" aria-label="1.4 done"></td><td class="name">1.4 GET /health</td><td class="det">Returns <code>{"status": "ok"}</code> and checks the DB connection.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p1-5" aria-label="1.5 done"></td><td class="name">1.5 docker-compose.dev.yml</td><td class="det">Local Postgres (<code>pgvector/pgvector:pg17</code>) + the API with hot reload.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p1-6" aria-label="1.6 done"></td><td class="name">1.6 Dockerfile</td><td class="det">One image: the API now, workers later.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p1-7" aria-label="1.7 done"></td><td class="name">1.7 First test</td><td class="det"><code>tests/test_health.py</code>. CI's backend job now really runs.</td></tr>
+  </tbody></table></div>
+  <div class="done"><b>Done when:</b> <code>docker compose -f docker-compose.dev.yml up</code> → <code>http://localhost:8000/docs</code> works, and the PR is green.</div>
+</section>
+
+<!-- Phase 2 -->
+<section class="phase" id="p2" data-phase="p2">
+  <div class="phase-head"><span class="num">Phase 2</span><h2>Database live</h2><span class="ms">M1</span><span class="prog" data-prog="p2"></span></div>
+  <p class="course">Course: databases, SQLAlchemy, Alembic (2:24–5:28, 10:30–11:14) + DATABASE.md. The spec §6 schema is fully designed, so create it in one go instead of table by table.</p>
+  <div class="scroll"><table class="steps"><tbody>
+    <tr><td class="chk"><input type="checkbox" id="p2-1" aria-label="2.1 done"></td><td class="name">2.1 models.py</td><td class="det">All spec §6 tables, SQLAlchemy 2.0 style: UUID PKs, ENUMs, JSONB, <code>TIMESTAMPTZ</code>, <code>VECTOR(512)</code> / <code>VECTOR(1536)</code>, <code>updated_at</code> / <code>deleted_at</code>.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p2-2" aria-label="2.2 done"></td><td class="name">2.2 Migration 001</td><td class="det"><code>CREATE EXTENSION vector</code> + every table + indexes (HNSW for vectors) + <b>RLS enabled on every table</b>. Read it line by line before committing.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p2-3" aria-label="2.3 done"></td><td class="name">2.3 Apply locally</td><td class="det"><code>alembic upgrade head</code> on Docker Postgres. Check in pgAdmin.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p2-4" aria-label="2.4 done"></td><td class="name">2.4 Seed script</td><td class="det"><code>scripts/seed.py</code>: the UI board's sample data (Fatma, caregivers Ahmed + Mona, people Ahmed / Sara / Dr. Hany / Mona, 3 reminders with today's logs, 3 places, device RMR-0007, a day of journal events, 1 receipt, 1 unknown-face cluster) + <b>test accounts</b>. Use <b>fixed UUIDs</b> so Flutter mocks and the real API share IDs.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p2-5" aria-label="2.5 done"></td><td class="name">2.5 Apply to Supabase</td><td class="det"><code>alembic upgrade head</code> with the Supabase URL, then run the seed.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p2-6" aria-label="2.6 done"></td><td class="name">2.6 Database users</td><td class="det">Supabase SQL editor: <code>remori_app</code> (read/write, no DDL) and <code>remori_readonly</code> (SELECT). The app uses <code>remori_app</code>.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p2-7" aria-label="2.7 done"></td><td class="name">2.7 Team access</td><td class="det">Give teammates the readonly connection string or dashboard access.</td></tr>
+  </tbody></table></div>
+  <div class="done"><b>Done when (M1):</b> every §6 table exists on Supabase with seed data, it's visible in pgAdmin and the dashboard, and the app connects as <code>remori_app</code>.</div>
+</section>
+
+<!-- Phase 3 -->
+<section class="phase" id="p3" data-phase="p3">
+  <div class="phase-head"><span class="num">Phase 3</span><h2>Auth and security core</h2><span class="prog" data-prog="p3"></span></div>
+  <p class="course">Course: users, hashing, JWT, protected routes, relationships (5:50–8:38) + study guide Parts 5 and 7.</p>
+  <div class="scroll"><table class="steps"><tbody>
+    <tr><td class="chk"><input type="checkbox" id="p3-1" aria-label="3.1 done"></td><td class="name">3.1 Errors</td><td class="det"><code>errors.py</code> domain exceptions + handlers → spec §7.5 shape.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p3-2" aria-label="3.2 done"></td><td class="name">3.2 Caregiver auth</td><td class="det"><code>POST /auth/register</code>, <code>/auth/login</code>, <code>/auth/refresh</code>, <code>/auth/logout</code>. pwdlib + PyJWT, 15-min access tokens, hashed refresh tokens.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p3-3" aria-label="3.3 done"></td><td class="name">3.3 Patients</td><td class="det"><code>POST /patients</code> (+ profile + consent records), <code>POST /patients/{id}/caregivers</code>.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p3-4" aria-label="3.4 done"></td><td class="name">3.4 Devices</td><td class="det"><code>POST /devices/pair</code> → device token (hashed in <code>devices.token_hash</code>), <code>POST /devices/{id}/heartbeat</code>.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p3-5" aria-label="3.5 done"></td><td class="name">3.5 Authorization</td><td class="det"><code>oauth2.py</code>: <code>get_current_user</code>, <code>get_current_device</code>, <b><code>require_patient_link</code></b>.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p3-6" aria-label="3.6 done"></td><td class="name">3.6 Tests</td><td class="det">Login and refresh flows, expired token, <b>caregiver A gets 404 on patient B</b>.</td></tr>
+  </tbody></table></div>
+  <div class="done"><b>Done when:</b> a seeded caregiver can log in, create a patient and pair a device, and the IDOR test passes.</div>
+</section>
+
+<!-- Phase 4 -->
+<section class="phase" id="p4" data-phase="p4">
+  <div class="phase-head"><span class="num">Phase 4</span><h2>First deploy</h2><span class="ms">M2</span><span class="prog" data-prog="p4"></span></div>
+  <p class="course">Course: Ubuntu VM deployment + Docker (12:05–14:08), with Caddy instead of nginx and Docker Compose instead of systemd.</p>
+  <div class="scroll"><table class="steps"><tbody>
+    <tr><td class="chk"><input type="checkbox" id="p4-1" aria-label="4.1 done"></td><td class="name">4.1 docker-compose.yml</td><td class="det"><code>api</code> + <code>caddy</code>. Caddy terminates HTTPS for the DuckDNS name and proxies to <code>api:8000</code>.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p4-2" aria-label="4.2 done"></td><td class="name">4.2 Server .env</td><td class="det">Supabase URL (as <code>remori_app</code>), JWT secret, S3 bucket name. Created by hand on the server, never committed.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p4-3" aria-label="4.3 done"></td><td class="name">4.3 Deploy procedure</td><td class="det"><code>ssh</code> → <code>cd ~/remori</code> → <code>git pull</code> → <code>docker compose up -d --build</code> → <code>alembic upgrade head</code> (in the api container) → smoke test. Document it in <code>backend-ai/README.md</code>.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p4-4" aria-label="4.4 done"></td><td class="name">4.4 Smoke test</td><td class="det"><code>https://&lt;name&gt;.duckdns.org/health</code> and <code>/docs</code>, plus a login with a seeded account.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p4-5" aria-label="4.5 done"></td><td class="name">4.5 Hand-over</td><td class="det">Give Flutter the base URL, test accounts and the seed's fixed IDs.</td></tr>
+  </tbody></table></div>
+  <div class="done"><b>Done when (M2):</b> the API answers over HTTPS and Flutter switches its auth repository to real.</div>
+</section>
+
+<!-- Phase 5 -->
+<section class="phase" id="p5" data-phase="p5">
+  <div class="phase-head"><span class="num">Phase 5</span><h2>All CRUD endpoints + AI stubs</h2><span class="ms">M3</span><span class="prog" data-prog="p5"></span></div>
+  <p class="course">Build in the order the Flutter screens need them (Caregiver Mode first). Deploy after every merged group so Flutter integrates screen by screen.</p>
+  <div class="scroll"><table class="steps">
+    <thead><tr><th></th><th>Group</th><th>Endpoints (spec §7.2)</th><th>Unlocks</th></tr></thead>
+    <tbody>
+    <tr><td class="chk"><input type="checkbox" id="p5-1" aria-label="5.1 done"></td><td class="name">5.1 People</td><td class="det"><code>GET/POST /patients/{id}/people</code> (multipart photos → S3), <code>PATCH/DELETE /people/{id}</code>, <code>POST /people/{id}/photos</code></td><td class="mono">C3 C4 C5 D6</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p5-2" aria-label="5.2 done"></td><td class="name">5.2 Reminders</td><td class="det">Reminders CRUD, <code>POST /patients/{id}/reminder-logs:batch</code></td><td class="mono">C8 C9 P2 P3</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p5-3" aria-label="5.3 done"></td><td class="name">5.3 Places</td><td class="det">Places CRUD</td><td class="mono">C10 C11</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p5-4" aria-label="5.4 done"></td><td class="name">5.4 Sync</td><td class="det"><code>GET /patients/{id}/sync?since=</code>: delta pull with <code>updated_at</code> / <code>deleted_at</code></td><td class="mono">relay, offline</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p5-5" aria-label="5.5 done"></td><td class="name">5.5 Journal + events</td><td class="det"><code>POST /patients/{id}/events:batch</code> (idempotent), <code>GET /patients/{id}/journal?date=</code></td><td class="mono">C12 P4 D4</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p5-6" aria-label="5.6 done"></td><td class="name">5.6 Uploads + media</td><td class="det"><code>POST /patients/{id}/uploads</code> (presigned URL), <code>POST /uploads/{id}/complete</code>, get / pin / delete media</td><td class="mono">C13 P5</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p5-7" aria-label="5.7 done"></td><td class="name">5.7 Documents</td><td class="det"><code>GET /patients/{id}/documents</code> (seeded documents)</td><td class="mono">C14 C15</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p5-8" aria-label="5.8 done"></td><td class="name">5.8 The rest</td><td class="det">Alerts + read, push token, mind-game sessions, unknown-faces list / promote / dismiss</td><td class="mono">C1 C2 C6 C7 P7–P9</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p5-9" aria-label="5.9 done"></td><td class="name">5.9 AI stubs</td><td class="det"><code>POST /patients/{id}/assist</code> → fixed answers (Abdelrahman's R6). <code>GET /patients/{id}/daily-summary</code> → seeded summary</td><td class="mono">P6 C17</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="rules">
+    <li>Stubs return <b>exactly</b> the spec §7.2 shape, through the same Pydantic schemas the real version will use.</li>
+    <li>Enrollment stores the person and photos. Face embeddings are filled in Phase 8.</li>
+    <li><code>uploads/{id}/complete</code> saves the record. The AI job it triggers arrives in Phases 7–8.</li>
+  </ul>
+  <div class="done"><b>Done when (M3):</b> every §7.2 endpoint answers on the deployed API, and Flutter runs every screen against it.</div>
+</section>
+
+<!-- Phase 6 -->
+<section class="phase" id="p6" data-phase="p6">
+  <div class="phase-head"><span class="num">Phase 6</span><h2>Celery + Redis foundation</h2><span class="ms">M4</span><span class="prog" data-prog="p6"></span></div>
+  <p class="course">Before starting: finish the study guide's Part B and its practice project. Follow CELERY_REDIS.md exactly.</p>
+  <div class="scroll"><table class="steps"><tbody>
+    <tr><td class="chk"><input type="checkbox" id="p6-1" aria-label="6.1 done"></td><td class="name">6.1 Compose</td><td class="det">Add <code>redis</code> (AOF on), <code>worker</code>, <code>beat</code> (exactly one), <code>flower</code> (internal only).</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p6-2" aria-label="6.2 done"></td><td class="name">6.2 celery_app.py</td><td class="det">The settings from CELERY_REDIS.md §3, the 3 queues, the Beat schedule.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p6-3" aria-label="6.3 done"></td><td class="name">6.3 First real task</td><td class="det"><code>alerts.evaluate</code> (missed meds, device offline, low battery) on seeded data. Simple, no AI.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p6-4" aria-label="6.4 done"></td><td class="name">6.4 Second task</td><td class="det"><code>retention.expire_media</code> (spec §8).</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p6-5" aria-label="6.5 done"></td><td class="name">6.5 Tests</td><td class="det">Idempotency (run twice → one result), failure → retry → <code>failed</code>.</td></tr>
+  </tbody></table></div>
+  <div class="done"><b>Done when (M4):</b> workers and Beat run on EC2, and alerts appear in C2 by themselves.</div>
+</section>
+
+<!-- Phase 7 -->
+<section class="phase" id="p7" data-phase="p7">
+  <div class="phase-head"><span class="num">Phase 7</span><h2>Ambient memory pipeline</h2><span class="ms">M5</span><span class="prog" data-prog="p7"></span></div>
+  <p class="course">Spec §7.3, AI_LAYER.md.</p>
+  <div class="scroll"><table class="steps"><tbody>
+    <tr><td class="chk"><input type="checkbox" id="p7-1" aria-label="7.1 done"></td><td class="name">7.1 STT client</td><td class="det"><code>ai/clients/stt.py</code> with a timeout + <code>TransientError</code>.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p7-2" aria-label="7.2 done"></td><td class="name">7.2 Task transcribe</td><td class="det">Audio from S3 → transcript → <code>conversation_segment</code> event with <code>present_person_ids</code> → <b>delete the audio</b>.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p7-3" aria-label="7.3 done"></td><td class="name">7.3 Task embed</td><td class="det"><code>ai/clients/embeddings.py</code> + <code>ai/rag/render.py</code>: each event rendered to a sentence and embedded.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p7-4" aria-label="7.4 done"></td><td class="name">7.4 Wire it</td><td class="det"><code>uploads/{id}/complete</code> for audio → enqueue <code>transcribe</code> after commit.</td></tr>
+  </tbody></table></div>
+  <div class="done"><b>Done when (M5):</b> a real recording from the phone shows up as a transcript in C12 / P4, and the audio is gone from S3.</div>
+</section>
+
+<!-- Phase 8 -->
+<section class="phase" id="p8" data-phase="p8">
+  <div class="phase-head"><span class="num">Phase 8</span><h2>Media AI + face enrollment</h2><span class="ms">M6</span><span class="prog" data-prog="p8"></span></div>
+  <div class="scroll"><table class="steps"><tbody>
+    <tr><td class="chk"><input type="checkbox" id="p8-1" aria-label="8.1 done"></td><td class="name">8.1 Face embedder</td><td class="det"><code>ai/inference/face.py</code>: the server-side face model (model file inside backend-ai, compatible with the edge per spec D14). Loaded once per process.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p8-2" aria-label="8.2 done"></td><td class="name">8.2 Enrollment</td><td class="det"><code>POST /people</code> computes embeddings, rejects photos with zero or several faces (C4 error state), and backfills seeded people.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p8-3" aria-label="8.3 done"></td><td class="name">8.3 Task review</td><td class="det">Blur non-enrolled faces → <code>ai/clients/vision.py</code> → keep / discard / tags / OCR → <code>captured_documents</code> + retention (spec §7.4, §8).</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p8-4" aria-label="8.4 done"></td><td class="name">8.4 Task cluster</td><td class="det">Unknown encounters → <code>ai/clustering.py</code> → caregiver alert at 3 distinct days.</td></tr>
+  </tbody></table></div>
+  <div class="done"><b>Done when (M6):</b> enrolled people sync to the glasses with real embeddings, and photos and documents are reviewed for real.</div>
+</section>
+
+<!-- Phase 9 -->
+<section class="phase" id="p9" data-phase="p9">
+  <div class="phase-head"><span class="num">Phase 9</span><h2>Phase 2 AI: replace the stubs</h2><span class="ms">M7</span><span class="prog" data-prog="p9"></span></div>
+  <div class="scroll"><table class="steps"><tbody>
+    <tr><td class="chk"><input type="checkbox" id="p9-1" aria-label="9.1 done"></td><td class="name">9.1 Real /assist</td><td class="det">Wire in Abdelrahman's R4 + R5: <code>ai/rag/retriever.py</code> + <code>answer.py</code>, hybrid retrieval (time window + pgvector) → LLM.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p9-2" aria-label="9.2 done"></td><td class="name">9.2 Real summaries</td><td class="det">Task <code>summaries.generate_due</code> with Abdelrahman's R7 prompt: nightly summaries + patterns per patient timezone.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p9-3" aria-label="9.3 done"></td><td class="name">9.3 Push alerts</td><td class="det"><code>integrations/fcm.py</code>: alerts and daily-summary pushes to caregivers.</td></tr>
+  </tbody></table></div>
+  <div class="done"><b>Done when (M7):</b> no AI stubs remain.</div>
+</section>
+
+<!-- Phase 10 -->
+<section class="phase" id="p10" data-phase="p10">
+  <div class="phase-head"><span class="num">Phase 10</span><h2>Hardening for the demo</h2><span class="ms">M8</span><span class="prog" data-prog="p10"></span></div>
+  <div class="scroll"><table class="steps"><tbody>
+    <tr><td class="chk"><input type="checkbox" id="p10-1" aria-label="10.1 done"></td><td class="name">10.1 Logging</td><td class="det">Structured logs with <code>request_id</code>, carried into tasks. No personal content in logs.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p10-2" aria-label="10.2 done"></td><td class="name">10.2 Limits</td><td class="det">Rate limits on AI tasks, timeouts everywhere, errors visible in Flower and the logs.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p10-3" aria-label="10.3 done"></td><td class="name">10.3 Security review</td><td class="det">IDOR tests on every patient router. Confirm Supabase's Data API is off and RLS is on.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p10-4" aria-label="10.4 done"></td><td class="name">10.4 Backups</td><td class="det"><code>pg_dump</code> before every demo. Consider Supabase Pro for the evaluation period.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p10-5" aria-label="10.5 done"></td><td class="name">10.5 Freeze</td><td class="det">No schema or contract changes in the last week before the demo.</td></tr>
+  </tbody></table></div>
+</section>
+
+<section class="phase" aria-labelledby="open-title">
+  <div class="phase-head"><h2 id="open-title">Open questions (ask the lead)</h2></div>
+  <div class="scroll"><table>
+    <thead><tr><th>When</th><th>Question</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">Phase 0</td><td>EC2 instance size, and whether to resize or add swap before Phase 6</td></tr>
+      <tr><td class="mono">Phase 5.5</td><td>Pagination for the journal and lists (not in the spec)</td></tr>
+      <tr><td class="mono">Phase 8</td><td>How the server's face model file gets onto EC2 (in the image, or downloaded from S3 at startup)</td></tr>
+      <tr><td class="mono">Phase 4+</td><td>When to automate deploys (currently manual by choice)</td></tr>
+      <tr><td class="mono">R, before start</td><td>Which LLM provider Abdelrahman uses for experiments, and a monthly spending cap</td></tr>
+      <tr><td class="mono">R3</td><td>Time parsing: hand-written rules for Egyptian Arabic time phrases, or LLM extraction</td></tr>
+      <tr><td class="mono">R4, R5</td><td>The interface. Suggested: <code>retrieve(patient_id, question, now, timezone) → events</code> and <code>answer(question, events, language) → {answer, language, source_event_ids}</code></td></tr>
+      <tr><td class="mono">R4, R5</td><td>The evaluation score that counts as good enough to replace the <code>/assist</code> stub</td></tr>
+      <tr><td class="mono">R → 9.1</td><td>Whether to move real <code>/assist</code> up to right after Phase 7 (it only needs the database and event embeddings)</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<footer>Source: <code>backend-ai/docs/DEVELOPMENT_PLAN.md</code>. Remori graduation project, Mansoura University.</footer>
+</div>
+
+<script>
+(function(){
+  var KEY='remori-backend-plan-v1';
+  var state={};
+  try{ state=JSON.parse(localStorage.getItem(KEY)||'{}')||{}; }catch(e){ state={}; }
+  var boxes=Array.prototype.slice.call(document.querySelectorAll('.steps input[type=checkbox]'));
+  function save(){ try{ localStorage.setItem(KEY,JSON.stringify(state)); }catch(e){} }
+  function render(){
+    var per={}, done=0;
+    boxes.forEach(function(b){
+      var ph=b.id.split('-')[0];
+      per[ph]=per[ph]||{d:0,t:0}; per[ph].t++;
+      b.checked=!!state[b.id];
+      var row=b.closest('tr'); if(row){ row.classList.toggle('is-done',b.checked); }
+      if(b.checked){ per[ph].d++; done++; }
+    });
+    document.querySelectorAll('[data-prog]').forEach(function(el){
+      var p=per[el.getAttribute('data-prog')]; if(!p) return;
+      el.textContent=p.d+'/'+p.t; el.classList.toggle('full',p.d===p.t);
+    });
+    var tot=document.getElementById('total-prog');
+    if(tot){ tot.textContent=done+' of '+boxes.length+' steps done'; }
+  }
+  boxes.forEach(function(b){
+    b.addEventListener('change',function(){ if(b.checked){ state[b.id]=true; } else { delete state[b.id]; } save(); render(); });
+  });
+  var reset=document.getElementById('reset');
+  if(reset){ reset.addEventListener('click',function(){ state={}; save(); render(); }); }
+  render();
+})();
+</script>

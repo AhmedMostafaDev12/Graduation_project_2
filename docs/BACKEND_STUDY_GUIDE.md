@@ -245,7 +245,7 @@ backend-ai/app/
 | **Security groups** (AWS's firewall) | Only 443/80 public, Postgres and Redis private |
 | **S3** buckets, private by default | Media + audio (Part E) |
 | **IAM roles** for EC2 (no access keys in `.env`) | The server talks to S3 securely |
-| *(Option)* **RDS** for Postgres | vs. Postgres in a container |
+| **Supabase** as hosted Postgres (spec D25): connection strings + SSL, session pooler, turning off the Data API, RLS as a safety net, free-tier pausing | Production database. Everything else stays on AWS |
 | Free-tier / credits limits | AWS changed new-account free tier in 2025, so check your account |
 
 🔎 **Study / search:** AWS docs → *"Get started with Amazon EC2"*, *"IAM roles for Amazon EC2"*, *"Security groups"*. Search: `deploy fastapi docker compose ec2`
@@ -257,7 +257,7 @@ backend-ai/app/
 
 ✅ **Course covered:** Dockerfile, Compose, Postgres container.
 
-➕ **Missing for Remori:** Compose with **more services**: `api`, `worker` (Celery, same image, different command), `beat` (Celery Beat, exactly one), `flower` (monitoring), `redis` (with AOF persistence enabled), `postgres` (with the `pgvector/pgvector` image). Health checks, plus `depends_on` with `condition: service_healthy`.
+➕ **Missing for Remori:** Compose with **more services**: `api`, `worker` (Celery, same image, different command), `beat` (Celery Beat, exactly one), `flower` (monitoring), `redis` (with AOF persistence enabled). Locally, a dev Compose file adds `postgres` (the `pgvector/pgvector:pg16` image); in production the database is Supabase, set by `DATABASE_URL`. Health checks, plus `depends_on` with `condition: service_healthy`.
 
 🔎 **Study / search:** `docker compose healthcheck depends_on condition`, `pgvector docker image`, `redis docker persistence appendonly`
 
