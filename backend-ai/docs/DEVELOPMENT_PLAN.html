@@ -196,14 +196,18 @@ html{scroll-behavior:smooth}
   <div class="phase-head"><span class="num">Phase 3</span><h2>Auth and security core</h2><span class="prog" data-prog="p3"></span></div>
   <p class="course">Course: users, hashing, JWT, protected routes, relationships (5:50–8:38) + study guide Parts 5 and 7.</p>
   <div class="scroll"><table class="steps"><tbody>
+    <tr><td class="chk"><input type="checkbox" id="p3-0" aria-label="3.0 done"></td><td class="name">3.0 Provider setup (you)</td><td class="det"><b>Google Cloud:</b> OAuth consent screen + client IDs (Android: package name + signing SHA-1; iOS; web). <b>Facebook Developers:</b> app with Facebook Login, Android key hash, privacy-policy URL, data-deletion instructions. IDs and secret go in <code>.env</code>.</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p3-1" aria-label="3.1 done"></td><td class="name">3.1 Errors</td><td class="det"><code>errors.py</code> domain exceptions + handlers → spec §7.5 shape.</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p3-2" aria-label="3.2 done"></td><td class="name">3.2 Caregiver auth</td><td class="det"><code>POST /auth/register</code>, <code>/auth/login</code>, <code>/auth/refresh</code>, <code>/auth/logout</code>. pwdlib + PyJWT, 15-min access tokens, hashed refresh tokens.</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p3-3" aria-label="3.3 done"></td><td class="name">3.3 Patients</td><td class="det"><code>POST /patients</code> (+ profile + consent records), <code>POST /patients/{id}/caregivers</code>.</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p3-4" aria-label="3.4 done"></td><td class="name">3.4 Devices</td><td class="det"><code>POST /devices/pair</code> → device token (hashed in <code>devices.token_hash</code>), <code>POST /devices/{id}/heartbeat</code>.</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p3-5" aria-label="3.5 done"></td><td class="name">3.5 Authorization</td><td class="det"><code>oauth2.py</code>: <code>get_current_user</code>, <code>get_current_device</code>, <b><code>require_patient_link</code></b>.</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p3-6" aria-label="3.6 done"></td><td class="name">3.6 Tests</td><td class="det">Login and refresh flows, expired token, <b>caregiver A gets 404 on patient B</b>.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p3-7" aria-label="3.7 done"></td><td class="name">3.7 Social sign-in</td><td class="det">Migration <code>0002</code>: <code>auth_identities</code>. <code>POST /auth/google</code> and <code>POST /auth/facebook</code> verify the provider token on the server, then find, link or create the caregiver. <code>409 ACCOUNT_EXISTS</code> for an unverified matching email (spec D26).</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p3-8" aria-label="3.8 done"></td><td class="name">3.8 Connected accounts</td><td class="det"><code>GET /auth/identities</code>, <code>POST</code>/<code>DELETE /auth/link/{provider}</code>, <code>409 LAST_SIGN_IN_METHOD</code> (screen C20).</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p3-9" aria-label="3.9 done"></td><td class="name">3.9 Social sign-in tests</td><td class="det">Google and Facebook verification <b>mocked</b>: new user, linked Google, Facebook conflict, token for another app rejected, expired token rejected, last method can't be removed.</td></tr>
   </tbody></table></div>
-  <div class="done"><b>Done when:</b> a seeded caregiver can log in, create a patient and pair a device, and the IDOR test passes.</div>
+  <div class="done"><b>Done when:</b> a seeded caregiver can log in with email + password, a tester can sign in with Google and with Facebook, a caregiver can create a patient and pair a device, and the IDOR test passes.</div>
 </section>
 
 <!-- Phase 4 -->

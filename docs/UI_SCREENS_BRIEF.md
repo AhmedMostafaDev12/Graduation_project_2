@@ -22,9 +22,9 @@ The glasses do the talking. The app never replaces them.
 - **Frames:** every screen is an **Android phone frame** (portrait, ~9:19.5) of the same size, with a **label above it**: `ID · Screen name` (e.g. `C4 · Add person`).
 - **Sections:** four horizontal bands, each with a large title at the top left:
   1. **A · Onboarding & pairing** (6 screens)
-  2. **B · Caregiver Mode** (19 screens, in two rows)
+  2. **B · Caregiver Mode** (20 screens, in two rows)
   3. **C · Patient Mode** (9 screens)
-  4. **D · System notifications & global states** (6 frames)
+  4. **D · System notifications & global states** (7 frames)
 - **Flow arrows:** thin gray arrows only for the main flows listed in §7.
 - **Language:** draw **Patient Mode in Arabic (RTL)** and **Caregiver Mode in English (LTR)**, to show the app supports both. Every screen exists in both languages in the real app.
 - **Sample data:** use only the sample data in §6, so screens look consistent across the board.
@@ -55,8 +55,8 @@ The glasses do the talking. The app never replaces them.
 | ID | Screen | Must show | Data |
 |---|---|---|---|
 | A1 | Welcome / mode select | Remori logo + tagline. Two large buttons: **"I'm a caregiver"** and **"This is the patient's phone"** | — |
-| A2 | Caregiver login | Email, password, Log in, "Create account" link, "Forgot password?" | `POST /auth/login` |
-| A3 | Caregiver sign-up | Full name, email, phone, password, Create account | `POST /auth/register` |
+| A2 | Caregiver login | **Continue with Google** and **Continue with Facebook** buttons (official brand styles) at the top, an "or" divider, then email, password, Log in, "Forgot password?", "Create account" link | `POST /auth/google`, `POST /auth/facebook`, `POST /auth/login` (spec D26) |
+| A3 | Caregiver sign-up | **Sign up with Google** / **Sign up with Facebook** buttons, an "or" divider, then full name, email, phone, password, Create account | `POST /auth/google`, `POST /auth/facebook`, `POST /auth/register` |
 | A4 | Create patient profile + consent | Patient full name, date of birth (optional), preferred language (Arabic / English), timezone (default Africa/Cairo). **Consent checkboxes:** "Household agrees to conversation memory (audio is deleted after transcription)", "Allow cloud AI processing". Continue | `POST /patients`, `consent_records` |
 | A5 | Pair glasses | Step 1: "Scan the QR code on the glasses case" (camera viewfinder). Step 2: progress "Connecting securely…". Step 3: success, "Glasses paired · Serial RMR-0007" | `POST /devices/pair` |
 | A6 | Permissions + hand-over | Checklist with grant buttons: Bluetooth, Notifications, Location ("for 'Where am I?'"), Background activity. Final button: **"Give phone to patient → Patient Mode"** | Android permissions |
@@ -82,8 +82,9 @@ The glasses do the talking. The app never replaces them.
 | C15 | Document detail | Photo, extracted fields as a key-value list, full OCR text (collapsible), date | `captured_documents` |
 | C16 | Device | Glasses card: serial, firmware, battery, last seen, connection status. **Memory capture master switch** (`memory_capture_enabled`) with an explanation. Re-pair, Unpair (confirm) | `devices`, `patient_profiles` |
 | C17 | Daily summary *(Phase 2)* | Date selector, AI summary paragraph, pattern tiles: **Medication adherence 92%**, **Visits 3**, **Talk time 2 h 20 m**, "Routine change" note if any. Label "Generated nightly" | `GET /patients/{id}/daily-summary?date=` |
-| C18 | More / settings | Sections: Patient profile (name, language, timezone) · Caregivers → C19 · Consent records (list with date, revoke) · Saved places → C10 · Documents → C14 · Device → C16 · My account · Log out | various |
+| C18 | More / settings | Sections: Patient profile (name, language, timezone) · Caregivers → C19 · Consent records (list with date, revoke) · Saved places → C10 · Documents → C14 · Device → C16 · My account · **Connected accounts → C20** · Log out | various |
 | C19 | Caregivers & invite | Linked caregivers: name, relationship, **Primary** badge, permission (**Viewer** / **Manager**). Invite form: email + relationship + permission → Send invite | `POST /patients/{id}/caregivers` |
+| C20 | Connected accounts | One row per sign-in method: **Google** (connected: email shown, **Disconnect**), **Facebook** (not connected: **Connect**), **Email + password** (set / change password). Note: "Keep at least one way to sign in": the last remaining method has no Disconnect button | `GET /auth/identities`, `POST`/`DELETE /auth/link/{provider}` (spec D26) |
 
 ### C · Patient Mode (Arabic, RTL on the board)
 
@@ -109,6 +110,7 @@ The glasses do the talking. The app never replaces them.
 | D4 | Offline / syncing banner | Caregiver Journal with top banner "Offline · 12 items waiting to sync" |
 | D5 | Glasses disconnected | Patient Today with a gentle banner "النضارة مش متوصلة" (glasses not connected) + "Try again" |
 | D6 | Empty state | Caregiver People list empty: illustration + "Add the first person your patient should recognize" + button |
+| D7 | Account already exists | A2 after "Continue with Facebook" with an email that already has an account: message "An account with this email already exists. Sign in with Google or your email, then connect Facebook in Connected accounts." + buttons: Continue with Google / Log in with email | `409 ACCOUNT_EXISTS` (spec D26) |
 
 ---
 
@@ -138,7 +140,8 @@ The glasses do the talking. The app never replaces them.
 
 ## 7. Flows to draw as arrows
 
-1. A1 → A2 → C1 (caregiver login)
+1. A1 → A2 → C1 (caregiver login: Google, Facebook or email)
+8. C18 → C20 (connected accounts) and A2 → D7 (Facebook email already used)
 2. A1 → A2 → A4 → A5 → A6 → P1 (first setup on the patient's phone)
 3. C3 → C4, and C3 → C6 → C7 (enroll / review unknown face)
 4. C8 → C9 (create reminder) and D2 → P3 (reminder notification → full screen)
@@ -181,13 +184,14 @@ The glasses do the talking. The app never replaces them.
 | User-requested recording | C12, C13, P4, P5 |
 | Privacy controls + retention | A4, C13 (expiry, pin, delete), C16, C18 (consent), P5 |
 | Device pairing + status | A5, A6, C1, C16, D1, D5 |
+| Caregiver sign-in: Google, Facebook, email (D26) | A2, A3, C20, D7 |
 | Alerts | C1, C2, D3 |
 | Mind games | P7, P8, P9 |
 | Daily summary / insights (Phase 2) | C1, C17 |
 | Multiple caregivers | C1 (switcher), C19 |
 | Offline-first | D4, D5 |
 
-**Total: 6 + 19 + 9 + 6 = 40 frames.**
+**Total: 6 + 20 + 9 + 7 = 42 frames.**
 
 ---
 

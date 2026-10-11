@@ -11,7 +11,8 @@ The Flutter app and the backend are built in parallel by different people. They 
 | Endpoints, methods, paths | spec §7.2 |
 | Request/response JSON shapes | spec §7.2 examples + §6 column names; after the API runs, FastAPI's OpenAPI at `/docs` and `/openapi.json` |
 | Error shape | spec §7.5: `{"error": {"code": "PERSON_NOT_FOUND", "message": "..."}}` |
-| Auth | Caregiver: `Authorization: Bearer <JWT>` (+ refresh token). Patient phone: device token. Spec §7.2 |
+| Auth | Caregiver signs in with **Google, Facebook or email + password** (spec D26), then always uses Remori's own `Authorization: Bearer <JWT>` (+ refresh token). Patient phone: device token. Spec §7.2 |
+| Social sign-in | The app sends the provider's token (Google **ID token**, Facebook **access token**) to `/auth/google` or `/auth/facebook`. It never sends a name or email of its own: the backend reads them from the verified token |
 | Base path | `/api/v1` |
 
 **Conventions both sides follow:**

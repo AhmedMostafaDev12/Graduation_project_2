@@ -114,6 +114,16 @@ erDiagram
     USERS ||--o| PATIENT_PROFILES : "profile"
     USERS ||--o{ CAREGIVER_PATIENT_LINKS : "as caregiver"
     USERS ||--o{ CAREGIVER_PATIENT_LINKS : "as patient"
+    AUTH_IDENTITIES {
+        uuid id PK
+        uuid user_id FK
+        enum provider "google | facebook"
+        text provider_subject "UNIQUE with provider"
+        text email "nullable"
+        bool email_verified
+        timestamptz last_used_at "nullable"
+    }
+    USERS ||--o{ AUTH_IDENTITIES : "signs in with (D26)"
     USERS ||--o{ REFRESH_TOKENS : "sessions"
     USERS ||--o{ PUSH_TOKENS : "notified on"
     USERS ||--o{ DEVICES : "wears"

@@ -420,3 +420,41 @@ sequenceDiagram
     W-->>CApp: FCM push
     Note over Cron,W: Other cron jobs: retention expiry hourly, device_offline from heartbeat gaps, low_battery from telemetry
 ```
+
+---
+
+## 3.13 Caregiver sign-in with Google or Facebook (D26)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor CG as Caregiver
+    participant App as Flutter app
+    participant P as Google / Facebook
+    participant API
+    participant DB
+
+    CG->>App: Tap "Continue with Google" (or Facebook)
+    App->>P: Provider sign-in screen
+    P-->>App: Google ID token / Facebook access token
+    App->>API: POST /auth/google {id_token} or /auth/facebook {access_token}
+    alt Google
+        API->>API: Verify signature with Google's public keys, audience = our client IDs, not expired
+    else Facebook
+        API->>P: debug_token with our app credentials, then GET /me (id, name, email)
+        P-->>API: Valid for our app + profile
+    end
+    API->>DB: Find auth_identities (provider, subject)
+    alt Already connected
+        API->>DB: Update last_used_at
+    else Verified email matches an existing caregiver (Google)
+        API->>DB: Insert auth_identities for that caregiver (linked)
+    else Facebook email matches an existing caregiver
+        API-->>App: 409 ACCOUNT_EXISTS
+        App->>CG: "Sign in the usual way, then connect Facebook in Connected accounts"
+    else New person
+        API->>DB: Insert caregiver user (no password) + auth_identities
+    end
+    API->>DB: Store hashed refresh token
+    API-->>App: Remori access token (15 min) + refresh token
+```

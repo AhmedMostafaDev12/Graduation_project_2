@@ -37,6 +37,7 @@ Decisions taken in the 2026-10-03 design session. **P** = product decision by th
 | D23 | **Unknown faces** are clustered in the cloud. The caregiver is asked once a cluster is seen on **≥3 different days** (configurable). | T |
 | D24 | **Privacy controls:** a visible listening LED, a "pause memory" button gesture, household consent, BLE bonding, encryption at rest on the glasses, an audit log (§9). | T |
 | D25 | **Database on Supabase, everything else on AWS.** Supabase hosts PostgreSQL 16 + pgvector (EU / Frankfurt region), used **only as plain Postgres**: no Supabase Auth, no auto-generated Data API (PostgREST), no Supabase Storage. API, workers, Redis and S3 stay on AWS. Local development uses Docker `pgvector/pgvector:pg16`. Moving to RDS later = dump + restore, no code change. | P |
+| D26 | **Caregiver sign-in: Google, Facebook, or email + password (no OTP).** Flutter uses `google_sign_in` and `flutter_facebook_auth`. The backend verifies the provider token itself (Google ID token: Google's public keys, audience = our client IDs, `email_verified`; Facebook access token: Graph API `debug_token` with our app credentials), then issues **Remori's own** JWT + refresh tokens. An existing account is linked automatically only when the provider says the email is verified (Google). A Facebook email matching an existing account is **not** linked: the caregiver signs in the usual way and connects Facebook in Connected accounts (C20). Patients are unchanged (device token). | P |
 
 ---
 
@@ -229,6 +230,19 @@ caregiver_patient_links (
 
 refresh_tokens (id UUID PK, user_id FK -> users, token_hash TEXT, expires_at, revoked_at NULLABLE)
 push_tokens    (id UUID PK, user_id FK -> users, fcm_token TEXT, updated_at)
+
+auth_identities (                     -- Google / Facebook sign-in connections (D26)
+  id UUID PK,
+  user_id UUID FK -> users,
+  provider ENUM('google','facebook'),
+  provider_subject TEXT,              -- Google 'sub' / Facebook user id
+  email TEXT NULLABLE,                -- as reported by the provider
+  email_verified BOOLEAN,
+  created_at TIMESTAMPTZ,
+  last_used_at TIMESTAMPTZ NULLABLE,
+  UNIQUE (provider, provider_subject),
+  UNIQUE (user_id, provider)          -- at most one Google and one Facebook per caregiver
+)
 
 devices (
   id UUID PK,
@@ -527,11 +541,15 @@ The link uses LE Secure Connections bonding. **Video** goes over a Wi-Fi burst: 
 
 ### 7.2 Phone ↔ Backend (REST, FastAPI)
 
-Base `/api/v1`. Auth: JWT access (15 min) + refresh token for caregivers. A device token for the patient's phone, which acts on behalf of its patient. **Every `/patients/{id}/...` route checks that the caller is linked to that patient** (caregiver link, or the device token's patient).
+Base `/api/v1`. Auth: JWT access (15 min) + refresh token for caregivers, who sign in with Google, Facebook or email + password (D26). A device token for the patient's phone, which acts on behalf of its patient. **Every `/patients/{id}/...` route checks that the caller is linked to that patient** (caregiver link, or the device token's patient).
 
 | Method | Path | Purpose |
 |---|---|---|
 | POST | `/auth/register` | Caregiver sign-up |
+| POST | `/auth/google` | Sign in or sign up with a Google ID token → tokens |
+| POST | `/auth/facebook` | Sign in or sign up with a Facebook access token → tokens. `409 ACCOUNT_EXISTS` when the email belongs to another account |
+| GET | `/auth/identities` | The caregiver's connected Google / Facebook accounts |
+| POST / DELETE | `/auth/link/{provider}` | Connect / disconnect Google or Facebook. `409 LAST_SIGN_IN_METHOD` when it would leave no way to sign in |
 | POST | `/auth/login` · `/auth/refresh` · `/auth/logout` | Session |
 | POST | `/patients` | Caregiver creates a patient (+ profile) |
 | POST | `/patients/{id}/caregivers` | Invite / link another caregiver |
@@ -615,6 +633,7 @@ Ambient listening is the core feature, so it has to be defensible. Egyptian law 
 - **Consent:** caregiver records household consent (`ambient_audio_household`) and per-person face consent at enrollment. `memory_capture_enabled` is a caregiver master switch.
 - **Minimization:** only speech segments leave the device. Raw audio is deleted after STT. Non-enrolled faces are blurred before any third-party vision call. Bystander photos expire after 30 days.
 - **Hosting:** the database is on Supabase (EU region), media in a private S3 bucket, compute on EC2. Supabase's Data API is disabled and RLS is on, so data is reachable only through FastAPI (§5.1).
+- **Sign-in (D26):** Google and Facebook tokens are verified on the server (signature, audience = our app, expiry). The client's claimed email is never trusted. Unverified emails are never linked to existing accounts.
 - **Security:** BLE LE Secure Connections bonding. Glasses storage encrypted (key provisioned at pairing). TLS everywhere. Private S3 with short-lived signed URLs. Every media view/delete goes into `audit_log`. Patient-link authorization on every route.
 - **Report:** the graduation report includes an ethics/privacy section built from this list.
 
@@ -634,7 +653,7 @@ Ambient listening is the core feature, so it has to be defensible. Egyptian law 
   Platform code lives behind one interface (`RelayService`) in `core/relay/`, with an `android/` implementation now and an `ios/` one later. The rest of the app never knows which one it's on.
   **iOS builds need a Mac + an Apple Developer account** for device installs. Without a Mac, a CI service (e.g. Codemagic) can build the app, but an account is still needed to install it on an iPhone.
 - **State:** Riverpod. **Navigation:** GoRouter, two shells:
-  - Caregiver → email/password → Caregiver shell (dashboard + alerts, people, unknown-face review, reminders, places, device, activity log + media, documents, AI summaries).
+  - Caregiver → Google / Facebook / email + password (D26) → Caregiver shell (dashboard + alerts, people, unknown-face review, reminders, places, device, activity log + media, documents, AI summaries).
   - Patient → device-token auto-login → Patient shell (today, reminders, journal recall, ask, mind games). Large type, high contrast, Arabic-first RTL.
 - **Background (Android relay):** a **foreground service** (persistent notification "Remori is connected") runs the BLE link, the outbox uploader, reminder sync + local notifications, and GPS for `where_am_i`.
 - **Reminders (D6):** the app expands RRULEs into `reminder_logs` for the next 48 h, schedules a local notification for each (with *Taken* / *Later* actions), lists them in the Reminders section, and pushes them to the glasses with `sync_reminders`. The glasses fire independently, and state changes on either side merge by the §7.1 rule.

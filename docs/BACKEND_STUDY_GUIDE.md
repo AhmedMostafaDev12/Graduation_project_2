@@ -126,13 +126,15 @@ Everything else is a small extension of what the course taught.
 | Topic | Where Remori uses it |
 |---|---|
 | **Refresh tokens** (long-lived, stored hashed, rotated) + **revocation** / logout | Caregiver sessions: `/auth/refresh`, `/auth/logout`, `refresh_tokens` table |
+| **Sign in with Google / Facebook** (spec D26): verify a Google **ID token** (`google-auth`: signature, audience, `email_verified`) and a Facebook token (Graph API `debug_token`), then issue **your own** JWTs | `POST /auth/google`, `/auth/facebook`, Connected accounts |
 | Short access-token lifetime (15 min) | Spec §7.2 |
 | **A second kind of principal: the device token** (not a user password) | Patient's phone auto-login. `devices.token_hash` |
 | Roles (`patient` / `caregiver`) + permission levels (`viewer` / `manager`) | `caregiver_patient_links.permission` |
 
 🔎 **Study / search**
 - FastAPI docs → *"OAuth2 with Password (and hashing), Bearer with JWT tokens"* (current version, uses PyJWT)
-- Search: `refresh token rotation`, `jwt refresh token revocation database`, `api key authentication fastapi`, `OWASP authentication cheat sheet`
+- Google docs → *"Authenticate with a backend server"* (verifying Google ID tokens). Meta docs → *"Manually Build a Login Flow"* → inspecting access tokens with `debug_token`
+- Search: `refresh token rotation`, `verify google id token python`, `facebook debug_token`, `account linking oauth verified email`, `jwt refresh token revocation database`, `api key authentication fastapi`, `OWASP authentication cheat sheet`
 
 ---
 
