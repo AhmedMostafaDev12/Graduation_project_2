@@ -28,6 +28,15 @@ ruff check .
 pytest -q
 ```
 
+Database tests run the migration and the seed against a real Postgres: start the Docker stack first. They create and use a separate `remori_test` database, so your local data is untouched. Without the database they're skipped.
+
+## Database
+
+```bash
+alembic upgrade head          # create / update the schema
+python -m scripts.seed        # sample data (docs/SEED_DATA.md)
+```
+
 ## Configuration
 
 Copy `.env.example` to `.env` for running outside Docker. Never commit `.env`. Production values (Supabase, secrets) live only on the server. See [docs/DATABASE.md](docs/DATABASE.md).
