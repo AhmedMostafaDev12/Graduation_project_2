@@ -34,6 +34,9 @@ def migrated(database_url):
     engine = create_engine(database_url)
     yield engine
     engine.dispose()
+    # The last test downgrades to nothing: put the schema back for the test files after this one
+    restore = _run(["alembic", "upgrade", "head"], database_url)
+    assert restore.returncode == 0, restore.stderr
 
 
 def _scalar(engine, sql: str):
