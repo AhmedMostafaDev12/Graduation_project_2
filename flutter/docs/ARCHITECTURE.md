@@ -1,0 +1,90 @@
+# flutter — Architecture
+
+Source of truth: [`REMORI_SPEC.md`](../../REMORI_SPEC.md) §10 (decisions D6, D8). Diagrams: `docs/diagrams/01-architecture.md` §1.7–1.8.
+
+---
+
+## 1. Stack (decided in the spec)
+
+| Concern | Choice |
+|---|---|
+| State management | Riverpod |
+| Navigation | GoRouter with two shells: Caregiver and Patient |
+| HTTP | dio, one `ApiClient` for `/api/v1` |
+| Local database | drift (SQLite) |
+| Push | Firebase Cloud Messaging |
+| Platforms | Android + iOS. The glasses relay is Android-only in v1 |
+
+Adding any other package is a lead decision.
+
+---
+
+## 2. Folder map (feature-first)
+
+```
+flutter/
+├── lib/
+│   ├── main.dart
+│   ├── app.dart                 # MaterialApp.router, theme, localization
+│   ├── core/
+│   │   ├── api/                 # ApiClient (dio), auth interceptor, error mapping (spec §7.5)
+│   │   ├── db/                  # drift database, tables, outbox
+│   │   ├── sync/                # sync engine: upload outbox, delta pull (GET /sync?since=)
+│   │   ├── relay/               # RelayService interface + android/ (+ ios/ later): BLE, Wi-Fi burst, GPS
+│   │   ├── router/              # GoRouter: entry, caregiver shell, patient shell
+│   │   ├── theme/               # ThemeData, status colors, patient vs caregiver scales
+│   │   └── l10n/                # Arabic + English strings
+│   └── features/
+│       ├── auth/  device_pairing/  enrollment/  unknown_faces/  journal/
+│       ├── reminders/  places/  assistant/  mind_games/  caregiver_dashboard/
+│       └── <feature>/
+│           ├── data/            # repositories: <X>Repository (real) + Mock<X>Repository, DTOs
+│           ├── domain/          # entities (plain Dart), use cases if needed
+│           └── presentation/    # screens (named by screen ID), widgets, Riverpod providers
+├── test/
+└── pubspec.yaml
+```
+
+---
+
+## 3. Rules per layer
+
+| Layer | Rule |
+|---|---|
+| **presentation** | Widgets read Riverpod providers only. No dio, no SQL, no BLE calls in widgets. Screen files carry the UI brief ID (`c4_add_person_screen.dart`) |
+| **domain** | Plain Dart entities that match spec §6/§7.2 fields. No Flutter imports |
+| **data** | Repositories own data access: drift for reads, outbox for writes, ApiClient for sync. Each has a mock with the same interface |
+| **core/relay** | Everything platform-specific sits behind `RelayService`. The rest of the app never knows whether it's Android or iOS |
+
+---
+
+## 4. Offline-first flow
+
+1. The UI reads **only** from drift.
+2. A write goes to drift **and** to the outbox in one transaction, with a **client-generated UUID**.
+3. The sync engine uploads the outbox when online (idempotent batch endpoints), then delta-pulls `GET /patients/{id}/sync?since=<last>`.
+4. Conflicts follow spec rules (e.g. reminders: `completed` always wins, else latest timestamp).
+
+---
+
+## 5. Relay (patient's Android phone only)
+
+- An Android **foreground service** (persistent notification D1) runs the BLE link, outbox uploads, reminder sync + local notifications, and GPS for "Where am I?".
+- BLE messages are exactly spec §7.1. Adding or changing a message is a contract change (lead + hardware + Flutter).
+- The iOS relay is a stretch goal behind the same `RelayService` interface.
+
+---
+
+## 6. Mock → real switch
+
+- Each repository is provided by a Riverpod provider. A single configuration (build flag or provider override) picks mock or real **per repository**.
+- Mocks return the UI brief's sample data (§6) parsed through the **same** DTO classes as the real API, so a shape mismatch shows up in tests, not in production.
+- When the backend ships an endpoint, flip that repository to real. Screens don't change.
+
+---
+
+## 7. Testing
+
+- Unit tests for repositories (mock API + in-memory drift) and sync logic.
+- Widget tests for each screen, using mock repositories.
+- Patient Mode widget tests check the big-text / big-button rules and RTL layout.

@@ -159,84 +159,35 @@ Three tiers, each able to degrade gracefully if the next is unreachable.
 ## 5. Repository structure
 
 ```
-graduation-project/          # "remori" monorepo
-├── flutter/                 # Patient + Caregiver app (Android + iOS; relay on Android)
-├── backend-ai/              # FastAPI, Postgres/Alembic, Celery worker + Beat, RAG, AI API clients
-├── ml/                      # Shared face pipeline package, intent classifier, capture gate,
-│                            # training / quantization / evaluation notebooks
+graduation-project/          # "remori" monorepo. Start at AGENTS.md (orchestrator)
+├── AGENTS.md                # orchestrator: repo map, rules for everyone, open decisions
+├── flutter/                 # Patient + Caregiver app (Android + iOS; relay on Android). flutter/AGENTS.md
+├── backend-ai/              # FastAPI, Postgres/Alembic, Celery + Redis, and AI as software:
+│                            # AI API clients, RAG, vector search, local model inference. backend-ai/AGENTS.md
+├── ml/                      # low-level ML: training, datasets, notebooks, evaluation, export,
+│                            # exported models + model cards, shared face preprocessing. ml/README.md
 ├── hardware/
 │   ├── pi/                  # capture/, inference/, audio/, link/ (BLE + Wi-Fi), store/
 │   └── esp32/               # button, battery, LED, UART protocol, timekeeping
-└── docs/                    # this spec's companions: review, diagrams, contracts
+├── docs/                    # review, diagrams, UI brief, API contract, team workflow, study guide
+└── .github/workflows/       # CI: pull-request checks per area (docs/TEAM_WORKFLOW.md)
 ```
 
-The face pipeline in `ml/` (detector + alignment + MobileFaceNet + preprocessing, versioned) is imported by **both** `hardware/pi` and `backend-ai`. A parity test asserts that both produce the same embedding for the same image (D14).
+**AI split:** `backend-ai/app/ai/` holds everything that *uses* AI (API clients, RAG, vector search, inference wrappers that load exported models). `ml/` holds everything that *makes* models (training, evaluation, export) plus the exported files. The face preprocessing in `ml/face/` is shared by `hardware/pi` and `backend-ai`, and a parity test asserts both produce the same embedding for the same image (D14).
 
 ### 5.1 `backend-ai` architecture and conventions
 
-Study companion: [`docs/BACKEND_STUDY_GUIDE.md`](docs/BACKEND_STUDY_GUIDE.md).
+The backend follows the **freeCodeCamp FastAPI course layout** (`main.py`, `config.py`, `database.py`, `models.py`, `schemas.py`, `oauth2.py`, `utils.py`, `routers/`, Alembic, pytest, Docker), using current library versions. It adds only what the course doesn't cover: `services/` (logic shared by routes and Celery tasks), `errors.py`, `integrations/` (S3, FCM), `ai/` and `workers/` (Celery).
 
-**Layered architecture** (routers → services → models), not logic inside routes. API routes and Celery tasks call the **same services**.
+The detailed rules live next to the code:
 
-```
-backend-ai/
-├── app/
-│   ├── main.py          # app factory, routers, exception handlers, middleware
-│   ├── api/v1/          # routers: thin, HTTP only (parse → call service → respond)
-│   ├── services/        # business logic + transactions, shared by routes and tasks (sync SQLAlchemy)
-│   ├── repositories/    # optional: shared complex queries (pgvector search, journal windows)
-│   ├── models/          # SQLAlchemy 2.0 ORM tables (§6)
-│   ├── schemas/         # Pydantic v2 request/response models
-│   ├── workers/         # celery_app.py (config, queues, beat_schedule) + tasks/
-│   ├── clients/         # wrappers for STT, LLM, vision, embeddings, S3, FCM
-│   ├── core/            # config (pydantic-settings), db session, security, errors, logging
-│   └── deps.py          # get_db, get_current_user, get_device, require_patient_link
-├── alembic/             # migrations (first one: CREATE EXTENSION vector)
-├── tests/               # unit (services), api (TestClient), workers (idempotency)
-├── Dockerfile           # one image; `api` and `worker` differ only by command
-├── docker-compose.yml   # production: api · worker · beat · flower · redis (AOF on); DB = Supabase
-└── docker-compose.dev.yml  # local: + postgres (pgvector/pgvector:pg16) so dev never touches Supabase
-```
-
-| Layer | Rule |
+| Topic | Document |
 |---|---|
-| Routers | No SQL and no business rules. Validate with schemas, call one service, return a schema |
-| Services | Own the transaction. Raise **domain exceptions** (`PersonNotFound`, `NotLinkedToPatient`), never `HTTPException` |
-| Tasks | Thin like routers: receive IDs only (never ORM objects or bytes), call services. No logic of their own |
-| Clients | Every external call has a timeout. Transient failures (timeout, 429, 5xx) raise a `TransientError` that Celery retries with backoff. Per-provider load is capped with task `rate_limit` and worker concurrency |
-| Models | Loaded once per process (`lifespan` for the API, the `worker_process_init` signal for Celery), e.g. the ONNX face pipeline |
-
-**Authorization.** Every `/patients/{id}/…` router includes the `require_patient_link` dependency (caregiver link with sufficient `permission`, or the device token of that patient). A test asserts that caregiver A gets **404** on patient B's resources.
-
-**Errors.** Domain exceptions are mapped **once** in `main.py` to the §7.5 shape `{"error": {"code", "message"}}`. Status mapping: not found → 404, not linked → 404 (don't reveal existence), validation → 422, conflict → 409.
-
-**Background jobs (Celery + Redis).**
-- **Enqueue only after commit.** A task is sent after the DB transaction commits, otherwise the worker can run before the row exists.
-- **Delivery is at-least-once, so every task is idempotent:** check state before acting, use deterministic IDs + upserts, and do side effects (S3 delete, FCM push) only after the state commit.
-- **Duplicates:** Celery doesn't deduplicate by ID. Tasks use a deterministic `task_id` (`transcribe:{segment_id}`, `review:{media_id}`, `cluster:{encounter_id}`, `summary:{patient_id}:{date}`) for tracing, plus a short Redis lock (`SET NX` with TTL on the same key) so two copies never run at once. Idempotency stays the real guarantee.
-- **Reliability settings:** `task_acks_late=True`, `task_reject_on_worker_lost=True`, `worker_prefetch_multiplier=1`. Redis broker `visibility_timeout` > the longest task. Redis persistence (AOF) on.
-- **Retries:** `autoretry_for=(TransientError,)`, `retry_backoff=True`, `retry_jitter=True`, `max_retries=3`. When retries are exhausted, the task sets the row's `status = failed` and logs at error level.
-- **Results:** `task_ignore_result=True`. State lives in Postgres, so no result backend is needed.
-- **Queues:** `ai_io` (STT, vision, LLM, embeddings: I/O-bound, threads pool), `cpu` (face pipeline, clustering: prefork), `default` (retention, alerts). Phase 1 runs one worker consuming all three, and they're split into separate workers if load requires.
-- **Celery Beat** (separate process) schedules: retention expiry (hourly), alert rules (every 5 min), daily summaries (every 30 min; each patient's summary is generated once their local time passes 23:30). Exactly **one** Beat instance runs.
-- **Flower** dashboard for monitoring (internal only, behind auth).
-- FastAPI `BackgroundTasks` is **not** used for anything that must survive a restart.
-
-**Idempotent writes.** Batch endpoints use `INSERT … ON CONFLICT (id) DO NOTHING` and return `accepted` + `duplicates`.
-
-**Logging.** Structured JSON logs. Every request gets a `request_id` (middleware), which is passed into enqueued jobs so one upload can be traced API → Redis → worker. No transcript text, names or embeddings in logs.
-
-**Testing.** pytest with a real Postgres + pgvector test database (Docker). External AI APIs are mocked with `respx`. Every task has a "run it twice → one result" test. Tasks are unit-tested by calling them directly (eager mode), and there's one integration test with a real worker.
-
-**Config.** `pydantic-settings` with `.env` locally, GitHub Secrets in CI, and an **IAM role** on EC2 for S3 (no AWS keys in env files). `DATABASE_URL` points to local Docker in dev and to Supabase in production, and is the only thing that differs.
-
-**Database access (Supabase, D25).**
-- **Connection:** SQLAlchemy and Alembic use Supabase's **direct connection** or **session pooler** string with `sslmode=require`. Avoid the transaction pooler, which needs extra driver settings.
-- **Turn off the Data API** (PostgREST) in the Supabase project settings. Remori never uses it, and leaving it on would expose tables outside FastAPI's authorization. As a second guard, enable Row Level Security on every table with no policies, so the anon/authenticated roles can read nothing.
-- **Database users:** `postgres` (Supabase owner) for migrations only · `remori_app` for FastAPI + Celery (read/write data, no DDL) · `remori_readonly` for teammates (SELECT only).
-- **Team access:** the Supabase dashboard (table + SQL editor) or pgAdmin with the connection string. No tunnel is needed. Never commit connection strings.
-- **Development:** everyone works against local Docker Postgres with a seed script (the UI board's sample data). Alembic migrations are applied to local first, then to Supabase.
-- **Free-tier limits:** a free project pauses after about a week without activity and has a small database quota. Unpause from the dashboard, watch the size (embeddings and transcripts grow), and consider the Pro plan for the demo/evaluation period. Take a `pg_dump` before every demo, since free-tier backups are limited.
+| Folder map, "where does this code go", layer rules, authorization, errors, logging, testing | [`backend-ai/docs/ARCHITECTURE.md`](backend-ai/docs/ARCHITECTURE.md) |
+| AI layer (`app/ai/`) and its boundary with `ml/` | [`backend-ai/docs/AI_LAYER.md`](backend-ai/docs/AI_LAYER.md) |
+| Celery + Redis best practices: idempotency, retries, queues, Beat | [`backend-ai/docs/CELERY_REDIS.md`](backend-ai/docs/CELERY_REDIS.md) |
+| Local Postgres, Supabase (D25), Alembic, column conventions, seed data | [`backend-ai/docs/DATABASE.md`](backend-ai/docs/DATABASE.md) |
+| How backend and Flutter share the API contract | [`docs/API_CONTRACT.md`](docs/API_CONTRACT.md) |
 
 ---
 
@@ -717,7 +668,7 @@ Ambient listening is the core feature, so it has to be defensible. Egyptian law 
 ## 12. Build order
 
 0. **Hardware spike (week 1, parallel):** Pi Zero 2W at 1 fps with detector + MobileFaceNet (FPS, RAM, °C, mA). Real BLE throughput Pi→Android with a 50 KB JPEG and Opus audio. Wi-Fi burst via `WifiNetworkSpecifier`. I²S mic + speaker + Piper Arabic. **The results may revise D7/D18.**
-1. Scaffold the monorepo (§5). Rename `backend&AI` → `backend-ai`.
+1. Scaffold the monorepo (§5). ✅ `backend&AI` renamed to `backend-ai`, CI added, `AGENTS.md` files written.
 2. `backend-ai`: schema (§6) via Alembic, FastAPI skeleton, auth + patient-link authorization.
 3. `backend-ai`: people/enrollment (shared face pipeline), events batch, reminders, places, delta sync.
 4. `flutter`: app shell, GoRouter, drift, ApiClient, caregiver auth.
