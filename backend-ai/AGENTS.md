@@ -9,7 +9,11 @@ Owner: **Ahmed Mostafa** (lead, backend + AI).
 
 ## 1. How this code is written
 
-The lead learned FastAPI from the freeCodeCamp course *"Python API Development – Comprehensive Course for Beginners"* (Sanjeev Thiyagarajan). **Follow that course's layout, names and style** so the code stays familiar. Only add what the course doesn't cover:
+The lead learned FastAPI from the freeCodeCamp course *"Python API Development – Comprehensive Course for Beginners"* (Sanjeev Thiyagarajan). **Follow that course's layout, names and style** so the code stays familiar. Only add what the course doesn't cover.
+
+- Course video: https://youtu.be/0sOvCWFmrtA
+- **Course source code (reference implementation): https://github.com/Sanjeev-Thiyagarajan/fastapi-course.** When unsure how something is done "the course way" (routers, `oauth2.py`, tests with `conftest.py`, Alembic, Docker, nginx, gunicorn), look there first, then apply the current library versions from §1 below.
+- **Production follows the course too:** nginx reverse proxy + certbot (HTTPS) + ufw on the Ubuntu host, and gunicorn with uvicorn workers serving the app. The app runs in Docker, bound to `127.0.0.1:8000`, because Celery + Redis join it later. Steps: [`docs/DEVELOPMENT_PLAN.md`](docs/DEVELOPMENT_PLAN.md) Phase 4.
 
 | From the course (keep as taught) | Added for Remori (course doesn't cover it) |
 |---|---|

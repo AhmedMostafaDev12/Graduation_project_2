@@ -17,4 +17,7 @@ RUN useradd --create-home --uid 1000 remori
 USER remori
 
 EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Production: gunicorn managing uvicorn workers, as in the course's gunicorn.service.
+# 2 workers fit the t3.small's 2 GB RAM. uvicorn_worker replaces the deprecated uvicorn.workers.
+# docker-compose.dev.yml overrides this with `uvicorn --reload` for development.
+CMD ["gunicorn", "app.main:app", "--workers", "2", "--worker-class", "uvicorn_worker.UvicornWorker", "--bind", "0.0.0.0:8000"]

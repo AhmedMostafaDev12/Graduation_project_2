@@ -5,7 +5,7 @@ The order in which the backend gets built, so that **the database is live first*
 **Decisions this plan follows (lead, 2026-10-11):**
 - **Mock data = seeded database.** CRUD endpoints are real and read/write the live database, filled with the UI board's sample data. Only AI-dependent endpoints return fixed fixture answers ("AI stubs") until the AI layer exists.
 - **Real auth from the first deploy:** login, JWT, device token and patient-link authorization.
-- **HTTPS from day 1:** a free DuckDNS subdomain pointing at EC2, with Caddy in front of FastAPI handling certificates automatically.
+- **Production as in the course** ([fastapi-course repo](https://github.com/Sanjeev-Thiyagarajan/fastapi-course)): **nginx** reverse proxy + **certbot** (HTTPS) + **ufw** on the Ubuntu host, **gunicorn** with 2 uvicorn workers serving the app. The app runs in Docker bound to `127.0.0.1:8000` (Celery + Redis join it later). Domain: `remori-ai.duckdns.org`.
 - **Manual deploy:** SSH into EC2 → `git pull` → `docker compose up -d --build`. CI stays "PR checks only".
 
 Related docs: [ARCHITECTURE.md](ARCHITECTURE.md) · [DATABASE.md](DATABASE.md) · [CELERY_REDIS.md](CELERY_REDIS.md) · [AI_LAYER.md](AI_LAYER.md) · [`docs/API_CONTRACT.md`](../../docs/API_CONTRACT.md) · spec §6 (tables), §7.2 (endpoints).
@@ -72,7 +72,7 @@ Abdelrahman builds the RAG pipeline **alongside** Phases 0–8. It needs no back
 
 **Done when:** you can SSH into EC2, the DuckDNS name resolves to it, and you can open the Supabase dashboard.
 
-> Small instances have about 1 GB RAM. That's enough for Phase 4–5 (API + Caddy). Before Phase 6 adds Redis and workers, check memory and add a swap file or resize. That's a lead decision at that point.
+> Small instances have about 1 GB RAM. That's enough for Phase 4–5 (API + nginx). Before Phase 6 adds Redis and workers, check memory and add a swap file or resize. That's a lead decision at that point.
 
 ---
 
@@ -109,6 +109,7 @@ The schema in spec §6 is fully designed, so create it **in one go** instead of 
 | 2.5 Apply to Supabase | `alembic upgrade head` with the Supabase URL, then run the seed |
 | 2.6 Database users | in Supabase's SQL editor: `remori_app` (read/write, no DDL) and `remori_readonly` (SELECT). The app uses `remori_app` |
 | 2.7 Team access | give teammates the readonly connection string or dashboard access |
+| 2.8 CI database | add a `pgvector/pgvector:pg17` **service container** to the CI backend job, as in the course's `build-deploy.yml`, plus a test-database fixture in `tests/conftest.py` (course: `tests/database.py` + `conftest.py`), so tests run against a real Postgres |
 
 **Done when (M1):** every §6 table exists on Supabase with seed data, you can see it in pgAdmin and the dashboard, and the app connects as `remori_app`.
 
@@ -133,17 +134,20 @@ The schema in spec §6 is fully designed, so create it **in one go** instead of 
 
 ## Phase 4 — First deploy (M2)
 
-*Course: Ubuntu VM deployment + Docker (12:05–14:08), with Caddy instead of nginx and Docker Compose instead of systemd.*
+*Course: Ubuntu VM deployment (12:05–13:23: gunicorn, nginx, domain, SSL, firewall) + Docker (13:26–14:08). Same production pieces as the course repo (`nginx`, `gunicorn.service`), except the app runs in Docker instead of a systemd venv.*
 
 | Step | Details |
 |---|---|
-| 4.1 `docker-compose.yml` | `api` + `caddy`. Caddy terminates HTTPS for the DuckDNS name and proxies to `api:8000` |
-| 4.2 Server `.env` | Supabase URL (as `remori_app`), JWT secret, S3 bucket name. Created by hand on the server, never committed |
-| 4.3 Deploy procedure | `ssh` → `cd ~/remori` → `git pull` → `docker compose up -d --build` → `alembic upgrade head` (inside the api container) → smoke test. Document it in `backend-ai/README.md` |
-| 4.4 Smoke test | `https://<name>.duckdns.org/health` and `/docs`, plus a login with a seeded account |
-| 4.5 Hand-over to Flutter | base URL, test accounts, the seed's fixed IDs |
+| 4.1 Firewall (ufw) | `sudo ufw allow OpenSSH` → `sudo ufw allow 'Nginx Full'` → `sudo ufw enable`. The AWS security group stays as a second layer |
+| 4.2 nginx | `sudo apt install nginx`. Site config = the course's `nginx` file with `server_name remori-ai.duckdns.org;` and `proxy_pass http://127.0.0.1:8000;`, keeping the course's forwarded headers (`X-Real-IP`, `X-Forwarded-For`, `Host`, upgrade) |
+| 4.3 HTTPS (certbot) | `sudo apt install certbot python3-certbot-nginx` → `sudo certbot --nginx -d remori-ai.duckdns.org` (also sets HTTP → HTTPS redirect). Renewal runs automatically; check with `sudo certbot renew --dry-run` |
+| 4.4 `docker-compose.yml` (production) | `api` built from the Dockerfile, which runs **gunicorn with 2 uvicorn workers** (the course's `gunicorn.service` command). Ports `"127.0.0.1:8000:8000"` only: Docker bypasses ufw for published ports, so the app must never listen publicly. `restart: unless-stopped` (the job systemd does in the course). `env_file: .env` |
+| 4.5 Server `.env` | Supabase session-pooler URL (as `remori_app`, `sslmode=require`), JWT secret, S3 bucket name. Created by hand on the server, never committed (the course's `EnvironmentFile`) |
+| 4.6 Deploy procedure | `ssh` → `cd ~/remori` → `git pull` → `docker compose up -d --build` → `alembic upgrade head` (inside the api container) → smoke test. Document it in `backend-ai/README.md`. Manual for now, like the course before its CI deploy job |
+| 4.7 Smoke test | `https://remori-ai.duckdns.org/health` and `/docs` over HTTPS, `http://` redirects to `https://`, port 8000 is **not** reachable from outside, plus a login with a seeded account |
+| 4.8 Hand-over to Flutter | base URL `https://remori-ai.duckdns.org/api/v1`, test accounts, the seed's fixed IDs |
 
-**Done when (M2):** the API answers over HTTPS. Flutter switches its auth repository to real.
+**Done when (M2):** the API answers over HTTPS through nginx. Flutter switches its auth repository to real.
 
 ---
 
