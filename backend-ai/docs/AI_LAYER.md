@@ -1,20 +1,21 @@
-# backend-ai — The AI layer (`app/ai/`) and its boundary with `ml/`
+# backend-ai — The AI layer (`app/ai/`)
 
-## 1. The boundary
+## 1. Scope: server-side AI only
 
-| `backend-ai/app/ai/`: AI **as software** | `ml/`: **low-level ML** |
+`app/ai/` covers **only the models and AI services that the backend server calls or runs**, in the API or in Celery workers. Models that run on the glasses (edge) are **out of scope**: they live in `ml/` or `hardware/` and are decided by their owners, not here.
+
+| In scope here (server) | Out of scope (edge: `ml/` or `hardware/`) |
 |---|---|
-| Calling AI APIs (STT, LLM, vision, embeddings) | Training and fine-tuning |
-| Running an exported local model (ONNX face embedder) | Datasets and data preparation |
-| RAG: rendering events, retrieval, prompts, answers | Notebooks and experiments |
-| Vector search in pgvector | Evaluation (face FAR/FRR, intent accuracy, RAG eval sets) |
-| Unknown-face clustering on stored embeddings | Quantization and export (`.onnx`, `.tflite`) |
-| Prompt templates | Shared preprocessing (face alignment) used by the Pi and the backend |
-| Timeouts, retries, cost limits | Model cards: what each exported model is, its version, its metrics |
+| AI API clients: STT, LLM, vision, embeddings | On-device models on the Pi: face detection + embedding, intent classifier, capture gate, VAD |
+| Server-side local models, e.g. the face embedder used at enrollment: loading + inference | Their training, quantization, export and on-device preprocessing |
+| RAG: rendering events, retrieval, prompts, answers | On-device runtimes and their performance tuning |
+| Vector search in pgvector | |
+| Unknown-face clustering on stored embeddings | |
+| Prompt templates, timeouts, retries, cost limits | |
 
-Rule of thumb: **if it imports a training framework or produces a model file, it belongs in `ml/`. If it uses a model to serve a request or a job, it belongs here.**
+Rule of thumb: **if it runs on the server, it belongs here. If it runs on the glasses, it doesn't.**
 
-The backend **only reads** from `ml/models/`. It never trains or exports. How `backend-ai` imports `ml/` code and model files is an **open decision**, so ask the lead (root `AGENTS.md` §5).
+**One cross-boundary constraint (spec D14):** the face embeddings the server computes at enrollment must be comparable with the ones the glasses compute, or recognition fails. The backend doesn't decide edge processing. The model version and preprocessing are agreed with the edge owners and recorded in the spec.
 
 ---
 
@@ -28,7 +29,7 @@ app/ai/
 │   ├── vision.py     #   review(image) -> ReviewResult          (keep/discard + tags + OCR, spec D20)
 │   └── embeddings.py #   embed(texts) -> list[vector]           (text-embedding-3-small, 1536-d, spec D15)
 ├── inference/
-│   └── face.py       #   embed_face(image) -> vector(512)       (exported MobileFaceNet from ml/models/, spec D14)
+│   └── face.py       #   embed_face(image) -> vector(512)       (server-side face embedder for enrollment, spec D14)
 ├── rag/
 │   ├── render.py     #   event -> one sentence ("09:20 talked with Ahmed (son): ...")
 │   ├── retriever.py  #   SQL time window + person filter, then pgvector ranking (spec D22)
@@ -45,7 +46,7 @@ app/ai/
 2. **Every external call has a timeout.** Temporary failures (timeout, HTTP 429, 5xx) raise `TransientError`, which Celery retries (CELERY_REDIS.md). Permanent failures raise a normal error.
 3. **AI calls run in Celery tasks, not in requests.** Exceptions: `POST /assist` (the user is waiting) and face embedding at enrollment (fast, local).
 4. **Local models load once per process.** API: FastAPI `lifespan`. Workers: Celery `worker_process_init`. Never load a model inside a request or a task.
-5. **Same face preprocessing as the glasses.** Face alignment and preprocessing come from `ml/` (spec D14). A parity test asserts the backend and the Pi produce the same embedding for the same image.
+5. **Server face embeddings stay compatible with the edge** (spec D14). Use the face model version and preprocessing recorded in the spec. If the edge owners change them, the server follows; the backend never changes them on its own.
 6. **Prompts are files, not strings in code.** Change a prompt by adding a new version (`.v2.txt`), never by editing the old one in place.
 7. **Vector dimensions are fixed by the model:** face 512, text 1536. Changing a model means re-embedding everything, so it's a lead decision.
 8. **Privacy:** blur non-enrolled faces before any vision call (spec §7.4). Never log prompts that contain transcripts or names. Raw audio is deleted after transcription (spec D4).
