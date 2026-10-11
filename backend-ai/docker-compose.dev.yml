@@ -1,0 +1,37 @@
+# Local development stack: Postgres (same major version as Supabase) + the API with hot reload.
+# Start:  docker compose -f docker-compose.dev.yml up --build
+# Docs:   http://localhost:8000/docs
+
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: remori
+      POSTGRES_PASSWORD: remori
+      POSTGRES_DB: remori
+    ports:
+      - "5434:5432"   # host port 5434: 5432/5433 are used by Windows PostgreSQL 17/18. pgAdmin: localhost:5434
+    volumes:
+      - remori-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U remori -d remori"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      ENVIRONMENT: local
+      DATABASE_URL: postgresql+psycopg://remori:remori@db:5432/remori
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/code/app   # code changes reload without rebuilding
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  remori-db-data:
