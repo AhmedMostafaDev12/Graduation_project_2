@@ -1,6 +1,5 @@
 .venv/
 .env
-.env.supabase
 __pycache__/
 .pytest_cache/
 .ruff_cache/

@@ -13,7 +13,8 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # As in the course: the database comes from the app's settings, never from alembic.ini.
-# Local: .env / defaults. Supabase: DATABASE_URL set from backend-ai/.env.supabase.
+# Local: DATABASE_URL from .env (Docker). Supabase: run with DATABASE_URL=$SUPABASE_DATABASE_URL
+# (also in .env) and ENVIRONMENT=production, on purpose only.
 target_metadata = Base.metadata
 
 
