@@ -36,6 +36,7 @@ Decisions taken in the 2026-10-03 design session. **P** = product decision by th
 | D22 | **RAG is hybrid:** SQL time-window filter first, then pgvector similarity over rendered event sentences. | T |
 | D23 | **Unknown faces** are clustered in the cloud. The caregiver is asked once a cluster is seen on **≥3 different days** (configurable). | T |
 | D24 | **Privacy controls:** a visible listening LED, a "pause memory" button gesture, household consent, BLE bonding, encryption at rest on the glasses, an audit log (§9). | T |
+| D25 | **Database on Supabase, everything else on AWS.** Supabase hosts PostgreSQL 16 + pgvector (EU / Frankfurt region), used **only as plain Postgres**: no Supabase Auth, no auto-generated Data API (PostgREST), no Supabase Storage. API, workers, Redis and S3 stay on AWS. Local development uses Docker `pgvector/pgvector:pg16`. Moving to RDS later = dump + restore, no code change. | P |
 
 ---
 
@@ -115,14 +116,14 @@ Remori helps a person living with Alzheimer's recognize the people around them, 
 | Backend | Python 3.12, FastAPI, Pydantic v2 + pydantic-settings, SQLAlchemy 2.0 (typed `Mapped[]` style) + Alembic, PyJWT, pwdlib, httpx |
 | Jobs | Celery + Redis broker, Celery Beat (cron), Flower (monitoring) (D19) |
 | Backend testing | pytest, pytest-asyncio, respx (mock external AI APIs) |
-| Database | PostgreSQL 16 + pgvector (only vector store) |
+| Database | PostgreSQL 16 + pgvector (only vector store), hosted on **Supabase** (D25). Local dev: Docker `pgvector/pgvector:pg16` |
 | Object storage | S3, private bucket, presigned URLs |
 | Push | Firebase Cloud Messaging |
 | Mobile app | Flutter (Dart), **Android + iOS** (relay role Android, D8), Riverpod, GoRouter, dio |
 | Phone local DB | drift (SQLite) |
 | Glasses↔phone | BLE (control + keyframes + audio), Wi-Fi burst (video) (D18) |
 | Phone↔cloud | HTTPS over phone Wi-Fi / cellular |
-| Hosting | AWS: one small EC2 (Docker: API + worker + Redis), Postgres (RDS or container), S3 |
+| Hosting | AWS: one small EC2 (Docker Compose: API, Celery worker, Beat, Flower, Redis) + S3. Database: Supabase (D25) |
 | Repo | Single GitHub monorepo |
 
 ---
@@ -193,7 +194,8 @@ backend-ai/
 ├── alembic/             # migrations (first one: CREATE EXTENSION vector)
 ├── tests/               # unit (services), api (TestClient), workers (idempotency)
 ├── Dockerfile           # one image; `api` and `worker` differ only by command
-└── docker-compose.yml   # api · worker · beat · flower · redis (AOF on) · postgres (pgvector image)
+├── docker-compose.yml   # production: api · worker · beat · flower · redis (AOF on); DB = Supabase
+└── docker-compose.dev.yml  # local: + postgres (pgvector/pgvector:pg16) so dev never touches Supabase
 ```
 
 | Layer | Rule |
@@ -226,7 +228,15 @@ backend-ai/
 
 **Testing.** pytest with a real Postgres + pgvector test database (Docker). External AI APIs are mocked with `respx`. Every task has a "run it twice → one result" test. Tasks are unit-tested by calling them directly (eager mode), and there's one integration test with a real worker.
 
-**Config.** `pydantic-settings` with `.env` locally, GitHub Secrets in CI, and an **IAM role** on EC2 for S3 (no AWS keys in env files).
+**Config.** `pydantic-settings` with `.env` locally, GitHub Secrets in CI, and an **IAM role** on EC2 for S3 (no AWS keys in env files). `DATABASE_URL` points to local Docker in dev and to Supabase in production, and is the only thing that differs.
+
+**Database access (Supabase, D25).**
+- **Connection:** SQLAlchemy and Alembic use Supabase's **direct connection** or **session pooler** string with `sslmode=require`. Avoid the transaction pooler, which needs extra driver settings.
+- **Turn off the Data API** (PostgREST) in the Supabase project settings. Remori never uses it, and leaving it on would expose tables outside FastAPI's authorization. As a second guard, enable Row Level Security on every table with no policies, so the anon/authenticated roles can read nothing.
+- **Database users:** `postgres` (Supabase owner) for migrations only · `remori_app` for FastAPI + Celery (read/write data, no DDL) · `remori_readonly` for teammates (SELECT only).
+- **Team access:** the Supabase dashboard (table + SQL editor) or pgAdmin with the connection string. No tunnel is needed. Never commit connection strings.
+- **Development:** everyone works against local Docker Postgres with a seed script (the UI board's sample data). Alembic migrations are applied to local first, then to Supabase.
+- **Free-tier limits:** a free project pauses after about a week without activity and has a small database quota. Unpause from the dashboard, watch the size (embeddings and transcripts grow), and consider the Pro plan for the demo/evaluation period. Take a `pg_dump` before every demo, since free-tier backups are limited.
 
 ---
 
@@ -653,6 +663,7 @@ Ambient listening is the core feature, so it has to be defensible. Egyptian law 
 - **Visible:** status LED shows when memory is capturing. Long-press pauses it, and a spoken confirmation follows ("وقفت التسجيل").
 - **Consent:** caregiver records household consent (`ambient_audio_household`) and per-person face consent at enrollment. `memory_capture_enabled` is a caregiver master switch.
 - **Minimization:** only speech segments leave the device. Raw audio is deleted after STT. Non-enrolled faces are blurred before any third-party vision call. Bystander photos expire after 30 days.
+- **Hosting:** the database is on Supabase (EU region), media in a private S3 bucket, compute on EC2. Supabase's Data API is disabled and RLS is on, so data is reachable only through FastAPI (§5.1).
 - **Security:** BLE LE Secure Connections bonding. Glasses storage encrypted (key provisioned at pairing). TLS everywhere. Private S3 with short-lived signed URLs. Every media view/delete goes into `audit_log`. Patient-link authorization on every route.
 - **Report:** the graduation report includes an ethics/privacy section built from this list.
 

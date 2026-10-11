@@ -81,7 +81,7 @@ flowchart LR
         worker["Celery worker"]
         beat["Celery Beat (cron)"]
         redis[("Redis broker")]
-        pg[("PostgreSQL + pgvector")]
+        pg[("PostgreSQL + pgvector<br/>Supabase")]
         s3[("S3 private")]
         api <--> pg
         api --> redis
@@ -275,7 +275,7 @@ flowchart LR
     beat["Celery Beat<br/>hourly · 5 min · 30 min"]
     flower["Flower<br/>monitoring"]
 
-    pg[("PostgreSQL + pgvector")]
+    pg[("PostgreSQL + pgvector<br/>Supabase")]
     s3[("S3")]
     redis[("Redis")]
     ext["AI APIs"]
@@ -304,7 +304,7 @@ flowchart LR
 
 ---
 
-## 1.6 Deployment (D5)
+## 1.6 Deployment (D5, D25)
 
 ```mermaid
 flowchart TB
@@ -316,9 +316,14 @@ flowchart TB
 
     subgraph AWS["AWS"]
         ec2["EC2 small instance<br/>Docker Compose: FastAPI · Celery worker · Beat · Flower · Redis"]
-        rds[("PostgreSQL 16 + pgvector<br/>RDS or container")]
         s3[("S3 private bucket")]
     end
+
+    subgraph SB["Supabase (EU region, D25)"]
+        db[("PostgreSQL 16 + pgvector<br/>plain Postgres only<br/>Data API off · RLS on")]
+    end
+
+    dev["Team: Supabase dashboard / pgAdmin<br/>(remori_readonly)"]
 
     subgraph AI["Managed AI APIs"]
         whisper["STT"]
@@ -334,7 +339,8 @@ flowchart TB
     cphone <-->|"HTTPS"| ec2
     pphone -.->|"presigned PUT"| s3
     cphone -.->|"signed GET"| s3
-    ec2 --> rds
+    ec2 -->|"SSL · remori_app"| db
+    dev -.-> db
     ec2 --> s3
     ec2 --> whisper
     ec2 --> llm
