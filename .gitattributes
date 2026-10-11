@@ -1,0 +1,25 @@
+# Store every text file with LF line endings in the repo, whatever OS the developer uses.
+# Without this, Windows (CRLF) and macOS/Linux (LF) edits rewrite every line and cause whole-file conflicts.
+* text=auto eol=lf
+
+# Windows-only scripts keep CRLF
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+*.ps1  text eol=crlf
+
+# Binary files: never diff or merge as text
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.webp   binary
+*.pdf    binary
+*.onnx   binary
+*.tflite binary
+*.pt     binary
+*.bin    binary
+*.ttf    binary
+*.otf    binary
+*.wav    binary
+*.opus   binary
+*.mp4    binary
