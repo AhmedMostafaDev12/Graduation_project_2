@@ -68,6 +68,24 @@ jobs:
     needs: changes
     if: needs.changes.outputs.backend == 'true'
     runs-on: ubuntu-latest
+    # A real Postgres + pgvector for database tests, as in the course's build-deploy.yml.
+    # Same major version as Supabase. Throwaway credentials: it only lives for this job.
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: remori
+          POSTGRES_PASSWORD: remori
+          POSTGRES_DB: remori
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U remori"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql+psycopg://remori:remori@localhost:5432/remori_test
     defaults:
       run:
         working-directory: backend-ai
