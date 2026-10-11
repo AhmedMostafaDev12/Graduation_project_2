@@ -9,7 +9,7 @@ Read the root [`AGENTS.md`](../AGENTS.md) first. Its rules apply here too.
 
 | Source | Use it for |
 |---|---|
-| [`docs/UI_SCREENS_BRIEF.md`](../docs/UI_SCREENS_BRIEF.md) | the **40 screens** (IDs A1–A6, C1–C19, P1–P9, D1–D6), their fields, and the "do NOT design" list |
+| [`docs/UI_SCREENS_BRIEF.md`](../docs/UI_SCREENS_BRIEF.md) | the **42 screens** (IDs A1–A6, C1–C20, P1–P9, D1–D7), their fields, and the "do NOT design" list |
 | UI board (clickable wireframes, link from the lead) | layout and flows |
 | [`docs/API_CONTRACT.md`](../docs/API_CONTRACT.md) | how the app talks to the backend, mock vs real repositories, base URLs |
 | spec §7.2 | endpoints and JSON shapes |

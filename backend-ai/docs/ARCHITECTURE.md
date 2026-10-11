@@ -30,7 +30,8 @@ backend-ai/
 │   ├── services/          # [added] business logic + transactions, called by routers AND workers
 │   │   └── people_service.py  sync_service.py  reminder_service.py  media_service.py …
 │   ├── errors.py          # [added] domain exceptions + handlers → spec §7.5 error shape
-│   ├── integrations/      # [added] non-AI external services: s3.py (presigned URLs), fcm.py (push)
+│   ├── integrations/      # [added] non-AI external services: s3.py (presigned URLs), fcm.py (push),
+│   │                      #   google_auth.py + facebook_auth.py (verify sign-in tokens, spec D26)
 │   ├── ai/                # [added] AI as software. See AI_LAYER.md
 │   │   ├── clients/       #   external AI APIs: stt.py, llm.py, vision.py, embeddings.py
 │   │   ├── inference/     #   local models: face.py (loads exported ONNX from ml/models/)
@@ -68,6 +69,7 @@ The course keeps `models.py` and `schemas.py` as single files. With 22 tables, R
 | Something slow or unreliable (AI calls, S3 deletes, pushes) | a Celery task in `workers/tasks/` that calls a service |
 | Something on a schedule | Celery Beat entry in `workers/celery_app.py` |
 | S3 or FCM | `integrations/` |
+| Verifying a Google / Facebook sign-in token | `integrations/google_auth.py`, `integrations/facebook_auth.py`. The login rules (find, link or create the caregiver) go in `services/auth_service.py` |
 
 ---
 

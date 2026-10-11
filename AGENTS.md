@@ -27,7 +27,7 @@ Remori is a graduation project: AI memory-assistant smart glasses for people liv
 3. Shared docs:
    - [`docs/API_CONTRACT.md`](docs/API_CONTRACT.md): how backend and Flutter work together
    - [`docs/TEAM_WORKFLOW.md`](docs/TEAM_WORKFLOW.md): branches, pull requests, CI, resolving conflicts
-   - [`docs/UI_SCREENS_BRIEF.md`](docs/UI_SCREENS_BRIEF.md): the 40 screens, nothing more and nothing less
+   - [`docs/UI_SCREENS_BRIEF.md`](docs/UI_SCREENS_BRIEF.md): the 42 screens, nothing more and nothing less
    - [`docs/diagrams/`](docs/diagrams/README.md): architecture, ERD, sequences, state machines
    - [`docs/BACKEND_STUDY_GUIDE.md`](docs/BACKEND_STUDY_GUIDE.md): what the backend needs beyond the freeCodeCamp FastAPI course
 

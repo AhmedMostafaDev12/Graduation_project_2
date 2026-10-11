@@ -11,6 +11,7 @@ Source of truth: [`REMORI_SPEC.md`](../../REMORI_SPEC.md) §10 (decisions D6, D8
 | State management | Riverpod |
 | Navigation | GoRouter with two shells: Caregiver and Patient |
 | HTTP | dio, one `ApiClient` for `/api/v1` |
+| Sign-in | `google_sign_in` + `flutter_facebook_auth` (spec D26). The app sends the provider token to the backend and stores only Remori's tokens |
 | Local database | drift (SQLite) |
 | Push | Firebase Cloud Messaging |
 | Platforms | Android + iOS. The glasses relay is Android-only in v1 |

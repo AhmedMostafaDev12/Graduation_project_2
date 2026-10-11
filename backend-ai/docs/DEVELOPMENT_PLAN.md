@@ -121,14 +121,18 @@ The schema in spec §6 is fully designed, so create it **in one go** instead of 
 
 | Step | Endpoints / pieces |
 |---|---|
+| 3.0 Provider setup (you) | **Google Cloud:** OAuth consent screen + OAuth client IDs (Android: package name + signing SHA-1 from the Flutter dev; iOS; web). **Facebook Developers:** app with Facebook Login, Android key hash, privacy-policy URL, data-deletion instructions. Put the IDs and secret in `.env` (`GOOGLE_CLIENT_IDS`, `FACEBOOK_APP_ID`, `FACEBOOK_APP_SECRET`) |
 | 3.1 Errors | `errors.py` domain exceptions + handlers → spec §7.5 shape |
 | 3.2 Caregiver auth | `POST /auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout`: pwdlib + PyJWT, 15-min access tokens, hashed refresh tokens |
 | 3.3 Patients | `POST /patients` (+ profile + consent records), `POST /patients/{id}/caregivers` |
 | 3.4 Devices | `POST /devices/pair` → device token (hashed in `devices.token_hash`), `POST /devices/{id}/heartbeat` |
 | 3.5 Authorization | `oauth2.py`: `get_current_user`, `get_current_device`, **`require_patient_link`** |
 | 3.6 Tests | login and refresh flows, expired token, **caregiver A gets 404 on patient B** |
+| 3.7 Social sign-in (D26) | migration `0002`: `auth_identities`. `POST /auth/google` (verify the Google ID token) and `POST /auth/facebook` (verify through Facebook's API) in `integrations/`, find / link / create rules in `services/auth_service.py`, `409 ACCOUNT_EXISTS` for an unverified matching email |
+| 3.8 Connected accounts | `GET /auth/identities`, `POST`/`DELETE /auth/link/{provider}`, `409 LAST_SIGN_IN_METHOD` (screen C20) |
+| 3.9 Social sign-in tests | Google and Facebook verification **mocked** (CI never calls them): new user, linked Google, Facebook conflict, token for another app rejected, expired token rejected, last method can't be removed |
 
-**Done when:** a seeded caregiver can log in, create a patient and pair a device, and the IDOR test passes.
+**Done when:** a seeded caregiver can log in with email + password, a tester can sign in with Google and with Facebook, a caregiver can create a patient and pair a device, and the IDOR test passes.
 
 ---
 
