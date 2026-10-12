@@ -10,6 +10,11 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 
+class TransientError(Exception):
+    """A temporary failure (timeout, 429, 5xx, storage hiccup): Celery retries the task.
+    Never raised to API clients."""
+
+
 class AppError(Exception):
     status_code = 400
     code = "BAD_REQUEST"

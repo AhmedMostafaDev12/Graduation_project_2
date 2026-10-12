@@ -2,7 +2,7 @@
 
 The freeCodeCamp course never leaves the request/response cycle, so this file **is** the guide for background work until the lead finishes studying it (`docs/BACKEND_STUDY_GUIDE.md`, Part B). Follow it exactly. Anything not covered here is a lead decision.
 
-When this starts: build order step 9 (spec §12). Before that, no Celery code.
+**Status: built in Phase 6** (`app/workers/`). Tasks today: `alerts.evaluate` (every 5 min), `retention.expire_media` (hourly), `media.make_thumbnail` (after each upload) and `media.backfill_thumbnails` (every 10 min). The AI tasks (`transcribe`, `review`, `embed`, `cluster`, `summaries`) arrive in Phases 7–9 and follow the same pattern.
 
 ---
 
@@ -58,7 +58,7 @@ Redis:            the broker                        <- stores and delivers the m
 | `cpu` | cluster (and face work if moved to a task) | `--pool=prefork --concurrency=2` |
 | `default` | retention, alerts | prefork |
 
-Phase 1 runs **one** worker consuming all three queues. Splitting them into separate workers is a lead decision, made when load requires it.
+Phase 1 runs **one** worker consuming all three queues, `--concurrency=2 --max-tasks-per-child=100` on the t3.small (2 processes; each recycled after 100 tasks so image work can't grow memory forever). Worker processes use **1 database connection each** (`DB_POOL_SIZE=1`, `DB_MAX_OVERFLOW=0`): API 2×5 + worker 2×1 = 12 connections to Supabase's pooler. Splitting the queues into separate workers is a lead decision, made when load requires it.
 
 **Beat schedule:**
 
@@ -71,6 +71,21 @@ Phase 1 runs **one** worker consuming all three queues. Splitting them into sepa
 **Task IDs and lock keys:** `transcribe:{segment_id}`, `review:{media_id}`, `embed:{event_id}`, `cluster:{encounter_id}`, `summary:{patient_id}:{date}`.
 
 ---
+
+**How Remori applies the rules (the code to copy for new tasks):**
+
+| Rule | Where |
+|---|---|
+| 1 enqueue after commit | `media_service.complete_upload` commits, then `_enqueue_thumbnail` |
+| 2 IDs only | `make_thumbnail.delay(str(media_id))` |
+| 3 thin tasks | `workers/tasks/*.py` only lock + open a session + call a service |
+| 4 idempotent | services check state first (preview exists, already alerted, already deleted) |
+| 5 Redis lock | `workers/locks.py`: `with task_lock(f"media.make_thumbnail:{id}", ttl) as got:` |
+| 6 retry only temporary failures | `workers/retry.py`: `TransientError`, `StorageUnavailable`, DB `OperationalError`; anything else fails at once |
+| 7–9 acks, prefetch, no results, time limits | `workers/celery_app.py`, one comment per setting |
+| 10 one beat | the `beat` service in `docker-compose.yml`, never scaled |
+
+**A queue that can't be reached never fails a request:** if Redis is down at upload time, the upload still succeeds and `media.backfill_thumbnails` re-queues it later. Use the same "sweep" pattern for any future task that a request enqueues.
 
 ## 4. Rate limits and cost
 
@@ -87,14 +102,14 @@ Same Docker image for everything, different commands (docker-compose):
 |---|---|
 | `worker` | `celery -A app.workers.celery_app worker -Q ai_io,cpu,default --loglevel=info` |
 | `beat` | `celery -A app.workers.celery_app beat --loglevel=info` (exactly one) |
-| `flower` | `celery -A app.workers.celery_app flower` (internal only, behind auth) |
+| `flower` | **not deployed** (the lead's choice, to save ~80 MB). Use `celery inspect` and the logs (README → Useful commands). If added later: internal only, behind auth |
 | `redis` | `redis-server --appendonly yes` |
 
 ---
 
 ## 6. Testing tasks
 
-- **Unit:** call the task function directly (or with `task_always_eager=True`) with a test database. AI APIs are mocked with `respx`.
+- **Unit:** the `worker_session` fixture (`tests/conftest.py`) runs tasks inline (`task_always_eager`), errors propagate, the Redis lock always succeeds, and task sessions use the test database: **CI needs no Redis**. AI APIs are mocked with `respx`. Example: `tests/test_workers.py`.
 - **Idempotency:** run every task **twice** with the same ID and assert one result (one event, one deletion, one push).
 - **Failure:** make the mocked API return 429/500 and assert `TransientError` is raised. After the final retry, assert the row is `failed`.
 - **Integration:** one test with a real worker + Redis (Docker) for the transcribe flow.

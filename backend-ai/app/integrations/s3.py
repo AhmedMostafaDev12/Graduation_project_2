@@ -108,3 +108,17 @@ def list_keys(prefix: str) -> list[str]:
         return sorted(obj["Key"] for obj in response.get("Contents", []))
     except (BotoCoreError, ClientError) as exc:
         raise _unavailable(exc) from exc
+
+
+def download_to(key: str, path: str, max_bytes: int) -> bool:
+    """Stream the object into a local file (videos). False when it is larger than max_bytes."""
+    try:
+        response = _s3().get_object(Bucket=settings.s3_bucket, Key=key)
+        if response["ContentLength"] > max_bytes:
+            response["Body"].close()
+            return False
+        with open(path, "wb") as out:
+            out.writelines(response["Body"].iter_chunks(1024 * 1024))
+        return True
+    except (BotoCoreError, ClientError) as exc:
+        raise _unavailable(exc) from exc

@@ -69,11 +69,35 @@ def migrated_engine(database_url):
 
 
 @pytest.fixture
-def client(migrated_engine):
-    """A TestClient whose requests use the test database (course: conftest.py `client`)."""
+def worker_session(migrated_engine, monkeypatch):
+    """Celery tasks run inline (no Redis): `.delay()` executes at once, errors propagate,
+    the Redis lock always succeeds, and tasks open sessions on the test database."""
+    from contextlib import contextmanager
+
+    from app.workers import celery_app as celery_module
+    from app.workers import db as worker_db
+    from app.workers import locks
+
     testing_session = sessionmaker(
         bind=migrated_engine, autoflush=False, expire_on_commit=False
     )
+
+    @contextmanager
+    def no_lock(key, ttl_seconds):
+        yield True
+
+    monkeypatch.setattr(worker_db, "make_session", testing_session)
+    monkeypatch.setattr(locks, "task_lock", no_lock)
+    conf = celery_module.celery_app.conf
+    monkeypatch.setattr(conf, "task_always_eager", True)
+    monkeypatch.setattr(conf, "task_eager_propagates", True)
+    return testing_session
+
+
+@pytest.fixture
+def client(migrated_engine, worker_session):
+    """A TestClient whose requests use the test database (course: conftest.py `client`)."""
+    testing_session = worker_session
 
     def override_get_db():
         db = testing_session()
@@ -107,6 +131,14 @@ class FakeS3:
         data = self.objects[key]
         return None if len(data) > max_bytes else data
 
+    def download_to(self, key, path, max_bytes):
+        data = self.objects[key]
+        if len(data) > max_bytes:
+            return False
+        with open(path, "wb") as out:
+            out.write(data)
+        return True
+
     def exists(self, key):
         return key in self.objects
 
@@ -127,6 +159,7 @@ def fake_s3(monkeypatch):
         "presign_get",
         "put_bytes",
         "get_bytes",
+        "download_to",
         "exists",
         "delete",
         "list_keys",

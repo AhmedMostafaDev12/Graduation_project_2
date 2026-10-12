@@ -199,7 +199,9 @@ Build in the order the Flutter screens need them (spec §12: Caregiver Mode firs
 | 6.3 First real task | `alerts.evaluate` (missed meds, device offline, low battery) on seeded data: simple, with no AI |
 | 6.4 Second | `retention.expire_media` (spec §8) |
 | 6.5 Tests | idempotency (run twice → one result), failure → retry → `failed` |
-| 6.6 Thumbnails | **Built early (D28, migration `0004`)** inside the request: `services/thumbnail_service.py` makes a ~320 px JPEG at enrollment and at `uploads/{id}/complete`. In Phase 6: move the upload case into a task `media.make_thumbnail` (just calls `thumbnail_service.create`), and add video thumbnails (ffmpeg in the worker image) |
+| 6.6 Thumbnails | **Done.** Enrollment previews stay in the request (bytes in memory); uploaded photos **and videos** get theirs from task `media.make_thumbnail` (queued after the commit), with `media.backfill_thumbnails` every 10 min as a safety net |
+
+**Status: built** (`feature/phase6-workers`). Decisions: no Flower; spec-default alert rules (missed medication after the 60-min grace, offline after 30 min, battery ≤ 20%, every linked caregiver once); video previews in the worker (ffmpeg from `imageio-ffmpeg`); 1 GB swap on the t3.small. Verified locally: worker + beat + Redis start, a task travels through Redis and its alerts appear in C2.
 
 **Done when (M4):** workers and Beat run on EC2 and alerts appear in C2 by themselves.
 

@@ -1,22 +1,81 @@
-# Production (EC2). The database is Supabase, so there is no postgres service here.
+# Production (EC2, t3.small: 2 GB RAM + 1 GB swap). The database is Supabase, so there is no
+# postgres service here.
 # Start / update:  docker compose up -d --build      (from backend-ai/ on the server)
 # nginx on the host forwards https://remori-ai.duckdns.org to 127.0.0.1:8000.
+# One image for api, worker and beat; only the command differs (docs/CELERY_REDIS.md §5).
+
+x-app: &app
+  build: .
+  image: remori-backend:latest
+  env_file: .env
+  restart: unless-stopped   # what systemd did in the course: restart after crashes and reboots
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"       # keep logs from filling the 20 GB disk
+      max-file: "5"
 
 services:
   api:
-    build: .
+    <<: *app
     # Dockerfile command: gunicorn with 2 uvicorn workers (the course's gunicorn.service)
-    env_file: .env
     environment:
       # The app is only reachable through nginx (bound to 127.0.0.1 below), so trusting
       # forwarded headers from any proxy address is safe and lets the app see real client IPs.
       FORWARDED_ALLOW_IPS: "*"
+      REDIS_URL: redis://redis:6379/0
     ports:
       # 127.0.0.1 only: Docker bypasses ufw for published ports, so never publish publicly.
       - "127.0.0.1:8000:8000"
-    restart: unless-stopped   # what systemd did in the course: restart after crashes and reboots
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  worker:
+    <<: *app
+    # one worker for all three queues (CELERY_REDIS.md §3); 2 processes fit the t3.small.
+    # --max-tasks-per-child restarts a process now and then, so image work can't grow memory forever
+    command: >
+      celery -A app.workers.celery_app worker -Q ai_io,cpu,default
+      --concurrency=2 --max-tasks-per-child=100 --loglevel=info
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      # 1 connection per worker process: api 2x5 + worker 2x1 = 12 to Supabase's pooler
+      DB_POOL_SIZE: "1"
+      DB_MAX_OVERFLOW: "0"
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  beat:
+    <<: *app
+    # EXACTLY ONE beat (rule 10): never scale this service
+    command: celery -A app.workers.celery_app beat --schedule /tmp/celerybeat-schedule --loglevel=info
+    environment:
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  redis:
+    image: redis:7.4-alpine
+    # AOF: queued jobs survive a restart. noeviction: a full broker refuses new messages
+    # instead of silently dropping queued ones. 128 MB is plenty for IDs-only messages.
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy noeviction
+    volumes:
+      - redis-data:/data
+    # no ports: only the containers above can reach it
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
     logging:
       driver: json-file
       options:
-        max-size: "10m"       # keep logs from filling the 20 GB disk
-        max-file: "5"
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  redis-data:
