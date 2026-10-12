@@ -17,6 +17,9 @@ class PersonOut(BaseModel):
     added_by: str
     status: str
     embedding_count: int = 0
+    photo_url: str | None = Field(
+        default=None, description="Signed URL (10 min) of the first photo; list only"
+    )
     created_at: datetime
     updated_at: datetime
 

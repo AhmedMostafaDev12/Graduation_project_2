@@ -9,6 +9,7 @@ from app.routers import (
     activity,
     assist,
     auth,
+    consents,
     devices,
     journal,
     media,
@@ -27,6 +28,7 @@ register_error_handlers(app)
 app.include_router(auth.router, prefix=API_PREFIX)
 app.include_router(patients.router, prefix=API_PREFIX)
 app.include_router(devices.router, prefix=API_PREFIX)
+app.include_router(consents.router, prefix=API_PREFIX)
 app.include_router(sync.router, prefix=API_PREFIX)
 app.include_router(people.router, prefix=API_PREFIX)
 app.include_router(reminders.router, prefix=API_PREFIX)

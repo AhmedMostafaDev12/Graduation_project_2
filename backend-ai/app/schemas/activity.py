@@ -45,6 +45,10 @@ class AlertOut(BaseModel):
     patient_id: uuid.UUID
     alert_type: str
     message: str
+    entity_type: str | None = Field(
+        description="What to open on tap: reminder_log, unknown_face_cluster, device, daily_summary"
+    )
+    entity_id: uuid.UUID | None
     read_at: datetime | None
     created_at: datetime
 

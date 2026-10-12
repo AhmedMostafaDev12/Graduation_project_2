@@ -116,14 +116,20 @@ def complete_upload(
     return UploadDone(id=upload_id, kind="media", status=asset.status)
 
 
-def _audit(db: Session, access: PatientAccess, action: str, media: MediaAsset) -> None:
-    """Who looked at or removed a photo. A phone acts on behalf of its patient."""
+def audit(db: Session, access: PatientAccess, action: str, media_ids: list) -> None:
+    """Who looked at or removed photos: one row per photo, added in one bulk insert.
+    A phone acts on behalf of its patient. The caller commits."""
     actor = access.principal.user.id if access.principal.user else access.patient_id
-    db.add(
+    db.add_all(
         AuditLog(
-            actor_user_id=actor, action=action, entity_type="media", entity_id=media.id
+            actor_user_id=actor, action=action, entity_type="media", entity_id=media_id
         )
+        for media_id in media_ids
     )
+
+
+def _audit(db: Session, access: PatientAccess, action: str, media: MediaAsset) -> None:
+    audit(db, access, action, [media.id])
 
 
 def get_media(db: Session, patient_id: uuid.UUID, media_id: uuid.UUID) -> MediaAsset:
@@ -167,7 +173,7 @@ def delete(db: Session, access: PatientAccess, media: MediaAsset) -> None:
 
 def documents(
     db: Session,
-    patient_id: uuid.UUID,
+    access: PatientAccess,
     document_type: str | None,
     limit: int,
     offset: int,
@@ -175,11 +181,33 @@ def documents(
     query = (
         select(CapturedDocument)
         .join(MediaAsset, MediaAsset.id == CapturedDocument.media_asset_id)
-        .where(MediaAsset.patient_id == patient_id, MediaAsset.deleted_at.is_(None))
+        .where(
+            MediaAsset.patient_id == access.patient_id, MediaAsset.deleted_at.is_(None)
+        )
     )
     if document_type:
         query = query.where(CapturedDocument.document_type == document_type)
-    rows = db.scalars(
-        query.order_by(CapturedDocument.created_at.desc()).limit(limit).offset(offset)
+    rows = list(
+        db.scalars(
+            query.order_by(CapturedDocument.created_at.desc())
+            .limit(limit)
+            .offset(offset)
+        )
     )
-    return [DocumentOut.model_validate(row, from_attributes=True) for row in rows]
+    keys = dict(
+        db.execute(
+            select(MediaAsset.id, MediaAsset.storage_key).where(
+                MediaAsset.id.in_([r.media_asset_id for r in rows])
+            )
+        ).all()
+    )
+    out = [
+        DocumentOut.model_validate(row, from_attributes=True).model_copy(
+            update={"url": s3.presign_get(keys[row.media_asset_id])}
+        )
+        for row in rows
+        if row.media_asset_id in keys
+    ]
+    audit(db, access, "media.view", list(keys))
+    db.commit()
+    return out

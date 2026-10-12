@@ -220,12 +220,27 @@ def archive(db: Session, person: EnrolledPerson) -> None:
 AWAITING = ("open", "awaiting_caregiver")
 
 
-def _cluster_out(db: Session, cluster: UnknownFaceCluster) -> UnknownFaceOut:
+def _sample_keys(db: Session, clusters: list[UnknownFaceCluster]) -> dict:
+    """media id -> S3 key for the clusters' sample photos, in one query."""
+    ids = {c.sample_media_id for c in clusters if c.sample_media_id}
+    if not ids:
+        return {}
+    return dict(
+        db.execute(
+            select(MediaAsset.id, MediaAsset.storage_key).where(
+                MediaAsset.id.in_(ids), MediaAsset.deleted_at.is_(None)
+            )
+        ).all()
+    )
+
+
+def _cluster_out(
+    db: Session, cluster: UnknownFaceCluster, keys: dict | None = None
+) -> UnknownFaceOut:
+    keys = _sample_keys(db, [cluster]) if keys is None else keys
     out = UnknownFaceOut.model_validate(cluster)
-    if cluster.sample_media_id:
-        media = db.get(MediaAsset, cluster.sample_media_id)
-        if media is not None and media.deleted_at is None:
-            out.sample_url = s3.presign_get(media.storage_key)
+    if cluster.sample_media_id in keys:
+        out.sample_url = s3.presign_get(keys[cluster.sample_media_id])
     return out
 
 
@@ -238,7 +253,9 @@ def list_unknown(db: Session, patient_id: uuid.UUID) -> list[UnknownFaceOut]:
         )
         .order_by(UnknownFaceCluster.last_seen_at.desc())
     )
-    return [_cluster_out(db, cluster) for cluster in clusters]
+    clusters = list(clusters)
+    keys = _sample_keys(db, clusters)
+    return [_cluster_out(db, cluster, keys) for cluster in clusters]
 
 
 def _undecided(cluster: UnknownFaceCluster) -> None:
@@ -287,12 +304,43 @@ def dismiss(db: Session, cluster: UnknownFaceCluster) -> UnknownFaceOut:
     return _cluster_out(db, cluster)
 
 
-def list_people(db: Session, patient_id: uuid.UUID) -> list[PersonOut]:
-    people = db.scalars(
-        select(EnrolledPerson)
-        .where(
-            EnrolledPerson.patient_id == patient_id, EnrolledPerson.deleted_at.is_(None)
-        )
-        .order_by(EnrolledPerson.name)
+def list_people(db: Session, patient_id: uuid.UUID, status: str) -> list[PersonOut]:
+    """C3: three queries in total, however many people (no query per person)."""
+    query = select(EnrolledPerson).where(EnrolledPerson.patient_id == patient_id)
+    if status == "archived":
+        query = query.where(EnrolledPerson.status == "archived")
+    else:
+        query = query.where(EnrolledPerson.deleted_at.is_(None))
+    people = list(db.scalars(query.order_by(EnrolledPerson.name)))
+    ids = [p.id for p in people]
+    if not ids:
+        return []
+
+    counts = dict(
+        db.execute(
+            select(FaceEmbedding.person_id, func.count())
+            .where(FaceEmbedding.person_id.in_(ids))
+            .group_by(FaceEmbedding.person_id)
+        ).all()
     )
-    return [person_out(db, person) for person in people]
+    first_photo = dict(
+        db.execute(
+            select(FaceEmbedding.person_id, FaceEmbedding.storage_key)
+            .where(
+                FaceEmbedding.person_id.in_(ids), FaceEmbedding.storage_key.is_not(None)
+            )
+            .order_by(FaceEmbedding.person_id, FaceEmbedding.created_at)
+            .distinct(FaceEmbedding.person_id)
+        ).all()
+    )
+    return [
+        PersonOut.model_validate(person).model_copy(
+            update={
+                "embedding_count": counts.get(person.id, 0),
+                "photo_url": s3.presign_get(first_photo[person.id])
+                if person.id in first_photo
+                else None,
+            }
+        )
+        for person in people
+    ]

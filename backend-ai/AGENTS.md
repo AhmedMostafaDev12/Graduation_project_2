@@ -66,7 +66,7 @@ Local stack (once it exists): `docker compose -f docker-compose.dev.yml up` → 
 
 Plan phases 0–4 are done (see [`docs/DEVELOPMENT_PLAN.md`](docs/DEVELOPMENT_PLAN.md)): the API is **live at `https://remori-ai.duckdns.org`**, with email + password auth, patients, caregivers and device pairing. Deploy procedure: [`README.md`](README.md) → Production.
 
-**Phase 5 is built** (PR #8): every spec §7.2 endpoint except social sign-in, on the real database, with AI stubs (`ai/rag/answer.py`, `ai/inference/face.py`). It is **not deployed**: it ships with Phase 6. Before that deploy, run `alembic upgrade head` on Supabase (migration `0002`).
+**Phase 5 is built** (PR #8): every spec §7.2 endpoint except social sign-in, on the real database, with AI stubs (`ai/rag/answer.py`, `ai/inference/face.py`). It is **not deployed**: it ships with Phase 6. Spec D28 added the endpoints the UI screens were missing. Before that deploy, run `alembic upgrade head` on Supabase (migrations `0002`, `0003`).
 
 **Next: Phase 6**, Celery + Redis workers ([`docs/CELERY_REDIS.md`](docs/CELERY_REDIS.md)). Google/Facebook sign-in (Phase 3 steps 3.0, 3.7–3.9) is postponed.
 

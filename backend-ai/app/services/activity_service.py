@@ -92,3 +92,16 @@ def register_push_token(db: Session, caregiver: User, fcm_token: str) -> None:
     else:
         row.user_id = caregiver.id
     db.commit()
+
+
+def list_games(
+    db: Session, patient_id: uuid.UUID, game_type: str | None, limit: int, offset: int
+) -> list[MindGameSession]:
+    """Past sessions, newest first (P7 last score per game)."""
+    query = select(MindGameSession).where(MindGameSession.patient_id == patient_id)
+    if game_type:
+        query = query.where(MindGameSession.game_type == game_type)
+    query = (
+        query.order_by(MindGameSession.completed_at.desc()).limit(limit).offset(offset)
+    )
+    return list(db.scalars(query))

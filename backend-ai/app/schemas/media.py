@@ -115,3 +115,6 @@ class DocumentOut(BaseModel):
     ocr_text: str
     extracted_fields: dict[str, Any]
     created_at: datetime
+    url: str | None = Field(
+        default=None, description="Signed URL (10 min) of the photo"
+    )

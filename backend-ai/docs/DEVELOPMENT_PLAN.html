@@ -206,7 +206,7 @@ html{scroll-behavior:smooth}
     <tr><td class="chk"><input type="checkbox" id="p3-4" aria-label="3.4 done"></td><td class="name">3.4 Devices</td><td class="det"><code>POST /devices/pair</code> → device token (hashed in <code>devices.token_hash</code>), <code>POST /devices/{id}/heartbeat</code>.</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p3-5" aria-label="3.5 done"></td><td class="name">3.5 Authorization</td><td class="det"><code>oauth2.py</code>: <code>get_current_user</code>, <code>get_current_device</code>, <b><code>require_patient_link</code></b>.</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p3-6" aria-label="3.6 done"></td><td class="name">3.6 Tests</td><td class="det">Login and refresh flows, expired token, <b>caregiver A gets 404 on patient B</b>.</td></tr>
-    <tr><td class="chk"><input type="checkbox" id="p3-7" aria-label="3.7 done"></td><td class="name">3.7 Social sign-in</td><td class="det">Migration <code>0003</code>: <code>auth_identities</code>. <code>POST /auth/google</code> and <code>POST /auth/facebook</code> verify the provider token on the server, then find, link or create the caregiver. <code>409 ACCOUNT_EXISTS</code> for an unverified matching email (spec D26).</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p3-7" aria-label="3.7 done"></td><td class="name">3.7 Social sign-in</td><td class="det">Migration <code>0004</code>: <code>auth_identities</code>. <code>POST /auth/google</code> and <code>POST /auth/facebook</code> verify the provider token on the server, then find, link or create the caregiver. <code>409 ACCOUNT_EXISTS</code> for an unverified matching email (spec D26).</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p3-8" aria-label="3.8 done"></td><td class="name">3.8 Connected accounts</td><td class="det"><code>GET /auth/identities</code>, <code>POST</code>/<code>DELETE /auth/link/{provider}</code>, <code>409 LAST_SIGN_IN_METHOD</code> (screen C20).</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p3-9" aria-label="3.9 done"></td><td class="name">3.9 Social sign-in tests</td><td class="det">Google and Facebook verification <b>mocked</b>: new user, linked Google, Facebook conflict, token for another app rejected, expired token rejected, last method can't be removed.</td></tr>
   </tbody></table></div>
@@ -234,7 +234,7 @@ html{scroll-behavior:smooth}
 <!-- Phase 5 -->
 <section class="phase" id="p5" data-phase="p5">
   <div class="phase-head"><span class="num">Phase 5</span><h2>All CRUD endpoints + AI stubs</h2><span class="ms">M3</span><span class="prog" data-prog="p5"></span></div>
-  <p class="course">Build in the order the Flutter screens need them (Caregiver Mode first). <b>Status: built in one PR (#8); deploys together with Phase 6.</b> Additions agreed while building are in spec D27: <code>GET /auth/me</code>, <code>GET /patients</code>, <code>GET /people/{id}</code>, <code>DELETE /people/{id}/photos/{photo_id}</code>, migration <code>0002</code> (<code>face_embeddings.storage_key</code>).</p>
+  <p class="course">Build in the order the Flutter screens need them (Caregiver Mode first). <b>Status: built in one PR (#8); deploys together with Phase 6.</b> Additions agreed while building are in spec D27: <code>GET /auth/me</code>, <code>GET /patients</code>, <code>GET /people/{id}</code>, <code>DELETE /people/{id}/photos/{photo_id}</code>, migration <code>0002</code> (<code>face_embeddings.storage_key</code>). Spec D28 then filled every screen of the UI brief: device list + unpair, patient profile edit, caregivers list, consents + revoke, one day's reminder logs, past games, archived filter, alert links (migration <code>0003</code>), signed URLs inside list responses.</p>
   <div class="scroll"><table class="steps">
     <thead><tr><th></th><th>Group</th><th>Endpoints (spec §7.2)</th><th>Unlocks</th></tr></thead>
     <tbody>
@@ -267,6 +267,7 @@ html{scroll-behavior:smooth}
     <tr><td class="chk"><input type="checkbox" id="p6-3" aria-label="6.3 done"></td><td class="name">6.3 First real task</td><td class="det"><code>alerts.evaluate</code> (missed meds, device offline, low battery) on seeded data. Simple, no AI.</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p6-4" aria-label="6.4 done"></td><td class="name">6.4 Second task</td><td class="det"><code>retention.expire_media</code> (spec §8).</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p6-5" aria-label="6.5 done"></td><td class="name">6.5 Tests</td><td class="det">Idempotency (run twice → one result), failure → retry → <code>failed</code>.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p6-6" aria-label="6.6 done"></td><td class="name">6.6 Thumbnails</td><td class="det">Task <code>media.make_thumbnail</code> after upload and enrollment: a ~320 px JPEG next to each photo, returned by lists so phones download ~30 KB instead of the full photo (Pillow and a new column: needs the lead's OK).</td></tr>
   </tbody></table></div>
   <div class="done"><b>Done when (M4):</b> workers and Beat run on EC2, and alerts appear in C2 by themselves.</div>
 </section>

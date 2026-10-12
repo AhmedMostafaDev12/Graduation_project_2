@@ -1,11 +1,18 @@
 """Schemas for auth, patients, caregivers and devices (spec §7.2, Phase 3)."""
 
 import uuid
-from datetime import date, datetime
+from datetime import UTC, date, datetime, timedelta
 from typing import Literal
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    EmailStr,
+    Field,
+    computed_field,
+    field_validator,
+)
 
 # ----- auth -----
 
@@ -78,6 +85,39 @@ class PatientOut(BaseModel):
     created_at: datetime
 
 
+class PatientUpdate(BaseModel):
+    """Screens C16 (memory capture switch) and C18 (patient profile). Send only what changes."""
+
+    full_name: str | None = Field(default=None, min_length=1, max_length=120)
+    preferred_language: Literal["ar", "en"] | None = None
+    timezone: str | None = None
+    date_of_birth: date | None = None
+    memory_capture_enabled: bool | None = None
+
+    @field_validator("timezone")
+    @classmethod
+    def _known_timezone(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
+        try:
+            ZoneInfo(value)
+        except (ZoneInfoNotFoundError, ValueError) as exc:
+            raise ValueError("Unknown timezone, e.g. use Africa/Cairo") from exc
+        return value
+
+
+class ConsentOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    consent_type: str
+    subject_person_id: uuid.UUID | None = Field(description="Set for face_enrollment")
+    subject_name: str | None = None
+    given_by: uuid.UUID
+    given_at: datetime
+    revoked_at: datetime | None
+
+
 class MyPatientOut(PatientOut):
     """A patient as seen by one linked caregiver (screen C1 switcher)."""
 
@@ -103,6 +143,8 @@ class CaregiverLinkOut(BaseModel):
 
 
 # ----- devices -----
+
+ONLINE_WINDOW = timedelta(minutes=5)
 
 
 class DevicePairRequest(BaseModel):
@@ -137,3 +179,11 @@ class DeviceOut(BaseModel):
     battery_level_pct: int | None
     last_seen_at: datetime | None
     paired_at: datetime
+
+    @computed_field
+    @property
+    def online(self) -> bool:
+        """A heartbeat in the last 5 minutes (C1 "connected" / C16 status)."""
+        return self.last_seen_at is not None and (
+            datetime.now(UTC) - self.last_seen_at < ONLINE_WINDOW
+        )

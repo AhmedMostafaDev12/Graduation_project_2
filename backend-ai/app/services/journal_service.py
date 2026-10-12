@@ -8,6 +8,7 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.integrations import s3
 from app.models import (
     Encounter,
     EnrolledPerson,
@@ -26,6 +27,7 @@ from app.schemas.journal import (
     JournalOut,
     JournalPerson,
 )
+from app.services import media_service
 
 
 def _owned(db: Session, model, ids: set, patient_id: uuid.UUID) -> set:
@@ -130,8 +132,10 @@ def upload_batch(db: Session, access: PatientAccess, batch: EventsBatch) -> Batc
     return result
 
 
-def journal(db: Session, patient_id: uuid.UUID, day: date | None) -> JournalOut:
-    """One day in the patient's own timezone, oldest first (screens P4, C3)."""
+def journal(db: Session, access: PatientAccess, day: date | None) -> JournalOut:
+    """One day in the patient's own timezone, oldest first (screens P4, C12). Photos come
+    with signed URLs, so the screen needs no request per photo; every URL is audit-logged."""
+    patient_id = access.patient_id
     tz_name = db.get(PatientProfile, patient_id).timezone
     tz = ZoneInfo(tz_name)
     day = day or datetime.now(tz).date()
@@ -167,6 +171,9 @@ def journal(db: Session, patient_id: uuid.UUID, day: date | None) -> JournalOut:
                     asset_type=asset.asset_type,
                     trigger=asset.trigger,
                     status=asset.status,
+                    duration_seconds=asset.duration_seconds,
+                    expires_at=asset.expires_at,
+                    url=s3.presign_get(asset.storage_key),
                 )
             )
 
@@ -210,4 +217,8 @@ def journal(db: Session, patient_id: uuid.UUID, day: date | None) -> JournalOut:
         )
         for e in events
     ]
+    media_service.audit(
+        db, access, "media.view", [m.id for ms in media.values() for m in ms]
+    )
+    db.commit()
     return JournalOut(date=day, timezone=tz_name, entries=entries)

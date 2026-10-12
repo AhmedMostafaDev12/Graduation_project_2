@@ -19,7 +19,8 @@ def pair_device(
     """A managing caregiver pairs glasses (serial from the QR code) with a patient.
 
     The device token is returned once and stored only as a hash. Pairing the same glasses
-    again with the same patient issues a new token; the old one stops working.
+    again with the same patient issues a new token; the old one stops working. Unpaired
+    glasses can be paired with any patient.
     """
     access = check_patient_access(db, principal, data.patient_id)
     if access.permission != "manager":
@@ -31,7 +32,11 @@ def pair_device(
     token = new_token()
     now = datetime.now(UTC)
     device = db.scalar(select(Device).where(Device.serial_number == serial))
-    if device is not None and device.patient_id != data.patient_id:
+    if (
+        device is not None
+        and device.patient_id != data.patient_id
+        and device.unpaired_at is None
+    ):
         raise Conflict(
             "These glasses are paired with another patient.",
             code="DEVICE_ALREADY_PAIRED",
@@ -46,8 +51,10 @@ def pair_device(
         )
         db.add(device)
     else:
+        device.patient_id = data.patient_id
         device.token_hash = hash_token(token)
         device.paired_at = now
+        device.unpaired_at = None
     db.commit()
     db.refresh(device)
     return DevicePairOut(
@@ -73,3 +80,21 @@ def heartbeat(
     db.commit()
     db.refresh(device)
     return device
+
+
+def list_devices(db: Session, patient_id: uuid.UUID) -> list[Device]:
+    """The patient's paired glasses (C1 device card, C16)."""
+    return list(
+        db.scalars(
+            select(Device)
+            .where(Device.patient_id == patient_id, Device.unpaired_at.is_(None))
+            .order_by(Device.paired_at.desc())
+        )
+    )
+
+
+def unpair(db: Session, device: Device) -> None:
+    """The row stays (recorded events point at it); the token stops working at once."""
+    device.token_hash = hash_token(new_token())  # nobody knows this one
+    device.unpaired_at = datetime.now(UTC)
+    db.commit()

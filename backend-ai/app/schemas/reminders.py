@@ -121,3 +121,5 @@ class ReminderLogOut(BaseModel):
     completed_at: datetime | None
     confirmed_via: str | None
     updated_at: datetime
+    title: str | None = Field(default=None, description="The reminder's title")
+    type: str | None = None

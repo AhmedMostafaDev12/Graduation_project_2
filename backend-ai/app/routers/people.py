@@ -1,4 +1,5 @@
 import uuid
+from typing import Literal
 
 from fastapi import APIRouter, Depends, File, Form, Response, UploadFile, status
 from sqlalchemy.orm import Session
@@ -53,9 +54,12 @@ def _cluster(db: Session, principal: Principal, cluster_id: uuid.UUID):
 
 @router.get("/patients/{patient_id}/people", response_model=list[PersonOut])
 def list_people(
-    db: Session = Depends(get_db), access: PatientAccess = Depends(require_patient_link)
+    status: Literal["active", "archived"] = "active",
+    db: Session = Depends(get_db),
+    access: PatientAccess = Depends(require_patient_link),
 ):
-    return people_service.list_people(db, access.patient_id)
+    """C3. Each item carries a signed photo_url, so the grid needs no extra requests."""
+    return people_service.list_people(db, access.patient_id, status)
 
 
 @router.post(

@@ -63,6 +63,9 @@ class JournalMedia(BaseModel):
     asset_type: str
     trigger: str
     status: str
+    duration_seconds: int | None
+    expires_at: datetime | None
+    url: str = Field(description="Signed URL (10 min). Cache images by id, not by URL")
 
 
 class JournalEntry(BaseModel):

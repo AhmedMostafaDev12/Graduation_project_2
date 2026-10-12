@@ -100,4 +100,4 @@ def list_documents(
     db: Session = Depends(get_db),
     access: PatientAccess = Depends(require_patient_link),
 ):
-    return media_service.documents(db, access.patient_id, document_type, limit, offset)
+    return media_service.documents(db, access, document_type, limit, offset)

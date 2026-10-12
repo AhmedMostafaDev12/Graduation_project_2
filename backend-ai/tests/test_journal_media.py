@@ -155,6 +155,7 @@ def test_upload_flow_view_pin_and_delete(client, fake_s3, migrated_engine):
         f"{base}/journal", params={"date": DAY}, headers=manager["headers"]
     ).json()
     assert journal["entries"][0]["media"][0]["id"] == media_id
+    assert journal["entries"][0]["media"][0]["url"].startswith("https://")
 
     assert (
         client.delete(f"{API}/media/{media_id}", headers=phone["headers"]).status_code
@@ -169,7 +170,8 @@ def test_upload_flow_view_pin_and_delete(client, fake_s3, migrated_engine):
         actions = db.scalars(
             select(AuditLog.action).where(AuditLog.entity_id == uuid.UUID(media_id))
         ).all()
-    assert sorted(actions) == ["media.delete", "media.view"]
+    # one view from GET media, one from the journal handing out a signed URL
+    assert sorted(actions) == ["media.delete", "media.view", "media.view"]
 
 
 def test_user_requested_clip_skips_review(client, fake_s3):
@@ -285,6 +287,7 @@ def test_documents_list(client, fake_s3, migrated_engine):
 
     docs = client.get(f"{base}/documents", headers=manager["headers"]).json()
     assert [d["document_type"] for d in docs] == ["receipt"]
+    assert docs[0]["url"].startswith("https://")
     bills = client.get(
         f"{base}/documents", params={"type": "bill"}, headers=manager["headers"]
     )
