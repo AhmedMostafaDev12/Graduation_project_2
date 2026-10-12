@@ -39,7 +39,7 @@ Decisions taken in the 2026-10-03 design session. **P** = product decision by th
 | D25 | **Database on Supabase, everything else on AWS.** Supabase hosts PostgreSQL 17 + pgvector (EU / Frankfurt region), used **only as plain Postgres**: no Supabase Auth, no auto-generated Data API (PostgREST), no Supabase Storage. API, workers, Redis and S3 stay on AWS. Local development uses Docker `pgvector/pgvector:pg17`. Moving to RDS later = dump + restore, no code change. | P |
 | D26 | **Caregiver sign-in: Google, Facebook, or email + password (no OTP).** Flutter uses `google_sign_in` and `flutter_facebook_auth`. The backend verifies the provider token itself (Google ID token: Google's public keys, audience = our client IDs, `email_verified`; Facebook access token: Graph API `debug_token` with our app credentials), then issues **Remori's own** JWT + refresh tokens. An existing account is linked automatically only when the provider says the email is verified (Google). A Facebook email matching an existing account is **not** linked: the caregiver signs in the usual way and connects Facebook in Connected accounts (C20). Patients are unchanged (device token). | P |
 | D27 | **Phase 5 API additions:** `GET /auth/me`, `GET /patients`, people list/detail, single-photo removal; batch responses add `rejected`; enrollment photo keys stored on `face_embeddings.storage_key`; archiving a person deletes their face data but keeps the row for the journal; a pagination rule for unbounded lists (§7.2). | P |
-| D28 | **Every UI-brief screen has its endpoints:** device list + unpair, patient profile edit, linked caregivers, consent list + revoke, one day's reminder logs, past games, archived-people filter, alert links (migration `0003`), and signed URLs inside list responses so a screen needs one request, not one per item (§7.2). | P |
+| D28 | **Every UI-brief screen has its endpoints:** device list + unpair, patient profile edit, linked caregivers, consent list + revoke, one day's reminder logs, past games, archived-people filter, alert links (migration `0003`), ~320 px thumbnails (migration `0004`), and signed URLs inside list responses so a screen needs one request, not one per item (§7.2). | P |
 
 ---
 
@@ -277,6 +277,7 @@ face_embeddings (                      -- several per person (D14)
   model_version TEXT,                  -- e.g. 'w600k_mbf@1.0'
   source_media_id UUID FK -> media_assets NULLABLE,
   storage_key TEXT NULLABLE,            -- S3 key of the enrollment photo; NULL if promoted from a cluster
+  thumbnail_key TEXT NULLABLE,          -- ~320 px JPEG preview (D28)
   created_at TIMESTAMPTZ
 )
 
@@ -355,6 +356,7 @@ media_assets (
   event_id UUID FK -> events,          -- media belongs to an event (one event : many media)
   asset_type ENUM('image','video'),
   storage_key TEXT,                    -- private S3 key, never a public URL
+  thumbnail_key TEXT NULLABLE,         -- ~320 px JPEG preview, NULL for videos (D28)
   trigger ENUM('encounter_keyframe','document_signal','salient_frame','user_requested'),
   status ENUM('pending_review','confirmed','discarded'),
   ai_tags JSONB NULLABLE,              -- open-ended {"category":"notable_moment","reason":"..."}
@@ -595,7 +597,7 @@ Base `/api/v1`. Auth: JWT access (15 min) + refresh token for caregivers, who si
 
 Smart review, OCR, STT, clustering, retention and summaries are **worker jobs only**. They have no public endpoints.
 
-**One request per screen:** list responses carry the signed URLs their screen shows (people `photo_url`, journal `media[].url`, documents `url`), so no screen makes a request per item; every URL handed out is audit-logged in one bulk insert. `GET /patients/{id}/people?status=archived` lists archived people (C3 filter).
+**One request per screen:** list responses carry the signed URLs their screen shows (people `photo_url`, journal `media[].url`, documents `url`, each with a ~320 px `thumbnail_url` preview made at upload; previews drop EXIF/GPS), so no screen makes a request per item; every URL handed out is audit-logged in one bulk insert. `GET /patients/{id}/people?status=archived` lists archived people (C3 filter).
 
 **Lists and pagination:** unbounded lists (`documents`, `caregivers/me/alerts`, `mind-game-sessions`) take `limit` (default 50, max 200) and `offset`, newest first. Lists bounded by nature (people, places, reminders, unknown faces, my patients) and the journal (one day per call) are not paginated. Batch requests take at most 500 items per array.
 

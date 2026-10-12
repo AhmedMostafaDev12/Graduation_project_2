@@ -258,7 +258,7 @@ Errors: `403 DEVICE_ONLY`, `404 DEVICE_NOT_FOUND`.
 
 **AI stubs until later phases:** `/assist` returns a fixed answer in the final shape (real in 9.1). Daily summaries, documents, unknown faces and media review are produced by worker jobs (Phase 6+), so those lists stay empty until then. Enrollment face embeddings are computed by a stub (`model_version: "stub-0"`) until the real face model is wired in; the glasses can't recognise stub embeddings yet.
 
-**Images: one request per screen, cached by id.** Lists already include signed URLs (people `photo_url`, journal `media[].url`, documents `url`, unknown faces `sample_url`), so never call `GET /media/{id}` per thumbnail. Signed URLs change on every response and expire after 10 minutes: cache images **by the item's id**, not by URL (e.g. `CachedNetworkImage(imageUrl: url, cacheKey: id)`), and re-fetch the list if an image fails with 403 (expired). Thumbnails are full-size photos until Phase 6 adds small ones.
+**Images: one request per screen, cached by id.** Lists already include signed URLs (people `photo_url`, journal `media[].url` + `thumbnail_url`, documents `url` + `thumbnail_url`, unknown faces `sample_url` + `sample_thumbnail_url`), so never call `GET /media/{id}` per thumbnail. **In lists and grids show `thumbnail_url`** (a ~320 px JPEG, ~30 KB); open `url` (full photo) only on the detail screen. `thumbnail_url` is `null` for videos and for photos whose preview couldn't be made: then use `url`. Signed URLs change on every response and expire after 10 minutes: cache images **by the item's id**, not by URL (e.g. `CachedNetworkImage(imageUrl: url, cacheKey: id)`), and re-fetch the list if an image fails with 403 (expired).
 
 #### Patient settings, caregivers, consents, devices · screens C1, C16, C18, C19
 - `PATCH /patients/{id}` with any of `{ "full_name", "preferred_language": "ar|en", "timezone", "date_of_birth", "memory_capture_enabled": false }` → the patient (same shape as `POST /patients`). The phone gets the change through `/sync` `settings`.
@@ -291,7 +291,7 @@ Fields: `name` (1–80), `relationship` (1–40), `consent_given` (`true`), `pho
 { "id": "…", "patient_id": "…", "name": "أحمد", "relationship": "son", "added_by": "caregiver_manual",
   "status": "active", "embedding_count": 2, "created_at": "…", "updated_at": "…" }
 ```
-List items also carry `"photo_url"` (the first photo, signed). `?status=archived` lists archived people. `GET /people/{id}` adds `"photos": [ { "id": "…", "url": "https://…signed, 10 min" } ]`. `DELETE /people/{id}/photos/{photo_id}` removes that photo and its embedding and returns the person (`409 LAST_PHOTO` for the only one). `PATCH` takes `{ "name"?, "relationship"? }`. `DELETE` → `204`: the person is archived, their photos and face data are deleted, and past journal entries keep the name. At most 20 photos per person (`409 TOO_MANY_PHOTOS`).
+List items also carry `"photo_url"` (the first photo's ~320 px preview, signed). `?status=archived` lists archived people. `GET /people/{id}` adds `"photos": [ { "id": "…", "url": "https://…signed, 10 min" } ]`. `DELETE /people/{id}/photos/{photo_id}` removes that photo and its embedding and returns the person (`409 LAST_PHOTO` for the only one). `PATCH` takes `{ "name"?, "relationship"? }`. `DELETE` → `204`: the person is archived, their photos and face data are deleted, and past journal entries keep the name. At most 20 photos per person (`409 TOO_MANY_PHOTOS`).
 
 #### Unknown faces · screen C7
 `GET` → `[ { "id", "patient_id", "sighting_count", "distinct_days", "first_seen_at", "last_seen_at", "status": "awaiting_caregiver", "sample_url": "signed or null" } ]`.
@@ -346,7 +346,8 @@ The day in the **patient's** timezone (default: today), oldest first.
                  "person": { "id": "…", "name": "أحمد", "relationship": "son" },
                  "transcript_text": null, "language": null, "rendered_text": null, "metadata": {},
                  "media": [ { "id": "…", "asset_type": "image", "trigger": "encounter_keyframe", "status": "pending_review",
-                              "duration_seconds": null, "expires_at": null, "url": "https://…signed, 10 min" } ] } ] }
+                              "duration_seconds": null, "expires_at": null, "url": "https://…signed, 10 min",
+                              "thumbnail_url": "https://…signed ~320 px preview, or null" } ] } ] }
 ```
 
 #### Uploads: photos, clips, audio

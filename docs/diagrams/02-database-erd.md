@@ -75,6 +75,7 @@ erDiagram
         text model_version "w600k_mbf@1.0"
         uuid source_media_id FK "nullable"
         text storage_key "enrollment photo S3 key, nullable"
+        text thumbnail_key "320 px preview, nullable"
     }
     UNKNOWN_FACE_CLUSTERS {
         uuid id PK
@@ -203,6 +204,7 @@ erDiagram
         uuid event_id FK
         enum asset_type "image | video"
         text storage_key "private S3"
+        text thumbnail_key "320 px preview, nullable"
         enum trigger "encounter_keyframe | document_signal | salient_frame | user_requested"
         enum status "pending_review | confirmed | discarded"
         jsonb ai_tags
