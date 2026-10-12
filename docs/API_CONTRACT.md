@@ -1,6 +1,6 @@
 # API contract: how the backend and the Flutter app talk
 
-The Flutter app and the backend are built in parallel by different people. They meet in one place: the REST API. This file is **the contract**: where the API lives, the rules both sides follow, every endpoint that's live today with its exact request and response, the error codes, and how to work before an endpoint exists.
+The Flutter app and the backend are built in parallel by different people. They meet in one place: the REST API. This file is **the contract**: where the API lives, the rules both sides follow, every endpoint that's live today with its exact request and response, and the error codes.
 
 Last updated: 12 Oct 2026, after Phase 4 (backend deployed).
 
@@ -195,7 +195,7 @@ Errors: `403 DEVICE_ONLY`, `404 DEVICE_NOT_FOUND`.
 
 ## 6. Endpoints not built yet ⏳ (agreed in spec §7.2)
 
-Until each one is live, Flutter uses its **mock** (§8). The phase is from `backend-ai/docs/DEVELOPMENT_PLAN.md`.
+These are being built in Phase 5 (`backend-ai/docs/DEVELOPMENT_PLAN.md`) and move to §5 as they go live. Flutter always calls the live API: if a screen needs an endpoint that isn't live yet, ask the lead.
 
 | Endpoint | For screens | Phase |
 |---|---|---|
@@ -219,61 +219,13 @@ Until each one is live, Flutter uses its **mock** (§8). The phase is from `back
 1. Whoever needs a change opens a **docs PR editing spec §7.2** (new endpoint, field or enum value) and explains why.
 2. **The lead approves it.** No contract change happens without that approval.
 3. The backend implements it. `/docs` and `/openapi.json` update automatically on the next deploy.
-4. Flutter updates its models and switches that repository from mock to real (§8).
+4. Flutter updates its models and screens.
 
 **Never:** rename or remove a field, change a type, or change an enum value silently. Adding an optional field or a new endpoint is safe. Breaking changes need the lead's approval and a coordinated release.
 
 ---
 
-## 8. Mock and real repositories in Flutter
-
-### The idea
-A **repository** is the one class in the app that knows **where data comes from**. Screens never call the API directly; they ask a repository ("give me today's reminders"). For each kind of data there are **two interchangeable versions of the same repository**:
-
-| | `MockRemindersRepository` | `ApiRemindersRepository` |
-|---|---|---|
-| Gets data from | a JSON file of sample data inside the app | the real server (`/api/v1/...`) |
-| Works when | always, even before the backend endpoint exists | the endpoint is live ✅ |
-| Same interface? | **yes**: both implement `RemindersRepository` with the same methods | **yes** |
-
-```dart
-abstract class RemindersRepository {                 // what screens depend on
-  Future<List<Reminder>> todaysReminders(String patientId);
-}
-
-class MockRemindersRepository implements RemindersRepository {   // sample data
-  Future<List<Reminder>> todaysReminders(String patientId) async =>
-      parseReminders(await loadJson('mock/reminders_today.json'));
-}
-
-class ApiRemindersRepository implements RemindersRepository {    // real server
-  Future<List<Reminder>> todaysReminders(String patientId) async =>
-      parseReminders((await api.get('/patients/$patientId/reminders')).data);
-}
-
-// One line decides which one the app uses (Riverpod provider):
-final remindersRepositoryProvider = Provider<RemindersRepository>(
-  (ref) => useMock.reminders ? MockRemindersRepository() : ApiRemindersRepository(ref.read(apiClient)),
-);
-```
-
-### Why bother
-- **Flutter doesn't wait for the backend.** Screen C8 can be built and demoed while `GET /reminders` is still in Phase 5.2.
-- **Switching is one line.** When the backend ships an endpoint, flip that repository from mock to real. **No screen changes.**
-- **Mistakes show up early.** The mock JSON is written in **exactly** the shape of this contract and parsed by the **same** parsing code (`parseReminders`) the real one uses. If the shapes ever differ, a test fails before release.
-- **Same data both ways.** The mock JSON uses the seed data (Fatma, Ahmed, the fixed IDs in `SEED_DATA.md`), so screens look the same on mock and on the real server.
-
-### Today's switch settings
-| Repository | Use |
-|---|---|
-| Auth (register, login, refresh, logout) | **real** ✅ |
-| Patients (create, link caregiver) | **real** ✅ |
-| Devices (pair, heartbeat) | **real** ✅ |
-| Everything else | **mock** until its row in §6 turns ✅ |
-
----
-
-## 9. Test data on production
+## 8. Test data on production
 
 | What | Value |
 |---|---|
@@ -288,7 +240,7 @@ Locally (Docker), the password is `remori-local` and the device token is `local-
 
 ---
 
-## 10. Who does what
+## 9. Who does what
 
 | Need | Who acts |
 |---|---|
