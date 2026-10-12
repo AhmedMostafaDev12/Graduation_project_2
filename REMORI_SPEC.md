@@ -36,7 +36,7 @@ Decisions taken in the 2026-10-03 design session. **P** = product decision by th
 | D22 | **RAG is hybrid:** SQL time-window filter first, then pgvector similarity over rendered event sentences. | T |
 | D23 | **Unknown faces** are clustered in the cloud. The caregiver is asked once a cluster is seen on **≥3 different days** (configurable). | T |
 | D24 | **Privacy controls:** a visible listening LED, a "pause memory" button gesture, household consent, BLE bonding, encryption at rest on the glasses, an audit log (§9). | T |
-| D25 | **Database on Supabase, everything else on AWS.** Supabase hosts PostgreSQL 16 + pgvector (EU / Frankfurt region), used **only as plain Postgres**: no Supabase Auth, no auto-generated Data API (PostgREST), no Supabase Storage. API, workers, Redis and S3 stay on AWS. Local development uses Docker `pgvector/pgvector:pg16`. Moving to RDS later = dump + restore, no code change. | P |
+| D25 | **Database on Supabase, everything else on AWS.** Supabase hosts PostgreSQL 17 + pgvector (EU / Frankfurt region), used **only as plain Postgres**: no Supabase Auth, no auto-generated Data API (PostgREST), no Supabase Storage. API, workers, Redis and S3 stay on AWS. Local development uses Docker `pgvector/pgvector:pg17`. Moving to RDS later = dump + restore, no code change. | P |
 | D26 | **Caregiver sign-in: Google, Facebook, or email + password (no OTP).** Flutter uses `google_sign_in` and `flutter_facebook_auth`. The backend verifies the provider token itself (Google ID token: Google's public keys, audience = our client IDs, `email_verified`; Facebook access token: Graph API `debug_token` with our app credentials), then issues **Remori's own** JWT + refresh tokens. An existing account is linked automatically only when the provider says the email is verified (Google). A Facebook email matching an existing account is **not** linked: the caregiver signs in the usual way and connects Facebook in Connected accounts (C20). Patients are unchanged (device token). | P |
 
 ---
@@ -117,7 +117,7 @@ Remori helps a person living with Alzheimer's recognize the people around them, 
 | Backend | Python 3.12, FastAPI, Pydantic v2 + pydantic-settings, SQLAlchemy 2.0 (typed `Mapped[]` style) + Alembic, PyJWT, pwdlib, httpx |
 | Jobs | Celery + Redis broker, Celery Beat (cron), Flower (monitoring) (D19) |
 | Backend testing | pytest, pytest-asyncio, respx (mock external AI APIs) |
-| Database | PostgreSQL 16 + pgvector (only vector store), hosted on **Supabase** (D25). Local dev: Docker `pgvector/pgvector:pg16` |
+| Database | PostgreSQL 17 + pgvector (only vector store), hosted on **Supabase** (D25). Local dev: Docker `pgvector/pgvector:pg17` |
 | Object storage | S3, private bucket, presigned URLs |
 | Push | Firebase Cloud Messaging |
 | Mobile app | Flutter (Dart), **Android + iOS** (relay role Android, D8), Riverpod, GoRouter, dio |
@@ -688,7 +688,7 @@ Ambient listening is the core feature, so it has to be defensible. Egyptian law 
 
 0. **Hardware spike (week 1, parallel):** Pi Zero 2W at 1 fps with detector + MobileFaceNet (FPS, RAM, °C, mA). Real BLE throughput Pi→Android with a 50 KB JPEG and Opus audio. Wi-Fi burst via `WifiNetworkSpecifier`. I²S mic + speaker + Piper Arabic. **The results may revise D7/D18.**
 1. Scaffold the monorepo (§5). ✅ `backend&AI` renamed to `backend-ai`, CI added, `AGENTS.md` files written.
-2. `backend-ai`: schema (§6) via Alembic, FastAPI skeleton, auth + patient-link authorization.
+2. `backend-ai`: schema (§6) via Alembic, FastAPI skeleton, auth + patient-link authorization. ✅ Done (email + password; API live since 12 Oct 2026).
 3. `backend-ai`: people/enrollment (shared face pipeline), events batch, reminders, places, delta sync.
 4. `flutter`: app shell, GoRouter, drift, ApiClient, caregiver auth.
 5. `flutter`: Caregiver Mode: enrollment, reminders, places, device pairing.

@@ -54,4 +54,6 @@ flutter test
 
 ## 5. Current step
 
-Build order (spec §12), step 4: app shell, GoRouter with both mode entry points, drift setup, ApiClient, caregiver auth. All repositories start as mocks.
+App shell, GoRouter with both mode entry points, drift setup, ApiClient, caregiver auth.
+
+**The backend is live** at `https://remori-ai.duckdns.org/api/v1` (try it at `/docs`). These repositories are **real** already: auth (register, login, refresh, logout), patients (create, link caregiver), devices (pair, heartbeat). Everything else starts as a **mock** and switches to real when its endpoint ships. The full contract, the error codes, and how mock vs real repositories work: [`../docs/API_CONTRACT.md`](../docs/API_CONTRACT.md).

@@ -320,7 +320,7 @@ flowchart TB
     end
 
     subgraph SB["Supabase (EU region, D25)"]
-        db[("PostgreSQL 16 + pgvector<br/>plain Postgres only<br/>Data API off · RLS on")]
+        db[("PostgreSQL 17 + pgvector<br/>plain Postgres only<br/>Data API off · RLS on")]
     end
 
     dev["Team: Supabase dashboard / pgAdmin<br/>(remori_readonly)"]
