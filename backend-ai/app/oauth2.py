@@ -151,3 +151,30 @@ def require_patient_manager(
     if access.permission != "manager":
         raise Forbidden("Only a managing caregiver can do this.", code="MANAGER_ONLY")
     return access
+
+
+def require_editor(access: PatientAccess, allow_device: bool = False) -> PatientAccess:
+    """Writes: a managing caregiver, or (where the patient's phone writes) its device."""
+    if access.permission == "manager" or (
+        allow_device and access.permission == "device"
+    ):
+        return access
+    if access.permission == "device":
+        raise Forbidden("Only a caregiver can do this.", code="CAREGIVER_ONLY")
+    raise Forbidden("Only a managing caregiver can do this.", code="MANAGER_ONLY")
+
+
+def load_for_patient(
+    db: Session, principal: Principal, model, obj_id, what: str, code: str
+):
+    """Load a record by its own id (/people/{id}, /media/{id}, ...) and check the caller may
+    access the record's patient. A record you can't access looks exactly like a missing one."""
+    obj = db.get(model, obj_id)
+    not_found = NotFound(f"{what} not found.", code=code)
+    if obj is None or getattr(obj, "deleted_at", None) is not None:
+        raise not_found
+    try:
+        access = check_patient_access(db, principal, obj.patient_id)
+    except NotFound:
+        raise not_found from None
+    return obj, access

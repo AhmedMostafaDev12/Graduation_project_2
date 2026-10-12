@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 15
     refresh_token_expire_days: int = 30
 
+    # Media and audio files (private bucket; the EC2 server uses its IAM role, no keys)
+    aws_region: str = "eu-central-1"
+    s3_bucket: str = "remori-media-090413359449"
+
     @model_validator(mode="after")
     def _real_secret_outside_local(self):
         if self.environment != "local" and self.jwt_secret == LOCAL_JWT_SECRET:
