@@ -49,7 +49,7 @@ def _cluster(db: Session, principal: Principal, cluster_id: uuid.UUID):
         "UNKNOWN_FACE_NOT_FOUND",
     )
     require_editor(access)
-    return cluster
+    return cluster, access
 
 
 @router.get("/patients/{patient_id}/people", response_model=list[PersonOut])
@@ -149,7 +149,7 @@ def list_unknown_faces(
     access: PatientAccess = Depends(require_patient_link),
     _caregiver: User = Depends(get_current_user),
 ):
-    return people_service.list_unknown(db, access.patient_id)
+    return people_service.list_unknown(db, access)
 
 
 @router.post("/unknown-faces/{cluster_id}/promote", response_model=PromoteOut)
@@ -159,9 +159,8 @@ def promote_unknown_face(
     db: Session = Depends(get_db),
     principal: Principal = Depends(get_principal),
 ):
-    cluster, person = people_service.promote(
-        db, _cluster(db, principal, cluster_id), principal.user, data
-    )
+    cluster, access = _cluster(db, principal, cluster_id)
+    cluster, person = people_service.promote(db, access, cluster, data)
     return PromoteOut(cluster=cluster, person=person)
 
 
@@ -171,4 +170,5 @@ def dismiss_unknown_face(
     db: Session = Depends(get_db),
     principal: Principal = Depends(get_principal),
 ):
-    return people_service.dismiss(db, _cluster(db, principal, cluster_id))
+    cluster, access = _cluster(db, principal, cluster_id)
+    return people_service.dismiss(db, access, cluster)

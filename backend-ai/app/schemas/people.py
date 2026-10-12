@@ -35,11 +35,22 @@ class PersonPhoto(BaseModel):
 
 class PersonDetail(PersonOut):
     photos: list[PersonPhoto]
+    enrolled_by_name: str | None = Field(
+        default=None, description="The caregiver who enrolled them (C5)"
+    )
 
 
 class PersonUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=80)
     relationship: str | None = Field(default=None, min_length=1, max_length=40)
+
+
+class SamplePhoto(BaseModel):
+    id: uuid.UUID
+    url: str = Field(description="Signed URL (10 min)")
+    thumbnail_url: str | None = Field(
+        default=None, description="~320 px; null = use url"
+    )
 
 
 class UnknownFaceOut(BaseModel):
@@ -54,6 +65,9 @@ class UnknownFaceOut(BaseModel):
     status: str
     sample_url: str | None = Field(
         default=None, description="Signed URL of a sample frame"
+    )
+    samples: list[SamplePhoto] = Field(
+        default_factory=list, description="Up to 3 photos of this face (C7)"
     )
     sample_thumbnail_url: str | None = Field(
         default=None, description="~320 px preview of the sample; null = use sample_url"

@@ -8,7 +8,7 @@ import uuid
 from datetime import UTC, datetime
 
 from fastapi import UploadFile
-from sqlalchemy import delete, func, select, update
+from sqlalchemy import delete, func, or_, select, update
 from sqlalchemy.orm import Session
 
 from app.ai.inference import face
@@ -18,20 +18,23 @@ from app.models import (
     ConsentRecord,
     Encounter,
     EnrolledPerson,
+    Event,
     FaceEmbedding,
     MediaAsset,
     UnknownFaceCluster,
     User,
 )
+from app.oauth2 import PatientAccess
 from app.schemas.people import (
     PersonDetail,
     PersonOut,
     PersonPhoto,
     PersonUpdate,
     PromoteRequest,
+    SamplePhoto,
     UnknownFaceOut,
 )
-from app.services import thumbnail_service
+from app.services import media_service, thumbnail_service
 
 MAX_PHOTOS_PER_REQUEST = 5
 MAX_EMBEDDINGS_PER_PERSON = 20
@@ -62,17 +65,28 @@ def _read_photos(photos: list[UploadFile]) -> list[tuple[bytes, str]]:
         raise InvalidInput(
             f"Send 1 to {MAX_PHOTOS_PER_REQUEST} photos.", code="PHOTO_COUNT"
         )
-    result = []
-    for photo in photos:
+    result, problems = [], []
+    for index, photo in enumerate(photos):
         data = photo.file.read(MAX_PHOTO_BYTES + 1)
+        field = f"body.photos.{index}"  # 0-based, so the app can mark that slot (C4)
         if len(data) > MAX_PHOTO_BYTES:
-            raise InvalidInput(
-                "Each photo must be 4 MB or smaller.", code="PHOTO_TOO_LARGE"
+            problems.append(("PHOTO_TOO_LARGE", field, "Must be 4 MB or smaller."))
+        elif not face.looks_like_image(data) or not thumbnail_service.is_decodable(
+            data
+        ):
+            problems.append(
+                ("UNSUPPORTED_PHOTO", field, "Must be a JPEG or PNG photo.")
             )
-        if not face.looks_like_image(data) or not thumbnail_service.is_decodable(data):
-            raise InvalidInput("Photos must be JPEG or PNG.", code="UNSUPPORTED_PHOTO")
-        ext = "png" if data.startswith(face.PNG_MAGIC) else "jpg"
-        result.append((data, ext))
+        else:
+            ext = "png" if data.startswith(face.PNG_MAGIC) else "jpg"
+            result.append((data, ext))
+    if problems:
+        codes = {code for code, _, _ in problems}
+        raise InvalidInput(
+            "Some photos can't be used.",
+            code=codes.pop() if len(codes) == 1 else "PHOTOS_INVALID",
+            details=[{"field": field, "message": msg} for _, field, msg in problems],
+        )
     return result
 
 
@@ -173,7 +187,18 @@ def detail(db: Session, person: EnrolledPerson) -> PersonDetail:
         )
         for photo_id, key, thumb in rows
     ]
-    return PersonDetail(**person_out(db, person).model_dump(), photos=photos)
+    enrolled_by = None
+    if person.consent_record_id:
+        enrolled_by = db.scalar(
+            select(User.full_name)
+            .join(ConsentRecord, ConsentRecord.given_by == User.id)
+            .where(ConsentRecord.id == person.consent_record_id)
+        )
+    return PersonDetail(
+        **person_out(db, person).model_dump(),
+        photos=photos,
+        enrolled_by_name=enrolled_by,
+    )
 
 
 def remove_photo(db: Session, person: EnrolledPerson, photo_id: uuid.UUID) -> PersonOut:
@@ -229,43 +254,85 @@ def archive(db: Session, person: EnrolledPerson) -> None:
 AWAITING = ("open", "awaiting_caregiver")
 
 
-def _sample_keys(db: Session, clusters: list[UnknownFaceCluster]) -> dict:
-    """media id -> S3 key for the clusters' sample photos, in one query."""
-    ids = {c.sample_media_id for c in clusters if c.sample_media_id}
-    if not ids:
+MAX_SAMPLES = 3
+
+
+def _cluster_media(db: Session, clusters: list[UnknownFaceCluster]) -> dict:
+    """cluster id -> its photos (sample first, then sighting keyframes, newest first),
+    in one query for any number of clusters."""
+    if not clusters:
         return {}
+    by_cluster = {c.id: [] for c in clusters}
+    sample_of = {c.sample_media_id: c.id for c in clusters if c.sample_media_id}
     rows = db.execute(
-        select(MediaAsset.id, MediaAsset.storage_key, MediaAsset.thumbnail_key).where(
-            MediaAsset.id.in_(ids), MediaAsset.deleted_at.is_(None)
+        select(Encounter.cluster_id, MediaAsset)
+        .select_from(MediaAsset)
+        .outerjoin(Event, Event.id == MediaAsset.event_id)
+        .outerjoin(Encounter, Encounter.id == Event.encounter_id)
+        .where(
+            MediaAsset.deleted_at.is_(None),
+            MediaAsset.asset_type == "image",
+            or_(
+                Encounter.cluster_id.in_(list(by_cluster)),
+                MediaAsset.id.in_(list(sample_of)),
+            ),
         )
+        .order_by(MediaAsset.created_at.desc())
     )
-    return {media_id: (key, thumb) for media_id, key, thumb in rows}
+    for cluster_id, media in rows:
+        owner = sample_of.get(media.id, cluster_id)
+        photos = by_cluster.get(owner)
+        if photos is None or media in photos:
+            continue
+        if media.id in sample_of:
+            photos.insert(0, media)  # the clusterer's chosen sample goes first
+        else:
+            photos.append(media)
+    return by_cluster
 
 
 def _cluster_out(
-    db: Session, cluster: UnknownFaceCluster, keys: dict | None = None
+    db: Session,
+    access: PatientAccess,
+    cluster: UnknownFaceCluster,
+    media: dict | None = None,
 ) -> UnknownFaceOut:
-    keys = _sample_keys(db, [cluster]) if keys is None else keys
+    photos = (_cluster_media(db, [cluster]) if media is None else media).get(
+        cluster.id, []
+    )
+    samples = [
+        SamplePhoto(
+            id=m.id,
+            url=s3.presign_get(m.storage_key),
+            thumbnail_url=s3.presign_get(m.thumbnail_key) if m.thumbnail_key else None,
+        )
+        for m in photos[:MAX_SAMPLES]
+    ]
+    media_service.audit(db, access, "media.view", [sample.id for sample in samples])
     out = UnknownFaceOut.model_validate(cluster)
-    if cluster.sample_media_id in keys:
-        key, thumb = keys[cluster.sample_media_id]
-        out.sample_url = s3.presign_get(key)
-        out.sample_thumbnail_url = s3.presign_get(thumb) if thumb else None
+    out.samples = samples
+    if samples:
+        out.sample_url = samples[0].url
+        out.sample_thumbnail_url = samples[0].thumbnail_url
     return out
 
 
-def list_unknown(db: Session, patient_id: uuid.UUID) -> list[UnknownFaceOut]:
-    clusters = db.scalars(
-        select(UnknownFaceCluster)
-        .where(
-            UnknownFaceCluster.patient_id == patient_id,
-            UnknownFaceCluster.status == "awaiting_caregiver",
+def list_unknown(db: Session, access: PatientAccess) -> list[UnknownFaceOut]:
+    """C6. Each face comes with up to 3 sample photos (C7); every URL is audit-logged."""
+    clusters = list(
+        db.scalars(
+            select(UnknownFaceCluster)
+            .where(
+                UnknownFaceCluster.patient_id == access.patient_id,
+                UnknownFaceCluster.status == "awaiting_caregiver",
+            )
+            .order_by(UnknownFaceCluster.last_seen_at.desc())
         )
-        .order_by(UnknownFaceCluster.last_seen_at.desc())
     )
-    clusters = list(clusters)
-    keys = _sample_keys(db, clusters)
-    return [_cluster_out(db, cluster, keys) for cluster in clusters]
+    media = _cluster_media(db, clusters)
+    out = [_cluster_out(db, access, cluster, media) for cluster in clusters]
+    db.commit()  # the audit rows
+    return out
 
 
 def _undecided(cluster: UnknownFaceCluster) -> None:
@@ -274,14 +341,17 @@ def _undecided(cluster: UnknownFaceCluster) -> None:
 
 
 def promote(
-    db: Session, cluster: UnknownFaceCluster, caregiver: User, data: PromoteRequest
+    db: Session,
+    access: PatientAccess,
+    cluster: UnknownFaceCluster,
+    data: PromoteRequest,
 ) -> tuple[UnknownFaceOut, PersonOut]:
     """Turn a recurring unknown face into an enrolled person (spec D2)."""
     _undecided(cluster)
     person = _new_person(
         db,
         cluster.patient_id,
-        caregiver,
+        access.principal.user,
         data.name,
         data.relationship,
         "promoted_from_unknown",
@@ -304,14 +374,28 @@ def promote(
     cluster.promoted_person_id = person.id
     db.commit()
     db.refresh(person)
-    return _cluster_out(db, cluster), person_out(db, person)
+    out = _cluster_out(db, access, cluster)
+    db.commit()
+    return out, person_out(db, person)
 
 
-def dismiss(db: Session, cluster: UnknownFaceCluster) -> UnknownFaceOut:
+def dismiss(
+    db: Session, access: PatientAccess, cluster: UnknownFaceCluster
+) -> UnknownFaceOut:
+    """A stranger: their photos are deleted now (spec §8 retention), not after 30 days.
+    The sightings stay in the journal, without the photos."""
     _undecided(cluster)
+    photos = _cluster_media(db, [cluster])[cluster.id]
+    now = datetime.now(UTC)
+    for media in photos:
+        s3.delete(media.storage_key)
+        if media.thumbnail_key:
+            s3.delete(media.thumbnail_key)
+        media.deleted_at = now
+    media_service.audit(db, access, "media.delete", [m.id for m in photos])
     cluster.status = "dismissed"
     db.commit()
-    return _cluster_out(db, cluster)
+    return _cluster_out(db, access, cluster)
 
 
 def list_people(db: Session, patient_id: uuid.UUID, status: str) -> list[PersonOut]:

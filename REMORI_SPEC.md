@@ -576,7 +576,7 @@ Base `/api/v1`. Auth: JWT access (15 min) + refresh token for caregivers, who si
 | DELETE | `/people/{id}/photos/{photo_id}` | Remove one photo and its embedding (not the last one) |
 | PATCH / DELETE | `/people/{id}` | Edit / archive (face data and photos are deleted; the row stays for the journal) |
 | GET | `/patients/{id}/unknown-faces` | Clusters awaiting caregiver |
-| POST | `/unknown-faces/{id}/promote` · `/dismiss` | Caregiver decision |
+| POST | `/unknown-faces/{id}/promote` · `/dismiss` | Caregiver decision. Dismiss deletes every photo of that face at once (§8) |
 | POST | `/patients/{id}/events:batch` | Idempotent batch upload (events + encounters) |
 | POST | `/patients/{id}/uploads` | Request presigned S3 URL for media or audio |
 | POST | `/uploads/{id}/complete` | Confirm upload → enqueue review (media) or STT (audio). Body carries `patient_id`, `kind` and the row's fields, since the path has no patient |

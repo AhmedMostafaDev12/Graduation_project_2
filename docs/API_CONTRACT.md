@@ -111,7 +111,7 @@ Validation errors add the fields that failed:
 | 409 | `UPLOAD_MISSING` | `complete` was called before the file reached S3 | retry the PUT, then `complete` |
 | 409 | `ID_IN_USE` | a client-generated id already belongs to another patient | generate a new id |
 | 422 | `VALIDATION_ERROR` | a field is missing or wrong; see `details` | highlight the fields |
-| 422 | `CONSENT_REQUIRED` · `PHOTO_COUNT` · `PHOTO_TOO_LARGE` · `UNSUPPORTED_PHOTO` | enrollment: no consent, not 1–5 photos, a photo over 4 MB, not JPEG/PNG | show the message |
+| 422 | `CONSENT_REQUIRED` · `PHOTO_COUNT` · `PHOTO_TOO_LARGE` · `UNSUPPORTED_PHOTO` · `PHOTOS_INVALID` | enrollment: no consent, not 1–5 photos, a photo over 4 MB, not a JPEG/PNG Pillow can open (`PHOTOS_INVALID` = several kinds at once). `details` lists **every** bad photo as `body.photos.<index>` (0-based) | outline those photo slots (C4) |
 | 503 | `DATABASE_UNAVAILABLE` | the server can't reach the database | "Try again in a moment" |
 | 503 | `STORAGE_UNAVAILABLE` | the server can't reach S3 | "Try again in a moment" |
 
@@ -291,11 +291,11 @@ Fields: `name` (1–80), `relationship` (1–40), `consent_given` (`true`), `pho
 { "id": "…", "patient_id": "…", "name": "أحمد", "relationship": "son", "added_by": "caregiver_manual",
   "status": "active", "embedding_count": 2, "created_at": "…", "updated_at": "…" }
 ```
-List items also carry `"photo_url"` (the first photo's ~320 px preview, signed). `?status=archived` lists archived people. `GET /people/{id}` adds `"photos": [ { "id": "…", "url": "https://…signed, 10 min" } ]`. `DELETE /people/{id}/photos/{photo_id}` removes that photo and its embedding and returns the person (`409 LAST_PHOTO` for the only one). `PATCH` takes `{ "name"?, "relationship"? }`. `DELETE` → `204`: the person is archived, their photos and face data are deleted, and past journal entries keep the name. At most 20 photos per person (`409 TOO_MANY_PHOTOS`).
+List items also carry `"photo_url"` (the first photo's ~320 px preview, signed). `?status=archived` lists archived people. `GET /people/{id}` adds `"photos": [ { "id": "…", "url": "https://…signed, 10 min", "thumbnail_url": "…or null" } ]` and `"enrolled_by_name": "Ahmed Mostafa"` (C5). `DELETE /people/{id}/photos/{photo_id}` removes that photo and its embedding and returns the person (`409 LAST_PHOTO` for the only one). `PATCH` takes `{ "name"?, "relationship"? }`. `DELETE` → `204`: the person is archived, their photos and face data are deleted, and past journal entries keep the name. At most 20 photos per person (`409 TOO_MANY_PHOTOS`).
 
 #### Unknown faces · screen C7
-`GET` → `[ { "id", "patient_id", "sighting_count", "distinct_days", "first_seen_at", "last_seen_at", "status": "awaiting_caregiver", "sample_url": "signed or null" } ]`.
-`POST /unknown-faces/{id}/promote` with `{ "name": "…", "relationship": "neighbour", "consent_given": true }` → `200 { "cluster": {…, "status": "promoted"}, "person": { person shape } }`. `POST …/dismiss` → the cluster with `"status": "dismissed"`. Deciding twice → `409 ALREADY_DECIDED`.
+`GET` → `[ { "id", "patient_id", "sighting_count", "distinct_days", "first_seen_at", "last_seen_at", "status": "awaiting_caregiver", "sample_url", "sample_thumbnail_url", "samples": [ { "id", "url", "thumbnail_url" } ] } ]`. `samples` = up to 3 photos of the face (C7), the clusterer's chosen one first; `sample_url` / `sample_thumbnail_url` repeat the first for the C6 card.
+`POST /unknown-faces/{id}/promote` with `{ "name": "…", "relationship": "neighbour", "consent_given": true }` → `200 { "cluster": {…, "status": "promoted"}, "person": { person shape } }`. `POST …/dismiss` → the cluster with `"status": "dismissed"` and `"samples": []`: **all photos of that face are deleted at once** (sightings stay in the journal without photos). Deciding twice → `409 ALREADY_DECIDED`.
 
 #### Reminders · screens C8, C9
 ```json
