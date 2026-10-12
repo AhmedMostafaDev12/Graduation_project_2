@@ -76,5 +76,5 @@ glasses (hardware/) ──BLE §7.1──> flutter/ (relay + UI) ──REST §7.
 
 ## 6. Status
 
-**Backend: live** at `https://remori-ai.duckdns.org` (API `/api/v1`, docs `/docs`) since 12 Oct 2026. Plan phases 0–4 done: infrastructure, skeleton, database (Supabase), auth (email + password), deploy. Phase 5 (all CRUD endpoints, AI stubs) built, not deployed yet: it ships with Phase 6 (Celery + Redis).
+**Backend: live** at `https://remori-ai.duckdns.org` (API `/api/v1`, docs `/docs`) since 12 Oct 2026. Plan phases 0–6 done and deployed (12–13 Oct 2026): infrastructure, database (Supabase), auth (email + password), every endpoint the 42 screens need (AI stubs where models aren't ready), and background workers (Celery + Redis: alerts, retention, previews). Next: Phase 7, the ambient memory pipeline.
 **Flutter, hardware, ml:** starting. The current step for each area is in its `AGENTS.md`. The contract between app and backend: [`docs/API_CONTRACT.md`](docs/API_CONTRACT.md).
