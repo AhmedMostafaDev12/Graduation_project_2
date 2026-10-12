@@ -40,12 +40,13 @@ backend-ai/
 │   │   └── prompts/       #   prompt templates as versioned text files
 │   └── workers/           # [added] Celery. See CELERY_REDIS.md
 │       ├── celery_app.py  #   Celery app, config, queues, beat_schedule
-│       └── tasks/         #   transcribe.py  review.py  embed.py  cluster.py  retention.py  summaries.py  alerts.py
+│       ├── locks.py · retry.py · db.py  # Redis lock, what to retry, task sessions
+│       └── tasks/         #   alerts.py  retention.py  media.py (built) · transcribe.py  review.py  embed.py  cluster.py  summaries.py (Phases 7–9)
 ├── alembic/               # [course] migrations (first one: CREATE EXTENSION vector)
 ├── tests/                 # [course] pytest: conftest.py, test database, TestClient
 ├── requirements.txt       # [course]
 ├── Dockerfile             # [course] one image, used for api, worker and beat
-├── docker-compose.yml     # [course] production: api · worker · beat · flower · redis (DB = Supabase)
+├── docker-compose.yml     # [course] production: api · worker · beat · redis (DB = Supabase; no flower)
 └── docker-compose.dev.yml # [added] local: + postgres (pgvector/pgvector:pg17)
 ```
 

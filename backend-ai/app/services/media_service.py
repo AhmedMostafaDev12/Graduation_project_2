@@ -5,9 +5,12 @@ patient, kind and id; the phone PUTs the file to S3 directly; POST /uploads/{id}
 checks the object is there and creates the database row. Completing twice is harmless.
 """
 
+import logging
 import uuid
 from datetime import UTC, datetime
 
+from kombu.exceptions import OperationalError as KombuOperationalError
+from redis.exceptions import RedisError
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -34,7 +37,8 @@ from app.schemas.media import (
     UploadOut,
     UploadRequest,
 )
-from app.services import thumbnail_service
+
+logger = logging.getLogger(__name__)
 
 
 def storage_key(
@@ -92,7 +96,7 @@ def complete_upload(
             )
             db.add(segment)
             db.commit()
-        # Phase 6: enqueue transcribe(segment) on Celery here
+        # Phase 7: enqueue transcribe(segment) here
         return UploadDone(id=upload_id, kind="audio", status=segment.status)
 
     asset = _already_done(db, MediaAsset, upload_id, patient_id)
@@ -120,13 +124,23 @@ def complete_upload(
             status="confirmed" if requested else "pending_review",
             retention_policy="keep_indefinitely" if requested else None,
         )
-        if asset.asset_type == "image":
-            # Phase 6: a Celery task instead (video thumbnails need ffmpeg there)
-            asset.thumbnail_key = thumbnail_service.create(key)
         db.add(asset)
         db.commit()
-        # Phase 6: enqueue review(asset) on Celery here when pending_review
+        # rule 1: enqueue only after the commit, so the worker finds the row
+        _enqueue_thumbnail(asset.id)
+        # Phase 7: enqueue review(asset) here when pending_review
     return UploadDone(id=upload_id, kind="media", status=asset.status)
+
+
+def _enqueue_thumbnail(media_id: uuid.UUID) -> None:
+    """Never fails the upload: if Redis is down, the media.backfill_thumbnails sweep
+    picks the item up later."""
+    from app.workers.tasks.media import make_thumbnail  # the API only needs it here
+
+    try:
+        make_thumbnail.delay(str(media_id))  # IDs only (rule 2)
+    except (KombuOperationalError, RedisError):
+        logger.warning("thumbnail not queued; the backfill sweep will retry")
 
 
 def audit(db: Session, access: PatientAccess, action: str, media_ids: list) -> None:

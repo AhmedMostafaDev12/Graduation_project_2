@@ -1,6 +1,13 @@
-# Local development stack: Postgres (same major version as Supabase) + the API with hot reload.
+# Local development stack: Postgres (same major version as Supabase), Redis, the API with hot
+# reload, and one Celery worker + beat.
 # Start:  docker compose -f docker-compose.dev.yml up --build
 # Docs:   http://localhost:8000/docs
+# The worker doesn't reload on code changes:  docker compose -f docker-compose.dev.yml restart worker
+
+x-app-env: &app-env
+  ENVIRONMENT: local
+  DATABASE_URL: postgresql+psycopg://remori:remori@db:5432/remori
+  REDIS_URL: redis://redis:6379/0
 
 services:
   db:
@@ -19,18 +26,54 @@ services:
       timeout: 3s
       retries: 10
 
+  redis:
+    image: redis:7.4-alpine
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy noeviction
+    ports:
+      - "6379:6379"   # so tests and scripts on the laptop can reach it
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   api:
     build: .
+    image: remori-backend:dev
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-    environment:
-      ENVIRONMENT: local
-      DATABASE_URL: postgresql+psycopg://remori:remori@db:5432/remori
+    environment: *app-env
     ports:
       - "8000:8000"
     volumes:
       - ./app:/code/app   # code changes reload without rebuilding
     depends_on:
       db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    image: remori-backend:dev
+    command: celery -A app.workers.celery_app worker -Q ai_io,cpu,default --concurrency=2 --loglevel=info
+    environment: *app-env
+    volumes:
+      - ./app:/code/app
+    depends_on:
+      api:
+        condition: service_started   # the api service builds the image
+      redis:
+        condition: service_healthy
+
+  beat:
+    image: remori-backend:dev
+    command: celery -A app.workers.celery_app beat --schedule /tmp/celerybeat-schedule --loglevel=info
+    environment: *app-env
+    volumes:
+      - ./app:/code/app
+    depends_on:
+      api:
+        condition: service_started
+      redis:
         condition: service_healthy
 
 volumes:

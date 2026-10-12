@@ -267,7 +267,7 @@ html{scroll-behavior:smooth}
     <tr><td class="chk"><input type="checkbox" id="p6-3" aria-label="6.3 done"></td><td class="name">6.3 First real task</td><td class="det"><code>alerts.evaluate</code> (missed meds, device offline, low battery) on seeded data. Simple, no AI.</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p6-4" aria-label="6.4 done"></td><td class="name">6.4 Second task</td><td class="det"><code>retention.expire_media</code> (spec §8).</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p6-5" aria-label="6.5 done"></td><td class="name">6.5 Tests</td><td class="det">Idempotency (run twice → one result), failure → retry → <code>failed</code>.</td></tr>
-    <tr><td class="chk"><input type="checkbox" id="p6-6" aria-label="6.6 done"></td><td class="name">6.6 Thumbnails</td><td class="det"><b>Built early (D28, migration <code>0004</code>)</b> inside the request: <code>services/thumbnail_service.py</code> makes a ~320 px JPEG at enrollment and at upload completion. In Phase 6: move the upload case into a task <code>media.make_thumbnail</code> (it just calls <code>thumbnail_service.create</code>), and add video thumbnails (ffmpeg in the worker image).</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p6-6" aria-label="6.6 done"></td><td class="name">6.6 Thumbnails</td><td class="det"><b>Done.</b> Enrollment previews stay in the request; uploaded photos <b>and videos</b> get theirs from task <code>media.make_thumbnail</code> (queued after the commit), with <code>media.backfill_thumbnails</code> every 10 min as a safety net.</td></tr>
   </tbody></table></div>
   <div class="done"><b>Done when (M4):</b> workers and Beat run on EC2, and alerts appear in C2 by themselves.</div>
 </section>

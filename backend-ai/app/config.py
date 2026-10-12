@@ -26,6 +26,9 @@ class Settings(BaseSettings):
     aws_region: str = "eu-central-1"
     s3_bucket: str = "remori-media-090413359449"
 
+    # Celery broker (docs/CELERY_REDIS.md). Compose sets redis://redis:6379/0.
+    redis_url: str = "redis://localhost:6379/0"
+
     @model_validator(mode="after")
     def _real_secret_outside_local(self):
         if self.environment != "local" and self.jwt_secret == LOCAL_JWT_SECRET:
