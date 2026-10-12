@@ -11,6 +11,7 @@ from app.models import CaregiverPatientLink, ConsentRecord, PatientProfile, User
 from app.schemas.accounts import (
     CaregiverLinkCreate,
     CaregiverLinkOut,
+    MyPatientOut,
     PatientCreate,
     PatientOut,
 )
@@ -26,6 +27,27 @@ def _patient_out(patient: User, profile: PatientProfile) -> PatientOut:
         memory_capture_enabled=profile.memory_capture_enabled,
         created_at=patient.created_at,
     )
+
+
+def list_my_patients(db: Session, caregiver: User) -> list[MyPatientOut]:
+    rows = db.execute(
+        select(User, PatientProfile, CaregiverPatientLink)
+        .join(PatientProfile, PatientProfile.user_id == User.id)
+        .join(CaregiverPatientLink, CaregiverPatientLink.patient_id == User.id)
+        .where(
+            CaregiverPatientLink.caregiver_id == caregiver.id, User.deleted_at.is_(None)
+        )
+        .order_by(CaregiverPatientLink.is_primary.desc(), User.full_name)
+    )
+    return [
+        MyPatientOut(
+            **_patient_out(patient, profile).model_dump(),
+            relationship=link.relationship,
+            permission=link.permission,
+            is_primary=link.is_primary,
+        )
+        for patient, profile, link in rows
+    ]
 
 
 def create_patient(db: Session, caregiver: User, data: PatientCreate) -> PatientOut:

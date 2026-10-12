@@ -67,6 +67,19 @@ def test_enroll_stores_photos_and_embeddings(client, fake_s3):
     assert [p["id"] for p in listed.json()] == [person["id"]]
 
 
+def test_last_photo_cannot_be_removed(client):
+    manager, patient = _setup(client)
+    person = _enroll(client, manager, patient["id"]).json()
+    detail = client.get(
+        f"{API}/people/{person['id']}", headers=manager["headers"]
+    ).json()
+    last = client.delete(
+        f"{API}/people/{person['id']}/photos/{detail['photos'][0]['id']}",
+        headers=manager["headers"],
+    )
+    assert last.status_code == 409 and last.json()["error"]["code"] == "LAST_PHOTO"
+
+
 def test_enroll_validates_consent_and_files(client, fake_s3):
     manager, patient = _setup(client)
     no_consent = _enroll(client, manager, patient["id"], consent="false")

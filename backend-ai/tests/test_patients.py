@@ -123,3 +123,29 @@ def test_a_viewer_cannot_add_caregivers(client):
     )
     assert response.status_code == 403
     assert response.json()["error"]["code"] == "MANAGER_ONLY"
+
+
+def test_list_my_patients_and_me(client):
+    from tests.conftest import add_viewer
+
+    manager = register_and_login(client)
+    own = create_patient(client, manager, name="Own")
+    other_manager = register_and_login(client)
+    shared = create_patient(client, other_manager, name="Shared")
+    client.post(
+        f"{API}/patients/{shared['id']}/caregivers",
+        json={"email": manager["email"], "relationship": "nurse"},
+        headers=other_manager["headers"],
+    )
+    create_patient(client, register_and_login(client), name="Not mine")
+    add_viewer(client, manager, own["id"])
+
+    listed = client.get(f"{API}/patients", headers=manager["headers"]).json()
+    assert [(p["id"], p["permission"], p["is_primary"]) for p in listed] == [
+        (own["id"], "manager", True),
+        (shared["id"], "viewer", False),
+    ]
+
+    me = client.get(f"{API}/auth/me", headers=manager["headers"])
+    assert me.status_code == 200 and me.json()["email"] == manager["email"]
+    assert "password_hash" not in me.json()

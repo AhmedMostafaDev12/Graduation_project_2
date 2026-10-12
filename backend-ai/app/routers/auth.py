@@ -3,6 +3,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.models import User
+from app.oauth2 import get_current_user
 from app.schemas.accounts import CaregiverCreate, RefreshRequest, Token, UserOut
 from app.services import auth_service
 
@@ -31,3 +33,9 @@ def refresh(data: RefreshRequest, db: Session = Depends(get_db)):
 def logout(data: RefreshRequest, db: Session = Depends(get_db)):
     auth_service.logout(db, data.refresh_token)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get("/me", response_model=UserOut)
+def me(caregiver: User = Depends(get_current_user)):
+    """The signed-in caregiver."""
+    return caregiver

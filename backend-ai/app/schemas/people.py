@@ -22,7 +22,7 @@ class PersonOut(BaseModel):
 
 
 class PersonPhoto(BaseModel):
-    key: str = Field(description="Stable id of the photo")
+    id: uuid.UUID = Field(description="Use it to remove this photo")
     url: str = Field(description="Short-lived signed URL (10 minutes)")
 
 

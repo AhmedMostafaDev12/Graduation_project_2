@@ -12,7 +12,7 @@ from sqlalchemy import delete, func, select, update
 from sqlalchemy.orm import Session
 
 from app.ai.inference import face
-from app.errors import Conflict, InvalidInput
+from app.errors import Conflict, InvalidInput, NotFound
 from app.integrations import s3
 from app.models import (
     ConsentRecord,
@@ -86,6 +86,7 @@ def _store_photos(
                 person_id=person.id,
                 embedding=face.embed_face(data),
                 model_version=face.MODEL_VERSION,
+                storage_key=key,
             )
         )
 
@@ -155,11 +156,35 @@ def add_photos(
 
 
 def detail(db: Session, person: EnrolledPerson) -> PersonDetail:
+    rows = db.execute(
+        select(FaceEmbedding.id, FaceEmbedding.storage_key)
+        .where(
+            FaceEmbedding.person_id == person.id, FaceEmbedding.storage_key.is_not(None)
+        )
+        .order_by(FaceEmbedding.created_at)
+    )
     photos = [
-        PersonPhoto(key=key.rsplit("/", 1)[-1], url=s3.presign_get(key))
-        for key in s3.list_keys(_photo_prefix(person))
+        PersonPhoto(id=photo_id, url=s3.presign_get(key)) for photo_id, key in rows
     ]
     return PersonDetail(**person_out(db, person).model_dump(), photos=photos)
+
+
+def remove_photo(db: Session, person: EnrolledPerson, photo_id: uuid.UUID) -> PersonOut:
+    """Remove one enrollment photo and the embedding made from it."""
+    row = db.get(FaceEmbedding, photo_id)
+    if row is None or row.person_id != person.id or row.storage_key is None:
+        raise NotFound("Photo not found.", code="PHOTO_NOT_FOUND")
+    if _embedding_count(db, person.id) == 1:
+        raise Conflict(
+            "This is the person's last photo. Add another first, or archive the person.",
+            code="LAST_PHOTO",
+        )
+    s3.delete(row.storage_key)
+    db.delete(row)
+    person.updated_at = func.now()  # /sync resends the person's remaining embeddings
+    db.commit()
+    db.refresh(person)
+    return person_out(db, person)
 
 
 def update_person(db: Session, person: EnrolledPerson, data: PersonUpdate) -> PersonOut:
@@ -174,7 +199,7 @@ def archive(db: Session, person: EnrolledPerson) -> None:
     """The glasses stop recognising this person. Encounters keep pointing at the row so the
     journal still shows the name, but face data is deleted (spec §7.4 retention)."""
     now = datetime.now(UTC)
-    for key in s3.list_keys(_photo_prefix(person)):
+    for key in s3.list_keys(_photo_prefix(person)):  # by prefix: also catches orphans
         s3.delete(key)
     db.execute(delete(FaceEmbedding).where(FaceEmbedding.person_id == person.id))
     db.execute(

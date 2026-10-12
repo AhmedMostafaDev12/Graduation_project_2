@@ -105,6 +105,18 @@ def add_photos(
     )
 
 
+@router.delete("/people/{person_id}/photos/{photo_id}", response_model=PersonOut)
+def remove_photo(
+    person_id: uuid.UUID,
+    photo_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    principal: Principal = Depends(get_principal),
+):
+    return people_service.remove_photo(
+        db, _person(db, principal, person_id, write=True), photo_id
+    )
+
+
 @router.patch("/people/{person_id}", response_model=PersonOut)
 def update_person(
     person_id: uuid.UUID,

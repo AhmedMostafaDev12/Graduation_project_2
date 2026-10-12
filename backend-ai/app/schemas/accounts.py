@@ -78,6 +78,14 @@ class PatientOut(BaseModel):
     created_at: datetime
 
 
+class MyPatientOut(PatientOut):
+    """A patient as seen by one linked caregiver (screen C1 switcher)."""
+
+    relationship: str = Field(description="Your relationship to the patient")
+    permission: str = Field(description="manager or viewer")
+    is_primary: bool
+
+
 class CaregiverLinkCreate(BaseModel):
     email: EmailStr
     relationship: str = Field(min_length=1, max_length=60)
