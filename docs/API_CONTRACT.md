@@ -98,7 +98,7 @@ Validation errors add the fields that failed:
 | 404 | `PATIENT_NOT_FOUND` | patient doesn't exist **or** isn't yours | treat as gone |
 | 404 | `CAREGIVER_NOT_FOUND` | no caregiver account has that email | "Ask them to create an account first" |
 | 404 | `DEVICE_NOT_FOUND` | device ID isn't this phone's device | bug in the app |
-| 404 | `PERSON_NOT_FOUND` · `PHOTO_NOT_FOUND` · `CONSENT_NOT_FOUND` · `UNKNOWN_FACE_NOT_FOUND` · `PLACE_NOT_FOUND` · `REMINDER_NOT_FOUND` · `MEDIA_NOT_FOUND` · `EVENT_NOT_FOUND` · `ALERT_NOT_FOUND` | doesn't exist, was deleted, **or** isn't yours | treat as gone, refresh the list |
+| 404 | `PERSON_NOT_FOUND` · `PHOTO_NOT_FOUND` · `DOCUMENT_NOT_FOUND` · `CONSENT_NOT_FOUND` · `UNKNOWN_FACE_NOT_FOUND` · `PLACE_NOT_FOUND` · `REMINDER_NOT_FOUND` · `MEDIA_NOT_FOUND` · `EVENT_NOT_FOUND` · `ALERT_NOT_FOUND` | doesn't exist, was deleted, **or** isn't yours | treat as gone, refresh the list |
 | 404 | `SUMMARY_NOT_READY` | no daily summary for that date yet | "No summary yet" |
 | 404 | `NOT_FOUND` | the URL doesn't exist | bug in the app |
 | 409 | `EMAIL_TAKEN` | registering an email that already has an account | offer login instead |
@@ -248,7 +248,7 @@ Errors: `403 DEVICE_ONLY`, `404 DEVICE_NOT_FOUND`.
 | `GET /patients/{id}/media/{media_id}` | any linked (audit-logged) | C13, P5 |
 | `POST /media/{id}/pin` | manager | C13 |
 | `DELETE /media/{id}` | phone + manager | C13, P5 |
-| `GET /patients/{id}/documents?type=&limit=&offset=` | any linked | C14, C15 |
+| `GET /patients/{id}/documents?type=&limit=&offset=` · `GET /documents/{id}` | any linked | C14, C15 |
 | `POST /patients/{id}/mind-game-sessions` | phone + manager | P7–P9 |
 | `GET /patients/{id}/mind-game-sessions?game_type=&limit=&offset=` | any linked | P7 |
 | `GET /patients/{id}/daily-summary?date=` | any linked | C17 |
@@ -367,10 +367,25 @@ The day in the **patient's** timezone (default: today), oldest first.
 `user_requested` media is `confirmed` and kept for good; the rest waits for review (`pending_review`); audio is `uploaded`. Calling `complete` twice is safe. Before the PUT lands: `409 UPLOAD_MISSING`.
 
 #### Media · screens C13, P5
-`GET /patients/{id}/media/{media_id}` → the media fields (`id, patient_id, event_id, asset_type, trigger, status, ai_tags, contains_other_people, duration_seconds, retention_policy, expires_at, pinned_by, created_at`) plus `"url"` (signed, 10 min) and `"url_expires_in": 600`. Every view is audit-logged. `POST /media/{id}/pin` → the media fields with `retention_policy: "keep_indefinitely"`. `DELETE /media/{id}` → `204` (the file is removed from S3).
+`GET /patients/{id}/media/{media_id}` → the media fields (`id, patient_id, event_id, asset_type, trigger, status, ai_tags, contains_other_people, duration_seconds, retention_policy, expires_at, pinned_by, created_at`) plus `"url"` (signed, 10 min), `"url_expires_in": 600` and `"event": { "id", "event_type", "occurred_at", "person": { "id", "name", "relationship" } or null }` for C13's title line. Every view is audit-logged.
 
-#### `GET /patients/{id}/documents?type=receipt` · screens C14, C15
-`[ { "id", "event_id", "media_asset_id", "document_type": "receipt | bill | medication_label | other", "ocr_text", "extracted_fields": {}, "created_at", "url" } ]`, newest first, 50 per page. `url` is the signed photo.
+`ai_tags` (here, in the journal and in lists) is always `{ "category": "notable_moment | document | person | place | other" or null, "tags": [], "reason": "… or null", "raw_category": "… only for other" }`. For `other`, show `reason`: it's something the AI judged worth keeping that fits none of our categories. "Auto-deletes in N days" = `expires_at` − now; show "Kept" when `retention_policy` is `keep_indefinitely`. `POST /media/{id}/pin` → the media fields with `retention_policy: "keep_indefinitely"`. `DELETE /media/{id}` → `204` (the file is removed from S3).
+
+#### `GET /patients/{id}/documents?type=receipt` · `GET /documents/{id}` · screens C14, C15
+```json
+{ "id": "…", "document_type": "receipt", "title": "صيدلية", "headline": "120 EGP",
+  "fields": [ { "key": "total", "label": null, "value": "120 EGP", "type": "text" },
+              { "key": "date", "label": null, "value": "2026-10-01", "type": "date" },
+              { "key": "items", "label": null, "value": "Concor 5 mg x1", "type": "text" } ],
+  "captured_at": "2026-10-01T08:45:00Z", "ocr_text": "…", "extracted_fields": { },
+  "url": "https://…signed", "thumbnail_url": "https://…signed ~320 px",
+  "event_id": "…", "media_asset_id": "…", "created_at": "…" }
+```
+- **C14 card:** `thumbnail_url`, `title` (null → show the translated type, e.g. "Receipt"), `captured_at`, `headline`. Newest capture first, 50 per page.
+- **C15 detail:** `url`, then one row per `fields` item, then `ocr_text` (collapsible).
+- **Row labels:** known types send a `key` to translate: `total` Amount · `date` Date · `items` Items · `merchant` Store · `issuer` Company · `due_date` Due date · `medication_name` Medicine · `strength` Strength · `instructions` How to take · `expiry_date` Expires. `type: "date"` values are `YYYY-MM-DD`, format them locally.
+- **`document_type: "other"`** (something the AI read that fits no type, e.g. an appointment card): `key` is null and `label` is the AI's own label in the patient's language, so show it as-is. `title` is the AI's title.
+- The journal's `document_captured` entries carry `"document": { "id", "document_type", "title", "headline" }` for C12; tap opens `GET /documents/{id}`.
 
 #### `POST /patients/{id}/mind-game-sessions` · screens P7–P9
 `{ "id": "…", "game_type": "face_match", "score": 8, "duration_seconds": 240, "completed_at": "…" }` → `201` with the same fields + `patient_id`. Sending the same id again returns the stored session. The game also appears in the journal. `GET` lists past games, newest first (`?game_type=` for one game's last score).

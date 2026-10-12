@@ -40,6 +40,7 @@ Decisions taken in the 2026-10-03 design session. **P** = product decision by th
 | D26 | **Caregiver sign-in: Google, Facebook, or email + password (no OTP).** Flutter uses `google_sign_in` and `flutter_facebook_auth`. The backend verifies the provider token itself (Google ID token: Google's public keys, audience = our client IDs, `email_verified`; Facebook access token: Graph API `debug_token` with our app credentials), then issues **Remori's own** JWT + refresh tokens. An existing account is linked automatically only when the provider says the email is verified (Google). A Facebook email matching an existing account is **not** linked: the caregiver signs in the usual way and connects Facebook in Connected accounts (C20). Patients are unchanged (device token). | P |
 | D27 | **Phase 5 API additions:** `GET /auth/me`, `GET /patients`, people list/detail, single-photo removal; batch responses add `rejected`; enrollment photo keys stored on `face_embeddings.storage_key`; archiving a person deletes their face data but keeps the row for the journal; a pagination rule for unbounded lists (§7.2). | P |
 | D28 | **Every UI-brief screen has its endpoints:** device list + unpair, patient profile edit, linked caregivers, consent list + revoke, one day's reminder logs, past games, archived-people filter, alert links (migration `0003`), ~320 px thumbnails (migration `0004`), and signed URLs inside list responses so a screen needs one request, not one per item (§7.2). | P |
+| D29 | **Smart-review contract:** keep/discard is separate from category; fixed shapes for receipt, bill, medication label and `ai_tags`; everything else is `other` with the model's own title, labels or reason (never dropped, never an error); unknown categories kept in `raw_category` and promoted to real ones only by the lead (§7.4). Documents and media responses are ready to show (`title`, `headline`, `fields`, `captured_at`, event summary). | P |
 
 ---
 
@@ -359,7 +360,7 @@ media_assets (
   thumbnail_key TEXT NULLABLE,         -- ~320 px JPEG preview, NULL for videos (D28)
   trigger ENUM('encounter_keyframe','document_signal','salient_frame','user_requested'),
   status ENUM('pending_review','confirmed','discarded'),
-  ai_tags JSONB NULLABLE,              -- open-ended {"category":"notable_moment","reason":"..."}
+  ai_tags JSONB NULLABLE,              -- {category, tags[], reason, raw_category?} (D29)
   contains_other_people BOOLEAN NULLABLE,
   duration_seconds INT NULLABLE,
   retention_policy ENUM('auto_expire','keep_indefinitely') NULLABLE,  -- set at review (§8)
@@ -374,7 +375,7 @@ captured_documents (
   media_asset_id UUID FK -> media_assets,
   document_type ENUM('receipt','bill','medication_label','other'),
   ocr_text TEXT,
-  extracted_fields JSONB,
+  extracted_fields JSONB,              -- per-type keys, or {title, fields[]} for other (D29)
   created_at TIMESTAMPTZ
 )
 
@@ -582,7 +583,7 @@ Base `/api/v1`. Auth: JWT access (15 min) + refresh token for caregivers, who si
 | POST | `/uploads/{id}/complete` | Confirm upload → enqueue review (media) or STT (audio). Body carries `patient_id`, `kind` and the row's fields, since the path has no patient |
 | GET | `/patients/{id}/media/{media_id}` | Short-lived signed URL (audit-logged) |
 | POST | `/media/{id}/pin` · DELETE `/media/{id}` | Pin to keep / delete |
-| GET | `/patients/{id}/documents` | OCR'd documents with extracted fields |
+| GET | `/patients/{id}/documents` · `/documents/{id}` | OCR'd documents, ready to show: `title`, `headline`, ordered `fields`, `captured_at` (D29) |
 | GET | `/patients/{id}/journal?date=` | Day timeline |
 | POST | `/patients/{id}/assist` | Free-form question (audio or text) → `{answer, language, source_event_ids}` (Phase 2) |
 | GET/POST/PATCH/DELETE | `/patients/{id}/reminders[/{rid}]` | Reminder CRUD |
@@ -624,6 +625,14 @@ Silence and non-speech never leave the glasses: only VAD-positive segments are e
 ### 7.4 Smart review, OCR, retention
 
 The on-device gate proposes (`pending_review`). The worker blurs faces that don't match an enrolled person, then makes **one vision-model call** that returns: keep/discard, open-ended `ai_tags`, `contains_other_people`, and, for documents, `document_type` + `ocr_text` + `extracted_fields` (D20). `user_requested` media skips review (`confirmed`, `keep_indefinitely`).
+
+**Review contract (D29), shapes in `backend-ai/app/ai/review_contract.py`:**
+1. **Importance and category are separate.** `keep` decides whether the photo is saved; the category only decides how the app displays it. Something important that fits no category is kept.
+2. **Fixed shapes for the known types:** receipt `{merchant, total{amount, currency}, date, items[]}`, bill `{issuer, total, due_date, date}`, medication label `{medication_name, strength, instructions, expiry_date}`; `ai_tags` = `{category: notable_moment|document|person|place|other, tags[], reason}`.
+3. **Anything else is `other` with the model's own words:** a document gets `{title, fields: [{label, value}]}` in the patient's language; a photo gets a `reason`. The app has one generic layout for `other`.
+4. **An unexpected answer never fails the job.** An unknown category is stored as `other` with the model's word in `raw_category`; known keys are matched by common variants (`amount` → `total`, `dosage` → `strength`).
+5. **Categories grow through the lead.** Frequent `raw_category` values are reviewed; adding one is a spec change, a prompt version bump, a new app layout and a backfill from `raw_category`.
+6. **`other` never creates event types or alerts.** It appears in the journal as a notable moment or a document.
 
 ### 7.5 Error shape (all endpoints)
 
