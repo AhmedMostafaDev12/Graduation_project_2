@@ -46,7 +46,7 @@ backend-ai/
 ├── requirements.txt       # [course]
 ├── Dockerfile             # [course] one image, used for api, worker and beat
 ├── docker-compose.yml     # [course] production: api · worker · beat · flower · redis (DB = Supabase)
-└── docker-compose.dev.yml # [added] local: + postgres (pgvector/pgvector:pg16)
+└── docker-compose.dev.yml # [added] local: + postgres (pgvector/pgvector:pg17)
 ```
 
 The course keeps `models.py` and `schemas.py` as single files. With 22 tables, Remori splits both into packages by domain, with the **same file names in both** (lead decision, 12 Oct 2026). A model and its schemas live in files with the same name: `models/reminders.py` ↔ `schemas/reminders.py`.

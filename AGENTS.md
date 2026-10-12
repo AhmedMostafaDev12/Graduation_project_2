@@ -70,9 +70,13 @@ glasses (hardware/) ──BLE §7.1──> flutter/ (relay + UI) ──REST §7.
 | Model files in git | Whether exported models (`*.onnx`, `*.tflite`) use Git LFS or are downloaded from S3 at build time |
 | Pagination | The journal and lists have no pagination rule in the spec yet |
 | Team assignment | Names per track (spec §11) |
+| Email verification | Whether email + password accounts must verify their email (link sent by AWS SES), or stay unverified |
+| Missing endpoints | `GET /patients` (a caregiver's patients, for the C1 switcher) and `GET /auth/me` are not in spec §7.2 yet |
+| Google / Facebook timing | Decided in D26 but postponed: when to build it (needs the Google Cloud + Facebook app setup, plan step 3.0) |
 
 ---
 
 ## 6. Status
 
-Pre-code. Folders contain placeholders. Build order: spec §12. The current step for each area is in its `AGENTS.md`.
+**Backend: live** at `https://remori-ai.duckdns.org` (API `/api/v1`, docs `/docs`) since 12 Oct 2026. Plan phases 0–4 done: infrastructure, skeleton, database (Supabase), auth (email + password), deploy. Next: Phase 5 (all CRUD endpoints).
+**Flutter, hardware, ml:** starting. The current step for each area is in its `AGENTS.md`. The contract between app and backend: [`docs/API_CONTRACT.md`](docs/API_CONTRACT.md).

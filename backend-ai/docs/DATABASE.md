@@ -62,4 +62,4 @@ As in the course, plus these points:
 
 ## 5. Seed data
 
-`scripts/seed.py` (when created) loads the UI brief's sample data: patient Fatma Mahmoud, caregivers Ahmed and Mona, people Ahmed / Sara / Dr. Hany / Mona, the three reminders, three places and device RMR-0007. The Flutter mocks use the same data, so screens look identical against mock and real.
+`scripts/seed.py` loads the UI brief's sample data: patient Fatma Mahmoud, caregivers Ahmed and Mona, people Ahmed / Sara / Dr. Hany / Mona, the three reminders, three places and device RMR-0007. Fixed IDs and test accounts: [SEED_DATA.md](SEED_DATA.md).

@@ -259,7 +259,7 @@ backend-ai/app/
 
 ✅ **Course covered:** Dockerfile, Compose, Postgres container.
 
-➕ **Missing for Remori:** Compose with **more services**: `api`, `worker` (Celery, same image, different command), `beat` (Celery Beat, exactly one), `flower` (monitoring), `redis` (with AOF persistence enabled). Locally, a dev Compose file adds `postgres` (the `pgvector/pgvector:pg16` image); in production the database is Supabase, set by `DATABASE_URL`. Health checks, plus `depends_on` with `condition: service_healthy`.
+➕ **Missing for Remori:** Compose with **more services**: `api`, `worker` (Celery, same image, different command), `beat` (Celery Beat, exactly one), `flower` (monitoring), `redis` (with AOF persistence enabled). Locally, a dev Compose file adds `postgres` (the `pgvector/pgvector:pg17` image); in production the database is Supabase, set by `DATABASE_URL`. Health checks, plus `depends_on` with `condition: service_healthy`.
 
 🔎 **Study / search:** `docker compose healthcheck depends_on condition`, `pgvector docker image`, `redis docker persistence appendonly`
 

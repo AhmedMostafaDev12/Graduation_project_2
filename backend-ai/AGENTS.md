@@ -64,4 +64,8 @@ Local stack (once it exists): `docker compose -f docker-compose.dev.yml up` → 
 
 ## 5. Current step
 
-Build order (spec §12): **step 2**, schema via Alembic, FastAPI skeleton, auth + patient-link authorization. Workers (Celery) start at step 9.
+Plan phases 0–4 are done (see [`docs/DEVELOPMENT_PLAN.md`](docs/DEVELOPMENT_PLAN.md)): the API is **live at `https://remori-ai.duckdns.org`**, with email + password auth, patients, caregivers and device pairing. Deploy procedure: [`README.md`](README.md) → Production.
+
+**Next: Phase 5**, all CRUD endpoints on seeded data, deployed group by group (5.1 people first). Google/Facebook sign-in (Phase 3 steps 3.0, 3.7–3.9) is postponed. Workers (Celery) start at Phase 6.
+
+Every endpoint you add or change must also be updated in [`../docs/API_CONTRACT.md`](../docs/API_CONTRACT.md) §5–§6.

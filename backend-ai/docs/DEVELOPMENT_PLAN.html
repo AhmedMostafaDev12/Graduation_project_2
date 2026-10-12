@@ -161,6 +161,7 @@ html{scroll-behavior:smooth}
 <!-- Phase 1 -->
 <section class="phase" id="p1" data-phase="p1">
   <div class="phase-head"><span class="num">Phase 1</span><h2>Project skeleton</h2><span class="prog" data-prog="p1"></span></div>
+  <div class="done"><b>Status:</b> done (11 Oct 2026). PR #2.</div>
   <p class="course">Course: setup, virtual env, FastAPI basics, routers (0:00–2:21, 6:17).</p>
   <div class="scroll"><table class="steps"><tbody>
     <tr><td class="chk"><input type="checkbox" id="p1-1" aria-label="1.1 done"></td><td class="name">1.1 Folder layout</td><td class="det">Exactly ARCHITECTURE.md §1: <code>app/main.py</code>, <code>config.py</code>, <code>database.py</code>, <code>routers/</code>, <code>services/</code>, <code>errors.py</code>…</td></tr>
@@ -177,6 +178,7 @@ html{scroll-behavior:smooth}
 <!-- Phase 2 -->
 <section class="phase" id="p2" data-phase="p2">
   <div class="phase-head"><span class="num">Phase 2</span><h2>Database live</h2><span class="ms">M1</span><span class="prog" data-prog="p2"></span></div>
+  <div class="done"><b>Status:</b> done (12 Oct 2026), M1 reached. Schema, RLS and seed on local Docker and Supabase. PR #3.</div>
   <p class="course">Course: databases, SQLAlchemy, Alembic (2:24–5:28, 10:30–11:14) + DATABASE.md. The spec §6 schema is fully designed, so create it in one go instead of table by table.</p>
   <div class="scroll"><table class="steps"><tbody>
     <tr><td class="chk"><input type="checkbox" id="p2-1" aria-label="2.1 done"></td><td class="name">2.1 models.py</td><td class="det">All spec §6 tables, SQLAlchemy 2.0 style: UUID PKs, ENUMs, JSONB, <code>TIMESTAMPTZ</code>, <code>VECTOR(512)</code> / <code>VECTOR(1536)</code>, <code>updated_at</code> / <code>deleted_at</code>.</td></tr>
@@ -194,6 +196,7 @@ html{scroll-behavior:smooth}
 <!-- Phase 3 -->
 <section class="phase" id="p3" data-phase="p3">
   <div class="phase-head"><span class="num">Phase 3</span><h2>Auth and security core</h2><span class="prog" data-prog="p3"></span></div>
+  <div class="done"><b>Status:</b> email + password done (12 Oct 2026). PR #5. Google/Facebook (3.0, 3.7–3.9) postponed.</div>
   <p class="course">Course: users, hashing, JWT, protected routes, relationships (5:50–8:38) + study guide Parts 5 and 7.</p>
   <div class="scroll"><table class="steps"><tbody>
     <tr><td class="chk"><input type="checkbox" id="p3-0" aria-label="3.0 done"></td><td class="name">3.0 Provider setup (you)</td><td class="det"><b>Google Cloud:</b> OAuth consent screen + client IDs (Android: package name + signing SHA-1; iOS; web). <b>Facebook Developers:</b> app with Facebook Login, Android key hash, privacy-policy URL, data-deletion instructions. IDs and secret go in <code>.env</code>.</td></tr>
@@ -213,6 +216,7 @@ html{scroll-behavior:smooth}
 <!-- Phase 4 -->
 <section class="phase" id="p4" data-phase="p4">
   <div class="phase-head"><span class="num">Phase 4</span><h2>First deploy</h2><span class="ms">M2</span><span class="prog" data-prog="p4"></span></div>
+  <div class="done"><b>Status:</b> done (12 Oct 2026), M2 reached. Live at <a href="https://remori-ai.duckdns.org/docs">remori-ai.duckdns.org</a>. PR #6.</div>
   <p class="course">Course: Ubuntu VM deployment (12:05–13:23: gunicorn, nginx, domain, SSL, firewall) + Docker (13:26–14:08). Same production pieces as the course repo (<code>nginx</code>, <code>gunicorn.service</code>), except the app runs in Docker instead of a systemd venv.</p>
   <div class="scroll"><table class="steps"><tbody>
     <tr><td class="chk"><input type="checkbox" id="p4-1" aria-label="4.1 done"></td><td class="name">4.1 Firewall (ufw)</td><td class="det"><code>sudo ufw allow OpenSSH</code> → <code>sudo ufw allow 'Nginx Full'</code> → <code>sudo ufw enable</code>. The AWS security group stays as a second layer.</td></tr>

@@ -39,7 +39,7 @@ flutter/
 │       ├── auth/  device_pairing/  enrollment/  unknown_faces/  journal/
 │       ├── reminders/  places/  assistant/  mind_games/  caregiver_dashboard/
 │       └── <feature>/
-│           ├── data/            # repositories: <X>Repository (real) + Mock<X>Repository, DTOs
+│           ├── data/            # repositories (live API + local drift), DTOs
 │           ├── domain/          # entities (plain Dart), use cases if needed
 │           └── presentation/    # screens (named by screen ID), widgets, Riverpod providers
 ├── test/
@@ -54,7 +54,7 @@ flutter/
 |---|---|
 | **presentation** | Widgets read Riverpod providers only. No dio, no SQL, no BLE calls in widgets. Screen files carry the UI brief ID (`c4_add_person_screen.dart`) |
 | **domain** | Plain Dart entities that match spec §6/§7.2 fields. No Flutter imports |
-| **data** | Repositories own data access: drift for reads, outbox for writes, ApiClient for sync. Each has a mock with the same interface |
+| **data** | Repositories own data access: drift for reads, outbox for writes, ApiClient (the live API) for sync |
 | **core/relay** | Everything platform-specific sits behind `RelayService`. The rest of the app never knows whether it's Android or iOS |
 
 ---
@@ -76,16 +76,8 @@ flutter/
 
 ---
 
-## 6. Mock → real switch
+## 6. Testing
 
-- Each repository is provided by a Riverpod provider. A single configuration (build flag or provider override) picks mock or real **per repository**.
-- Mocks return the UI brief's sample data (§6) parsed through the **same** DTO classes as the real API, so a shape mismatch shows up in tests, not in production.
-- When the backend ships an endpoint, flip that repository to real. Screens don't change.
-
----
-
-## 7. Testing
-
-- Unit tests for repositories (mock API + in-memory drift) and sync logic.
-- Widget tests for each screen, using mock repositories.
+- Unit tests for repositories and sync logic (a test double for the HTTP client + in-memory drift).
+- Widget tests for each screen, with the repositories overridden in Riverpod.
 - Patient Mode widget tests check the big-text / big-button rules and RTL layout.

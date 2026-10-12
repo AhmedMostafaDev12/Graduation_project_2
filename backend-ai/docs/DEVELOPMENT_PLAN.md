@@ -78,6 +78,8 @@ Abdelrahman builds the RAG pipeline **alongside** Phases 0–8. It needs no back
 
 ## Phase 1 — Project skeleton
 
+> **Status: done (11 Oct 2026).** PR #2.
+
 *Course: setup, virtual env, FastAPI basics, routers (0:00–2:21, 6:17).*
 
 | Step | Details |
@@ -95,6 +97,8 @@ Abdelrahman builds the RAG pipeline **alongside** Phases 0–8. It needs no back
 ---
 
 ## Phase 2 — Database live (M1)
+
+> **Status: done (12 Oct 2026). M1 reached.** Schema, RLS and seed on local Docker and Supabase. PR #3.
 
 *Course: databases, SQLAlchemy, Alembic (2:24–5:28, 10:30–11:14) + DATABASE.md.*
 
@@ -117,6 +121,8 @@ The schema in spec §6 is fully designed, so create it **in one go** instead of 
 
 ## Phase 3 — Auth and security core
 
+> **Status: email + password done (12 Oct 2026).** PR #5. Google/Facebook (3.0, 3.7–3.9) postponed.
+
 *Course: users, hashing, JWT, protected routes, relationships (5:50–8:38) + study guide Parts 5 and 7.*
 
 | Step | Endpoints / pieces |
@@ -137,6 +143,8 @@ The schema in spec §6 is fully designed, so create it **in one go** instead of 
 ---
 
 ## Phase 4 — First deploy (M2)
+
+> **Status: done (12 Oct 2026). M2 reached.** Live at https://remori-ai.duckdns.org. PR #6.
 
 *Course: Ubuntu VM deployment (12:05–13:23: gunicorn, nginx, domain, SSL, firewall) + Docker (13:26–14:08). Same production pieces as the course repo (`nginx`, `gunicorn.service`), except the app runs in Docker instead of a systemd venv.*
 
