@@ -165,7 +165,7 @@ The schema in spec §6 is fully designed, so create it **in one go** instead of 
 
 ## Phase 5 — All CRUD endpoints on seeded data + AI stubs (M3)
 
-Build in the order the Flutter screens need them (spec §12: Caregiver Mode first). **Status: built in one PR (#8); deploys together with Phase 6** (the lead's decision). Additions agreed while building are in spec D27: `GET /auth/me`, `GET /patients`, `GET /people/{id}`, `DELETE /people/{id}/photos/{photo_id}`, migration `0002` (`face_embeddings.storage_key`). Spec D28 then filled every screen of the UI brief: device list + unpair, patient profile edit, caregivers list, consents + revoke, one day's reminder logs, past games, archived filter, alert links (migration `0003`), signed URLs inside list responses.
+Build in the order the Flutter screens need them (spec §12: Caregiver Mode first). **Status: done, live since 13 Oct 2026** (PRs #8, #9; deployed together with Phase 6). Additions agreed while building are in spec D27: `GET /auth/me`, `GET /patients`, `GET /people/{id}`, `DELETE /people/{id}/photos/{photo_id}`, migration `0002` (`face_embeddings.storage_key`). Spec D28 then filled every screen of the UI brief: device list + unpair, patient profile edit, caregivers list, consents + revoke, one day's reminder logs, past games, archived filter, alert links (migration `0003`), signed URLs inside list responses.
 
 | Group | Endpoints (spec §7.2) | Unlocks screens |
 |---|---|---|
@@ -201,7 +201,7 @@ Build in the order the Flutter screens need them (spec §12: Caregiver Mode firs
 | 6.5 Tests | idempotency (run twice → one result), failure → retry → `failed` |
 | 6.6 Thumbnails | **Done.** Enrollment previews stay in the request (bytes in memory); uploaded photos **and videos** get theirs from task `media.make_thumbnail` (queued after the commit), with `media.backfill_thumbnails` every 10 min as a safety net |
 
-**Status: built** (`feature/phase6-workers`). Decisions: no Flower; spec-default alert rules (missed medication after the 60-min grace, offline after 30 min, battery ≤ 20%, every linked caregiver once); video previews in the worker (ffmpeg from `imageio-ffmpeg`); 1 GB swap on the t3.small. Verified locally: worker + beat + Redis start, a task travels through Redis and its alerts appear in C2.
+**Status: done, live since 13 Oct 2026** (PR #10). Decisions: no Flower; spec-default alert rules (missed medication after the 60-min grace, offline after 30 min, battery ≤ 20%, every linked caregiver once); video previews in the worker (ffmpeg from `imageio-ffmpeg`); 1 GB swap on the t3.small. Verified locally: worker + beat + Redis start, a task travels through Redis and its alerts appear in C2.
 
 **Done when (M4):** workers and Beat run on EC2 and alerts appear in C2 by themselves.
 

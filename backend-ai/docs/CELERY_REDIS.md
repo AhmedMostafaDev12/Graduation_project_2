@@ -2,7 +2,7 @@
 
 The freeCodeCamp course never leaves the request/response cycle, so this file **is** the guide for background work until the lead finishes studying it (`docs/BACKEND_STUDY_GUIDE.md`, Part B). Follow it exactly. Anything not covered here is a lead decision.
 
-**Status: built in Phase 6** (`app/workers/`). Tasks today: `alerts.evaluate` (every 5 min), `retention.expire_media` (hourly), `media.make_thumbnail` (after each upload) and `media.backfill_thumbnails` (every 10 min). The AI tasks (`transcribe`, `review`, `embed`, `cluster`, `summaries`) arrive in Phases 7–9 and follow the same pattern.
+**Status: live since 13 Oct 2026** (`app/workers/`, Phase 6). Tasks today: `alerts.evaluate` (every 5 min), `retention.expire_media` (hourly), `media.make_thumbnail` (after each upload) and `media.backfill_thumbnails` (every 10 min). The AI tasks (`transcribe`, `review`, `embed`, `cluster`, `summaries`) arrive in Phases 7–9 and follow the same pattern.
 
 ---
 

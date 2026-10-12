@@ -56,4 +56,4 @@ flutter test
 
 App shell, GoRouter with both mode entry points, drift setup, ApiClient, caregiver auth.
 
-**The backend is live** at `https://remori-ai.duckdns.org/api/v1` (try it at `/docs`). Build every screen against it. **Phase 5 endpoints (people, reminders, places, sync, journal, media, alerts, …) are built but reach production only with the Phase 6 deploy**: until then use the backend running locally (base URLs in the contract §1). The full contract (endpoints, auth, error codes, test accounts): [`../docs/API_CONTRACT.md`](../docs/API_CONTRACT.md).
+**The backend is live** at `https://remori-ai.duckdns.org/api/v1` (try it at `/docs`). Build every screen against it: every endpoint the screens need is live (people, reminders, places, sync, journal, media, documents, alerts, …), and alerts appear by themselves every 5 minutes. The full contract (endpoints, auth, error codes, test accounts): [`../docs/API_CONTRACT.md`](../docs/API_CONTRACT.md).

@@ -3,9 +3,10 @@
 # Start / update:  docker compose up -d --build      (from backend-ai/ on the server)
 # nginx on the host forwards https://remori-ai.duckdns.org to 127.0.0.1:8000.
 # One image for api, worker and beat; only the command differs (docs/CELERY_REDIS.md §5).
+# Only `api` builds it: three services building the same tag at once collide
+# ("image already exists"), so worker and beat reuse the image api built.
 
 x-app: &app
-  build: .
   image: remori-backend:latest
   env_file: .env
   restart: unless-stopped   # what systemd did in the course: restart after crashes and reboots
@@ -18,6 +19,7 @@ x-app: &app
 services:
   api:
     <<: *app
+    build: .
     # Dockerfile command: gunicorn with 2 uvicorn workers (the course's gunicorn.service)
     environment:
       # The app is only reachable through nginx (bound to 127.0.0.1 below), so trusting

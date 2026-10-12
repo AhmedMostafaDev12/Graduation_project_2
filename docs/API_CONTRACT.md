@@ -2,7 +2,7 @@
 
 The Flutter app and the backend are built in parallel by different people. They meet in one place: the REST API. This file is **the contract**: where the API lives, the rules both sides follow, every endpoint that's live today with its exact request and response, and the error codes.
 
-Last updated: 12 Oct 2026, after Phase 5 was built (Phase 5 deploys together with Phase 6).
+Last updated: 13 Oct 2026, after Phases 5 and 6 went live.
 
 ---
 
@@ -213,9 +213,7 @@ Errors: `404 PATIENT_NOT_FOUND`, `403 MANAGER_ONLY`, `409 DEVICE_ALREADY_PAIRED`
 ```
 Errors: `403 DEVICE_ONLY`, `404 DEVICE_NOT_FOUND`.
 
-### Phase 5: the patient's data (built, ⏳ not on production yet)
-
-**These endpoints are merged into the code but deploy to `remori-ai.duckdns.org` together with Phase 6.** Until then production returns `404 NOT_FOUND` for them. To build against them now, run the backend locally (`backend-ai/README.md`) and use the laptop base URLs in §1. Everything above this heading is live on production.
+### Phase 5: the patient's data (live ✅)
 
 **Who can call what.** "Any linked" = linked caregivers (manager or viewer) **and** the patient's phone. "Manager" = managing caregiver only (a viewer gets `403 MANAGER_ONLY`, the phone gets `403 CAREGIVER_ONLY`). "Phone + manager" = the patient's phone or a managing caregiver. Every `{patient_id}` route returns `404 PATIENT_NOT_FOUND` for a patient that isn't yours; every `/{thing}/{id}` route returns that thing's `*_NOT_FOUND` for one that isn't yours.
 

@@ -85,6 +85,8 @@ free -h                                                      # Swap: 1.0Gi
 ```
 Measured locally: worker ~165 MB, beat ~90 MB, Redis ~4 MB, API (2 gunicorn workers) ~250 MB.
 
+**SSH times out?** SSH is open only to the lead's home IP, and home IPs change. Check yours (`curl https://checkip.amazonaws.com`), then in AWS: EC2 → Security Groups → `remori-api-sg` → Edit inbound rules → SSH (22) → Source **My IP** → Save. Ports 80/443 stay open to everyone.
+
 The server pulls code with a **read-only deploy key** (GitHub → Settings → Deploy keys). It can pull but never push.
 
 ## Configuration

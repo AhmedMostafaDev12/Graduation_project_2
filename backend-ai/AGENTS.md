@@ -64,10 +64,10 @@ Local stack (once it exists): `docker compose -f docker-compose.dev.yml up` → 
 
 ## 5. Current step
 
-Plan phases 0–4 are done (see [`docs/DEVELOPMENT_PLAN.md`](docs/DEVELOPMENT_PLAN.md)): the API is **live at `https://remori-ai.duckdns.org`**, with email + password auth, patients, caregivers and device pairing. Deploy procedure: [`README.md`](README.md) → Production.
+Plan phases 0–6 are done and **live at `https://remori-ai.duckdns.org`** (see [`docs/DEVELOPMENT_PLAN.md`](docs/DEVELOPMENT_PLAN.md)). Production runs `api`, `worker`, `beat` and `redis` (Supabase at migration `0004`). Deploy procedure: [`README.md`](README.md) → Production.
 
-**Phase 5 is built** (PR #8): every spec §7.2 endpoint except social sign-in, on the real database, with AI stubs (`ai/rag/answer.py`, `ai/inference/face.py`). It is **not deployed**: it ships with Phase 6. Spec D28 added the endpoints the UI screens were missing, plus ~320 px thumbnails (Pillow, made inside the request until Phase 6 moves them to Celery). **Supabase is already at migration `0004`** (applied 12 Oct 2026); the columns are additive, so the old code on EC2 keeps working until the deploy.
+**Phase 5** (PRs #8, #9): every spec §7.2 endpoint except social sign-in, on the real database, with AI stubs (`ai/rag/answer.py`, `ai/inference/face.py`); D27–D29 filled every screen, added ~320 px previews and the smart-review contract. Report: [`docs/REPORT_PHASE_5.md`](docs/REPORT_PHASE_5.md).
 
-**Phase 6 is built** (`feature/phase6-workers`): Redis + one Celery worker + one Beat, tasks `alerts.evaluate`, `retention.expire_media`, `media.make_thumbnail`, `media.backfill_thumbnails`. Copy their pattern for new tasks ([`docs/CELERY_REDIS.md`](docs/CELERY_REDIS.md)). **Next: Phase 7**, the ambient memory pipeline. Google/Facebook sign-in (Phase 3 steps 3.0, 3.7–3.9) is postponed.
+**Phase 6** (PR #10): Redis + one Celery worker + one Beat, tasks `alerts.evaluate`, `retention.expire_media`, `media.make_thumbnail`, `media.backfill_thumbnails`. Copy their pattern for new tasks ([`docs/CELERY_REDIS.md`](docs/CELERY_REDIS.md)). **Next: Phase 7**, the ambient memory pipeline. Google/Facebook sign-in (Phase 3 steps 3.0, 3.7–3.9) is postponed.
 
 Every endpoint you add or change must also be updated in [`../docs/API_CONTRACT.md`](../docs/API_CONTRACT.md) §5–§6.
