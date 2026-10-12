@@ -98,7 +98,7 @@ Validation errors add the fields that failed:
 | 404 | `PATIENT_NOT_FOUND` | patient doesn't exist **or** isn't yours | treat as gone |
 | 404 | `CAREGIVER_NOT_FOUND` | no caregiver account has that email | "Ask them to create an account first" |
 | 404 | `DEVICE_NOT_FOUND` | device ID isn't this phone's device | bug in the app |
-| 404 | `PERSON_NOT_FOUND` · `PHOTO_NOT_FOUND` · `UNKNOWN_FACE_NOT_FOUND` · `PLACE_NOT_FOUND` · `REMINDER_NOT_FOUND` · `MEDIA_NOT_FOUND` · `EVENT_NOT_FOUND` · `ALERT_NOT_FOUND` | doesn't exist, was deleted, **or** isn't yours | treat as gone, refresh the list |
+| 404 | `PERSON_NOT_FOUND` · `PHOTO_NOT_FOUND` · `CONSENT_NOT_FOUND` · `UNKNOWN_FACE_NOT_FOUND` · `PLACE_NOT_FOUND` · `REMINDER_NOT_FOUND` · `MEDIA_NOT_FOUND` · `EVENT_NOT_FOUND` · `ALERT_NOT_FOUND` | doesn't exist, was deleted, **or** isn't yours | treat as gone, refresh the list |
 | 404 | `SUMMARY_NOT_READY` | no daily summary for that date yet | "No summary yet" |
 | 404 | `NOT_FOUND` | the URL doesn't exist | bug in the app |
 | 409 | `EMAIL_TAKEN` | registering an email that already has an account | offer login instead |
@@ -106,6 +106,7 @@ Validation errors add the fields that failed:
 | 409 | `DEVICE_ALREADY_PAIRED` | these glasses belong to another patient | "These glasses are paired with someone else" |
 | 409 | `ALREADY_DECIDED` | that unknown face was already promoted or dismissed | refresh the list |
 | 409 | `TOO_MANY_PHOTOS` | a person already has 20 photos | "Remove a photo first" |
+| 409 | `ALREADY_REVOKED` | that consent was already revoked | refresh the list |
 | 409 | `LAST_PHOTO` | removing the person's only photo | "Add another photo first, or archive the person" |
 | 409 | `UPLOAD_MISSING` | `complete` was called before the file reached S3 | retry the PUT, then `complete` |
 | 409 | `ID_IN_USE` | a client-generated id already belongs to another patient | generate a new id |
@@ -225,13 +226,20 @@ Errors: `403 DEVICE_ONLY`, `404 DEVICE_NOT_FOUND`.
 | Endpoint | Who | Screens |
 |---|---|---|
 | `GET /patients/{id}/sync?since=` | any linked | relay, offline |
-| `GET /patients/{id}/people` · `GET /people/{id}` | any linked | C4, C5 |
+| `PATCH /patients/{id}` | manager | C16, C18 |
+| `GET /patients/{id}/caregivers` | caregivers | C19 |
+| `GET /patients/{id}/consents` | caregivers | C18 |
+| `POST /consents/{id}/revoke` | manager | C18 |
+| `GET /patients/{id}/devices` | any linked | C1, C16 |
+| `DELETE /devices/{id}` | manager | C16 |
+| `GET /patients/{id}/people?status=active\|archived` · `GET /people/{id}` | any linked | C3, C4, C5 |
 | `POST /patients/{id}/people` (multipart) · `POST /people/{id}/photos` · `DELETE /people/{id}/photos/{photo_id}` · `PATCH /people/{id}` · `DELETE /people/{id}` | manager | C4, C5, D6 |
 | `GET /patients/{id}/unknown-faces` | caregivers | C6, C7 |
 | `POST /unknown-faces/{id}/promote` · `POST /unknown-faces/{id}/dismiss` | manager | C7 |
 | `GET /patients/{id}/reminders[/{rid}]` | any linked | C8, P2 |
 | `POST/PATCH/DELETE /patients/{id}/reminders[/{rid}]` | manager | C8, C9 |
 | `POST /patients/{id}/reminder-logs:batch` | phone + manager | P2, P3 |
+| `GET /patients/{id}/reminder-logs?date=` | any linked | C1, C8 |
 | `GET /patients/{id}/places[/{pid}]` | any linked | C10 |
 | `POST/PATCH/DELETE /patients/{id}/places[/{pid}]` | manager | C10, C11 |
 | `POST /patients/{id}/events:batch` | phone + manager | relay |
@@ -242,12 +250,25 @@ Errors: `403 DEVICE_ONLY`, `404 DEVICE_NOT_FOUND`.
 | `DELETE /media/{id}` | phone + manager | C13, P5 |
 | `GET /patients/{id}/documents?type=&limit=&offset=` | any linked | C14, C15 |
 | `POST /patients/{id}/mind-game-sessions` | phone + manager | P7–P9 |
+| `GET /patients/{id}/mind-game-sessions?game_type=&limit=&offset=` | any linked | P7 |
 | `GET /patients/{id}/daily-summary?date=` | any linked | C17 |
 | `POST /patients/{id}/assist` | any linked | P6 |
 | `GET /caregivers/me/alerts?unread_only=&limit=&offset=` · `POST /alerts/{id}/read` | caregiver (own alerts only) | C1, C2 |
 | `POST /me/push-token` | caregiver | (startup) |
 
 **AI stubs until later phases:** `/assist` returns a fixed answer in the final shape (real in 9.1). Daily summaries, documents, unknown faces and media review are produced by worker jobs (Phase 6+), so those lists stay empty until then. Enrollment face embeddings are computed by a stub (`model_version: "stub-0"`) until the real face model is wired in; the glasses can't recognise stub embeddings yet.
+
+**Images: one request per screen, cached by id.** Lists already include signed URLs (people `photo_url`, journal `media[].url`, documents `url`, unknown faces `sample_url`), so never call `GET /media/{id}` per thumbnail. Signed URLs change on every response and expire after 10 minutes: cache images **by the item's id**, not by URL (e.g. `CachedNetworkImage(imageUrl: url, cacheKey: id)`), and re-fetch the list if an image fails with 403 (expired). Thumbnails are full-size photos until Phase 6 adds small ones.
+
+#### Patient settings, caregivers, consents, devices · screens C1, C16, C18, C19
+- `PATCH /patients/{id}` with any of `{ "full_name", "preferred_language": "ar|en", "timezone", "date_of_birth", "memory_capture_enabled": false }` → the patient (same shape as `POST /patients`). The phone gets the change through `/sync` `settings`.
+- `GET /patients/{id}/caregivers` → `[ { "id", "caregiver_id", "full_name", "email", "relationship", "permission", "is_primary" } ]`, primary first.
+- `GET /patients/{id}/consents` → `[ { "id", "consent_type", "subject_person_id", "subject_name", "given_by", "given_at", "revoked_at" } ]`, newest first. `POST /consents/{id}/revoke` → that consent with `revoked_at` set. Revoking a `face_enrollment` consent **archives the person** (face data deleted).
+- `GET /patients/{id}/devices` → `[ { "id", "patient_id", "serial_number", "firmware_version", "battery_level_pct", "last_seen_at", "paired_at", "online" } ]`. `online` = a heartbeat in the last 5 minutes.
+- `DELETE /devices/{id}` → `204`. The phone's device token stops working at once (`401`); pairing the glasses again (`POST /devices/pair`, any patient) issues a new one.
+
+#### `GET /patients/{id}/reminder-logs?date=YYYY-MM-DD` · screens C1, C8
+One day (patient's timezone, default today), by time: `[ { "id", "reminder_id", "title", "type", "scheduled_at", "status", "snoozed_until", "completed_at", "confirmed_via", "updated_at" } ]`.
 
 #### `GET /patients/{id}/sync?since=`
 ```json
@@ -270,7 +291,7 @@ Fields: `name` (1–80), `relationship` (1–40), `consent_given` (`true`), `pho
 { "id": "…", "patient_id": "…", "name": "أحمد", "relationship": "son", "added_by": "caregiver_manual",
   "status": "active", "embedding_count": 2, "created_at": "…", "updated_at": "…" }
 ```
-`GET /people/{id}` adds `"photos": [ { "id": "…", "url": "https://…signed, 10 min" } ]`. `DELETE /people/{id}/photos/{photo_id}` removes that photo and its embedding and returns the person (`409 LAST_PHOTO` for the only one). `PATCH` takes `{ "name"?, "relationship"? }`. `DELETE` → `204`: the person is archived, their photos and face data are deleted, and past journal entries keep the name. At most 20 photos per person (`409 TOO_MANY_PHOTOS`).
+List items also carry `"photo_url"` (the first photo, signed). `?status=archived` lists archived people. `GET /people/{id}` adds `"photos": [ { "id": "…", "url": "https://…signed, 10 min" } ]`. `DELETE /people/{id}/photos/{photo_id}` removes that photo and its embedding and returns the person (`409 LAST_PHOTO` for the only one). `PATCH` takes `{ "name"?, "relationship"? }`. `DELETE` → `204`: the person is archived, their photos and face data are deleted, and past journal entries keep the name. At most 20 photos per person (`409 TOO_MANY_PHOTOS`).
 
 #### Unknown faces · screen C7
 `GET` → `[ { "id", "patient_id", "sighting_count", "distinct_days", "first_seen_at", "last_seen_at", "status": "awaiting_caregiver", "sample_url": "signed or null" } ]`.
@@ -324,7 +345,8 @@ The day in the **patient's** timezone (default: today), oldest first.
   "entries": [ { "id": "…", "event_type": "encounter", "source": "glasses", "occurred_at": "…", "ended_at": null,
                  "person": { "id": "…", "name": "أحمد", "relationship": "son" },
                  "transcript_text": null, "language": null, "rendered_text": null, "metadata": {},
-                 "media": [ { "id": "…", "asset_type": "image", "trigger": "encounter_keyframe", "status": "pending_review" } ] } ] }
+                 "media": [ { "id": "…", "asset_type": "image", "trigger": "encounter_keyframe", "status": "pending_review",
+                              "duration_seconds": null, "expires_at": null, "url": "https://…signed, 10 min" } ] } ] }
 ```
 
 #### Uploads: photos, clips, audio
@@ -347,10 +369,10 @@ The day in the **patient's** timezone (default: today), oldest first.
 `GET /patients/{id}/media/{media_id}` → the media fields (`id, patient_id, event_id, asset_type, trigger, status, ai_tags, contains_other_people, duration_seconds, retention_policy, expires_at, pinned_by, created_at`) plus `"url"` (signed, 10 min) and `"url_expires_in": 600`. Every view is audit-logged. `POST /media/{id}/pin` → the media fields with `retention_policy: "keep_indefinitely"`. `DELETE /media/{id}` → `204` (the file is removed from S3).
 
 #### `GET /patients/{id}/documents?type=receipt` · screens C14, C15
-`[ { "id", "event_id", "media_asset_id", "document_type": "receipt | bill | medication_label | other", "ocr_text", "extracted_fields": {}, "created_at" } ]`, newest first, 50 per page.
+`[ { "id", "event_id", "media_asset_id", "document_type": "receipt | bill | medication_label | other", "ocr_text", "extracted_fields": {}, "created_at", "url" } ]`, newest first, 50 per page. `url` is the signed photo.
 
 #### `POST /patients/{id}/mind-game-sessions` · screens P7–P9
-`{ "id": "…", "game_type": "face_match", "score": 8, "duration_seconds": 240, "completed_at": "…" }` → `201` with the same fields + `patient_id`. Sending the same id again returns the stored session. The game also appears in the journal.
+`{ "id": "…", "game_type": "face_match", "score": 8, "duration_seconds": 240, "completed_at": "…" }` → `201` with the same fields + `patient_id`. Sending the same id again returns the stored session. The game also appears in the journal. `GET` lists past games, newest first (`?game_type=` for one game's last score).
 
 #### `GET /patients/{id}/daily-summary?date=` · screen C17
 `200 { "patient_id", "summary_date", "summary_text", "patterns": {}, "generated_at" }` or `404 SUMMARY_NOT_READY`.
@@ -359,7 +381,7 @@ The day in the **patient's** timezone (default: today), oldest first.
 `{ "question": "مين جالي النهارده؟", "language": "ar" }` (`language` optional, defaults to the patient's) → `200 { "answer": "…", "language": "ar", "source_event_ids": [] }`. **Stub**: a fixed answer for now.
 
 #### Alerts and push · screens C1, C2
-`GET /caregivers/me/alerts` → `[ { "id", "patient_id", "alert_type": "missed_medication | unknown_person_flagged | low_battery | device_offline | daily_summary_ready", "message", "read_at", "created_at" } ]`, newest first. `POST /alerts/{id}/read` → the alert with `read_at` set. `POST /me/push-token` with `{ "fcm_token": "…" }` → `204`; call it after every login.
+`GET /caregivers/me/alerts` → `[ { "id", "patient_id", "alert_type": "missed_medication | unknown_person_flagged | low_battery | device_offline | daily_summary_ready", "message", "entity_type", "entity_id", "read_at", "created_at" } ]`. `entity_type` + `entity_id` say what to open on tap (`reminder_log`, `unknown_face_cluster`, `device`, `daily_summary`; may be null), newest first. `POST /alerts/{id}/read` → the alert with `read_at` set. `POST /me/push-token` with `{ "fcm_token": "…" }` → `204`; call it after every login.
 
 ---
 

@@ -57,6 +57,7 @@ erDiagram
         int battery_level_pct
         timestamptz last_seen_at
         timestamptz paired_at
+        timestamptz unpaired_at "nullable"
     }
     ENROLLED_PEOPLE {
         uuid id PK
@@ -290,6 +291,8 @@ erDiagram
         uuid patient_id FK
         enum alert_type "missed_medication | unknown_person_flagged | low_battery | device_offline | daily_summary_ready"
         text message
+        text entity_type "nullable, what tap opens"
+        uuid entity_id "nullable"
         timestamptz read_at
     }
 

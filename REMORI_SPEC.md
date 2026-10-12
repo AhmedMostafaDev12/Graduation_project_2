@@ -39,6 +39,7 @@ Decisions taken in the 2026-10-03 design session. **P** = product decision by th
 | D25 | **Database on Supabase, everything else on AWS.** Supabase hosts PostgreSQL 17 + pgvector (EU / Frankfurt region), used **only as plain Postgres**: no Supabase Auth, no auto-generated Data API (PostgREST), no Supabase Storage. API, workers, Redis and S3 stay on AWS. Local development uses Docker `pgvector/pgvector:pg17`. Moving to RDS later = dump + restore, no code change. | P |
 | D26 | **Caregiver sign-in: Google, Facebook, or email + password (no OTP).** Flutter uses `google_sign_in` and `flutter_facebook_auth`. The backend verifies the provider token itself (Google ID token: Google's public keys, audience = our client IDs, `email_verified`; Facebook access token: Graph API `debug_token` with our app credentials), then issues **Remori's own** JWT + refresh tokens. An existing account is linked automatically only when the provider says the email is verified (Google). A Facebook email matching an existing account is **not** linked: the caregiver signs in the usual way and connects Facebook in Connected accounts (C20). Patients are unchanged (device token). | P |
 | D27 | **Phase 5 API additions:** `GET /auth/me`, `GET /patients`, people list/detail, single-photo removal; batch responses add `rejected`; enrollment photo keys stored on `face_embeddings.storage_key`; archiving a person deletes their face data but keeps the row for the journal; a pagination rule for unbounded lists (§7.2). | P |
+| D28 | **Every UI-brief screen has its endpoints:** device list + unpair, patient profile edit, linked caregivers, consent list + revoke, one day's reminder logs, past games, archived-people filter, alert links (migration `0003`), and signed URLs inside list responses so a screen needs one request, not one per item (§7.2). | P |
 
 ---
 
@@ -253,7 +254,8 @@ devices (
   firmware_version TEXT,
   battery_level_pct INT,
   last_seen_at TIMESTAMPTZ,            -- from phone heartbeat
-  paired_at TIMESTAMPTZ
+  paired_at TIMESTAMPTZ,
+  unpaired_at TIMESTAMPTZ NULLABLE      -- unpaired: token dead, row kept for history (D28)
 )
 
 -- ===== People =====
@@ -421,6 +423,7 @@ caregiver_alerts (
   alert_type ENUM('missed_medication','unknown_person_flagged','low_battery',
                   'device_offline','daily_summary_ready'),
   message TEXT,
+  entity_type TEXT NULLABLE, entity_id UUID NULLABLE,  -- what tapping the alert opens (D28)
   read_at TIMESTAMPTZ NULLABLE,
   created_at TIMESTAMPTZ
 )
@@ -555,10 +558,15 @@ Base `/api/v1`. Auth: JWT access (15 min) + refresh token for caregivers, who si
 | POST | `/auth/login` · `/auth/refresh` · `/auth/logout` | Session |
 | GET | `/auth/me` | The signed-in caregiver |
 | GET | `/patients` | The caregiver's linked patients with their permission (C1 switcher) |
+| PATCH | `/patients/{id}` | Patient profile and `memory_capture_enabled` (C16, C18) |
+| GET | `/patients/{id}/caregivers` | Linked caregivers (C19) |
+| GET | `/patients/{id}/consents` · POST `/consents/{id}/revoke` | Consent records (C18). Revoking face enrollment archives the person |
 | POST | `/patients` | Caregiver creates a patient (+ profile) |
 | POST | `/patients/{id}/caregivers` | Invite / link another caregiver |
 | POST | `/devices/pair` | Pair glasses (serial from QR) to a patient → device token |
 | POST | `/devices/{id}/heartbeat` | Battery, firmware, last seen (from phone) |
+| GET | `/patients/{id}/devices` | Paired glasses with battery, last seen, `online` (C1, C16) |
+| DELETE | `/devices/{id}` | Unpair (C16): the token stops working; the glasses can be paired again |
 | GET | `/patients/{id}/sync?since=` | **Delta pull**: people, embeddings, reminders, places, settings changed since T |
 | POST | `/patients/{id}/people` | Enroll a person (multipart: 1–5 photos, name, relationship, consent) |
 | POST | `/people/{id}/photos` | Add more photos/embeddings |
@@ -577,15 +585,19 @@ Base `/api/v1`. Auth: JWT access (15 min) + refresh token for caregivers, who si
 | POST | `/patients/{id}/assist` | Free-form question (audio or text) → `{answer, language, source_event_ids}` (Phase 2) |
 | GET/POST/PATCH/DELETE | `/patients/{id}/reminders[/{rid}]` | Reminder CRUD |
 | POST | `/patients/{id}/reminder-logs:batch` | Upsert occurrences generated on the phone |
+| GET | `/patients/{id}/reminder-logs?date=` | One day's occurrences with reminder title (C1, C8 Today) |
 | GET/POST/PATCH/DELETE | `/patients/{id}/places[/{pid}]` | Saved places |
 | POST | `/patients/{id}/mind-game-sessions` | Log a game |
+| GET | `/patients/{id}/mind-game-sessions` | Past games, newest first (P7 last score) |
 | GET | `/patients/{id}/daily-summary?date=` | Phase 2 |
 | GET | `/caregivers/me/alerts` · POST `/alerts/{id}/read` | Alert feed |
 | POST | `/me/push-token` | Register FCM token |
 
 Smart review, OCR, STT, clustering, retention and summaries are **worker jobs only**. They have no public endpoints.
 
-**Lists and pagination:** unbounded lists (`documents`, `caregivers/me/alerts`) take `limit` (default 50, max 200) and `offset`, newest first. Lists bounded by nature (people, places, reminders, unknown faces, my patients) and the journal (one day per call) are not paginated. Batch requests take at most 500 items per array.
+**One request per screen:** list responses carry the signed URLs their screen shows (people `photo_url`, journal `media[].url`, documents `url`), so no screen makes a request per item; every URL handed out is audit-logged in one bulk insert. `GET /patients/{id}/people?status=archived` lists archived people (C3 filter).
+
+**Lists and pagination:** unbounded lists (`documents`, `caregivers/me/alerts`, `mind-game-sessions`) take `limit` (default 50, max 200) and `offset`, newest first. Lists bounded by nature (people, places, reminders, unknown faces, my patients) and the journal (one day per call) are not paginated. Batch requests take at most 500 items per array.
 
 **`where_am_i` is answered on the phone**, not the backend: phone GPS → nearest saved place within its radius → "انت في البيت". With no saved place nearby and internet available, it falls back to a reverse-geocoded street/area name. Otherwise: "مش عارف المكان ده بالظبط".
 
