@@ -1,0 +1,22 @@
+# Production (EC2). The database is Supabase, so there is no postgres service here.
+# Start / update:  docker compose up -d --build      (from backend-ai/ on the server)
+# nginx on the host forwards https://remori-ai.duckdns.org to 127.0.0.1:8000.
+
+services:
+  api:
+    build: .
+    # Dockerfile command: gunicorn with 2 uvicorn workers (the course's gunicorn.service)
+    env_file: .env
+    environment:
+      # The app is only reachable through nginx (bound to 127.0.0.1 below), so trusting
+      # forwarded headers from any proxy address is safe and lets the app see real client IPs.
+      FORWARDED_ALLOW_IPS: "*"
+    ports:
+      # 127.0.0.1 only: Docker bypasses ufw for published ports, so never publish publicly.
+      - "127.0.0.1:8000:8000"
+    restart: unless-stopped   # what systemd did in the course: restart after crashes and reboots
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"       # keep logs from filling the 20 GB disk
+        max-file: "5"
