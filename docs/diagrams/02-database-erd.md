@@ -73,6 +73,7 @@ erDiagram
         vector512 embedding
         text model_version "w600k_mbf@1.0"
         uuid source_media_id FK "nullable"
+        text storage_key "enrollment photo S3 key, nullable"
     }
     UNKNOWN_FACE_CLUSTERS {
         uuid id PK

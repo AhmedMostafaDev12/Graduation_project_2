@@ -29,11 +29,11 @@ app/ai/
 │   ├── vision.py     #   review(image) -> ReviewResult          (keep/discard + tags + OCR, spec D20)
 │   └── embeddings.py #   embed(texts) -> list[vector]           (text-embedding-3-small, 1536-d, spec D15)
 ├── inference/
-│   └── face.py       #   embed_face(image) -> vector(512)       (server-side face embedder for enrollment, spec D14)
+│   └── face.py       #   embed_face(image) -> vector(512)       (server-side face embedder for enrollment, spec D14; STUB 'stub-0' until Phase 8)
 ├── rag/
 │   ├── render.py     #   event -> one sentence ("09:20 talked with Ahmed (son): ...")
 │   ├── retriever.py  #   SQL time window + person filter, then pgvector ranking (spec D22)
-│   └── answer.py     #   build prompt from top-k events, call llm, return answer + source_event_ids
+│   └── answer.py     #   build prompt from top-k events, call llm, return answer + source_event_ids (STUB: fixed answer until 9.1)
 ├── clustering.py     #   assign an unknown embedding to the nearest cluster (spec D23)
 └── prompts/          #   *.txt templates, versioned (e.g. assist_answer.v1.txt)
 ```
