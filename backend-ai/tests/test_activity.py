@@ -79,6 +79,8 @@ def test_alerts_are_private_to_their_caregiver(client, migrated_engine):
             patient_id=uuid.UUID(patient["id"]),
             alert_type="low_battery",
             message="Glasses battery is at 10%",
+            entity_type="device",
+            entity_id=uuid.uuid4(),
         )
         db.add(alert)
         db.commit()
@@ -88,6 +90,7 @@ def test_alerts_are_private_to_their_caregiver(client, migrated_engine):
         f"{API}/caregivers/me/alerts", headers=manager["headers"]
     ).json()
     assert [a["id"] for a in listed] == [alert_id] and listed[0]["read_at"] is None
+    assert listed[0]["entity_type"] == "device"
 
     stranger = register_and_login(client)
     stolen = client.post(f"{API}/alerts/{alert_id}/read", headers=stranger["headers"])

@@ -134,7 +134,7 @@ The schema in spec §6 is fully designed, so create it **in one go** instead of 
 | 3.4 Devices | `POST /devices/pair` → device token (hashed in `devices.token_hash`), `POST /devices/{id}/heartbeat` |
 | 3.5 Authorization | `oauth2.py`: `get_current_user`, `get_current_device`, **`require_patient_link`** |
 | 3.6 Tests | login and refresh flows, expired token, **caregiver A gets 404 on patient B** |
-| 3.7 Social sign-in (D26) | migration `0002`: `auth_identities`. `POST /auth/google` (verify the Google ID token) and `POST /auth/facebook` (verify through Facebook's API) in `integrations/`, find / link / create rules in `services/auth_service.py`, `409 ACCOUNT_EXISTS` for an unverified matching email |
+| 3.7 Social sign-in (D26) | migration `0005`: `auth_identities`. `POST /auth/google` (verify the Google ID token) and `POST /auth/facebook` (verify through Facebook's API) in `integrations/`, find / link / create rules in `services/auth_service.py`, `409 ACCOUNT_EXISTS` for an unverified matching email |
 | 3.8 Connected accounts | `GET /auth/identities`, `POST`/`DELETE /auth/link/{provider}`, `409 LAST_SIGN_IN_METHOD` (screen C20) |
 | 3.9 Social sign-in tests | Google and Facebook verification **mocked** (CI never calls them): new user, linked Google, Facebook conflict, token for another app rejected, expired token rejected, last method can't be removed |
 
@@ -165,7 +165,7 @@ The schema in spec §6 is fully designed, so create it **in one go** instead of 
 
 ## Phase 5 — All CRUD endpoints on seeded data + AI stubs (M3)
 
-Build in the order the Flutter screens need them (spec §12: Caregiver Mode first). **Deploy after every merged group**, so Flutter integrates screen by screen.
+Build in the order the Flutter screens need them (spec §12: Caregiver Mode first). **Status: built in one PR (#8); deploys together with Phase 6** (the lead's decision). Additions agreed while building are in spec D27: `GET /auth/me`, `GET /patients`, `GET /people/{id}`, `DELETE /people/{id}/photos/{photo_id}`, migration `0002` (`face_embeddings.storage_key`). Spec D28 then filled every screen of the UI brief: device list + unpair, patient profile edit, caregivers list, consents + revoke, one day's reminder logs, past games, archived filter, alert links (migration `0003`), signed URLs inside list responses.
 
 | Group | Endpoints (spec §7.2) | Unlocks screens |
 |---|---|---|
@@ -181,7 +181,7 @@ Build in the order the Flutter screens need them (spec §12: Caregiver Mode firs
 
 **Rules while stubbing AI:**
 - Stubs return **exactly** the spec §7.2 shape, through the same Pydantic schemas the real version will use.
-- Enrollment stores the person and photos. Face embeddings are filled in Phase 8 (a stub can't produce real ones).
+- Enrollment stores the person and photos, plus **stub** embeddings (`model_version = 'stub-0'`, deterministic from the photo) so sync works end to end. Phase 8 re-embeds every `stub-0` row with the real face model.
 - `uploads/{id}/complete` saves the record. The AI job it will trigger arrives in Phases 7–8.
 
 **Done when (M3):** every §7.2 endpoint answers on the deployed API, and Flutter can run every screen against it.
@@ -199,6 +199,7 @@ Build in the order the Flutter screens need them (spec §12: Caregiver Mode firs
 | 6.3 First real task | `alerts.evaluate` (missed meds, device offline, low battery) on seeded data: simple, with no AI |
 | 6.4 Second | `retention.expire_media` (spec §8) |
 | 6.5 Tests | idempotency (run twice → one result), failure → retry → `failed` |
+| 6.6 Thumbnails | **Built early (D28, migration `0004`)** inside the request: `services/thumbnail_service.py` makes a ~320 px JPEG at enrollment and at `uploads/{id}/complete`. In Phase 6: move the upload case into a task `media.make_thumbnail` (just calls `thumbnail_service.create`), and add video thumbnails (ffmpeg in the worker image) |
 
 **Done when (M4):** workers and Beat run on EC2 and alerts appear in C2 by themselves.
 
@@ -259,7 +260,6 @@ Build in the order the Flutter screens need them (spec §12: Caregiver Mode firs
 | When | Question |
 |---|---|
 | Phase 0 | EC2 instance size, and whether to resize or add swap before Phase 6 |
-| Phase 5.5 | Pagination for the journal and lists (not in the spec) |
 | Phase 8 | How the server's face model file gets onto EC2 (in the image, or downloaded from S3 at startup) |
 | Phase 4+ | When to automate deploys (currently manual by choice) |
 | R, before start | Which LLM provider Abdelrahman uses for experiments, and a monthly spending cap |

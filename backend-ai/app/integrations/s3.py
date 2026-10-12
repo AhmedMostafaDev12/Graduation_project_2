@@ -67,6 +67,18 @@ def put_bytes(key: str, data: bytes, content_type: str) -> None:
         raise _unavailable(exc) from exc
 
 
+def get_bytes(key: str, max_bytes: int) -> bytes | None:
+    """The object's bytes, or None when it is larger than max_bytes (not downloaded)."""
+    try:
+        response = _s3().get_object(Bucket=settings.s3_bucket, Key=key)
+        if response["ContentLength"] > max_bytes:
+            response["Body"].close()
+            return None
+        return response["Body"].read()
+    except (BotoCoreError, ClientError) as exc:
+        raise _unavailable(exc) from exc
+
+
 def exists(key: str) -> bool:
     try:
         _s3().head_object(Bucket=settings.s3_bucket, Key=key)

@@ -13,11 +13,20 @@ from sqlalchemy.orm import Session
 
 from app.errors import Conflict, Forbidden, NotFound
 from app.integrations import s3
-from app.models import AudioSegment, AuditLog, CapturedDocument, Event, MediaAsset, User
+from app.models import (
+    AudioSegment,
+    AuditLog,
+    Encounter,
+    EnrolledPerson,
+    Event,
+    MediaAsset,
+    User,
+)
 from app.oauth2 import PatientAccess
 from app.schemas.media import (
     CONTENT_TYPES,
-    DocumentOut,
+    MediaEvent,
+    MediaEventPerson,
     MediaOut,
     MediaView,
     UploadComplete,
@@ -25,6 +34,7 @@ from app.schemas.media import (
     UploadOut,
     UploadRequest,
 )
+from app.services import thumbnail_service
 
 
 def storage_key(
@@ -110,20 +120,29 @@ def complete_upload(
             status="confirmed" if requested else "pending_review",
             retention_policy="keep_indefinitely" if requested else None,
         )
+        if asset.asset_type == "image":
+            # Phase 6: a Celery task instead (video thumbnails need ffmpeg there)
+            asset.thumbnail_key = thumbnail_service.create(key)
         db.add(asset)
         db.commit()
         # Phase 6: enqueue review(asset) on Celery here when pending_review
     return UploadDone(id=upload_id, kind="media", status=asset.status)
 
 
-def _audit(db: Session, access: PatientAccess, action: str, media: MediaAsset) -> None:
-    """Who looked at or removed a photo. A phone acts on behalf of its patient."""
+def audit(db: Session, access: PatientAccess, action: str, media_ids: list) -> None:
+    """Who looked at or removed photos: one row per photo, added in one bulk insert.
+    A phone acts on behalf of its patient. The caller commits."""
     actor = access.principal.user.id if access.principal.user else access.patient_id
-    db.add(
+    db.add_all(
         AuditLog(
-            actor_user_id=actor, action=action, entity_type="media", entity_id=media.id
+            actor_user_id=actor, action=action, entity_type="media", entity_id=media_id
         )
+        for media_id in media_ids
     )
+
+
+def _audit(db: Session, access: PatientAccess, action: str, media: MediaAsset) -> None:
+    audit(db, access, action, [media.id])
 
 
 def get_media(db: Session, patient_id: uuid.UUID, media_id: uuid.UUID) -> MediaAsset:
@@ -142,6 +161,30 @@ def view(db: Session, access: PatientAccess, media_id: uuid.UUID) -> MediaView:
         **MediaOut.model_validate(media, from_attributes=True).model_dump(),
         url=url,
         url_expires_in=s3.VIEW_URL_SECONDS,
+        event=_event_summary(db, media.event_id),
+    )
+
+
+def _event_summary(db: Session, event_id: uuid.UUID) -> MediaEvent | None:
+    """C13 "Encounter with Ahmed (son) · Thu 1 Oct 09:15", wherever the photo is opened."""
+    event = db.get(Event, event_id)
+    if event is None:
+        return None
+    person_id = event.person_id
+    if person_id is None and event.encounter_id:
+        person_id = db.scalar(
+            select(Encounter.person_id).where(Encounter.id == event.encounter_id)
+        )
+    person = db.get(EnrolledPerson, person_id) if person_id else None
+    return MediaEvent(
+        id=event.id,
+        event_type=event.event_type,
+        occurred_at=event.occurred_at,
+        person=MediaEventPerson(
+            id=person.id, name=person.name, relationship=person.relationship
+        )
+        if person
+        else None,
     )
 
 
@@ -160,26 +203,8 @@ def pin(db: Session, media: MediaAsset, caregiver: User) -> MediaOut:
 
 def delete(db: Session, access: PatientAccess, media: MediaAsset) -> None:
     s3.delete(media.storage_key)
+    if media.thumbnail_key:
+        s3.delete(media.thumbnail_key)
     media.deleted_at = datetime.now(UTC)
     _audit(db, access, "media.delete", media)
     db.commit()
-
-
-def documents(
-    db: Session,
-    patient_id: uuid.UUID,
-    document_type: str | None,
-    limit: int,
-    offset: int,
-) -> list[DocumentOut]:
-    query = (
-        select(CapturedDocument)
-        .join(MediaAsset, MediaAsset.id == CapturedDocument.media_asset_id)
-        .where(MediaAsset.patient_id == patient_id, MediaAsset.deleted_at.is_(None))
-    )
-    if document_type:
-        query = query.where(CapturedDocument.document_type == document_type)
-    rows = db.scalars(
-        query.order_by(CapturedDocument.created_at.desc()).limit(limit).offset(offset)
-    )
-    return [DocumentOut.model_validate(row, from_attributes=True) for row in rows]

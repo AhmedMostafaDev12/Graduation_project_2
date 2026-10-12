@@ -14,9 +14,14 @@ class AppError(Exception):
     status_code = 400
     code = "BAD_REQUEST"
 
-    def __init__(self, message: str, code: str | None = None):
+    def __init__(
+        self, message: str, code: str | None = None, details: list[dict] | None = None
+    ):
         super().__init__(message)
         self.message = message
+        self.details = (
+            details  # [{"field": ..., "message": ...}], like validation errors
+        )
         if code:
             self.code = code
 
@@ -70,7 +75,8 @@ def _error(status_code: int, code: str, message: str, **extra) -> JSONResponse:
 def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(AppError)
     async def handle_app_error(request: Request, exc: AppError) -> JSONResponse:
-        return _error(exc.status_code, exc.code, exc.message)
+        extra = {"details": exc.details} if exc.details else {}
+        return _error(exc.status_code, exc.code, exc.message, **extra)
 
     @app.exception_handler(RequestValidationError)
     async def handle_validation_error(

@@ -84,7 +84,7 @@ def get_principal(
         return Principal(kind="caregiver", user=user)
 
     device = db.scalar(select(Device).where(Device.token_hash == hash_token(token)))
-    if device is None:
+    if device is None or device.unpaired_at is not None:
         raise Unauthorized("Invalid token.", code="INVALID_TOKEN")
     return Principal(kind="device", device=device)
 

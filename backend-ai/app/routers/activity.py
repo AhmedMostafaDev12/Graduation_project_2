@@ -79,3 +79,16 @@ def register_push_token(
 ):
     activity_service.register_push_token(db, caregiver, data.fcm_token)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get(
+    "/patients/{patient_id}/mind-game-sessions", response_model=list[MindGameOut]
+)
+def list_mind_games(
+    game_type: str | None = Query(default=None, max_length=40),
+    limit: int = Query(default=50, ge=1, le=200),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db),
+    access: PatientAccess = Depends(require_patient_link),
+):
+    return activity_service.list_games(db, access.patient_id, game_type, limit, offset)

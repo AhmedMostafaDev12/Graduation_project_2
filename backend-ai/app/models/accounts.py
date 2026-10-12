@@ -107,3 +107,4 @@ class Device(Base):
     battery_level_pct: Mapped[int | None] = mapped_column(Integer, nullable=True)
     last_seen_at: Mapped[datetime | None] = ts(nullable=True)
     paired_at: Mapped[datetime] = ts()
+    unpaired_at: Mapped[datetime | None] = ts(nullable=True)  # token dead; row kept

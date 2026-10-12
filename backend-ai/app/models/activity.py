@@ -11,7 +11,7 @@ from sqlalchemy import (
     UniqueConstraint,
     text,
 )
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -63,5 +63,10 @@ class CaregiverAlert(Base):
         )
     )
     message: Mapped[str] = mapped_column(Text)
+    # what the alert is about, so the app can open it (C2)
+    entity_type: Mapped[str | None] = mapped_column(Text, nullable=True)
+    entity_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), nullable=True
+    )
     read_at: Mapped[datetime | None] = ts(nullable=True)
     created_at: Mapped[datetime] = created_at()

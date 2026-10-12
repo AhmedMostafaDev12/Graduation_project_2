@@ -11,12 +11,13 @@ from tests.conftest import (
     API,
     add_viewer,
     create_patient,
+    image_bytes,
     pair_device,
     register_and_login,
 )
 
-JPEG = b"\xff\xd8\xff\xe0" + b"fake-jpeg-body"
-PNG = b"\x89PNG\r\n\x1a\n" + b"fake-png-body"
+JPEG = image_bytes("JPEG")
+PNG = image_bytes("PNG", color=(10, 90, 200))
 
 
 def _enroll(client, caregiver, patient_id, photos=(JPEG,), consent="true", name="أحمد"):
@@ -43,9 +44,10 @@ def test_enroll_stores_photos_and_embeddings(client, fake_s3):
     assert created.status_code == 201, created.text
     person = created.json()
     assert person["embedding_count"] == 2 and person["added_by"] == "caregiver_manual"
-    assert (
-        len(fake_s3.list_keys(f"patients/{patient['id']}/people/{person['id']}/")) == 2
-    )
+    folder = f"patients/{patient['id']}/people/{person['id']}/"
+    keys = fake_s3.list_keys(folder)
+    assert len(keys) == 4  # 2 photos + 2 previews
+    assert sum(k.endswith(".thumb.jpg") for k in keys) == 2
 
     detail = client.get(
         f"{API}/people/{person['id']}", headers=manager["headers"]
@@ -56,15 +58,36 @@ def test_enroll_stores_photos_and_embeddings(client, fake_s3):
 
     more = client.post(
         f"{API}/people/{person['id']}/photos",
-        files=[("photos", ("p.jpg", JPEG + b"2", "image/jpeg"))],
+        files=[("photos", ("p.jpg", image_bytes(color=(1, 2, 3)), "image/jpeg"))],
         headers=manager["headers"],
     )
     assert more.status_code == 200 and more.json()["embedding_count"] == 3
+
+    photo = detail["photos"][0]
+    assert ".thumb.jpg" in photo["thumbnail_url"]
+    removed = client.delete(
+        f"{API}/people/{person['id']}/photos/{photo['id']}", headers=manager["headers"]
+    )
+    assert removed.status_code == 200 and removed.json()["embedding_count"] == 2
+    assert len(fake_s3.list_keys(folder)) == 4  # 3 photos + previews, minus one pair
 
     listed = client.get(
         f"{API}/patients/{patient['id']}/people", headers=manager["headers"]
     )
     assert [p["id"] for p in listed.json()] == [person["id"]]
+
+
+def test_last_photo_cannot_be_removed(client):
+    manager, patient = _setup(client)
+    person = _enroll(client, manager, patient["id"]).json()
+    detail = client.get(
+        f"{API}/people/{person['id']}", headers=manager["headers"]
+    ).json()
+    last = client.delete(
+        f"{API}/people/{person['id']}/photos/{detail['photos'][0]['id']}",
+        headers=manager["headers"],
+    )
+    assert last.status_code == 409 and last.json()["error"]["code"] == "LAST_PHOTO"
 
 
 def test_enroll_validates_consent_and_files(client, fake_s3):

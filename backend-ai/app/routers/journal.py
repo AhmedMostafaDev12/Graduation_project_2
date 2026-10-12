@@ -33,4 +33,4 @@ def get_journal(
     db: Session = Depends(get_db),
     access: PatientAccess = Depends(require_patient_link),
 ):
-    return journal_service.journal(db, access.patient_id, day)
+    return journal_service.journal(db, access, day)

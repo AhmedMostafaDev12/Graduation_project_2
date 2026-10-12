@@ -8,7 +8,10 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.ai import review_contract
+from app.integrations import s3
 from app.models import (
+    CapturedDocument,
     Encounter,
     EnrolledPerson,
     Event,
@@ -21,11 +24,13 @@ from app.oauth2 import PatientAccess
 from app.schemas.common import BatchResult
 from app.schemas.journal import (
     EventsBatch,
+    JournalDocument,
     JournalEntry,
     JournalMedia,
     JournalOut,
     JournalPerson,
 )
+from app.services import media_service
 
 
 def _owned(db: Session, model, ids: set, patient_id: uuid.UUID) -> set:
@@ -130,8 +135,10 @@ def upload_batch(db: Session, access: PatientAccess, batch: EventsBatch) -> Batc
     return result
 
 
-def journal(db: Session, patient_id: uuid.UUID, day: date | None) -> JournalOut:
-    """One day in the patient's own timezone, oldest first (screens P4, C3)."""
+def journal(db: Session, access: PatientAccess, day: date | None) -> JournalOut:
+    """One day in the patient's own timezone, oldest first (screens P4, C12). Photos come
+    with signed URLs, so the screen needs no request per photo; every URL is audit-logged."""
+    patient_id = access.patient_id
     tz_name = db.get(PatientProfile, patient_id).timezone
     tz = ZoneInfo(tz_name)
     day = day or datetime.now(tz).date()
@@ -167,7 +174,35 @@ def journal(db: Session, patient_id: uuid.UUID, day: date | None) -> JournalOut:
                     asset_type=asset.asset_type,
                     trigger=asset.trigger,
                     status=asset.status,
+                    duration_seconds=asset.duration_seconds,
+                    expires_at=asset.expires_at,
+                    ai_tags=asset.ai_tags,
+                    url=s3.presign_get(asset.storage_key),
+                    thumbnail_url=s3.presign_get(asset.thumbnail_key)
+                    if asset.thumbnail_key
+                    else None,
                 )
+            )
+
+    documents = {}
+    if event_ids:
+        for doc in db.scalars(
+            select(CapturedDocument)
+            .join(MediaAsset, MediaAsset.id == CapturedDocument.media_asset_id)
+            .where(
+                CapturedDocument.event_id.in_(event_ids),
+                MediaAsset.deleted_at.is_(None),
+            )
+        ):
+            kind, fields = review_contract.normalize_document(
+                doc.document_type, doc.extracted_fields
+            )
+            shown = review_contract.display(kind, fields)
+            documents[doc.event_id] = JournalDocument(
+                id=doc.id,
+                document_type=kind,
+                title=shown["title"],
+                headline=shown["headline"],
             )
 
     # an encounter event may name its person only through the encounter
@@ -207,7 +242,12 @@ def journal(db: Session, patient_id: uuid.UUID, day: date | None) -> JournalOut:
             # face vectors are for the clustering worker, not for people
             metadata={k: v for k, v in e.metadata_.items() if k != "unknown_embedding"},
             media=media[e.id],
+            document=documents.get(e.id),
         )
         for e in events
     ]
+    media_service.audit(
+        db, access, "media.view", [m.id for ms in media.values() for m in ms]
+    )
+    db.commit()
     return JournalOut(date=day, timezone=tz_name, entries=entries)

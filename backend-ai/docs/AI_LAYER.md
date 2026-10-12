@@ -29,11 +29,11 @@ app/ai/
 │   ├── vision.py     #   review(image) -> ReviewResult          (keep/discard + tags + OCR, spec D20)
 │   └── embeddings.py #   embed(texts) -> list[vector]           (text-embedding-3-small, 1536-d, spec D15)
 ├── inference/
-│   └── face.py       #   embed_face(image) -> vector(512)       (server-side face embedder for enrollment, spec D14)
+│   └── face.py       #   embed_face(image) -> vector(512)       (server-side face embedder for enrollment, spec D14; STUB 'stub-0' until Phase 8)
 ├── rag/
 │   ├── render.py     #   event -> one sentence ("09:20 talked with Ahmed (son): ...")
 │   ├── retriever.py  #   SQL time window + person filter, then pgvector ranking (spec D22)
-│   └── answer.py     #   build prompt from top-k events, call llm, return answer + source_event_ids
+│   └── answer.py     #   build prompt from top-k events, call llm, return answer + source_event_ids (STUB: fixed answer until 9.1)
 ├── clustering.py     #   assign an unknown embedding to the nearest cluster (spec D23)
 └── prompts/          #   *.txt templates, versioned (e.g. assist_answer.v1.txt)
 ```
@@ -54,12 +54,28 @@ app/ai/
 
 ---
 
-## 4. Where each AI feature lives
+## 4. Smart-review contract (spec D29)
+
+The vision prompt (Phase 7) must return `ReviewResult` from [`app/ai/review_contract.py`](../app/ai/review_contract.py): `keep`, `category`, `tags`, `reason`, `contains_other_people`, and for documents `document_type`, `ocr_text`, `fields`.
+
+- **Store only through `normalize_document` / `normalize_ai_tags`.** They never raise: unknown categories become `other` with `raw_category`, known keys accept common variants, junk is dropped.
+- **Known types use fixed keys** (`DOCUMENT_KEYS`); the app translates them. **`other` carries the model's own `title` and `{label, value}` rows**, written in the patient's language, shown as-is.
+- **Keep/discard never depends on the category.** An important photo that fits nothing is kept as `other` with a `reason`.
+- **Never add a category in code alone.** Review what the model keeps inventing, then propose it to the lead:
+  ```sql
+  SELECT extracted_fields->>'raw_category' AS raw, count(*) FROM captured_documents
+  WHERE document_type = 'other' GROUP BY 1 ORDER BY 2 DESC;
+  SELECT ai_tags->>'raw_category' AS raw, count(*) FROM media_assets
+  WHERE ai_tags->>'category' = 'other' GROUP BY 1 ORDER BY 2 DESC;
+  ```
+  An approved category means: spec change → `DOCUMENT_KEYS` / `MEDIA_CATEGORIES` → prompt version bump → app layout → backfill rows whose `raw_category` matches.
+
+## 5. Where each AI feature lives
 
 | Feature (spec) | Client / module | Runs in |
 |---|---|---|
 | Transcribe speech segments (§7.3) | `clients/stt.py` | task `transcribe` (queue `ai_io`) |
-| Smart review + OCR (§7.4) | `clients/vision.py` | task `review` (queue `ai_io`) |
+| Smart review + OCR (§7.4) | `clients/vision.py`, output shape in `review_contract.py` | task `review` (queue `ai_io`) |
 | Embed events for RAG | `rag/render.py` + `clients/embeddings.py` | task `embed` (queue `ai_io`) |
 | Answer a question (`/assist`) | `rag/retriever.py` + `rag/answer.py` + `clients/llm.py` | request (user waiting) |
 | Daily summary (Phase 2) | `clients/llm.py` | Beat → task `summaries` |

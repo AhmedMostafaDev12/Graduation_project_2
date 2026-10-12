@@ -14,3 +14,4 @@ boto3==1.43.111
 python-multipart==0.0.32
 tzdata==2026.5
 python-dateutil==2.9.0.post0
+pillow==12.3.0

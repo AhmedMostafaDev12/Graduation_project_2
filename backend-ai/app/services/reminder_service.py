@@ -2,15 +2,21 @@
 fires them through the glasses, and reports each occurrence back as a reminder log."""
 
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, time, timedelta
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.errors import NotFound
-from app.models import Reminder, ReminderLog, User
+from app.models import PatientProfile, Reminder, ReminderLog, User
 from app.schemas.common import BatchResult
-from app.schemas.reminders import ReminderCreate, ReminderLogIn, ReminderUpdate
+from app.schemas.reminders import (
+    ReminderCreate,
+    ReminderLogIn,
+    ReminderLogOut,
+    ReminderUpdate,
+)
 
 
 def list_reminders(db: Session, patient_id: uuid.UUID) -> list[Reminder]:
@@ -120,3 +126,28 @@ def upsert_logs(
             result.duplicates.append(log.id)
     db.commit()
     return result
+
+
+def list_logs(
+    db: Session, patient_id: uuid.UUID, day: date | None
+) -> list[ReminderLogOut]:
+    """One day's occurrences in the patient's timezone (C1 "1/3 done", C8 Today), by time."""
+    tz = ZoneInfo(db.get(PatientProfile, patient_id).timezone)
+    day = day or datetime.now(tz).date()
+    start = datetime.combine(day, time.min, tzinfo=tz)
+    rows = db.execute(
+        select(ReminderLog, Reminder.title, Reminder.type)
+        .join(Reminder, Reminder.id == ReminderLog.reminder_id)
+        .where(
+            Reminder.patient_id == patient_id,
+            ReminderLog.scheduled_at >= start,
+            ReminderLog.scheduled_at < start + timedelta(days=1),
+        )
+        .order_by(ReminderLog.scheduled_at)
+    )
+    return [
+        ReminderLogOut.model_validate(log).model_copy(
+            update={"title": title, "type": kind}
+        )
+        for log, title, kind in rows
+    ]

@@ -1,6 +1,7 @@
 import uuid
+from datetime import date
 
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -14,6 +15,7 @@ from app.schemas.common import BatchResult
 from app.schemas.reminders import (
     ReminderCreate,
     ReminderLogBatch,
+    ReminderLogOut,
     ReminderOut,
     ReminderUpdate,
 )
@@ -80,3 +82,16 @@ def upload_reminder_logs(
     """The patient's phone reports occurrences; a managing caregiver may also mark one done."""
     require_editor(access, allow_device=True)
     return reminder_service.upsert_logs(db, access.patient_id, data.logs)
+
+
+@router.get("/reminder-logs", response_model=list[ReminderLogOut])
+def list_reminder_logs(
+    day: date | None = Query(
+        default=None,
+        alias="date",
+        description="YYYY-MM-DD; today in the patient's timezone",
+    ),
+    db: Session = Depends(get_db),
+    access: PatientAccess = Depends(require_patient_link),
+):
+    return reminder_service.list_logs(db, access.patient_id, day)

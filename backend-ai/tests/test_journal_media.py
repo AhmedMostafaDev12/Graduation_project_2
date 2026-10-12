@@ -155,6 +155,7 @@ def test_upload_flow_view_pin_and_delete(client, fake_s3, migrated_engine):
         f"{base}/journal", params={"date": DAY}, headers=manager["headers"]
     ).json()
     assert journal["entries"][0]["media"][0]["id"] == media_id
+    assert journal["entries"][0]["media"][0]["url"].startswith("https://")
 
     assert (
         client.delete(f"{API}/media/{media_id}", headers=phone["headers"]).status_code
@@ -169,7 +170,8 @@ def test_upload_flow_view_pin_and_delete(client, fake_s3, migrated_engine):
         actions = db.scalars(
             select(AuditLog.action).where(AuditLog.entity_id == uuid.UUID(media_id))
         ).all()
-    assert sorted(actions) == ["media.delete", "media.view"]
+    # one view from GET media, one from the journal handing out a signed URL
+    assert sorted(actions) == ["media.delete", "media.view", "media.view"]
 
 
 def test_user_requested_clip_skips_review(client, fake_s3):
@@ -285,7 +287,74 @@ def test_documents_list(client, fake_s3, migrated_engine):
 
     docs = client.get(f"{base}/documents", headers=manager["headers"]).json()
     assert [d["document_type"] for d in docs] == ["receipt"]
+    assert docs[0]["url"].startswith("https://")
     bills = client.get(
         f"{base}/documents", params={"type": "bill"}, headers=manager["headers"]
     )
     assert bills.json() == []
+
+
+def test_image_upload_gets_an_upright_small_thumbnail(client, fake_s3):
+    import io
+
+    from PIL import Image
+
+    from tests.conftest import image_bytes
+
+    _, patient, phone, base = _setup(client)
+    moment = _event()
+    client.post(
+        f"{base}/events:batch", json={"events": [moment]}, headers=phone["headers"]
+    )
+    media_id, ticket = _upload(client, base, phone, moment["id"])
+    fake_s3.put_bytes(ticket["key"], image_bytes(size=(4000, 3000)), "image/jpeg")
+    done = client.post(
+        f"{API}/uploads/{media_id}/complete",
+        json={
+            "patient_id": patient["id"],
+            "kind": "media",
+            "content_type": "image/jpeg",
+            "event_id": moment["id"],
+            "trigger": "salient_frame",
+        },
+        headers=phone["headers"],
+    )
+    assert done.status_code == 200
+
+    thumb_key = ticket["key"].replace(".jpg", ".thumb.jpg")
+    with Image.open(io.BytesIO(fake_s3.objects[thumb_key])) as thumb:
+        assert max(thumb.size) == 320 and not thumb.getexif()
+
+    journal = client.get(
+        f"{base}/journal", params={"date": DAY}, headers=phone["headers"]
+    ).json()
+    assert thumb_key in journal["entries"][0]["media"][0]["thumbnail_url"]
+
+    client.delete(f"{API}/media/{media_id}", headers=phone["headers"])
+    assert fake_s3.objects == {}
+
+
+def test_broken_image_still_uploads_without_thumbnail(client, fake_s3):
+    _, patient, phone, base = _setup(client)
+    moment = _event()
+    client.post(
+        f"{base}/events:batch", json={"events": [moment]}, headers=phone["headers"]
+    )
+    media_id, ticket = _upload(client, base, phone, moment["id"])
+    fake_s3.put_bytes(ticket["key"], b"\xff\xd8\xff not really a jpeg", "image/jpeg")
+    done = client.post(
+        f"{API}/uploads/{media_id}/complete",
+        json={
+            "patient_id": patient["id"],
+            "kind": "media",
+            "content_type": "image/jpeg",
+            "event_id": moment["id"],
+            "trigger": "salient_frame",
+        },
+        headers=phone["headers"],
+    )
+    assert done.status_code == 200
+    journal = client.get(
+        f"{base}/journal", params={"date": DAY}, headers=phone["headers"]
+    ).json()
+    assert journal["entries"][0]["media"][0]["thumbnail_url"] is None
