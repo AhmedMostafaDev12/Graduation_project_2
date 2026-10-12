@@ -6,6 +6,8 @@ from typing import Any, Literal
 
 from pydantic import AwareDatetime, BaseModel, Field, model_validator
 
+from app.ai.review_contract import normalize_ai_tags
+
 # content type -> file extension; anything else is refused
 CONTENT_TYPES = {
     "image/jpeg": "jpg",
@@ -86,6 +88,39 @@ class UploadDone(BaseModel):
     )
 
 
+class AiTags(BaseModel):
+    """What smart review said about a photo (spec D29). Unknown categories arrive as
+    "other" with the model's word in raw_category; show `reason` for those."""
+
+    category: str | None = Field(
+        default=None, description="notable_moment | document | person | place | other"
+    )
+    tags: list[str] = Field(default_factory=list)
+    reason: str | None = None
+    raw_category: str | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _normalized(cls, value):
+        """Every response gets the contract's shape, whatever the model or old rows stored."""
+        return (normalize_ai_tags(value) or {}) if isinstance(value, dict) else value
+
+
+class MediaEventPerson(BaseModel):
+    id: uuid.UUID
+    name: str
+    relationship: str
+
+
+class MediaEvent(BaseModel):
+    """The moment the photo belongs to, for C13's title line."""
+
+    id: uuid.UUID
+    event_type: str
+    occurred_at: datetime
+    person: MediaEventPerson | None
+
+
 class MediaOut(BaseModel):
     id: uuid.UUID
     patient_id: uuid.UUID
@@ -93,7 +128,7 @@ class MediaOut(BaseModel):
     asset_type: str
     trigger: str
     status: str
-    ai_tags: dict[str, Any] | None
+    ai_tags: AiTags | None
     contains_other_people: bool | None
     duration_seconds: int | None
     retention_policy: str | None
@@ -103,12 +138,37 @@ class MediaOut(BaseModel):
 
 
 class MediaView(MediaOut):
+    event: MediaEvent | None = None
     url: str = Field(description="Short-lived signed URL")
     url_expires_in: int = Field(description="Seconds")
 
 
+class DocumentField(BaseModel):
+    key: str | None = Field(
+        description="Known types: translate this (e.g. total -> Amount)"
+    )
+    label: str | None = Field(
+        description="type other: the model's own label, show as-is"
+    )
+    value: str
+    type: Literal["text", "date"] = Field(
+        description="date = YYYY-MM-DD, format it locally"
+    )
+
+
 class DocumentOut(BaseModel):
     id: uuid.UUID
+    title: str | None = Field(
+        description="Merchant, issuer or medicine; for other the model's title. "
+        "null: show the localized document type"
+    )
+    headline: str | None = Field(
+        description="The key value for the card: 120 EGP, Concor 5 mg"
+    )
+    fields: list[DocumentField] = Field(
+        description="Rows for the detail screen, in order"
+    )
+    captured_at: datetime = Field(description="When the glasses captured it")
     event_id: uuid.UUID
     media_asset_id: uuid.UUID
     document_type: str

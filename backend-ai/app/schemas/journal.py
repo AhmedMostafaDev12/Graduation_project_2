@@ -6,6 +6,8 @@ from typing import Any, Literal
 
 from pydantic import AwareDatetime, BaseModel, Field
 
+from app.schemas.media import AiTags
+
 # conversation_segment events are written by the transcription worker, never by clients
 ClientEventType = Literal[
     "encounter",
@@ -58,6 +60,15 @@ class JournalPerson(BaseModel):
     relationship: str
 
 
+class JournalDocument(BaseModel):
+    """C12 "Document (type icon + key field)"; open C15 with id."""
+
+    id: uuid.UUID
+    document_type: str
+    title: str | None
+    headline: str | None
+
+
 class JournalMedia(BaseModel):
     id: uuid.UUID
     asset_type: str
@@ -65,6 +76,7 @@ class JournalMedia(BaseModel):
     status: str
     duration_seconds: int | None
     expires_at: datetime | None
+    ai_tags: AiTags | None = None
     url: str = Field(description="Signed URL (10 min). Cache images by id, not by URL")
     thumbnail_url: str | None = Field(
         default=None, description="~320 px preview for the timeline; null = use url"
@@ -83,6 +95,7 @@ class JournalEntry(BaseModel):
     rendered_text: str | None
     metadata: dict[str, Any]
     media: list[JournalMedia]
+    document: JournalDocument | None = None
 
 
 class JournalOut(BaseModel):

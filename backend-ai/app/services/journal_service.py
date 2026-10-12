@@ -8,8 +8,10 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.ai import review_contract
 from app.integrations import s3
 from app.models import (
+    CapturedDocument,
     Encounter,
     EnrolledPerson,
     Event,
@@ -22,6 +24,7 @@ from app.oauth2 import PatientAccess
 from app.schemas.common import BatchResult
 from app.schemas.journal import (
     EventsBatch,
+    JournalDocument,
     JournalEntry,
     JournalMedia,
     JournalOut,
@@ -173,11 +176,33 @@ def journal(db: Session, access: PatientAccess, day: date | None) -> JournalOut:
                     status=asset.status,
                     duration_seconds=asset.duration_seconds,
                     expires_at=asset.expires_at,
+                    ai_tags=asset.ai_tags,
                     url=s3.presign_get(asset.storage_key),
                     thumbnail_url=s3.presign_get(asset.thumbnail_key)
                     if asset.thumbnail_key
                     else None,
                 )
+            )
+
+    documents = {}
+    if event_ids:
+        for doc in db.scalars(
+            select(CapturedDocument)
+            .join(MediaAsset, MediaAsset.id == CapturedDocument.media_asset_id)
+            .where(
+                CapturedDocument.event_id.in_(event_ids),
+                MediaAsset.deleted_at.is_(None),
+            )
+        ):
+            kind, fields = review_contract.normalize_document(
+                doc.document_type, doc.extracted_fields
+            )
+            shown = review_contract.display(kind, fields)
+            documents[doc.event_id] = JournalDocument(
+                id=doc.id,
+                document_type=kind,
+                title=shown["title"],
+                headline=shown["headline"],
             )
 
     # an encounter event may name its person only through the encounter
@@ -217,6 +242,7 @@ def journal(db: Session, access: PatientAccess, day: date | None) -> JournalOut:
             # face vectors are for the clustering worker, not for people
             metadata={k: v for k, v in e.metadata_.items() if k != "unknown_embedding"},
             media=media[e.id],
+            document=documents.get(e.id),
         )
         for e in events
     ]

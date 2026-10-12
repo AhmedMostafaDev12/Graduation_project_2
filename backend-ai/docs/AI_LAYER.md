@@ -54,12 +54,28 @@ app/ai/
 
 ---
 
-## 4. Where each AI feature lives
+## 4. Smart-review contract (spec D29)
+
+The vision prompt (Phase 7) must return `ReviewResult` from [`app/ai/review_contract.py`](../app/ai/review_contract.py): `keep`, `category`, `tags`, `reason`, `contains_other_people`, and for documents `document_type`, `ocr_text`, `fields`.
+
+- **Store only through `normalize_document` / `normalize_ai_tags`.** They never raise: unknown categories become `other` with `raw_category`, known keys accept common variants, junk is dropped.
+- **Known types use fixed keys** (`DOCUMENT_KEYS`); the app translates them. **`other` carries the model's own `title` and `{label, value}` rows**, written in the patient's language, shown as-is.
+- **Keep/discard never depends on the category.** An important photo that fits nothing is kept as `other` with a `reason`.
+- **Never add a category in code alone.** Review what the model keeps inventing, then propose it to the lead:
+  ```sql
+  SELECT extracted_fields->>'raw_category' AS raw, count(*) FROM captured_documents
+  WHERE document_type = 'other' GROUP BY 1 ORDER BY 2 DESC;
+  SELECT ai_tags->>'raw_category' AS raw, count(*) FROM media_assets
+  WHERE ai_tags->>'category' = 'other' GROUP BY 1 ORDER BY 2 DESC;
+  ```
+  An approved category means: spec change → `DOCUMENT_KEYS` / `MEDIA_CATEGORIES` → prompt version bump → app layout → backfill rows whose `raw_category` matches.
+
+## 5. Where each AI feature lives
 
 | Feature (spec) | Client / module | Runs in |
 |---|---|---|
 | Transcribe speech segments (§7.3) | `clients/stt.py` | task `transcribe` (queue `ai_io`) |
-| Smart review + OCR (§7.4) | `clients/vision.py` | task `review` (queue `ai_io`) |
+| Smart review + OCR (§7.4) | `clients/vision.py`, output shape in `review_contract.py` | task `review` (queue `ai_io`) |
 | Embed events for RAG | `rag/render.py` + `clients/embeddings.py` | task `embed` (queue `ai_io`) |
 | Answer a question (`/assist`) | `rag/retriever.py` + `rag/answer.py` + `clients/llm.py` | request (user waiting) |
 | Daily summary (Phase 2) | `clients/llm.py` | Beat → task `summaries` |

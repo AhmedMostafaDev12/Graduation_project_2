@@ -24,7 +24,7 @@ from app.schemas.media import (
     UploadOut,
     UploadRequest,
 )
-from app.services import media_service
+from app.services import document_service, media_service
 
 router = APIRouter(tags=["Media"])
 
@@ -100,4 +100,14 @@ def list_documents(
     db: Session = Depends(get_db),
     access: PatientAccess = Depends(require_patient_link),
 ):
-    return media_service.documents(db, access, document_type, limit, offset)
+    return document_service.list_documents(db, access, document_type, limit, offset)
+
+
+@router.get("/documents/{document_id}", response_model=DocumentOut)
+def get_document(
+    document_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    principal: Principal = Depends(get_principal),
+):
+    """C15, also when opened from a link. The photo URL is audit-logged."""
+    return document_service.get_document(db, principal, document_id)

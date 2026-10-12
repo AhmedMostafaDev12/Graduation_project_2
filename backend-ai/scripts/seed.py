@@ -591,8 +591,10 @@ def seed(db, password: str, device_token: str) -> None:
                 "media_asset_id": sid(8, 3),
                 "document_type": "receipt",
                 "ocr_text": "صيدلية\nConcor 5 mg x1\nالإجمالي 120 ج.م",
+                # canonical shapes: app/ai/review_contract.py (spec D29)
                 "extracted_fields": {
-                    "amount": "120 EGP",
+                    "merchant": "صيدلية",
+                    "total": {"amount": 120, "currency": "EGP"},
                     "date": today.isoformat(),
                     "items": ["Concor 5 mg x1"],
                 },
@@ -603,7 +605,11 @@ def seed(db, password: str, device_token: str) -> None:
                 "media_asset_id": sid(8, 5),
                 "document_type": "medication_label",
                 "ocr_text": "Concor 5 mg\nBisoprolol fumarate",
-                "extracted_fields": {"medication_name": "Concor", "dosage": "5 mg"},
+                "extracted_fields": {
+                    "medication_name": "Concor",
+                    "strength": "5 mg",
+                    "instructions": "قرص واحد الصبح",
+                },
             },
         ],
     )

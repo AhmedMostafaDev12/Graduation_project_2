@@ -13,11 +13,20 @@ from sqlalchemy.orm import Session
 
 from app.errors import Conflict, Forbidden, NotFound
 from app.integrations import s3
-from app.models import AudioSegment, AuditLog, CapturedDocument, Event, MediaAsset, User
+from app.models import (
+    AudioSegment,
+    AuditLog,
+    Encounter,
+    EnrolledPerson,
+    Event,
+    MediaAsset,
+    User,
+)
 from app.oauth2 import PatientAccess
 from app.schemas.media import (
     CONTENT_TYPES,
-    DocumentOut,
+    MediaEvent,
+    MediaEventPerson,
     MediaOut,
     MediaView,
     UploadComplete,
@@ -152,6 +161,30 @@ def view(db: Session, access: PatientAccess, media_id: uuid.UUID) -> MediaView:
         **MediaOut.model_validate(media, from_attributes=True).model_dump(),
         url=url,
         url_expires_in=s3.VIEW_URL_SECONDS,
+        event=_event_summary(db, media.event_id),
+    )
+
+
+def _event_summary(db: Session, event_id: uuid.UUID) -> MediaEvent | None:
+    """C13 "Encounter with Ahmed (son) · Thu 1 Oct 09:15", wherever the photo is opened."""
+    event = db.get(Event, event_id)
+    if event is None:
+        return None
+    person_id = event.person_id
+    if person_id is None and event.encounter_id:
+        person_id = db.scalar(
+            select(Encounter.person_id).where(Encounter.id == event.encounter_id)
+        )
+    person = db.get(EnrolledPerson, person_id) if person_id else None
+    return MediaEvent(
+        id=event.id,
+        event_type=event.event_type,
+        occurred_at=event.occurred_at,
+        person=MediaEventPerson(
+            id=person.id, name=person.name, relationship=person.relationship
+        )
+        if person
+        else None,
     )
 
 
@@ -175,51 +208,3 @@ def delete(db: Session, access: PatientAccess, media: MediaAsset) -> None:
     media.deleted_at = datetime.now(UTC)
     _audit(db, access, "media.delete", media)
     db.commit()
-
-
-def documents(
-    db: Session,
-    access: PatientAccess,
-    document_type: str | None,
-    limit: int,
-    offset: int,
-) -> list[DocumentOut]:
-    query = (
-        select(CapturedDocument)
-        .join(MediaAsset, MediaAsset.id == CapturedDocument.media_asset_id)
-        .where(
-            MediaAsset.patient_id == access.patient_id, MediaAsset.deleted_at.is_(None)
-        )
-    )
-    if document_type:
-        query = query.where(CapturedDocument.document_type == document_type)
-    rows = list(
-        db.scalars(
-            query.order_by(CapturedDocument.created_at.desc())
-            .limit(limit)
-            .offset(offset)
-        )
-    )
-    keys = {
-        media_id: (key, thumb)
-        for media_id, key, thumb in db.execute(
-            select(
-                MediaAsset.id, MediaAsset.storage_key, MediaAsset.thumbnail_key
-            ).where(MediaAsset.id.in_([r.media_asset_id for r in rows]))
-        )
-    }
-    out = [
-        DocumentOut.model_validate(row, from_attributes=True).model_copy(
-            update={
-                "url": s3.presign_get(keys[row.media_asset_id][0]),
-                "thumbnail_url": s3.presign_get(keys[row.media_asset_id][1])
-                if keys[row.media_asset_id][1]
-                else None,
-            }
-        )
-        for row in rows
-        if row.media_asset_id in keys
-    ]
-    audit(db, access, "media.view", list(keys))
-    db.commit()
-    return out
