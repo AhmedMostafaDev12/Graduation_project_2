@@ -98,7 +98,7 @@ Validation errors add the fields that failed:
 | 404 | `PATIENT_NOT_FOUND` | patient doesn't exist **or** isn't yours | treat as gone |
 | 404 | `CAREGIVER_NOT_FOUND` | no caregiver account has that email | "Ask them to create an account first" |
 | 404 | `DEVICE_NOT_FOUND` | device ID isn't this phone's device | bug in the app |
-| 404 | `PERSON_NOT_FOUND` · `UNKNOWN_FACE_NOT_FOUND` · `PLACE_NOT_FOUND` · `REMINDER_NOT_FOUND` · `MEDIA_NOT_FOUND` · `EVENT_NOT_FOUND` · `ALERT_NOT_FOUND` | doesn't exist, was deleted, **or** isn't yours | treat as gone, refresh the list |
+| 404 | `PERSON_NOT_FOUND` · `PHOTO_NOT_FOUND` · `UNKNOWN_FACE_NOT_FOUND` · `PLACE_NOT_FOUND` · `REMINDER_NOT_FOUND` · `MEDIA_NOT_FOUND` · `EVENT_NOT_FOUND` · `ALERT_NOT_FOUND` | doesn't exist, was deleted, **or** isn't yours | treat as gone, refresh the list |
 | 404 | `SUMMARY_NOT_READY` | no daily summary for that date yet | "No summary yet" |
 | 404 | `NOT_FOUND` | the URL doesn't exist | bug in the app |
 | 409 | `EMAIL_TAKEN` | registering an email that already has an account | offer login instead |
@@ -106,6 +106,7 @@ Validation errors add the fields that failed:
 | 409 | `DEVICE_ALREADY_PAIRED` | these glasses belong to another patient | "These glasses are paired with someone else" |
 | 409 | `ALREADY_DECIDED` | that unknown face was already promoted or dismissed | refresh the list |
 | 409 | `TOO_MANY_PHOTOS` | a person already has 20 photos | "Remove a photo first" |
+| 409 | `LAST_PHOTO` | removing the person's only photo | "Add another photo first, or archive the person" |
 | 409 | `UPLOAD_MISSING` | `complete` was called before the file reached S3 | retry the PUT, then `complete` |
 | 409 | `ID_IN_USE` | a client-generated id already belongs to another patient | generate a new id |
 | 422 | `VALIDATION_ERROR` | a field is missing or wrong; see `details` | highlight the fields |
@@ -156,6 +157,18 @@ Errors: `401 INVALID_REFRESH_TOKEN`.
 { "refresh_token": "N2ZmY..." }
 ```
 `204` (no body), even if the token was already logged out.
+
+### `GET /auth/me` (caregiver)
+`200` with the same fields as register's response. Use it on startup to show who is signed in.
+
+### `GET /patients` (caregiver) · screen C1
+```json
+// 200: primary patients first, then by name
+[ { "id": "…", "full_name": "فاطمة محمود", "preferred_language": "ar", "timezone": "Africa/Cairo",
+    "date_of_birth": "1954-03-12", "memory_capture_enabled": true, "created_at": "…",
+    "relationship": "son", "permission": "manager", "is_primary": true } ]
+```
+`relationship` and `permission` are **yours** towards that patient: hide write actions when `permission` is `viewer`.
 
 ### `POST /patients` (caregiver) · screen A4
 ```json
@@ -211,7 +224,7 @@ Errors: `403 DEVICE_ONLY`, `404 DEVICE_NOT_FOUND`.
 |---|---|---|
 | `GET /patients/{id}/sync?since=` | any linked | relay, offline |
 | `GET /patients/{id}/people` · `GET /people/{id}` | any linked | C4, C5 |
-| `POST /patients/{id}/people` (multipart) · `POST /people/{id}/photos` · `PATCH /people/{id}` · `DELETE /people/{id}` | manager | C4, C5, D6 |
+| `POST /patients/{id}/people` (multipart) · `POST /people/{id}/photos` · `DELETE /people/{id}/photos/{photo_id}` · `PATCH /people/{id}` · `DELETE /people/{id}` | manager | C4, C5, D6 |
 | `GET /patients/{id}/unknown-faces` | caregivers | C6, C7 |
 | `POST /unknown-faces/{id}/promote` · `POST /unknown-faces/{id}/dismiss` | manager | C7 |
 | `GET /patients/{id}/reminders[/{rid}]` | any linked | C8, P2 |
@@ -255,7 +268,7 @@ Fields: `name` (1–80), `relationship` (1–40), `consent_given` (`true`), `pho
 { "id": "…", "patient_id": "…", "name": "أحمد", "relationship": "son", "added_by": "caregiver_manual",
   "status": "active", "embedding_count": 2, "created_at": "…", "updated_at": "…" }
 ```
-`GET /people/{id}` adds `"photos": [ { "key": "…jpg", "url": "https://…signed, 10 min" } ]`. `PATCH` takes `{ "name"?, "relationship"? }`. `DELETE` → `204`: the person is archived, their photos and face data are deleted, and past journal entries keep the name. At most 20 photos per person (`409 TOO_MANY_PHOTOS`).
+`GET /people/{id}` adds `"photos": [ { "id": "…", "url": "https://…signed, 10 min" } ]`. `DELETE /people/{id}/photos/{photo_id}` removes that photo and its embedding and returns the person (`409 LAST_PHOTO` for the only one). `PATCH` takes `{ "name"?, "relationship"? }`. `DELETE` → `204`: the person is archived, their photos and face data are deleted, and past journal entries keep the name. At most 20 photos per person (`409 TOO_MANY_PHOTOS`).
 
 #### Unknown faces · screen C7
 `GET` → `[ { "id", "patient_id", "sighting_count", "distinct_days", "first_seen_at", "last_seen_at", "status": "awaiting_caregiver", "sample_url": "signed or null" } ]`.
@@ -355,8 +368,6 @@ Flutter always calls the live API: if a screen needs an endpoint that isn't live
 | Endpoint | For screens | Phase |
 |---|---|---|
 | `POST /auth/google`, `POST /auth/facebook`, `GET /auth/identities`, `POST/DELETE /auth/link/{provider}` | A2, A3, C20, D7 | Phase 3 social sign-in (postponed) |
-
-**Proposed, not in the spec yet** (waiting for the lead's decision): `GET /patients` (list my patients, for the C1 patient switcher) and `GET /auth/me` (the logged-in caregiver).
 
 ---
 

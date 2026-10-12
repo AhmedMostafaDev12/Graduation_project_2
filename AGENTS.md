@@ -68,15 +68,13 @@ glasses (hardware/) ──BLE §7.1──> flutter/ (relay + UI) ──REST §7.
 |---|---|
 | ml ↔ backend packaging | How `backend-ai` imports the shared face preprocessing from `ml/` (local package install, copied module, or published wheel) |
 | Model files in git | Whether exported models (`*.onnx`, `*.tflite`) use Git LFS or are downloaded from S3 at build time |
-| Pagination | The journal and lists have no pagination rule in the spec yet |
 | Team assignment | Names per track (spec §11) |
 | Email verification | Whether email + password accounts must verify their email (link sent by AWS SES), or stay unverified |
-| Missing endpoints | `GET /patients` (a caregiver's patients, for the C1 switcher) and `GET /auth/me` are not in spec §7.2 yet |
 | Google / Facebook timing | Decided in D26 but postponed: when to build it (needs the Google Cloud + Facebook app setup, plan step 3.0) |
 
 ---
 
 ## 6. Status
 
-**Backend: live** at `https://remori-ai.duckdns.org` (API `/api/v1`, docs `/docs`) since 12 Oct 2026. Plan phases 0–4 done: infrastructure, skeleton, database (Supabase), auth (email + password), deploy. Next: Phase 5 (all CRUD endpoints).
+**Backend: live** at `https://remori-ai.duckdns.org` (API `/api/v1`, docs `/docs`) since 12 Oct 2026. Plan phases 0–4 done: infrastructure, skeleton, database (Supabase), auth (email + password), deploy. Phase 5 (all CRUD endpoints, AI stubs) built, not deployed yet: it ships with Phase 6 (Celery + Redis).
 **Flutter, hardware, ml:** starting. The current step for each area is in its `AGENTS.md`. The contract between app and backend: [`docs/API_CONTRACT.md`](docs/API_CONTRACT.md).

@@ -38,6 +38,7 @@ Decisions taken in the 2026-10-03 design session. **P** = product decision by th
 | D24 | **Privacy controls:** a visible listening LED, a "pause memory" button gesture, household consent, BLE bonding, encryption at rest on the glasses, an audit log (§9). | T |
 | D25 | **Database on Supabase, everything else on AWS.** Supabase hosts PostgreSQL 17 + pgvector (EU / Frankfurt region), used **only as plain Postgres**: no Supabase Auth, no auto-generated Data API (PostgREST), no Supabase Storage. API, workers, Redis and S3 stay on AWS. Local development uses Docker `pgvector/pgvector:pg17`. Moving to RDS later = dump + restore, no code change. | P |
 | D26 | **Caregiver sign-in: Google, Facebook, or email + password (no OTP).** Flutter uses `google_sign_in` and `flutter_facebook_auth`. The backend verifies the provider token itself (Google ID token: Google's public keys, audience = our client IDs, `email_verified`; Facebook access token: Graph API `debug_token` with our app credentials), then issues **Remori's own** JWT + refresh tokens. An existing account is linked automatically only when the provider says the email is verified (Google). A Facebook email matching an existing account is **not** linked: the caregiver signs in the usual way and connects Facebook in Connected accounts (C20). Patients are unchanged (device token). | P |
+| D27 | **Phase 5 API additions:** `GET /auth/me`, `GET /patients`, people list/detail, single-photo removal; batch responses add `rejected`; enrollment photo keys stored on `face_embeddings.storage_key`; archiving a person deletes their face data but keeps the row for the journal; a pagination rule for unbounded lists (§7.2). | P |
 
 ---
 
@@ -273,6 +274,7 @@ face_embeddings (                      -- several per person (D14)
   embedding VECTOR(512),
   model_version TEXT,                  -- e.g. 'w600k_mbf@1.0'
   source_media_id UUID FK -> media_assets NULLABLE,
+  storage_key TEXT NULLABLE,            -- S3 key of the enrollment photo; NULL if promoted from a cluster
   created_at TIMESTAMPTZ
 )
 
@@ -551,6 +553,8 @@ Base `/api/v1`. Auth: JWT access (15 min) + refresh token for caregivers, who si
 | GET | `/auth/identities` | The caregiver's connected Google / Facebook accounts |
 | POST / DELETE | `/auth/link/{provider}` | Connect / disconnect Google or Facebook. `409 LAST_SIGN_IN_METHOD` when it would leave no way to sign in |
 | POST | `/auth/login` · `/auth/refresh` · `/auth/logout` | Session |
+| GET | `/auth/me` | The signed-in caregiver |
+| GET | `/patients` | The caregiver's linked patients with their permission (C1 switcher) |
 | POST | `/patients` | Caregiver creates a patient (+ profile) |
 | POST | `/patients/{id}/caregivers` | Invite / link another caregiver |
 | POST | `/devices/pair` | Pair glasses (serial from QR) to a patient → device token |
@@ -558,12 +562,14 @@ Base `/api/v1`. Auth: JWT access (15 min) + refresh token for caregivers, who si
 | GET | `/patients/{id}/sync?since=` | **Delta pull**: people, embeddings, reminders, places, settings changed since T |
 | POST | `/patients/{id}/people` | Enroll a person (multipart: 1–5 photos, name, relationship, consent) |
 | POST | `/people/{id}/photos` | Add more photos/embeddings |
-| PATCH / DELETE | `/people/{id}` | Edit / archive |
+| GET | `/patients/{id}/people` · `/people/{id}` | List people · one person with signed photo URLs |
+| DELETE | `/people/{id}/photos/{photo_id}` | Remove one photo and its embedding (not the last one) |
+| PATCH / DELETE | `/people/{id}` | Edit / archive (face data and photos are deleted; the row stays for the journal) |
 | GET | `/patients/{id}/unknown-faces` | Clusters awaiting caregiver |
 | POST | `/unknown-faces/{id}/promote` · `/dismiss` | Caregiver decision |
 | POST | `/patients/{id}/events:batch` | Idempotent batch upload (events + encounters) |
 | POST | `/patients/{id}/uploads` | Request presigned S3 URL for media or audio |
-| POST | `/uploads/{id}/complete` | Confirm upload → enqueue review (media) or STT (audio) |
+| POST | `/uploads/{id}/complete` | Confirm upload → enqueue review (media) or STT (audio). Body carries `patient_id`, `kind` and the row's fields, since the path has no patient |
 | GET | `/patients/{id}/media/{media_id}` | Short-lived signed URL (audit-logged) |
 | POST | `/media/{id}/pin` · DELETE `/media/{id}` | Pin to keep / delete |
 | GET | `/patients/{id}/documents` | OCR'd documents with extracted fields |
@@ -579,6 +585,8 @@ Base `/api/v1`. Auth: JWT access (15 min) + refresh token for caregivers, who si
 
 Smart review, OCR, STT, clustering, retention and summaries are **worker jobs only**. They have no public endpoints.
 
+**Lists and pagination:** unbounded lists (`documents`, `caregivers/me/alerts`) take `limit` (default 50, max 200) and `offset`, newest first. Lists bounded by nature (people, places, reminders, unknown faces, my patients) and the journal (one day per call) are not paginated. Batch requests take at most 500 items per array.
+
 **`where_am_i` is answered on the phone**, not the backend: phone GPS → nearest saved place within its radius → "انت في البيت". With no saved place nearby and internet available, it falls back to a reverse-geocoded street/area name. Otherwise: "مش عارف المكان ده بالظبط".
 
 Example — idempotent batch:
@@ -586,7 +594,8 @@ Example — idempotent batch:
 // POST /patients/{id}/events:batch
 { "encounters": [ { "id": "uuid", "person_id": "uuid", "started_at": "...", "ended_at": "...", "best_confidence": 0.94, "announced": true } ],
   "events": [ { "id": "uuid", "event_type": "encounter", "encounter_id": "uuid", "occurred_at": "...", "source": "glasses" } ] }
-// 200 → { "accepted": ["uuid", ...], "duplicates": ["uuid"] }
+// 200 → { "accepted": ["uuid", ...], "duplicates": ["uuid"], "rejected": ["uuid"] }
+// rejected = points at something this patient doesn't have; the rest of the batch is still stored
 ```
 
 ### 7.3 Ambient memory pipeline (cloud)
