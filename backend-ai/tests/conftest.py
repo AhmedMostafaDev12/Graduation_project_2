@@ -103,6 +103,10 @@ class FakeS3:
     def put_bytes(self, key, data, content_type):
         self.objects[key] = data
 
+    def get_bytes(self, key, max_bytes):
+        data = self.objects[key]
+        return None if len(data) > max_bytes else data
+
     def exists(self, key):
         return key in self.objects
 
@@ -122,6 +126,7 @@ def fake_s3(monkeypatch):
         "presign_put",
         "presign_get",
         "put_bytes",
+        "get_bytes",
         "exists",
         "delete",
         "list_keys",
@@ -200,3 +205,14 @@ def add_viewer(client, manager: dict, patient_id: str) -> dict:
     )
     assert response.status_code == 201, response.text
     return viewer
+
+
+def image_bytes(fmt: str = "JPEG", color=(200, 120, 80), size=(1200, 900)) -> bytes:
+    """A real, decodable photo (enrollment rejects files Pillow can't open)."""
+    import io
+
+    from PIL import Image
+
+    out = io.BytesIO()
+    Image.new("RGB", size, color).save(out, fmt)
+    return out.getvalue()

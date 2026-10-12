@@ -18,7 +18,8 @@ class PersonOut(BaseModel):
     status: str
     embedding_count: int = 0
     photo_url: str | None = Field(
-        default=None, description="Signed URL (10 min) of the first photo; list only"
+        default=None,
+        description="Signed URL (10 min) of the first photo's ~320 px preview; list only",
     )
     created_at: datetime
     updated_at: datetime
@@ -27,6 +28,9 @@ class PersonOut(BaseModel):
 class PersonPhoto(BaseModel):
     id: uuid.UUID = Field(description="Use it to remove this photo")
     url: str = Field(description="Short-lived signed URL (10 minutes)")
+    thumbnail_url: str | None = Field(
+        default=None, description="~320 px preview; null = use url"
+    )
 
 
 class PersonDetail(PersonOut):
@@ -50,6 +54,9 @@ class UnknownFaceOut(BaseModel):
     status: str
     sample_url: str | None = Field(
         default=None, description="Signed URL of a sample frame"
+    )
+    sample_thumbnail_url: str | None = Field(
+        default=None, description="~320 px preview of the sample; null = use sample_url"
     )
 
 

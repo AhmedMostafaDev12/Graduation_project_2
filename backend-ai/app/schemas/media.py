@@ -118,3 +118,6 @@ class DocumentOut(BaseModel):
     url: str | None = Field(
         default=None, description="Signed URL (10 min) of the photo"
     )
+    thumbnail_url: str | None = Field(
+        default=None, description="~320 px preview; null = use url"
+    )

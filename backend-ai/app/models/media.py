@@ -31,6 +31,9 @@ class MediaAsset(Base):
     event_id: Mapped[uuid.UUID] = fk("events.id")
     asset_type: Mapped[str] = mapped_column(Enum("image", "video", name="asset_type"))
     storage_key: Mapped[str] = mapped_column(Text)  # private S3 key, never a public URL
+    thumbnail_key: Mapped[str | None] = mapped_column(
+        Text, nullable=True
+    )  # ~320 px JPEG
     trigger: Mapped[str] = mapped_column(
         Enum(
             "encounter_keyframe",

@@ -25,6 +25,7 @@ from app.schemas.media import (
     UploadOut,
     UploadRequest,
 )
+from app.services import thumbnail_service
 
 
 def storage_key(
@@ -110,6 +111,9 @@ def complete_upload(
             status="confirmed" if requested else "pending_review",
             retention_policy="keep_indefinitely" if requested else None,
         )
+        if asset.asset_type == "image":
+            # Phase 6: a Celery task instead (video thumbnails need ffmpeg there)
+            asset.thumbnail_key = thumbnail_service.create(key)
         db.add(asset)
         db.commit()
         # Phase 6: enqueue review(asset) on Celery here when pending_review
@@ -166,6 +170,8 @@ def pin(db: Session, media: MediaAsset, caregiver: User) -> MediaOut:
 
 def delete(db: Session, access: PatientAccess, media: MediaAsset) -> None:
     s3.delete(media.storage_key)
+    if media.thumbnail_key:
+        s3.delete(media.thumbnail_key)
     media.deleted_at = datetime.now(UTC)
     _audit(db, access, "media.delete", media)
     db.commit()
@@ -194,16 +200,22 @@ def documents(
             .offset(offset)
         )
     )
-    keys = dict(
-        db.execute(
-            select(MediaAsset.id, MediaAsset.storage_key).where(
-                MediaAsset.id.in_([r.media_asset_id for r in rows])
-            )
-        ).all()
-    )
+    keys = {
+        media_id: (key, thumb)
+        for media_id, key, thumb in db.execute(
+            select(
+                MediaAsset.id, MediaAsset.storage_key, MediaAsset.thumbnail_key
+            ).where(MediaAsset.id.in_([r.media_asset_id for r in rows]))
+        )
+    }
     out = [
         DocumentOut.model_validate(row, from_attributes=True).model_copy(
-            update={"url": s3.presign_get(keys[row.media_asset_id])}
+            update={
+                "url": s3.presign_get(keys[row.media_asset_id][0]),
+                "thumbnail_url": s3.presign_get(keys[row.media_asset_id][1])
+                if keys[row.media_asset_id][1]
+                else None,
+            }
         )
         for row in rows
         if row.media_asset_id in keys

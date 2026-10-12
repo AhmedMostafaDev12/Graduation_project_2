@@ -31,6 +31,7 @@ from app.schemas.people import (
     PromoteRequest,
     UnknownFaceOut,
 )
+from app.services import thumbnail_service
 
 MAX_PHOTOS_PER_REQUEST = 5
 MAX_EMBEDDINGS_PER_PERSON = 20
@@ -68,7 +69,7 @@ def _read_photos(photos: list[UploadFile]) -> list[tuple[bytes, str]]:
             raise InvalidInput(
                 "Each photo must be 4 MB or smaller.", code="PHOTO_TOO_LARGE"
             )
-        if not face.looks_like_image(data):
+        if not face.looks_like_image(data) or not thumbnail_service.is_decodable(data):
             raise InvalidInput("Photos must be JPEG or PNG.", code="UNSUPPORTED_PHOTO")
         ext = "png" if data.startswith(face.PNG_MAGIC) else "jpg"
         result.append((data, ext))
@@ -87,6 +88,7 @@ def _store_photos(
                 embedding=face.embed_face(data),
                 model_version=face.MODEL_VERSION,
                 storage_key=key,
+                thumbnail_key=thumbnail_service.create(key, data),
             )
         )
 
@@ -157,14 +159,19 @@ def add_photos(
 
 def detail(db: Session, person: EnrolledPerson) -> PersonDetail:
     rows = db.execute(
-        select(FaceEmbedding.id, FaceEmbedding.storage_key)
+        select(FaceEmbedding.id, FaceEmbedding.storage_key, FaceEmbedding.thumbnail_key)
         .where(
             FaceEmbedding.person_id == person.id, FaceEmbedding.storage_key.is_not(None)
         )
         .order_by(FaceEmbedding.created_at)
     )
     photos = [
-        PersonPhoto(id=photo_id, url=s3.presign_get(key)) for photo_id, key in rows
+        PersonPhoto(
+            id=photo_id,
+            url=s3.presign_get(key),
+            thumbnail_url=s3.presign_get(thumb) if thumb else None,
+        )
+        for photo_id, key, thumb in rows
     ]
     return PersonDetail(**person_out(db, person).model_dump(), photos=photos)
 
@@ -180,6 +187,8 @@ def remove_photo(db: Session, person: EnrolledPerson, photo_id: uuid.UUID) -> Pe
             code="LAST_PHOTO",
         )
     s3.delete(row.storage_key)
+    if row.thumbnail_key:
+        s3.delete(row.thumbnail_key)
     db.delete(row)
     person.updated_at = func.now()  # /sync resends the person's remaining embeddings
     db.commit()
@@ -225,13 +234,12 @@ def _sample_keys(db: Session, clusters: list[UnknownFaceCluster]) -> dict:
     ids = {c.sample_media_id for c in clusters if c.sample_media_id}
     if not ids:
         return {}
-    return dict(
-        db.execute(
-            select(MediaAsset.id, MediaAsset.storage_key).where(
-                MediaAsset.id.in_(ids), MediaAsset.deleted_at.is_(None)
-            )
-        ).all()
+    rows = db.execute(
+        select(MediaAsset.id, MediaAsset.storage_key, MediaAsset.thumbnail_key).where(
+            MediaAsset.id.in_(ids), MediaAsset.deleted_at.is_(None)
+        )
     )
+    return {media_id: (key, thumb) for media_id, key, thumb in rows}
 
 
 def _cluster_out(
@@ -240,7 +248,9 @@ def _cluster_out(
     keys = _sample_keys(db, [cluster]) if keys is None else keys
     out = UnknownFaceOut.model_validate(cluster)
     if cluster.sample_media_id in keys:
-        out.sample_url = s3.presign_get(keys[cluster.sample_media_id])
+        key, thumb = keys[cluster.sample_media_id]
+        out.sample_url = s3.presign_get(key)
+        out.sample_thumbnail_url = s3.presign_get(thumb) if thumb else None
     return out
 
 
@@ -325,7 +335,11 @@ def list_people(db: Session, patient_id: uuid.UUID, status: str) -> list[PersonO
     )
     first_photo = dict(
         db.execute(
-            select(FaceEmbedding.person_id, FaceEmbedding.storage_key)
+            # the small preview when there is one, else the photo itself
+            select(
+                FaceEmbedding.person_id,
+                func.coalesce(FaceEmbedding.thumbnail_key, FaceEmbedding.storage_key),
+            )
             .where(
                 FaceEmbedding.person_id.in_(ids), FaceEmbedding.storage_key.is_not(None)
             )

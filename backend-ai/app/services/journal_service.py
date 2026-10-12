@@ -174,6 +174,9 @@ def journal(db: Session, access: PatientAccess, day: date | None) -> JournalOut:
                     duration_seconds=asset.duration_seconds,
                     expires_at=asset.expires_at,
                     url=s3.presign_get(asset.storage_key),
+                    thumbnail_url=s3.presign_get(asset.thumbnail_key)
+                    if asset.thumbnail_key
+                    else None,
                 )
             )
 

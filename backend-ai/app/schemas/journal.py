@@ -66,6 +66,9 @@ class JournalMedia(BaseModel):
     duration_seconds: int | None
     expires_at: datetime | None
     url: str = Field(description="Signed URL (10 min). Cache images by id, not by URL")
+    thumbnail_url: str | None = Field(
+        default=None, description="~320 px preview for the timeline; null = use url"
+    )
 
 
 class JournalEntry(BaseModel):

@@ -6,11 +6,12 @@ from tests.conftest import (
     API,
     add_viewer,
     create_patient,
+    image_bytes,
     pair_device,
     register_and_login,
 )
 
-JPEG = b"\xff\xd8\xff\xe0" + b"fake-jpeg-body"
+JPEG = image_bytes("JPEG")
 
 
 def _setup(client):
@@ -23,7 +24,12 @@ def _enroll(client, manager, base, name="أحمد"):
     response = client.post(
         f"{base}/people",
         data={"name": name, "relationship": "son", "consent_given": "true"},
-        files=[("photos", ("p.jpg", JPEG + name.encode(), "image/jpeg"))],
+        files=[
+            (
+                "photos",
+                ("p.jpg", image_bytes(color=(len(name) * 20, 50, 50)), "image/jpeg"),
+            )
+        ],
         headers=manager["headers"],
     )
     assert response.status_code == 201, response.text
@@ -145,6 +151,7 @@ def test_people_list_carries_photo_urls(client):
         p["photo_url"].startswith("https://") and p["embedding_count"] == 1
         for p in listed
     )
+    assert all(".thumb.jpg" in p["photo_url"] for p in listed)  # the small preview
 
 
 def test_caregiver_reads_todays_reminder_logs(client):

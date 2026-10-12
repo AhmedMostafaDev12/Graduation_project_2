@@ -70,6 +70,9 @@ class FaceEmbedding(Base):
     source_media_id: Mapped[uuid.UUID | None] = fk("media_assets.id", nullable=True)
     # S3 key of the enrollment photo this came from (NULL when promoted from a cluster)
     storage_key: Mapped[str | None] = mapped_column(Text, nullable=True)
+    thumbnail_key: Mapped[str | None] = mapped_column(
+        Text, nullable=True
+    )  # ~320 px JPEG
     created_at: Mapped[datetime] = created_at()
 
 
