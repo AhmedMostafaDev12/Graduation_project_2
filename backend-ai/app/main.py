@@ -5,7 +5,19 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.errors import DatabaseUnavailable, register_error_handlers
-from app.routers import auth, devices, patients
+from app.routers import (
+    activity,
+    assist,
+    auth,
+    devices,
+    journal,
+    media,
+    patients,
+    people,
+    places,
+    reminders,
+    sync,
+)
 
 API_PREFIX = "/api/v1"
 
@@ -15,6 +27,14 @@ register_error_handlers(app)
 app.include_router(auth.router, prefix=API_PREFIX)
 app.include_router(patients.router, prefix=API_PREFIX)
 app.include_router(devices.router, prefix=API_PREFIX)
+app.include_router(sync.router, prefix=API_PREFIX)
+app.include_router(people.router, prefix=API_PREFIX)
+app.include_router(reminders.router, prefix=API_PREFIX)
+app.include_router(places.router, prefix=API_PREFIX)
+app.include_router(journal.router, prefix=API_PREFIX)
+app.include_router(media.router, prefix=API_PREFIX)
+app.include_router(assist.router, prefix=API_PREFIX)
+app.include_router(activity.router, prefix=API_PREFIX)
 
 
 @app.get("/health", tags=["health"])

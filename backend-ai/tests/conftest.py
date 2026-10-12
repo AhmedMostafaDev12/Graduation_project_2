@@ -88,6 +88,48 @@ def client(migrated_engine):
     app.dependency_overrides.clear()
 
 
+class FakeS3:
+    """In-memory stand-in for app.integrations.s3, so tests never reach AWS."""
+
+    def __init__(self):
+        self.objects: dict[str, bytes] = {}
+
+    def presign_put(self, key, content_type):
+        return f"https://fake-s3.test/{key}?op=put"
+
+    def presign_get(self, key):
+        return f"https://fake-s3.test/{key}?op=get"
+
+    def put_bytes(self, key, data, content_type):
+        self.objects[key] = data
+
+    def exists(self, key):
+        return key in self.objects
+
+    def delete(self, key):
+        self.objects.pop(key, None)
+
+    def list_keys(self, prefix):
+        return sorted(k for k in self.objects if k.startswith(prefix))
+
+
+@pytest.fixture(autouse=True)
+def fake_s3(monkeypatch):
+    from app.integrations import s3
+
+    fake = FakeS3()
+    for name in (
+        "presign_put",
+        "presign_get",
+        "put_bytes",
+        "exists",
+        "delete",
+        "list_keys",
+    ):
+        monkeypatch.setattr(s3, name, getattr(fake, name))
+    return fake
+
+
 # ----- helpers: every test makes its own fresh accounts, so tests never share data -----
 
 
@@ -126,3 +168,35 @@ def create_patient(client, caregiver: dict, name: str = "Test Patient") -> dict:
     )
     assert response.status_code == 201, response.text
     return response.json()
+
+
+def pair_device(client, caregiver: dict, patient_id: str) -> dict:
+    """Pair new glasses to the patient; returns the pairing body plus "headers" for the phone."""
+    response = client.post(
+        f"{API}/devices/pair",
+        json={
+            "serial_number": f"RMR-T{uuid.uuid4().hex[:6].upper()}",
+            "patient_id": patient_id,
+        },
+        headers=caregiver["headers"],
+    )
+    assert response.status_code == 201, response.text
+    body = response.json()
+    body["headers"] = {"Authorization": f"Bearer {body['device_token']}"}
+    return body
+
+
+def add_viewer(client, manager: dict, patient_id: str) -> dict:
+    """A second caregiver linked with view-only permission."""
+    viewer = register_and_login(client)
+    response = client.post(
+        f"{API}/patients/{patient_id}/caregivers",
+        json={
+            "email": viewer["email"],
+            "relationship": "nurse",
+            "permission": "viewer",
+        },
+        headers=manager["headers"],
+    )
+    assert response.status_code == 201, response.text
+    return viewer

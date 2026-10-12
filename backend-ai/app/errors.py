@@ -41,6 +41,18 @@ class Conflict(AppError):
     code = "CONFLICT"
 
 
+class InvalidInput(AppError):
+    """Input that passes field validation but breaks a rule (e.g. an invalid schedule)."""
+
+    status_code = 422
+    code = "VALIDATION_ERROR"
+
+
+class StorageUnavailable(AppError):
+    status_code = 503
+    code = "STORAGE_UNAVAILABLE"
+
+
 class DatabaseUnavailable(AppError):
     status_code = 503
     code = "DATABASE_UNAVAILABLE"
