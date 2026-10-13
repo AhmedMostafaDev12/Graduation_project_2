@@ -34,6 +34,11 @@ flutter:
   generate: true
   assets:
     - assets/images/remori-logo.svg
+    - assets/images/google.svg
+    - assets/images/facebook.svg
+    - assets/images/login-email.svg
+    - assets/images/login-password.svg
+    - assets/images/login-eye.svg
   fonts:
     - family: DM Sans
       fonts:

@@ -252,7 +252,7 @@ If the local debugger reports a DDS/service-protocol connection error, add
 A1 renders the exported 210dp logo, introduction, and two 52dp pill buttons
 with the HTML spacing. Arabic and English copy comes from the ARBs; the router
 owns the onboarding background and native safe area. Both choices open A2 Login
-as the design specifies. A2 remains an empty route until its screen PR.
+as the design specifies. A2 now renders caregiver login.
 
 A1 has no API calls or stored mode selection. The existing router continues to
 handle authenticated mode entry. Short screens and enlarged text can scroll to
@@ -264,3 +264,31 @@ Review captures: [English](test/goldens/a1_en.png),
 Pixel 9a was offline in ADB during this change.
 Regenerate the widget captures with
 `flutter test test/a1_mode_select_test.dart --update-goldens`.
+## A2 Caregiver Login
+
+A2 follows the exported PNG/HTML, with Arabic and English strings, password
+visibility, autofill, native safe areas, and scrolling for enlarged text and the
+keyboard. The field and provider SVGs are copied from the design export.
+
+The repository calls `POST /auth/login` anonymously using URL-encoded `username`
+and `password`. Both tokens are saved in secure storage before route access is
+granted. Authentication never uses drift or the outbox. The normal login opens
+C1; the patient setup login opens A4. Sign up opens A3. These destination screens
+remain route slots until their own PRs.
+
+Stored caregiver credentials are checked using `GET /auth/me` on startup, with
+the existing ApiClient handling token refresh. Invalidated credentials revoke
+caregiver route access. A failed network check retains stored tokens and keeps
+online route access closed. Device-token restoration and paired patient entry
+remain part of the pairing integration.
+
+As approved for this PR, Google, Facebook, and Forgot password remain visible
+and disabled: social backend endpoints are postponed, and password reset has no
+contract. Errors use local translations, never raw server messages. Duplicate
+submission is blocked; password fields are cleared after successful navigation.
+
+Review captures: [English](test/goldens/a2_en.png) and
+[Arabic](test/goldens/a2_ar.png). Regenerate with
+`flutter test test/a2_login_test.dart --update-goldens`.
+Native A2 validation remains pending; emulator launch permission was declined.
+Live credential-based smoke testing and iOS validation remain pending.
