@@ -835,6 +835,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Manage permissions on an Android or iOS phone. You can continue in caregiver mode.'**
   String get permissionsUnsupported;
+
+  /// No description provided for @permissionsHandoverReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Once setup is complete, hand this phone to the patient to enter Patient Mode.'**
+  String get permissionsHandoverReady;
+
+  /// No description provided for @permissionsHandoverFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to enter Patient Mode. Check your connection and try again.'**
+  String get permissionsHandoverFailed;
 }
 
 class _AppLocalizationsDelegate

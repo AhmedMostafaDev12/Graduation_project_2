@@ -4,6 +4,7 @@ import '../../../core/api/api_failure.dart';
 import '../../../core/api/api_providers.dart';
 import '../data/pairing_repository.dart';
 import '../domain/pairing_info.dart';
+import 'handover_providers.dart';
 
 final pairingRepositoryProvider = Provider<PairingRepository>(
   (ref) => PairingRepository(
@@ -35,7 +36,10 @@ class PairingController extends Notifier<PairingState> {
       final info = await ref
           .read(pairingRepositoryProvider)
           .pair(patientId, serial);
-      if (ref.mounted) state = PairingState(info: info, serial: serial);
+      if (ref.mounted) {
+        ref.read(pairedGlassesProvider.notifier).paired(info);
+        state = PairingState(info: info, serial: serial);
+      }
     } catch (error) {
       if (ref.mounted) {
         state = PairingState(

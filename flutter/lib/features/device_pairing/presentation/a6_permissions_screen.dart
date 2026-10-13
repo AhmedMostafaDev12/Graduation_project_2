@@ -4,11 +4,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/app_localizations.dart';
+import '../../../core/api/patient_session_provider.dart';
 import '../../../core/relay/permission_service.dart';
 import '../../../core/router/remori_routes.dart';
 import '../../../core/theme/remori_theme.dart';
 import '../../../core/theme/remori_widgets.dart';
 import 'permissions_providers.dart';
+import 'handover_providers.dart';
 
 class A6PermissionsScreen extends ConsumerStatefulWidget {
   const A6PermissionsScreen({super.key, this.patientId});
@@ -24,6 +26,13 @@ class _A6PermissionsScreenState extends ConsumerState<A6PermissionsScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    Future.microtask(() {
+      if (mounted &&
+          ref.read(permissionServiceProvider).platform ==
+              PermissionPlatform.android) {
+        ref.read(handoverConnectionProvider.notifier).prepare(widget.patientId);
+      }
+    });
   }
 
   @override
@@ -46,6 +55,9 @@ class _A6PermissionsScreenState extends ConsumerState<A6PermissionsScreen>
     final platform = ref.watch(permissionServiceProvider).platform;
     final android = platform == PermissionPlatform.android;
     final permissions = ref.watch(setupPermissionsProvider);
+    final connection = ref.watch(handoverConnectionProvider);
+    final session = ref.watch(patientSessionProvider);
+    final ready = android && connection.readyFor(widget.patientId);
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -171,7 +183,9 @@ class _A6PermissionsScreenState extends ConsumerState<A6PermissionsScreen>
                                 ),
                               ),
                               Text(
-                                s.permissionsHandoverPending,
+                                ready
+                                    ? s.permissionsHandoverReady
+                                    : s.permissionsHandoverPending,
                                 style: theme.textTheme.bodySmall,
                               ),
                             ],
@@ -185,6 +199,14 @@ class _A6PermissionsScreenState extends ConsumerState<A6PermissionsScreen>
                   Text(
                     s.permissionsUnsupported,
                     style: theme.textTheme.bodySmall,
+                  ),
+                if (session.failed)
+                  Semantics(
+                    liveRegion: true,
+                    child: Text(
+                      s.permissionsHandoverFailed,
+                      style: TextStyle(color: theme.colorScheme.error),
+                    ),
                   ),
                 if (permissions.failed)
                   Semantics(
@@ -216,12 +238,28 @@ class _A6PermissionsScreenState extends ConsumerState<A6PermissionsScreen>
                           padding: const EdgeInsets.only(top: 10),
                           child: RemoriButton(
                             label: s.permissionsPatientMode,
-                            onPressed: null,
+                            onPressed: ready && !session.busy
+                                ? () async {
+                                    final success = await ref
+                                        .read(patientSessionProvider.notifier)
+                                        .handover(
+                                          connection.context!,
+                                          connected: () => ref
+                                              .read(handoverConnectionProvider)
+                                              .readyFor(widget.patientId),
+                                        );
+                                    if (context.mounted && success) {
+                                      context.goNamed(RemoriScreen.p1.name);
+                                    }
+                                  }
+                                : null,
                           ),
                         ),
                       RemoriButton(
                         label: s.permissionsCaregiverMode,
-                        onPressed: () => context.goNamed(RemoriScreen.c1.name),
+                        onPressed: session.busy
+                            ? null
+                            : () => context.goNamed(RemoriScreen.c1.name),
                       ),
                     ],
                   ),

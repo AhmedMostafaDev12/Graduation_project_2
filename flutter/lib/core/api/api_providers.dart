@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'api_client.dart';
 import 'api_config.dart';
 import 'credential_store.dart';
+import 'patient_session_provider.dart';
 
 final apiConfigProvider = Provider<ApiConfig>(
   (ref) => ApiConfig.fromEnvironment(),
@@ -16,6 +17,8 @@ final credentialsInvalidatedProvider = Provider<void Function(ApiCredential)>(
   (ref) => (credential) {
     if (credential == ApiCredential.caregiver) {
       ref.read(caregiverSessionProvider.notifier).invalidate();
+    } else if (credential == ApiCredential.device) {
+      ref.read(patientSessionProvider.notifier).invalidate();
     }
   },
 );
@@ -24,6 +27,7 @@ final apiClientProvider = Provider<ApiClient>((ref) {
     config: ref.watch(apiConfigProvider),
     credentials: ref.watch(credentialStoreProvider),
     onCredentialsInvalidated: ref.watch(credentialsInvalidatedProvider),
+    canUseCaregiver: () => !ref.read(patientSessionProvider).active,
   );
   ref.onDispose(client.close);
   return client;
@@ -46,6 +50,12 @@ class CaregiverSession extends Notifier<bool> {
   Future<void> _restore() async {
     final generation = _generation;
     try {
+      await ref.read(patientSessionProvider.notifier).restoration;
+      if (!ref.mounted ||
+          generation != _generation ||
+          ref.read(patientSessionProvider).active) {
+        return;
+      }
       final tokens = await ref.read(credentialStoreProvider).readCaregiver();
       if (!ref.mounted || tokens == null || generation != _generation) return;
       // /auth/me validates stored credentials, including refresh on expiry.

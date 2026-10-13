@@ -13,9 +13,11 @@ class ApiClient {
     required ApiConfig config,
     required this.credentials,
     required void Function(ApiCredential) onCredentialsInvalidated,
+    bool Function()? canUseCaregiver,
     HttpClientAdapter? adapter,
     HttpClientAdapter? refreshAdapter,
-  }) : _invalidated = onCredentialsInvalidated,
+  }) : _canUseCaregiver = canUseCaregiver ?? (() => true),
+       _invalidated = onCredentialsInvalidated,
        _dio = Dio(BaseOptions(baseUrl: config.baseUrl, followRedirects: false)),
        _refreshDio = Dio(
          BaseOptions(baseUrl: config.baseUrl, followRedirects: false),
@@ -28,12 +30,14 @@ class ApiClient {
           try {
             options.headers.remove('Authorization');
             final credential = options.extra[_credential] as ApiCredential;
+            _checkCredential(credential);
             final token = switch (credential) {
               ApiCredential.none => null,
               ApiCredential.caregiver =>
                 (await credentials.readCaregiver())?.accessToken,
               ApiCredential.device => await credentials.readDevice(),
             };
+            _checkCredential(credential);
             if (token != null && token.isNotEmpty) {
               options.headers['Authorization'] = 'Bearer $token';
             }
@@ -53,6 +57,13 @@ class ApiClient {
   }
   static const _credential = 'remori.credential';
   static const _retried = 'remori.retried';
+  final bool Function() _canUseCaregiver;
+  void _checkCredential(ApiCredential credential) {
+    if (credential == ApiCredential.caregiver && !_canUseCaregiver()) {
+      throw ApiFailure(ApiFailureKind.credentials);
+    }
+  }
+
   final Dio _dio;
   final Dio _refreshDio;
   final CredentialStore credentials;
@@ -93,7 +104,8 @@ class ApiClient {
       throw ArgumentError('ApiClient accepts only relative API paths.');
     }
     try {
-      return await _dio.request<T>(
+      _checkCredential(credential);
+      final response = await _dio.request<T>(
         path,
         data: data,
         queryParameters: queryParameters,
@@ -104,6 +116,8 @@ class ApiClient {
           extra: {_credential: credential},
         ),
       );
+      _checkCredential(credential);
+      return response;
     } on DioException catch (error) {
       throw ApiFailure.fromDio(error);
     }
@@ -166,6 +180,7 @@ class ApiClient {
   }
 
   Future<void> _refresh(String? failedAuthorization) async {
+    _checkCredential(ApiCredential.caregiver);
     final current = await credentials.readCaregiver();
     if (current == null) {
       _invalidated(ApiCredential.caregiver);
@@ -184,6 +199,7 @@ class ApiClient {
   }
 
   Future<void> _rotate(CaregiverTokens previous) async {
+    _checkCredential(ApiCredential.caregiver);
     try {
       final response = await _refreshDio.post<dynamic>(
         '/auth/refresh',
@@ -201,18 +217,24 @@ class ApiClient {
           statusCode: response.statusCode,
         );
       }
+      _checkCredential(ApiCredential.caregiver);
       final current = await credentials.readCaregiver();
       if (current?.accessToken != previous.accessToken ||
           current?.refreshToken != previous.refreshToken) {
         // Do not restore credentials after logout or overwrite a different login.
         throw ApiFailure(ApiFailureKind.credentials);
       }
+      _checkCredential(ApiCredential.caregiver);
       await credentials.saveCaregiver(
         CaregiverTokens(
           accessToken: data['access_token'] as String,
           refreshToken: data['refresh_token'] as String,
         ),
       );
+      if (!_canUseCaregiver()) {
+        await credentials.clearCaregiver();
+        throw ApiFailure(ApiFailureKind.credentials);
+      }
     } on DioException catch (error) {
       final failure = ApiFailure.fromDio(error);
       if (failure.statusCode == 401 &&
