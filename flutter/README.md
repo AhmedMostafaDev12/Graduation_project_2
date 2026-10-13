@@ -129,3 +129,46 @@ exactly the headers returned by the API. Never use this client to PUT S3 bytes.
 Tests use dio adapter doubles and secure-storage mocks; they do not access the
 live API. Real auth screens, secure-storage device validation, API smoke tests,
 and native Android/iOS build validation remain for their integration PRs.
+
+## Drift and outbox foundation
+
+`databaseProvider` lazily opens schema version 1 in the private application-support
+folder (`remori.sqlite`) using drift's background native executor. SQL logging is
+disabled. Tests override the executor with in-memory SQLite or a temporary file.
+Tokens remain exclusively in secure storage.
+
+This skeleton includes local reminder logs and a patient-scoped transactional
+outbox. Other entity-cache tables arrive with their feature PRs. It does not create
+or change any backend table, field, or endpoint.
+
+- `saveReminderLog` generates a UUID v4 for a new occurrence, or retains a supplied
+  occurrence UUID for changes. Local data and its API snapshot commit together.
+- Merge rules match D6: completed wins, otherwise newer `at` wins. UTC timestamps
+  are stored as integer microseconds so close updates retain their ordering.
+- `writeAndEnqueue` lets future repositories persist their typed local entity and
+  immutable JSON upload snapshot in one transaction. Outbox kinds cover events,
+  encounters, reminder logs, and game sessions, the specified client-ID writes.
+- Each queued snapshot has an operation UUID and a monotonically increasing local
+  sequence. These are local transport metadata, not fields sent to the API. The
+  payload retains the record's stable API UUID.
+- Reads, pending counts, and acknowledgement deletion are patient-scoped. Batches
+  are ordered and limited to 500. Acknowledgement removes only captured operation
+  UUIDs, so receipts cannot discard newer updates or cached records.
+
+The sync engine is a later integration: build the contracted request arrays, map
+accepted/duplicate record IDs back to the captured operation IDs, and acknowledge
+only successful receipts. Keep rejected or failed writes for explicit handling;
+never treat an HTTP 200 batch response as accepting every item. This PR performs
+no uploads or delta pulls. Reminder scheduling, remote-to-cache ingestion, other
+cache tables, logout/cache lifecycle, and native device validation also follow
+separately. Server-ID caregiver creates are not placed in this UUID batch outbox.
+
+Generated drift code is committed so existing CI checks can run without an extra
+code-generation step. After changing tables, regenerate it and run the checks:
+
+```sh
+dart run build_runner build
+dart format .
+flutter analyze
+flutter test
+```
