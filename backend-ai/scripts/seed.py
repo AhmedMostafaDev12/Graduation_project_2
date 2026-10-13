@@ -1,4 +1,4 @@
-"""Seed the database with the UI board's sample data (docs/UI_SCREENS_BRIEF.md §6).
+"""Seed the database with the UI board's sample data (see docs/SEED_DATA.md).
 
 Run from backend-ai/:
     python -m scripts.seed            # local database (ENVIRONMENT=local)

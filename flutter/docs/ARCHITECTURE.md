@@ -52,7 +52,7 @@ flutter/
 
 | Layer | Rule |
 |---|---|
-| **presentation** | Widgets read Riverpod providers only. No dio, no SQL, no BLE calls in widgets. Screen files carry the UI brief ID (`c4_add_person_screen.dart`) |
+| **presentation** | Widgets read Riverpod providers only. No dio, no SQL, no BLE calls in widgets. Screen files carry the UI board's screen ID (`c4_add_person_screen.dart`) |
 | **domain** | Plain Dart entities that match spec §6/§7.2 fields. No Flutter imports |
 | **data** | Repositories own data access: drift for reads, outbox for writes, ApiClient (the live API) for sync |
 | **core/relay** | Everything platform-specific sits behind `RelayService`. The rest of the app never knows whether it's Android or iOS |

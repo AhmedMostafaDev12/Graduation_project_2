@@ -281,7 +281,7 @@ Also checked for real: the Docker image builds and starts with Pillow, every new
 
 ## 11. Docs updated
 
-[`REMORI_SPEC.md`](../../REMORI_SPEC.md) (D27, D28, D29, §6 columns, §7.2 endpoints, pagination, §7.4 review contract) · [`docs/API_CONTRACT.md`](../../docs/API_CONTRACT.md) (every endpoint, error codes, image caching, document rows) · [`docs/UI_SCREENS_BRIEF.md`](../../docs/UI_SCREENS_BRIEF.md) (real endpoints per screen) · [`docs/diagrams/02-database-erd.md`](../../docs/diagrams/02-database-erd.md) · [`AI_LAYER.md`](AI_LAYER.md) (stubs, review contract) · [`DEVELOPMENT_PLAN.md`](DEVELOPMENT_PLAN.md) + `.html` · [`../AGENTS.md`](../AGENTS.md) · [`../../flutter/AGENTS.md`](../../flutter/AGENTS.md) · [`../../AGENTS.md`](../../AGENTS.md).
+[`REMORI_SPEC.md`](../../REMORI_SPEC.md) (D27, D28, D29, §6 columns, §7.2 endpoints, pagination, §7.4 review contract) · [`docs/API_CONTRACT.md`](../../docs/API_CONTRACT.md) (every endpoint, error codes, image caching, document rows) · [`flutter/AGENTS.md`](../../flutter/AGENTS.md) §1.1 (real endpoints per screen; the UI brief was replaced by the UI board) · [`docs/diagrams/02-database-erd.md`](../../docs/diagrams/02-database-erd.md) · [`AI_LAYER.md`](AI_LAYER.md) (stubs, review contract) · [`DEVELOPMENT_PLAN.md`](DEVELOPMENT_PLAN.md) + `.html` · [`../AGENTS.md`](../AGENTS.md) · [`../../flutter/AGENTS.md`](../../flutter/AGENTS.md) · [`../../AGENTS.md`](../../AGENTS.md).
 
 ---
 

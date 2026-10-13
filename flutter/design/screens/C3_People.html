@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<title>C3 People</title>
+<!-- Exported from the Remori UI board. Edit the board, not this file. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&amp;family=Manrope:wght@600;700;800&amp;family=Readex+Pro:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#6D4AA8}a:hover{color:#57398C}
+.s{width:390px;height:844px;box-sizing:border-box;display:flex;flex-direction:column;background:#fff;color:#141414;font-family:'DM Sans','Readex Pro',sans-serif;overflow:hidden}
+.hd{padding:20px 20px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #DCD3EC}
+.t{margin:0;font-size:20px;font-weight:600}
+.bd{flex:1;padding:14px 20px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.card{border:1px solid #A48FCB;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:6px;text-decoration:none;color:#141414}
+.row{display:flex;align-items:center;gap:10px}
+.sp{flex:1;min-width:0}
+.h3{margin:0;font-size:15px;font-weight:600}
+.sub{font-size:13px;color:#4D4D4D;margin:0}
+.chip{display:inline-block;font-size:13px;padding:5px 12px;border-radius:999px;border:1px solid #A48FCB;color:#4D4D4D;background:#FEFEFE}
+.sel{background:#6D4AA8;color:#fff;border-color:#6D4AA8}
+.ph{background:#E2DCEE;border-radius:8px;flex-shrink:0}
+.sm{display:inline-block;text-decoration:none;padding:7px 14px;border-radius:8px;background:#6D4AA8;color:#fff;font-weight:600;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.nav{display:flex;border-top:1px solid #DCD3EC;background:#fff}
+.nav a{flex:1;text-align:center;padding:12px 0 16px;font-size:12px;color:#4D4D4D;text-decoration:none}
+.nav a.cur{color:#6D4AA8;font-weight:600}
+
+/* Remori design system (designer's Figma): cream ground, bordered white cards, pill buttons */
+.s{background:#F7F4EE;position:relative}
+.s>*{position:relative;z-index:1}
+.s>.wave{position:absolute;z-index:0;left:0;bottom:0;width:390px;height:300px;pointer-events:none}
+a{color:#6D4AA8}a:hover{color:#57398C}
+.t{font-family:'Manrope','Readex Pro',sans-serif;font-weight:700;font-size:22px;color:#141414}
+.hd{border-bottom:1px solid rgba(109,74,168,.7)}
+.sub{color:rgba(0,0,0,.68)}
+.card{background:#FEFEFE;border:1px solid rgba(109,74,168,.8);border-radius:10px}
+.btn{display:flex;align-items:center;justify-content:center;min-height:52px;box-sizing:border-box;border-radius:26px;background:#6D4AA8;color:#fff;font-size:17px;box-shadow:0 8px 20px rgba(109,74,168,.19)}
+.btn2{display:flex;align-items:center;justify-content:center;min-height:52px;box-sizing:border-box;border-radius:26px;background:#FEFEFE;border:1px solid #6D4AA8;color:#6D4AA8;font-size:17px;box-shadow:0 8px 20px rgba(109,74,168,.19)}
+.sm{border-radius:26px;background:#6D4AA8;color:#fff;padding:9px 16px;box-shadow:0 8px 20px rgba(109,74,168,.19)}
+.soc{border-radius:26px;min-height:52px;box-sizing:border-box}
+.chip{border-radius:26px;border:1px solid rgba(109,74,168,.8);background:#FEFEFE;color:#6D4AA8;font-weight:600}
+.chip.sel{background:#6D4AA8;border-color:#6D4AA8;color:#fff}
+.chip.ok{background:#CFE8C9;border-color:transparent;color:#2F5130;font-weight:400;box-shadow:0 1px 2px rgba(0,0,0,.3),0 1px 3px 1px rgba(0,0,0,.15)}
+.chip.warn{background:#FBE7B5;border-color:transparent;color:#7A5410;font-weight:400;box-shadow:0 1px 2px rgba(0,0,0,.3),0 1px 3px 1px rgba(0,0,0,.15)}
+.chip.bad{background:#F9D5CC;border-color:transparent;color:#9A3B26;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.3),0 1px 3px 1px rgba(0,0,0,.15)}
+.chip.p2{background:#FEFEFE;border-color:#D9CCF0;color:#6D4AA8}
+.f label,.f>span{font-family:'Manrope',sans-serif;font-weight:600}
+.f input{border:1px solid rgba(109,74,168,.8);border-radius:10px;background:#FEFEFE;padding:14px 12px}
+.ph{background:#E2DCEE}
+.grp{color:rgba(0,0,0,.7)}
+.kind{font-family:'Manrope',sans-serif;font-weight:800;color:#6D4AA8}
+.key,.big{font-family:'Manrope',sans-serif;font-weight:800}
+.nav{border-top:1px solid #6D4AA8;background:#fff}
+.nav a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 12px;color:rgba(0,0,0,.7)}
+.nav a.cur{color:#6D4AA8;font-weight:600}
+/* Patient Mode: bigger, calmer (people living with dementia) */
+.s[dir=rtl] .card{border-radius:16px;border-width:1.5px}
+.s[dir=rtl] .pb{display:flex;align-items:center;justify-content:center;min-height:64px;box-sizing:border-box;border-radius:26px;background:#6D4AA8;color:#fff;font-size:24px;box-shadow:0 8px 20px rgba(109,74,168,.19)}
+.s[dir=rtl] .pb2{display:flex;align-items:center;justify-content:center;min-height:64px;box-sizing:border-box;border-radius:26px;background:#FEFEFE;border:2px solid #6D4AA8;color:#6D4AA8;font-size:24px}
+.s[dir=rtl] .pl{font-size:22px}
+.s[dir=rtl] .pt{font-size:32px}
+.s[dir=rtl] .chip{font-size:17px}
+.s[dir=rtl] .nav a{font-size:15px;padding:10px 0 14px}
+
+/* Curved bottom bar with a raised center button */
+.nav.nav2{position:relative;display:grid;grid-template-columns:1fr 1fr 78px 1fr 1fr;align-items:end;height:68px;border-top:0;background:transparent;filter:drop-shadow(0 -3px 8px rgba(0,0,0,.08));flex-shrink:0}
+.nav2 .navbg{position:absolute;left:0;top:0;width:100%;height:100%;z-index:0}
+.nav2 a{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 11px;font-size:12px;color:rgba(0,0,0,.55);text-decoration:none}
+.nav2 a.cur{color:#6D4AA8;font-weight:600}
+.nav2 .slot{display:block}
+.nav2 a.fab{position:absolute;left:50%;top:-24px;transform:translateX(-50%);width:58px;height:58px;padding:0;gap:0;border-radius:50%;background:#FEFEFE;color:#6D4AA8;justify-content:center;box-shadow:0 6px 16px rgba(109,74,168,.28);z-index:2}
+.s[dir=rtl] .nav2 a{font-size:14px}
+
+/* People: free-license photos (Unsplash, Pexels). Objects and places: illustrations */
+.pic-ahmed{background:#F2EEF8 url(images/ahmed.jpg) center/cover no-repeat !important}.pic-hany{background:#F2EEF8 url(images/hany.jpg) center/cover no-repeat !important}.pic-mona{background:#F2EEF8 url(images/mona.jpg) center/cover no-repeat !important}.pic-sara{background:#F2EEF8 url(images/sara.jpg) center/cover no-repeat !important}
+
+/* iPhone status bar (safe area under the Dynamic Island) */
+.s>.sb{display:flex;align-items:center;justify-content:space-between;height:47px;flex-shrink:0;box-sizing:border-box;padding:4px 26px 0 34px;position:relative;z-index:2}.sb .sbt{font-family:-apple-system,'SF Pro Text','DM Sans',sans-serif;font-weight:600;font-size:16px;letter-spacing:-.2px}.sb .sbi{display:flex;align-items:center;gap:6px}
+</style>
+</head>
+<body>
+<div class="s"><svg class="wave" viewBox="0 0 390 300" preserveAspectRatio="none" aria-hidden="true"><path d="M0 190 C50 160 120 172 160 214 C190 246 184 300 184 300 H0 Z" fill="#AFC8E8" fill-opacity="0.3"></path><path d="M140 300 C166 238 232 196 302 202 C348 206 390 176 390 176 V300 Z" fill="#E4D9E9" fill-opacity="0.62"></path><path d="M250 300 C276 252 342 238 390 252 V300 Z" fill="#ECD9E1" fill-opacity="0.75"></path><path d="M-10 120 C70 76 140 150 210 112 S330 50 400 74" fill="none" stroke="#8C6CC7" stroke-opacity="0.55" stroke-width="1.6"></path><circle cx="66" cy="98" r="5" fill="#F7F4EE" stroke="#8C6CC7" stroke-opacity="0.75" stroke-width="1.6"></circle><circle cx="322" cy="64" r="5" fill="#F7F4EE" stroke="#8C6CC7" stroke-opacity="0.75" stroke-width="1.6"></circle></svg><div class="sb" dir="ltr" aria-hidden="true"><span class="sbt">9:41</span><span class="sbi"><svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#141414"/><rect x="5" y="5.5" width="3" height="6.5" rx="1" fill="#141414"/><rect x="10" y="3" width="3" height="9" rx="1" fill="#141414"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#141414"/></svg><svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 2.6c2.3 0 4.4.9 6 2.4l1.3-1.4A10.6 10.6 0 0 0 8 .7 10.6 10.6 0 0 0 .7 3.6L2 5c1.6-1.5 3.7-2.4 6-2.4z" fill="#141414"/><path d="M8 6.3c1.3 0 2.5.5 3.4 1.3l1.3-1.4A6.8 6.8 0 0 0 8 4.4c-1.8 0-3.4.7-4.7 1.8l1.3 1.4c.9-.8 2.1-1.3 3.4-1.3z" fill="#141414"/><path d="M8 8.2c-.8 0-1.5.3-2 .8L8 11.3 10 9c-.5-.5-1.2-.8-2-.8z" fill="#141414"/></svg><svg width="27" height="13" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="#141414" stroke-opacity=".4"/><rect x="2" y="2" width="20" height="9" rx="2.5" fill="#141414"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2z" fill="#141414" fill-opacity=".45"/></svg></span></div>
+<div class="hd"><h1 class="t">People</h1><a class="sm" href="C4_AddPerson.html">+ Add person</a></div>
+<div class="bd">
+<a class="card" href="C6_UnknownFaces.html" style="flex-direction: row; align-items: center; background: #FBE7B5; border-color: #FBE7B5; padding: 12px 14px;"><span class="sp" style="font-weight: 600; color: #7A5410;">2 new faces to review</span><span style="color: #7A5410;">›</span></a>
+<div class="row"><span class="chip sel">Active (4)</span><span class="chip">Archived</span></div>
+<div class="grid">
+<a class="card" href="C5_PersonDetail.html"><div class="ph pic-ahmed" style="height: 130px;"></div><p class="h3">Ahmed</p><p class="sub">Son</p></a>
+<a class="card" href="C5_PersonDetail.html"><div class="ph pic-sara" style="height: 130px;"></div><p class="h3">Sara</p><p class="sub">Daughter</p></a>
+<a class="card" href="C5_PersonDetail.html"><div class="ph pic-hany" style="height: 130px;"></div><p class="h3">Dr. Hany</p><p class="sub">Doctor</p></a>
+<a class="card" href="C5_PersonDetail.html"><div class="ph pic-mona" style="height: 130px;"></div><p class="h3">Mona</p><p class="sub">Nurse</p></a>
+</div>
+</div>
+<nav class="nav nav2" aria-label="Main"><svg class="navbg" viewBox="0 0 390 68" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0 H146 C162 0 165 6 169 14 C176 30 185 37 195 37 C205 37 214 30 221 14 C225 6 228 0 244 0 H390 V68 H0 Z" fill="#FEFEFE"></path></svg><a href="C1_Home.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"></path><path d="M5 10v10h14V10"></path></svg><span>Home</span></a><a href="C3_People.html" class="cur"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"></path><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"></path><path d="M18.5 14.8c1.7.8 2.8 2.5 3 5.2"></path></svg><span>People</span></a><span class="slot" aria-hidden="true"></span><a href="C8_Reminders.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"></path><path d="M10 20.5a2 2 0 0 0 4 0"></path></svg><span>Reminders</span></a><a href="C18_More.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.4"></circle><circle cx="12" cy="12" r="1.4"></circle><circle cx="19" cy="12" r="1.4"></circle></svg><span>More</span></a><a class="fab" href="C9_EditReminder.html" aria-label="Add reminder"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></a></nav>
+</div>
+</body>
+</html>

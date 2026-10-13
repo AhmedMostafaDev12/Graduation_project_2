@@ -1,6 +1,6 @@
 # Seed data: fixed IDs and test accounts
 
-`scripts/seed.py` loads the UI board's sample data (docs/UI_SCREENS_BRIEF.md §6) with **fixed IDs**, so the Flutter app, tests and teammates can refer to the same records. All times are around **today** in Africa/Cairo when the seed runs.
+`scripts/seed.py` loads the UI board's sample data with **fixed IDs**, so the Flutter app, tests and teammates can refer to the same records. All times are around **today** in Africa/Cairo when the seed runs.
 
 ```bash
 cd backend-ai
