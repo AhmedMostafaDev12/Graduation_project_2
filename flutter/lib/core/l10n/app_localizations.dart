@@ -335,7 +335,7 @@ abstract class AppLocalizations {
   /// No description provided for @fullNameHint.
   ///
   /// In en, this message translates to:
-  /// **'Aya Waleed Mohamed'**
+  /// **'Enter your full name'**
   String get fullNameHint;
 
   /// No description provided for @phoneLabel.
@@ -425,7 +425,7 @@ abstract class AppLocalizations {
   /// No description provided for @patientNameHint.
   ///
   /// In en, this message translates to:
-  /// **'Fatma Mahmoud'**
+  /// **'Enter patient\'s full name'**
   String get patientNameHint;
 
   /// No description provided for @patientRelationship.

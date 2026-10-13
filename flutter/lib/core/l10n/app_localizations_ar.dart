@@ -129,7 +129,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get fullNameLabel => 'الاسم الكامل';
 
   @override
-  String get fullNameHint => 'آية وليد محمد';
+  String get fullNameHint => 'أدخل اسمك الكامل';
 
   @override
   String get phoneLabel => 'الهاتف';
@@ -175,7 +175,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get patientName => 'اسم المريض الكامل';
 
   @override
-  String get patientNameHint => 'فاطمة محمود';
+  String get patientNameHint => 'أدخل اسم المريض الكامل';
 
   @override
   String get patientRelationship => 'علاقتك بالمريض';
