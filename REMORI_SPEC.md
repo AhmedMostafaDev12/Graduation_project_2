@@ -174,7 +174,7 @@ graduation-project/          # "remori" monorepo. Start at AGENTS.md (orchestrat
 ├── hardware/
 │   ├── pi/                  # capture/, inference/, audio/, link/ (BLE + Wi-Fi), store/
 │   └── esp32/               # button, battery, LED, UART protocol, timekeeping
-├── docs/                    # review, diagrams, UI brief, API contract, team workflow, study guide
+├── docs/                    # review, diagrams, API contract, team workflow, study guide
 └── .github/workflows/       # CI: pull-request checks per area (docs/TEAM_WORKFLOW.md)
 ```
 

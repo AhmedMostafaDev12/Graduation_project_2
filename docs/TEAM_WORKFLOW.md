@@ -20,7 +20,7 @@ git push -u origin <type>/<short-name>
 # → open a Pull Request on GitHub → CI runs → lead reviews → merge → delete branch
 ```
 
-**Branch names:** `feature/c4-add-person`, `feature/events-batch-endpoint`, `fix/reminder-timezone`, `chore/…`, `docs/…`. Put the screen ID (UI brief) or endpoint in the name when there is one.
+**Branch names:** `feature/c4-add-person`, `feature/events-batch-endpoint`, `fix/reminder-timezone`, `chore/…`, `docs/…`. Put the screen ID (UI board) or endpoint in the name when there is one.
 
 **Commit messages:** `<area>: <what changed>`, for example `flutter(C4): photo slots with retake error` or `backend: POST /patients/{id}/events:batch`.
 

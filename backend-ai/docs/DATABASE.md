@@ -11,7 +11,7 @@ Tables: spec §6 (the ERD is in `docs/diagrams/02-database-erd.md`). Hosting dec
 | What | Docker `pgvector/pgvector:pg17` | Supabase project, PostgreSQL 17 + pgvector 0.8, EU (Frankfurt) |
 | Who uses it | every developer, every test run | the deployed API and workers on EC2 |
 | Connection | `postgresql://remori:remori@localhost:5434/remori` (Docker host port 5434; 5432/5433 are taken by Windows PostgreSQL) | Supabase **session pooler** (IPv4): host `aws-1-eu-central-1.pooler.supabase.com`, port 5432, user `postgres.<project-ref>`, `sslmode=require`. The direct host (`db.<ref>.supabase.co`) is **IPv6-only** and doesn't work from home networks or EC2. Not the transaction pooler |
-| Data | seed script (the UI brief's sample data) | real data |
+| Data | seed script (the UI board's sample data) | real data |
 
 `DATABASE_URL` in `config.py` is the **only** difference. Never develop or run tests against Supabase.
 
@@ -62,4 +62,4 @@ As in the course, plus these points:
 
 ## 5. Seed data
 
-`scripts/seed.py` loads the UI brief's sample data: patient Fatma Mahmoud, caregivers Ahmed and Mona, people Ahmed / Sara / Dr. Hany / Mona, the three reminders, three places and device RMR-0007. Fixed IDs and test accounts: [SEED_DATA.md](SEED_DATA.md).
+`scripts/seed.py` loads the UI board's sample data: patient Fatma Mahmoud, caregivers Ahmed and Mona, people Ahmed / Sara / Dr. Hany / Mona, the three reminders, three places and device RMR-0007. Fixed IDs and test accounts: [SEED_DATA.md](SEED_DATA.md).

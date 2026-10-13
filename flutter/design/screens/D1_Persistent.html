@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<title>D1 Persistent notification</title>
+<!-- Exported from the Remori UI board. Edit the board, not this file. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&amp;family=Manrope:wght@600;700;800&amp;family=Readex+Pro:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#6D4AA8}a:hover{color:#57398C}
+.s{width:390px;height:844px;box-sizing:border-box;display:flex;flex-direction:column;background:#20262d;color:#e9edf1;font-family:'DM Sans','Readex Pro',sans-serif;overflow:hidden;padding:24px 14px;gap:12px}
+.nt{background:#fff;color:#141414;border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;text-decoration:none}
+.app{font-size:12px;color:#4D4D4D;display:flex;align-items:center;gap:6px}
+.lg{width:16px;height:16px;border-radius:5px;background:#6D4AA8}
+
+/* iPhone status bar (safe area under the Dynamic Island) */
+.s>.sb{display:flex;align-items:center;justify-content:space-between;height:47px;flex-shrink:0;box-sizing:border-box;padding:4px 26px 0 34px;position:relative;z-index:2}.sb .sbt{font-family:-apple-system,'SF Pro Text','DM Sans',sans-serif;font-weight:600;font-size:16px;letter-spacing:-.2px}.sb .sbi{display:flex;align-items:center;gap:6px}
+</style>
+</head>
+<body>
+<div class="s"><div class="sb" style="margin: -24px -14px -4px; color: #FFFFFF;" dir="ltr" aria-hidden="true"><span class="sbt">9:41</span><span class="sbi"><svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#FFFFFF"/><rect x="5" y="5.5" width="3" height="6.5" rx="1" fill="#FFFFFF"/><rect x="10" y="3" width="3" height="9" rx="1" fill="#FFFFFF"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#FFFFFF"/></svg><svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 2.6c2.3 0 4.4.9 6 2.4l1.3-1.4A10.6 10.6 0 0 0 8 .7 10.6 10.6 0 0 0 .7 3.6L2 5c1.6-1.5 3.7-2.4 6-2.4z" fill="#FFFFFF"/><path d="M8 6.3c1.3 0 2.5.5 3.4 1.3l1.3-1.4A6.8 6.8 0 0 0 8 4.4c-1.8 0-3.4.7-4.7 1.8l1.3 1.4c.9-.8 2.1-1.3 3.4-1.3z" fill="#FFFFFF"/><path d="M8 8.2c-.8 0-1.5.3-2 .8L8 11.3 10 9c-.5-.5-1.2-.8-2-.8z" fill="#FFFFFF"/></svg><svg width="27" height="13" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="#FFFFFF" stroke-opacity=".4"/><rect x="2" y="2" width="20" height="9" rx="2.5" fill="#FFFFFF"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2z" fill="#FFFFFF" fill-opacity=".45"/></svg></span></div>
+<p style="margin: 0 6px; font-size: 15px; color: #c3cbd3;">Thursday, 1 October</p>
+<p style="margin: 8px 6px 0; font-size: 12px; color: #9aa6b2; text-transform: uppercase; letter-spacing: .05em;">Ongoing</p>
+<a class="nt" href="P1_Today.html">
+<span class="app"><span class="lg"></span>Remori · now</span>
+<span style="font-size: 15px; font-weight: 600;">Remori is connected to your glasses</span>
+<span style="font-size: 13px; color: #4D4D4D;">Keeping reminders and memory in sync. Tap to open.</span>
+</a>
+<p style="margin: 8px 6px 0; font-size: 13px; color: #9aa6b2;">Android foreground-service notification. It's always present while the relay runs, low priority, and can't be swiped away.</p>
+</div>
+</body>
+</html>
