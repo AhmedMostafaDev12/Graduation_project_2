@@ -60,7 +60,9 @@ class _A4PatientProfileScreenState
             cloudConsent: _cloud,
           ),
         );
-    if (mounted && id != null) context.goNamed(RemoriScreen.a5.name, extra: id);
+    if (mounted && id != null) {
+      context.pushNamed(RemoriScreen.a5.name, extra: id);
+    }
   }
 
   @override
@@ -186,7 +188,7 @@ class _A4PatientProfileScreenState
                         s.conversationMemory,
                         s.conversationMemoryDetail,
                         _conversation,
-                        state.busy
+                        (state.busy || state.patientId != null)
                             ? null
                             : (value) => setState(() => _conversation = value),
                       ),
@@ -194,7 +196,7 @@ class _A4PatientProfileScreenState
                         s.cloudProcessing,
                         s.cloudProcessingDetail,
                         _cloud,
-                        state.busy
+                        (state.busy || state.patientId != null)
                             ? null
                             : (value) => setState(() => _cloud = value),
                       ),
@@ -275,7 +277,7 @@ class _A4PatientProfileScreenState
           label: label,
           child: TextField(
             controller: controller,
-            enabled: !state.busy,
+            enabled: !state.busy && state.patientId == null,
             textDirection: ltr || date ? TextDirection.ltr : null,
             keyboardType: date ? TextInputType.datetime : TextInputType.text,
             textInputAction: TextInputAction.next,
@@ -303,7 +305,8 @@ class _A4PatientProfileScreenState
 
   Widget _languageChip(String label, String language) {
     final selected = _language == language;
-    final busy = ref.watch(patientSetupProvider).busy;
+    final setup = ref.watch(patientSetupProvider);
+    final busy = setup.busy || setup.patientId != null;
     return Semantics(
       button: true,
       selected: selected,

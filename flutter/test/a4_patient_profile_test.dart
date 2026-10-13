@@ -15,6 +15,7 @@ import 'package:remori/core/router/remori_routes.dart';
 import 'package:remori/features/enrollment/domain/patient_draft.dart';
 import 'package:remori/features/enrollment/data/patient_repository.dart';
 import 'package:remori/features/enrollment/presentation/a4_patient_profile_screen.dart';
+import 'package:remori/features/device_pairing/presentation/a5_pair_glasses_screen.dart';
 import 'package:remori/features/enrollment/presentation/patient_setup_providers.dart';
 
 const patientId = '00000001-0000-4000-8000-000000000001';
@@ -128,9 +129,13 @@ void main() {
       );
       repository.pending!.complete();
       await tester.pumpAndSettle();
-      final router = container.read(remoriRouterProvider);
-      expect(router.routeInformationProvider.value.uri.path, '/a5');
-      expect(router.routerDelegate.currentConfiguration.extra, patientId);
+      expect(find.byType(A5PairGlassesScreen), findsOneWidget);
+      expect(
+        tester
+            .widget<A5PairGlassesScreen>(find.byType(A5PairGlassesScreen))
+            .patientId,
+        patientId,
+      );
     },
   );
   testWidgets('chosen language, consent, and calendar date reach the request', (
@@ -233,6 +238,36 @@ void main() {
     await submit(tester);
     await tester.pumpAndSettle();
     expect(repository.submitted!.toJson()['consents'], ['cloud_processing']);
+  });
+  testWidgets('A5 back preserves the created patient without another POST', (
+    tester,
+  ) async {
+    final repository = TestPatientRepository();
+    await mount(tester, repository);
+    await fill(tester);
+    await submit(tester);
+    await tester.pumpAndSettle();
+    expect(repository.calls, 1);
+    await tester.tap(find.text('Pair glasses'));
+    await tester.pumpAndSettle();
+    expect(find.byType(A4PatientProfileScreen), findsOneWidget);
+    expect(
+      tester.widget<TextField>(find.byType(TextField).first).controller!.text,
+      'Test Patient',
+    );
+    expect(
+      tester.widget<TextField>(find.byType(TextField).first).enabled,
+      isFalse,
+    );
+    await submit(tester);
+    await tester.pumpAndSettle();
+    expect(repository.calls, 1);
+    expect(
+      tester
+          .widget<A5PairGlassesScreen>(find.byType(A5PairGlassesScreen))
+          .patientId,
+      patientId,
+    );
   });
   for (final language in ['en', 'ar']) {
     testWidgets(

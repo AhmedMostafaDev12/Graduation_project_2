@@ -234,4 +234,93 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get patientLoginAgain => 'سجّل الدخول مرة أخرى للمتابعة.';
+
+  @override
+  String get pairGlasses => 'ربط النظارة';
+
+  @override
+  String get pairStepTwo => 'الخطوة 2 من 3';
+
+  @override
+  String get pairScanTitle => 'امسح رمز QR للنظارة';
+
+  @override
+  String get pairScanPosition => 'ضع الرمز داخل منطقة المسح.';
+
+  @override
+  String get pairCameraHint => 'وجّه الكاميرا إلى رمز QR على علبة النظارة.';
+
+  @override
+  String get pairScanButton => 'مسح رمز QR';
+
+  @override
+  String get pairContinueHint => 'يمكنك المتابعة بعد ربط النظارة بالمريض.';
+
+  @override
+  String get pairScanStep => 'امسح رمز QR';
+
+  @override
+  String get pairScanStepDetail => 'اقرأ الرمز على علبة النظارة.';
+
+  @override
+  String get pairConnectStep => 'الاتصال بأمان';
+
+  @override
+  String get pairBluetoothPending => 'لم يكتمل اتصال البلوتوث بعد.';
+
+  @override
+  String get pairConfirmStep => 'تأكيد الربط';
+
+  @override
+  String get pairConfirmDetail => 'اربط النظارة بهذا المريض.';
+
+  @override
+  String get pairDeviceStatus => 'حالة الجهاز';
+
+  @override
+  String get pairStatusInitial => 'ستظهر هنا حالة الربط وتفاصيل الجهاز.';
+
+  @override
+  String get pairLinkedPending =>
+      'تم ربط النظارة بالمريض. لم يكتمل اتصال البلوتوث بعد.';
+
+  @override
+  String get pairNeedsPatient => 'عُد إلى إعداد المريض للمتابعة.';
+
+  @override
+  String get pairLinking => 'جارٍ ربط النظارة…';
+
+  @override
+  String get pairAlreadyPaired => 'هذه النظارة مرتبطة بمريض آخر.';
+
+  @override
+  String get pairPatientMissing =>
+      'لم يعد هذا المريض متاحًا. عُد إلى إعداد المريض.';
+
+  @override
+  String get pairInvalidCode =>
+      'تحقق من رمز QR على علبة النظارة وحاول مرة أخرى.';
+
+  @override
+  String get pairSaveFailed =>
+      'تم ربط النظارة، لكن تعذر الحفظ على هذا الهاتف. حاول مرة أخرى.';
+
+  @override
+  String get pairRetrySave => 'إعادة محاولة الربط';
+
+  @override
+  String get pairRetry => 'تعذر ربط النظارة. حاول مرة أخرى بعد قليل.';
+
+  @override
+  String get pairCameraPermission =>
+      'اسمح باستخدام الكاميرا من إعدادات الهاتف، ثم أعد المسح.';
+
+  @override
+  String get pairCameraUnavailable =>
+      'الكاميرا غير متاحة. حاول المسح مرة أخرى.';
+
+  @override
+  String pairSerial(String serial) {
+    return 'الرقم التسلسلي: $serial';
+  }
 }

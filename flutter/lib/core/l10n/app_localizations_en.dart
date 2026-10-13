@@ -235,4 +235,97 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get patientLoginAgain => 'Please log in again to continue.';
+
+  @override
+  String get pairGlasses => 'Pair glasses';
+
+  @override
+  String get pairStepTwo => 'Step 2 of 3';
+
+  @override
+  String get pairScanTitle => 'Scan glasses QR code';
+
+  @override
+  String get pairScanPosition => 'Position the code inside the scan area.';
+
+  @override
+  String get pairCameraHint =>
+      'Point your camera at the QR code on the glasses case.';
+
+  @override
+  String get pairScanButton => 'Scan QR code';
+
+  @override
+  String get pairContinueHint =>
+      'You can continue after your glasses are linked.';
+
+  @override
+  String get pairScanStep => 'Scan the QR code';
+
+  @override
+  String get pairScanStepDetail => 'Read the code on the glasses case.';
+
+  @override
+  String get pairConnectStep => 'Connect securely';
+
+  @override
+  String get pairBluetoothPending => 'Bluetooth connection is still pending.';
+
+  @override
+  String get pairConfirmStep => 'Confirm pairing';
+
+  @override
+  String get pairConfirmDetail => 'Associate the glasses with this patient.';
+
+  @override
+  String get pairDeviceStatus => 'Device status';
+
+  @override
+  String get pairStatusInitial =>
+      'Your pairing status and device details will appear here.';
+
+  @override
+  String get pairLinkedPending =>
+      'Glasses linked. Bluetooth connection is still pending.';
+
+  @override
+  String get pairNeedsPatient => 'Return to patient setup to continue.';
+
+  @override
+  String get pairLinking => 'Linking glasses…';
+
+  @override
+  String get pairAlreadyPaired => 'These glasses are paired with someone else.';
+
+  @override
+  String get pairPatientMissing =>
+      'This patient is no longer available. Return to patient setup.';
+
+  @override
+  String get pairInvalidCode =>
+      'Check the QR code on the glasses case and try again.';
+
+  @override
+  String get pairSaveFailed =>
+      'The glasses were linked, but saving on this phone failed. Please retry.';
+
+  @override
+  String get pairRetrySave => 'Retry pairing';
+
+  @override
+  String get pairRetry =>
+      'Unable to link the glasses. Please try again in a moment.';
+
+  @override
+  String get pairCameraPermission =>
+      'Allow camera access in your phone settings, then scan again.';
+
+  @override
+  String get pairCameraUnavailable =>
+      'The camera is unavailable. Please try scanning again.';
+
+  @override
+  String pairSerial(String serial) {
+    return 'Serial: $serial';
+  }
 }
