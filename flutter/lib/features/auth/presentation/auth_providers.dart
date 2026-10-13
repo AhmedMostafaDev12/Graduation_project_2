@@ -35,3 +35,61 @@ class LoginController extends Notifier<AsyncValue<void>> {
     }
   }
 }
+
+class SignUpState {
+  const SignUpState({
+    this.busy = false,
+    this.accountCreated = false,
+    this.failure,
+  });
+  final bool busy;
+  final bool accountCreated;
+  final ApiFailure? failure;
+}
+
+final signUpControllerProvider =
+    NotifierProvider.autoDispose<SignUpController, SignUpState>(
+      SignUpController.new,
+    );
+
+class SignUpController extends Notifier<SignUpState> {
+  @override
+  SignUpState build() => const SignUpState();
+
+  Future<bool> signUp({
+    required String name,
+    required String email,
+    required String password,
+    String? phone,
+  }) async {
+    if (state.busy || state.accountCreated) return false;
+    state = const SignUpState(busy: true);
+    bool created = false;
+    try {
+      final repository = ref.read(authRepositoryProvider);
+      await repository.register(
+        name: name,
+        email: email,
+        password: password,
+        phone: phone,
+      );
+      created = true;
+      if (!ref.mounted) return false;
+      await repository.login(email, password);
+      if (!ref.mounted) return false;
+      ref.read(caregiverSessionProvider.notifier).signedIn();
+      state = const SignUpState(accountCreated: true);
+      return true;
+    } catch (error) {
+      if (ref.mounted) {
+        state = SignUpState(
+          accountCreated: created,
+          failure: error is ApiFailure
+              ? error
+              : ApiFailure(ApiFailureKind.network),
+        );
+      }
+      return false;
+    }
+  }
+}
