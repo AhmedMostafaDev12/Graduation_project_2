@@ -535,6 +535,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please log in again to continue.'**
   String get patientLoginAgain;
+
+  /// No description provided for @pairGlasses.
+  ///
+  /// In en, this message translates to:
+  /// **'Pair glasses'**
+  String get pairGlasses;
+
+  /// No description provided for @pairStepTwo.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2 of 3'**
+  String get pairStepTwo;
+
+  /// No description provided for @pairScanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan glasses QR code'**
+  String get pairScanTitle;
+
+  /// No description provided for @pairScanPosition.
+  ///
+  /// In en, this message translates to:
+  /// **'Position the code inside the scan area.'**
+  String get pairScanPosition;
+
+  /// No description provided for @pairCameraHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Point your camera at the QR code on the glasses case.'**
+  String get pairCameraHint;
+
+  /// No description provided for @pairScanButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR code'**
+  String get pairScanButton;
+
+  /// No description provided for @pairContinueHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You can continue after your glasses are linked.'**
+  String get pairContinueHint;
+
+  /// No description provided for @pairScanStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan the QR code'**
+  String get pairScanStep;
+
+  /// No description provided for @pairScanStepDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Read the code on the glasses case.'**
+  String get pairScanStepDetail;
+
+  /// No description provided for @pairConnectStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect securely'**
+  String get pairConnectStep;
+
+  /// No description provided for @pairBluetoothPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth connection is still pending.'**
+  String get pairBluetoothPending;
+
+  /// No description provided for @pairConfirmStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm pairing'**
+  String get pairConfirmStep;
+
+  /// No description provided for @pairConfirmDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Associate the glasses with this patient.'**
+  String get pairConfirmDetail;
+
+  /// No description provided for @pairDeviceStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Device status'**
+  String get pairDeviceStatus;
+
+  /// No description provided for @pairStatusInitial.
+  ///
+  /// In en, this message translates to:
+  /// **'Your pairing status and device details will appear here.'**
+  String get pairStatusInitial;
+
+  /// No description provided for @pairLinkedPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Glasses linked. Bluetooth connection is still pending.'**
+  String get pairLinkedPending;
+
+  /// No description provided for @pairNeedsPatient.
+  ///
+  /// In en, this message translates to:
+  /// **'Return to patient setup to continue.'**
+  String get pairNeedsPatient;
+
+  /// No description provided for @pairLinking.
+  ///
+  /// In en, this message translates to:
+  /// **'Linking glasses…'**
+  String get pairLinking;
+
+  /// No description provided for @pairAlreadyPaired.
+  ///
+  /// In en, this message translates to:
+  /// **'These glasses are paired with someone else.'**
+  String get pairAlreadyPaired;
+
+  /// No description provided for @pairPatientMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'This patient is no longer available. Return to patient setup.'**
+  String get pairPatientMissing;
+
+  /// No description provided for @pairInvalidCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the QR code on the glasses case and try again.'**
+  String get pairInvalidCode;
+
+  /// No description provided for @pairSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The glasses were linked, but saving on this phone failed. Please retry.'**
+  String get pairSaveFailed;
+
+  /// No description provided for @pairRetrySave.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry pairing'**
+  String get pairRetrySave;
+
+  /// No description provided for @pairRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to link the glasses. Please try again in a moment.'**
+  String get pairRetry;
+
+  /// No description provided for @pairCameraPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow camera access in your phone settings, then scan again.'**
+  String get pairCameraPermission;
+
+  /// No description provided for @pairCameraUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The camera is unavailable. Please try scanning again.'**
+  String get pairCameraUnavailable;
+
+  /// Scanned glasses-case serial in A5 status; never a device token
+  ///
+  /// In en, this message translates to:
+  /// **'Serial: {serial}'**
+  String pairSerial(String serial);
 }
 
 class _AppLocalizationsDelegate

@@ -332,7 +332,7 @@ default. Conversation capture still depends on backend consent and memory rules.
 
 The repository calls authenticated `POST /patients`. Continue opens A5 only after
 a valid server-issued patient UUID is returned, passing that ID in route state.
-A5 remains a route slot. Duplicate in-flight submits are blocked; there is no
+A5 now provides the approved QR/API association stage. Duplicate in-flight submits are blocked; there is no
 background retry or offline queue for this non-idempotent identity-creation call.
 No server profile data is rendered by A4; local profile caching/sync belongs to
 the profile-reading screens. The next pairing screen must consume this patient ID;
@@ -348,3 +348,43 @@ Review captures: [English](test/goldens/a4_en.png) and
 `flutter test test/a4_patient_profile_test.dart --update-goldens`.
 Native Android/iOS and live patient-creation smoke testing remain pending;
 no emulator was connected during this change.
+## A5 Pair Glasses — approved QR/API stage
+
+A5 follows the exported pairing screen, using the approved mobile_scanner package
+for Android/iOS camera QR scanning. Camera starts only on Scan QR code. The
+package owns camera lifecycle/disposal; no images are returned, uploaded, or
+logged. QR content is a plain glasses-case serial; URL/JSON wrappers and other
+barcode formats are ignored. No manual serial-entry feature is added.
+
+The repository calls caregiver-authenticated `POST /devices/pair` with the serial
+and the patient UUID supplied by A4. It validates the response’s device UUID,
+patient/serial match, and nonempty token, then saves the device token in existing
+secure storage. Presentation receives only safe metadata. Continue remains
+disabled until association and storage succeed, then opens A6 with the patient ID.
+A6 remains a route slot. Missing patient context blocks scanning/Continue.
+
+If secure storage fails after pairing, Retry pairing reuses the received grant
+in memory without posting again and rotating the token. This recovery does not
+survive process termination; interrupted setup/recovery remains integration work.
+Duplicate scanner callbacks and concurrent pairing requests are guarded.
+
+As explicitly approved, BLE bonding, GATT connection, encryption-key provisioning,
+and relay startup remain pending. Step 2 and successful status say Bluetooth is
+pending. Backend association does not grant Patient Mode route access or claim a
+Bluetooth connection. Both Continue guidance and device status distinguish linking
+from full hardware pairing. Backend conflict errors are translated locally.
+
+A4 pushes A5 while retaining the completed form. Back returns to that form, whose
+created fields/consents are locked; Continue reuses the patient ID rather than
+posting another patient. New setup after app restart still requires integration.
+
+Android declares camera and internet permissions; camera hardware is optional so
+permission/unavailable states can be shown. iOS includes camera usage text and
+English/Arabic InfoPlist.strings registered as localized Xcode resources.
+
+Review captures: [English](test/goldens/a5_en.png), [Arabic](test/goldens/a5_ar.png),
+[linked English](test/goldens/a5_linked_en.png), and
+[linked Arabic](test/goldens/a5_linked_ar.png). Regenerate with
+`flutter test test/a5_pair_glasses_test.dart --update-goldens`.
+Android debug APK build passed. Actual camera/device scans, live pairing smoke
+tests, and iOS build/runtime validation remain pending.
