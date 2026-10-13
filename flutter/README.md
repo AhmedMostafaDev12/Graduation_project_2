@@ -7,7 +7,7 @@ Read `AGENTS.md` and `docs/ARCHITECTURE.md` before making changes. Screen refere
 are in `design/screens/`; preserve those exports.
 
 The app includes the native projects, application entry point, shared theme, and reusable controls.
-GoRouter supplies entry routes and both mode shells. API access, local database, localization, and screens follow separately.
+Foundations include GoRouter, ApiClient, drift/outbox, and Arabic/English localization. Authentication integration and individual screens follow separately.
 
 From this folder:
 
@@ -70,9 +70,9 @@ starts in a Riverpod `ProviderScope` and uses `MaterialApp.router`.
 - `screenBuildersProvider`: future feature PRs supply screen body builders.
   The router and shells own Scaffold, backgrounds, SafeArea, and shell navigation.
   Unimplemented screens are empty slots, with no mock records or success flows.
-- `shellLabelsProvider`: localization will supply the four destination labels,
-  center action label, and direction for each mode. Bars are hidden until labels
-  are supplied; no production user-facing strings are hard-coded in routing.
+- Shell labels come from generated Arabic/English ARB resources. The optional
+  `shellLabelsProvider` override is used by routing tests; production navigation
+  uses localized labels and direction.
 - Caregiver destinations: C1, C3, C8, C18; center action pushes C9. Patient
   destinations: P1, P2, P4, P7; center action pushes P6. Detail screens omit the
   navigation bar, as in the HTML, and pushed routes retain the back destination.
@@ -82,8 +82,8 @@ starts in a Riverpod `ProviderScope` and uses `MaterialApp.router`.
 Router tests override the access, screen-builder, and shell-label providers.
 They verify entry/deep links, separate credential guards, both navigation bars,
 back behavior, RTL typography, and access revocation without recreating GoRouter.
-The app intentionally still shows no finished screens; authentication, localized
-navigation labels, and actual feature content are separate planned PRs.
+The app intentionally still shows no finished screens; authentication and actual
+feature content are separate planned PRs. Shell labels are localized.
 
 ## ApiClient foundation
 
@@ -172,3 +172,39 @@ dart format .
 flutter analyze
 flutter test
 ```
+
+## Arabic/English localization foundation
+
+`lib/core/l10n/app_en.arb` and `app_ar.arb` are the string sources. Flutter gen-l10n
+produces the typed `AppLocalizations` API; screens access strings through
+`AppLocalizations.of(context)`. Add every new user-facing string to both files.
+The foundation currently includes shell destination and center-action labels;
+individual screen strings are added in their feature PRs.
+
+MaterialApp registers Arabic and English delegates, including localized Flutter
+controls and layout direction. `appLocaleProvider` defaults to the device locale,
+with English fallback for unsupported languages. `patientLocaleProvider` defaults
+to Arabic and provides the integration point for the synced patient profile's
+preferred_language. Both providers may be overridden by profile/auth integration;
+no persisted app preference or new settings screen is introduced.
+
+Patient shells override their locale independently of the caregiver/app locale.
+Arabic uses RTL and Readex Pro; English uses LTR and DM Sans/Manrope. Patient text
+and control sizes remain large in either language. Locale changes do not recreate
+the router or reset the current destination.
+
+Generated localization files are committed for inspection. They are also generated
+by Flutter's normal build/pub workflow because pubspec enables generate. After
+editing ARBs, run:
+
+```sh
+flutter gen-l10n
+dart format .
+flutter analyze
+flutter test
+```
+
+Tests check matching translation keys, both caregiver languages, Arabic-first and
+English patient shells, accessibility action labels, fonts/direction, unsupported
+locale fallback, and preservation of routing when the locale changes. Native
+Android/iOS validation and complete screen comparisons remain integration work.

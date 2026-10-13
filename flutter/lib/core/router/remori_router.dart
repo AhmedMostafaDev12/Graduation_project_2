@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../l10n/app_localizations.dart';
+import '../l10n/locale_providers.dart';
 import '../theme/remori_background.dart';
 import '../theme/remori_navigation_bar.dart';
 import '../theme/remori_theme.dart';
@@ -41,8 +43,7 @@ class RemoriShellLabels {
   final TextDirection direction;
 }
 
-/// Localization supplies shell labels in its own foundation PR. Until then,
-/// production has no hard-coded navigation text or simulated feature screens.
+/// Optional test overrides; production labels come from generated ARB resources.
 final shellLabelsProvider = Provider<Map<RemoriMode, RemoriShellLabels>>(
   (ref) => const {},
 );
@@ -146,10 +147,10 @@ class _ModeShell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final patient = mode == RemoriMode.patient;
-    final labels = ref.watch(shellLabelsProvider)[mode];
-    final direction =
-        labels?.direction ??
-        (patient ? TextDirection.rtl : Directionality.of(context));
+    final labelOverride = ref.watch(shellLabelsProvider)[mode];
+    final locale = patient
+        ? ref.watch(patientLocaleProvider)
+        : Localizations.localeOf(context);
     final destinations = patient
         ? const [
             RemoriScreen.p1,
@@ -176,38 +177,74 @@ class _ModeShell extends ConsumerWidget {
             Icons.notifications_none,
             Icons.more_horiz,
           ];
-    return Theme(
-      data: RemoriTheme.forMode(mode, arabic: direction == TextDirection.rtl),
-      child: Directionality(
-        textDirection: direction,
-        child: Scaffold(
-          body: RemoriBackground(
-            child: Column(
-              children: [
-                Expanded(child: child),
-                if (screen.showsNavigation && labels != null)
-                  RemoriNavigationBar(
-                    mode: mode,
-                    items: [
-                      for (var index = 0; index < 4; index++)
-                        RemoriNavigationItem(
-                          label: labels.destinations[index],
-                          icon: Icon(icons[index]),
+    return Localizations.override(
+      context: context,
+      locale: locale,
+      child: Builder(
+        builder: (context) {
+          final strings = AppLocalizations.of(context);
+          final labels =
+              labelOverride ??
+              RemoriShellLabels(
+                destinations: patient
+                    ? [
+                        strings.patientToday,
+                        strings.reminders,
+                        strings.patientMyDay,
+                        strings.patientGames,
+                      ]
+                    : [
+                        strings.caregiverHome,
+                        strings.caregiverPeople,
+                        strings.reminders,
+                        strings.caregiverMore,
+                      ],
+                action: patient ? strings.ask : strings.addReminder,
+                direction: Directionality.of(context),
+              );
+          final direction = labels.direction;
+          return Theme(
+            data: RemoriTheme.forMode(
+              mode,
+              arabic: direction == TextDirection.rtl,
+            ),
+            child: Directionality(
+              textDirection: direction,
+              child: Scaffold(
+                body: RemoriBackground(
+                  child: Column(
+                    children: [
+                      Expanded(child: child),
+                      if (screen.showsNavigation)
+                        RemoriNavigationBar(
+                          mode: mode,
+                          items: [
+                            for (var index = 0; index < 4; index++)
+                              RemoriNavigationItem(
+                                label: labels.destinations[index],
+                                icon: Icon(icons[index]),
+                              ),
+                          ],
+                          selectedIndex: screen.navigationIndex,
+                          onSelected: (index) =>
+                              context.goNamed(destinations[index].name),
+                          actionLabel: labels.action,
+                          actionIcon: Icon(
+                            patient ? Icons.mic_none : Icons.add,
+                          ),
+                          onAction: () => context.pushNamed(
+                            patient
+                                ? RemoriScreen.p6.name
+                                : RemoriScreen.c9.name,
+                          ),
                         ),
                     ],
-                    selectedIndex: screen.navigationIndex,
-                    onSelected: (index) =>
-                        context.goNamed(destinations[index].name),
-                    actionLabel: labels.action,
-                    actionIcon: Icon(patient ? Icons.mic_none : Icons.add),
-                    onAction: () => context.pushNamed(
-                      patient ? RemoriScreen.p6.name : RemoriScreen.c9.name,
-                    ),
                   ),
-              ],
+                ),
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

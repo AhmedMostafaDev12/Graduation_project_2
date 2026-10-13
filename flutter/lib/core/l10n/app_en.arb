@@ -1,0 +1,21 @@
+{
+  "@@locale": "en",
+  "caregiverHome": "Home",
+  "@caregiverHome": {"description": "Caregiver shell C1 destination"},
+  "caregiverPeople": "People",
+  "@caregiverPeople": {"description": "Caregiver shell C3 destination"},
+  "reminders": "Reminders",
+  "@reminders": {"description": "Reminders destination in both shells"},
+  "caregiverMore": "More",
+  "@caregiverMore": {"description": "Caregiver shell C18 destination"},
+  "addReminder": "Add reminder",
+  "@addReminder": {"description": "Accessible label for caregiver center action opening C9"},
+  "patientToday": "Today",
+  "@patientToday": {"description": "Patient shell P1 destination"},
+  "patientMyDay": "My Day",
+  "@patientMyDay": {"description": "Patient shell P4 destination"},
+  "patientGames": "Games",
+  "@patientGames": {"description": "Patient shell P7 destination"},
+  "ask": "Ask",
+  "@ask": {"description": "Accessible label for patient center action opening P6"}
+}
