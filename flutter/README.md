@@ -84,3 +84,48 @@ They verify entry/deep links, separate credential guards, both navigation bars,
 back behavior, RTL typography, and access revocation without recreating GoRouter.
 The app intentionally still shows no finished screens; authentication, localized
 navigation labels, and actual feature content are separate planned PRs.
+
+## ApiClient foundation
+
+`lib/core/api/` provides dio transport, build configuration, secure credential
+storage, and typed Remori error mapping. Repositories will access it through
+`apiClientProvider`; widgets still read repository providers and drift.
+
+Supply the API base URL when running or building:
+
+```sh
+flutter run --dart-define=REMORI_API_BASE_URL=https://remori-ai.duckdns.org/api/v1
+```
+
+There is no source-code default. Configuration is validated lazily when the client
+is used. Release configuration requires HTTPS; debug/test configuration may use
+the development URLs in the API contract. Native cleartext permissions, if needed
+for a debug backend, are separate platform setup.
+
+Every request explicitly selects `ApiCredential.none`, `caregiver`, or `device`.
+Use `none` for register/login/refresh/logout. Login sends form data with `username`
+and `password` using `Headers.formUrlEncodedContentType`; most endpoints use JSON.
+Tokens are acquired by future auth/pairing repositories, not build configuration.
+
+Caregiver access/refresh tokens are saved together in one secure-storage value.
+Device credentials use a separate key. The auth interceptor coordinates concurrent
+401 TOKEN_EXPIRED responses, saves the rotated pair before replaying the original
+request once, and handles delayed responses referring to the old token.
+Multipart forms are cloned for replay; one-shot streams are not retried. Logout
+or another login during refresh prevents restoration of the previous session.
+Transient refresh errors retain credentials. Invalid refresh/device credentials
+clear only the affected credential and signal `credentialsInvalidatedProvider`;
+the auth integration PR must connect that signal to route access/login.
+
+`ApiFailure` preserves the server code and field errors for localized presentation.
+Network, timeout, cancellation, malformed-response, and storage failures have
+separate kinds. Exception strings omit raw messages, request payloads, and tokens.
+There are no request or token loggers.
+
+The API transport rejects absolute/external URLs and traversal, and does not follow
+redirects. Upload presigned S3 URLs with a separate unauthenticated transport and
+exactly the headers returned by the API. Never use this client to PUT S3 bytes.
+
+Tests use dio adapter doubles and secure-storage mocks; they do not access the
+live API. Real auth screens, secure-storage device validation, API smoke tests,
+and native Android/iOS build validation remain for their integration PRs.
