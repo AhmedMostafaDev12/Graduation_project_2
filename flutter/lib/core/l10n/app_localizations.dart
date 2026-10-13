@@ -403,6 +403,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your account was created. Please log in to continue.'**
   String get signupAccountCreated;
+
+  /// No description provided for @newPatient.
+  ///
+  /// In en, this message translates to:
+  /// **'New patient'**
+  String get newPatient;
+
+  /// No description provided for @patientStepOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1 of 3'**
+  String get patientStepOne;
+
+  /// No description provided for @patientName.
+  ///
+  /// In en, this message translates to:
+  /// **'Patient\'s full name'**
+  String get patientName;
+
+  /// No description provided for @patientNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Fatma Mahmoud'**
+  String get patientNameHint;
+
+  /// No description provided for @patientRelationship.
+  ///
+  /// In en, this message translates to:
+  /// **'Your relationship to the patient'**
+  String get patientRelationship;
+
+  /// No description provided for @patientBirthDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date of birth (optional)'**
+  String get patientBirthDate;
+
+  /// No description provided for @patientDateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'DD / MM / YYYY'**
+  String get patientDateHint;
+
+  /// No description provided for @patientLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred language'**
+  String get patientLanguage;
+
+  /// No description provided for @patientEnglish.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get patientEnglish;
+
+  /// No description provided for @patientArabic.
+  ///
+  /// In en, this message translates to:
+  /// **'العربية Arabic'**
+  String get patientArabic;
+
+  /// No description provided for @patientTimezone.
+  ///
+  /// In en, this message translates to:
+  /// **'Timezone'**
+  String get patientTimezone;
+
+  /// No description provided for @patientConsent.
+  ///
+  /// In en, this message translates to:
+  /// **'Consent'**
+  String get patientConsent;
+
+  /// No description provided for @conversationMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation memory'**
+  String get conversationMemory;
+
+  /// No description provided for @conversationMemoryDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'The household agrees to conversation memory. Audio is deleted after transcription.'**
+  String get conversationMemoryDetail;
+
+  /// No description provided for @cloudProcessing.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow Cloud AI processing'**
+  String get cloudProcessing;
+
+  /// No description provided for @cloudProcessingDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Transcription, photo review, and summaries'**
+  String get cloudProcessingDetail;
+
+  /// No description provided for @consentLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Consent can be changed or revoked later in More → Consent.'**
+  String get consentLater;
+
+  /// No description provided for @continueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueLabel;
+
+  /// No description provided for @patientCreating.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating patient…'**
+  String get patientCreating;
+
+  /// No description provided for @patientCreateRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to create the patient. Please try again in a moment.'**
+  String get patientCreateRetry;
+
+  /// No description provided for @patientInvalidDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid date as DD / MM / YYYY'**
+  String get patientInvalidDate;
+
+  /// No description provided for @patientLoginAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Please log in again to continue.'**
+  String get patientLoginAgain;
 }
 
 class _AppLocalizationsDelegate

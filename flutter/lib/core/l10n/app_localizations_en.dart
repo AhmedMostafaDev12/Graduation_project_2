@@ -165,4 +165,74 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get signupAccountCreated =>
       'Your account was created. Please log in to continue.';
+
+  @override
+  String get newPatient => 'New patient';
+
+  @override
+  String get patientStepOne => 'Step 1 of 3';
+
+  @override
+  String get patientName => 'Patient\'s full name';
+
+  @override
+  String get patientNameHint => 'Fatma Mahmoud';
+
+  @override
+  String get patientRelationship => 'Your relationship to the patient';
+
+  @override
+  String get patientBirthDate => 'Date of birth (optional)';
+
+  @override
+  String get patientDateHint => 'DD / MM / YYYY';
+
+  @override
+  String get patientLanguage => 'Preferred language';
+
+  @override
+  String get patientEnglish => 'English';
+
+  @override
+  String get patientArabic => 'العربية Arabic';
+
+  @override
+  String get patientTimezone => 'Timezone';
+
+  @override
+  String get patientConsent => 'Consent';
+
+  @override
+  String get conversationMemory => 'Conversation memory';
+
+  @override
+  String get conversationMemoryDetail =>
+      'The household agrees to conversation memory. Audio is deleted after transcription.';
+
+  @override
+  String get cloudProcessing => 'Allow Cloud AI processing';
+
+  @override
+  String get cloudProcessingDetail =>
+      'Transcription, photo review, and summaries';
+
+  @override
+  String get consentLater =>
+      'Consent can be changed or revoked later in More → Consent.';
+
+  @override
+  String get continueLabel => 'Continue';
+
+  @override
+  String get patientCreating => 'Creating patient…';
+
+  @override
+  String get patientCreateRetry =>
+      'Unable to create the patient. Please try again in a moment.';
+
+  @override
+  String get patientInvalidDate => 'Enter a valid date as DD / MM / YYYY';
+
+  @override
+  String get patientLoginAgain => 'Please log in again to continue.';
 }
