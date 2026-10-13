@@ -57,4 +57,68 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get modePatientPhone => 'This is the patient\'s phone';
+
+  @override
+  String get loginTitle => 'Caregiver Log in';
+
+  @override
+  String get emailLabel => 'Email';
+
+  @override
+  String get emailHint => 'Enter your email';
+
+  @override
+  String get passwordLabel => 'Password';
+
+  @override
+  String get passwordHint => 'Enter your password';
+
+  @override
+  String get forgotPassword => 'Forgot password';
+
+  @override
+  String get logIn => 'Log In';
+
+  @override
+  String get loggingIn => 'Logging in…';
+
+  @override
+  String get orLabel => 'OR';
+
+  @override
+  String get continueGoogle => 'Continue with Google';
+
+  @override
+  String get continueFacebook => 'Continue with Facebook';
+
+  @override
+  String get patientPhoneSetup =>
+      'Setting up patient phone for the first time?';
+
+  @override
+  String get logInSetupPatient => 'Log In and set up for a patient';
+
+  @override
+  String get noAccount => 'Don\'t have an account?';
+
+  @override
+  String get signUp => 'Sign up';
+
+  @override
+  String get showPassword => 'Show password';
+
+  @override
+  String get hidePassword => 'Hide password';
+
+  @override
+  String get requiredField => 'This field is required';
+
+  @override
+  String get loginInvalidCredentials => 'Wrong email or password';
+
+  @override
+  String get loginConnectionError => 'Check your connection and try again';
+
+  @override
+  String get loginRetry => 'Unable to log in. Please try again in a moment.';
 }
