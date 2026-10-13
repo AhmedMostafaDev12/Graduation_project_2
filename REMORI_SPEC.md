@@ -42,6 +42,7 @@ Decisions taken in the 2026-10-03 design session. **P** = product decision by th
 | D28 | **Every UI-brief screen has its endpoints:** device list + unpair, patient profile edit, linked caregivers, consent list + revoke, one day's reminder logs, past games, archived-people filter, alert links (migration `0003`), ~320 px thumbnails (migration `0004`), and signed URLs inside list responses so a screen needs one request, not one per item (§7.2). | P |
 | D29 | **Smart-review contract:** keep/discard is separate from category; fixed shapes for receipt, bill, medication label and `ai_tags`; everything else is `other` with the model's own title, labels or reason (never dropped, never an error); unknown categories kept in `raw_category` and promoted to real ones only by the lead (§7.4). Documents and media responses are ready to show (`title`, `headline`, `fields`, `captured_at`, event summary). | P |
 | D30 | **Background jobs (Phase 6):** one Celery worker + one Beat + Redis (AOF) on the API server, no Flower. Caregiver alerts every 5 min: missed medication (marked missed, or pending 60 min after its time), glasses offline 30 min (once per spell), battery <= 20% (at most every 12 h), to every linked caregiver once. Retention hourly: expired unpinned photos, audio untranscribed after 7 days. Upload previews (photos and videos) made by the worker. | P |
+| D31 | **Flutter packages, pairing QR, fake glasses.** Approved on top of the §10 stack: `flutter_secure_storage` (auth + device tokens), `flutter_svg`, `mobile_scanner` (A5), `permission_handler` (A6), `flutter_blue_plus` (BLE relay), and `uuid`, `intl`, `path_provider`, `sqlite3` (drift); fonts are bundled as assets. The glasses-case QR holds **only the plain serial** (§7.1). Until the glasses run the §7.1 service, **development builds** use a `FakeGlassesConnection` that sends §7.1 messages, so A6 handover, Patient Mode and every glasses-dependent screen can be built and tested; release builds use real BLE only. | P |
 
 ---
 
@@ -475,6 +476,7 @@ audit_log (
 
 The link uses LE Secure Connections bonding. **Video** goes over a Wi-Fi burst: the glasses start a soft-AP, send `wifi_ready`, and the phone joins via `WifiNetworkSpecifier` and pulls over HTTP (D18).
 **Delivery rule:** the glasses delete a queued item only after the phone's `ack`. Every item carries a client-generated UUID, so redelivery is harmless.
+**Pairing QR (D31).** The QR on the glasses case contains only the serial as plain text (e.g. `RMR-0007`): no URL, no JSON. The phone reads it on A5 and sends it to `POST /devices/pair` (§7.2).
 
 ```jsonc
 // ---------- session ----------

@@ -15,6 +15,11 @@ Source of truth: [`REMORI_SPEC.md`](../../REMORI_SPEC.md) §10 (decisions D6, D8
 | Local database | drift (SQLite) |
 | Push | Firebase Cloud Messaging |
 | Platforms | Android + iOS. The glasses relay is Android-only in v1 |
+| Secure storage | `flutter_secure_storage`: auth tokens and the patient phone's device token (D31) |
+| Camera QR + permissions | `mobile_scanner` (A5), `permission_handler` (A6) (D31) |
+| Images + fonts | `flutter_svg`; DM Sans, Manrope and Readex Pro bundled in `assets/fonts` (D31) |
+| Glasses link | `flutter_blue_plus` for BLE (spec §7.1), behind `GlassesConnection` (§5) (D31) |
+| Utilities | `uuid` (client IDs), `intl`, `path_provider` + `sqlite3` (drift) (D31) |
 
 Adding any other package is a lead decision.
 
@@ -72,6 +77,10 @@ flutter/
 
 - An Android **foreground service** (persistent notification D1) runs the BLE link, outbox uploads, reminder sync + local notifications, and GPS for "Where am I?".
 - BLE messages are exactly spec §7.1. Adding or changing a message is a contract change (lead + hardware + Flutter).
+- **All glasses communication goes through one `GlassesConnection` interface**, provided by Riverpod (D31). Screens never know which implementation they get:
+  - `FakeGlassesConnection` (**development builds only**, until the glasses run the §7.1 service): sends real §7.1 messages: `hello` with the paired serial, `telemetry` every 60 s, now and then an `encounter` or a reminder state change. It can be switched to "disconnected" to show D5. With it, A6 can hand the phone over to Patient Mode.
+  - `BleGlassesConnection` (`flutter_blue_plus`): the real link. Release builds use only this one.
+- The pairing QR on the glasses case is the plain serial (spec §7.1). Test codes RMR-0008 … RMR-0015 come from the lead.
 - The iOS relay is a stretch goal behind the same `RelayService` interface.
 
 ---
