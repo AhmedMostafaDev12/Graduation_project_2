@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'core/theme/remori_background.dart';
+import 'core/router/remori_router.dart';
 import 'core/theme/remori_theme.dart';
 
-/// Routing and localized screens arrive in separate foundation changes.
-class RemoriApp extends StatelessWidget {
+class RemoriApp extends ConsumerWidget {
   const RemoriApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: RemoriTheme.forMode(RemoriMode.caregiver),
-      home: const Scaffold(body: RemoriBackground(child: SizedBox.expand())),
-    );
-  }
+  Widget build(BuildContext context, WidgetRef ref) => MaterialApp.router(
+    debugShowCheckedModeBanner: false,
+    theme: RemoriTheme.forMode(RemoriMode.caregiver),
+    routerConfig: ref.watch(remoriRouterProvider),
+  );
 }
