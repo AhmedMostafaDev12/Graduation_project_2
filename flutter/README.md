@@ -7,7 +7,7 @@ Read `AGENTS.md` and `docs/ARCHITECTURE.md` before making changes. Screen refere
 are in `design/screens/`; preserve those exports.
 
 The app includes the native projects, application entry point, shared theme, and reusable controls.
-Foundations include GoRouter, ApiClient, drift/outbox, and Arabic/English localization. Authentication integration and individual screens follow separately.
+Foundations include GoRouter, ApiClient, drift/outbox, and Arabic/English localization. A0 Splash is implemented; authentication integration and the remaining screens follow separately.
 
 From this folder:
 
@@ -208,3 +208,41 @@ Tests check matching translation keys, both caregiver languages, Arabic-first an
 English patient shells, accessibility action labels, fonts/direction, unsupported
 locale fallback, and preservation of routing when the locale changes. Native
 Android/iOS validation and complete screen comparisons remain integration work.
+
+## A0 Splash
+
+The signed-out entry now renders A0 from its PNG/HTML reference: exported logo,
+cream curves, centered two-line tagline, Get Started pill with its exact arrow,
+and support caption. All text and accessibility labels come from the Arabic and
+English ARBs. System bars are native; SafeArea reserves their space.
+
+The 390 x 844 layout matches the reference metrics. Short/narrow screens or larger
+text can scroll to keep the action reachable. Get Started opens the existing A1
+route; A1 is still an empty slot until its screen PR is implemented. A0 calls no
+API endpoint and has no repository/data model.
+
+Review artifacts:
+
+- [English reference-size render](test/goldens/a0_en.png)
+- [Arabic reference-size render](test/goldens/a0_ar.png)
+- [Pixel 9a Android emulator capture](test/goldens/a0_android.png)
+
+Run from this folder with a booted emulator:
+
+```sh
+flutter run -d emulator-5554 --dart-define=REMORI_API_BASE_URL=https://remori-ai.duckdns.org/api/v1
+```
+
+To regenerate widget review captures:
+
+```sh
+flutter test test/a0_splash_test.dart --update-goldens
+```
+
+The screen is tested in both languages, for A1 navigation, native safe-area
+reservation, and scrolling with 2x text on a 320 x 480 viewport. Android debug APK
+build, installation, and the running screen were validated on Pixel 9a. iOS
+validation remains pending.
+
+If the local debugger reports a DDS/service-protocol connection error, add
+`--no-dds` to the run command. That workaround was validated on this emulator.

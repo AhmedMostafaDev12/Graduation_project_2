@@ -8,6 +8,7 @@ abstract final class RemoriColors {
   static const surface = Color(0xFFFEFEFE);
   static const ink = Color(0xFF141414);
   static const muted = Color(0xAD000000);
+  static const lead = Color(0xB8000000);
   static const border = Color(0xCC6D4AA8);
   static const success = Color(0xFFCFE8C9);
   static const successInk = Color(0xFF2F5130);
@@ -63,33 +64,47 @@ abstract final class RemoriTheme {
     final textTheme = TextTheme(
       headlineLarge: TextStyle(
         fontFamily: headingFamily,
+        letterSpacing: 0,
         fontSize: patient ? 32 : 28,
         fontWeight: FontWeight.w700,
       ),
       titleLarge: TextStyle(
         fontFamily: headingFamily,
+        letterSpacing: 0,
         fontSize: patient ? 32 : 22,
         fontWeight: FontWeight.w700,
       ),
       titleMedium: TextStyle(
         fontFamily: family,
+        letterSpacing: 0,
         fontSize: patient ? 24 : 15,
         fontWeight: FontWeight.w600,
       ),
-      bodyLarge: TextStyle(fontFamily: family, fontSize: patient ? 22 : 15),
-      bodyMedium: TextStyle(fontFamily: family, fontSize: patient ? 22 : 14),
+      bodyLarge: TextStyle(
+        fontFamily: family,
+        letterSpacing: 0,
+        fontSize: patient ? 22 : 15,
+      ),
+      bodyMedium: TextStyle(
+        fontFamily: family,
+        letterSpacing: 0,
+        fontSize: patient ? 22 : 14,
+      ),
       bodySmall: TextStyle(
         fontFamily: family,
+        letterSpacing: 0,
         fontSize: patient ? 22 : 13,
         color: RemoriColors.muted,
       ),
       labelLarge: TextStyle(
         fontFamily: family,
+        letterSpacing: 0,
         fontSize: patient ? 24 : 17,
         fontWeight: FontWeight.w600,
       ),
       labelMedium: TextStyle(
         fontFamily: family,
+        letterSpacing: 0,
         fontSize: patient ? 22 : 14,
         fontWeight: FontWeight.w600,
       ),

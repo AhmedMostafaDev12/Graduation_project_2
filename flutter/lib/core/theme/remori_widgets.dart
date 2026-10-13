@@ -23,10 +23,12 @@ class RemoriButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.outlined = false,
+    this.trailingIcon,
   });
   final String label;
   final VoidCallback? onPressed;
   final bool outlined;
+  final Widget? trailingIcon;
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
@@ -36,8 +38,22 @@ class RemoriButton extends StatelessWidget {
     ),
     child: outlined
         ? OutlinedButton(onPressed: onPressed, child: Text(label))
-        : FilledButton(onPressed: onPressed, child: Text(label)),
+        : FilledButton(onPressed: onPressed, child: _content()),
   );
+  Widget _content() => trailingIcon == null
+      ? Text(label)
+      : Row(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsetsDirectional.only(start: 20),
+                child: Text(label, textAlign: TextAlign.center),
+              ),
+            ),
+            const SizedBox(width: 10),
+            ExcludeSemantics(child: trailingIcon!),
+          ],
+        );
 }
 
 class RemoriCard extends StatelessWidget {

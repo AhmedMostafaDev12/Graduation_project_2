@@ -17,5 +17,13 @@
   "patientGames": "Games",
   "@patientGames": {"description": "Patient shell P7 destination"},
   "ask": "Ask",
-  "@ask": {"description": "Accessible label for patient center action opening P6"}
+  "@ask": {"description": "Accessible label for patient center action opening P6"},
+  "appName": "Remori",
+  "@appName": {"description": "App brand accessibility label"},
+  "splashTagline": "A quiet layer of memory\nthat stays with you.",
+  "@splashTagline": {"description": "A0 two-line tagline"},
+  "getStarted": "Get Started",
+  "@getStarted": {"description": "A0 button opening A1"},
+  "splashSupport": "Support for everyday moments.",
+  "@splashSupport": {"description": "A0 support caption"}
 }
