@@ -697,6 +697,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Serial: {serial}'**
   String pairSerial(String serial);
+
+  /// No description provided for @permissionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Permissions'**
+  String get permissionsTitle;
+
+  /// No description provided for @permissionsStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3 of 3'**
+  String get permissionsStep;
+
+  /// No description provided for @permissionsIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Remori needs these permissions to help keep the glasses connected throughout the day.'**
+  String get permissionsIntro;
+
+  /// No description provided for @permissionsCaregiverIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow notifications to receive reminders on this phone.'**
+  String get permissionsCaregiverIntro;
+
+  /// No description provided for @permissionBluetooth.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth'**
+  String get permissionBluetooth;
+
+  /// No description provided for @permissionBluetoothDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect to the glasses'**
+  String get permissionBluetoothDetail;
+
+  /// No description provided for @permissionNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get permissionNotifications;
+
+  /// No description provided for @permissionNotificationsDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive reminders on the phone'**
+  String get permissionNotificationsDetail;
+
+  /// No description provided for @permissionLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get permissionLocation;
+
+  /// No description provided for @permissionLocationDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'For location-related assistance'**
+  String get permissionLocationDetail;
+
+  /// No description provided for @permissionBackground.
+  ///
+  /// In en, this message translates to:
+  /// **'Background activity'**
+  String get permissionBackground;
+
+  /// No description provided for @permissionBackgroundDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep the glasses connected and syncing'**
+  String get permissionBackgroundDetail;
+
+  /// No description provided for @permissionGranted.
+  ///
+  /// In en, this message translates to:
+  /// **'Granted'**
+  String get permissionGranted;
+
+  /// No description provided for @permissionAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow'**
+  String get permissionAllow;
+
+  /// No description provided for @permissionChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking…'**
+  String get permissionChecking;
+
+  /// No description provided for @permissionLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Limited access'**
+  String get permissionLimited;
+
+  /// No description provided for @permissionSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get permissionSettings;
+
+  /// No description provided for @permissionsHandoverTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready for handover?'**
+  String get permissionsHandoverTitle;
+
+  /// No description provided for @permissionsHandoverPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Patient handover will be available when the glasses connection is ready. You can continue in caregiver mode now.'**
+  String get permissionsHandoverPending;
+
+  /// No description provided for @permissionsPatientMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Give phone to patient → patient mode'**
+  String get permissionsPatientMode;
+
+  /// No description provided for @permissionsCaregiverMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue on caregiver mode'**
+  String get permissionsCaregiverMode;
+
+  /// No description provided for @permissionsReadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to update permissions. Please try again.'**
+  String get permissionsReadFailed;
+
+  /// No description provided for @permissionsUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage permissions on an Android or iOS phone. You can continue in caregiver mode.'**
+  String get permissionsUnsupported;
 }
 
 class _AppLocalizationsDelegate

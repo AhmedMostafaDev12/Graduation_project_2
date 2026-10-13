@@ -361,7 +361,7 @@ and the patient UUID supplied by A4. It validates the response’s device UUID,
 patient/serial match, and nonempty token, then saves the device token in existing
 secure storage. Presentation receives only safe metadata. Continue remains
 disabled until association and storage succeed, then opens A6 with the patient ID.
-A6 remains a route slot. Missing patient context blocks scanning/Continue.
+A6 now provides the approved staged permission setup. Missing patient context blocks scanning/Continue.
 
 If secure storage fails after pairing, Retry pairing reuses the received grant
 in memory without posting again and rotating the token. This recovery does not
@@ -388,3 +388,41 @@ Review captures: [English](test/goldens/a5_en.png), [Arabic](test/goldens/a5_ar.
 `flutter test test/a5_pair_glasses_test.dart --update-goldens`.
 Android debug APK build passed. Actual camera/device scans, live pairing smoke
 tests, and iOS build/runtime validation remain pending.
+## A6 Permissions — approved staged setup
+
+A6 follows its PNG/HTML layout while reading real OS permission status. The board's
+sample Granted badges are not hard-coded. Checking, granted, denied, limited,
+blocked, and restricted states come from the permission service; limited/blocked
+access opens app settings. No permission is requested automatically on entry.
+Returning from system settings refreshes status, and failed checks clear stale
+grants rather than displaying raw platform exceptions.
+
+The approved permission_handler package checks/requests Android Bluetooth Scan and
+Connect (legacy Bluetooth on API <=30), notifications, and foreground location.
+Background activity opens Android's battery-optimization settings, falling back
+to app settings on devices without that screen. Its status reflects the OS battery
+exemption flag. It does not request background/Always location or a battery-exemption
+permission, and it does not start a foreground service. Android compile SDK is 37
+as required by the permission plugin; minimum and target SDK stay at Flutter defaults.
+
+As approved, iOS shows notifications and caregiver continuation only. Android
+shows the four rows and handover card, but patient handover remains disabled until
+BLE/relay integration is ready. Permission grants alone never enable Patient Mode.
+Caregiver continuation opens C1 regardless of optional permission denial; C1 is
+still a route slot. A6 calls no REST endpoint and stores no fake permission state.
+
+A5 pushes A6 while keeping its linked state. Back returns to A5 without a new
+pairing request or device-token rotation; patient context is preserved. Both
+languages and 2x text are supported, including the Arabic arrow font fallback.
+
+Review captures (mocked OS status fixtures):
+[Android English](test/goldens/a6_android_en.png),
+[Android Arabic](test/goldens/a6_android_ar.png),
+[iOS English](test/goldens/a6_ios_en.png),
+[iOS Arabic](test/goldens/a6_ios_ar.png).
+Regenerate with `flutter test test/a6_permissions_test.dart --update-goldens`.
+
+All 135 tests and analysis pass; the Android debug APK builds successfully.
+Real-device permission dialogs/battery settings and iOS build/runtime validation
+remain pending. BLE connection, key provisioning, and relay startup remain pending
+under the previously approved staged pairing scope.

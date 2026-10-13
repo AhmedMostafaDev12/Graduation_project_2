@@ -328,4 +328,79 @@ class AppLocalizationsEn extends AppLocalizations {
   String pairSerial(String serial) {
     return 'Serial: $serial';
   }
+
+  @override
+  String get permissionsTitle => 'Permissions';
+
+  @override
+  String get permissionsStep => 'Step 3 of 3';
+
+  @override
+  String get permissionsIntro =>
+      'Remori needs these permissions to help keep the glasses connected throughout the day.';
+
+  @override
+  String get permissionsCaregiverIntro =>
+      'Allow notifications to receive reminders on this phone.';
+
+  @override
+  String get permissionBluetooth => 'Bluetooth';
+
+  @override
+  String get permissionBluetoothDetail => 'Connect to the glasses';
+
+  @override
+  String get permissionNotifications => 'Notifications';
+
+  @override
+  String get permissionNotificationsDetail => 'Receive reminders on the phone';
+
+  @override
+  String get permissionLocation => 'Location';
+
+  @override
+  String get permissionLocationDetail => 'For location-related assistance';
+
+  @override
+  String get permissionBackground => 'Background activity';
+
+  @override
+  String get permissionBackgroundDetail =>
+      'Keep the glasses connected and syncing';
+
+  @override
+  String get permissionGranted => 'Granted';
+
+  @override
+  String get permissionAllow => 'Allow';
+
+  @override
+  String get permissionChecking => 'Checking…';
+
+  @override
+  String get permissionLimited => 'Limited access';
+
+  @override
+  String get permissionSettings => 'Settings';
+
+  @override
+  String get permissionsHandoverTitle => 'Ready for handover?';
+
+  @override
+  String get permissionsHandoverPending =>
+      'Patient handover will be available when the glasses connection is ready. You can continue in caregiver mode now.';
+
+  @override
+  String get permissionsPatientMode => 'Give phone to patient → patient mode';
+
+  @override
+  String get permissionsCaregiverMode => 'Continue on caregiver mode';
+
+  @override
+  String get permissionsReadFailed =>
+      'Unable to update permissions. Please try again.';
+
+  @override
+  String get permissionsUnsupported =>
+      'Manage permissions on an Android or iOS phone. You can continue in caregiver mode.';
 }

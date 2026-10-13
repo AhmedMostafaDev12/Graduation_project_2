@@ -323,4 +323,78 @@ class AppLocalizationsAr extends AppLocalizations {
   String pairSerial(String serial) {
     return 'الرقم التسلسلي: $serial';
   }
+
+  @override
+  String get permissionsTitle => 'الأذونات';
+
+  @override
+  String get permissionsStep => 'الخطوة 3 من 3';
+
+  @override
+  String get permissionsIntro =>
+      'يحتاج ريموري إلى هذه الأذونات للمساعدة في إبقاء النظارة متصلة طوال اليوم.';
+
+  @override
+  String get permissionsCaregiverIntro =>
+      'اسمح بالإشعارات لتلقي التذكيرات على هذا الهاتف.';
+
+  @override
+  String get permissionBluetooth => 'البلوتوث';
+
+  @override
+  String get permissionBluetoothDetail => 'الاتصال بالنظارة';
+
+  @override
+  String get permissionNotifications => 'الإشعارات';
+
+  @override
+  String get permissionNotificationsDetail => 'تلقي التذكيرات على الهاتف';
+
+  @override
+  String get permissionLocation => 'الموقع';
+
+  @override
+  String get permissionLocationDetail => 'للمساعدة المتعلقة بالموقع';
+
+  @override
+  String get permissionBackground => 'النشاط في الخلفية';
+
+  @override
+  String get permissionBackgroundDetail =>
+      'إبقاء النظارة متصلة ومزامنة البيانات';
+
+  @override
+  String get permissionGranted => 'مسموح';
+
+  @override
+  String get permissionAllow => 'السماح';
+
+  @override
+  String get permissionChecking => 'جارٍ التحقق…';
+
+  @override
+  String get permissionLimited => 'وصول محدود';
+
+  @override
+  String get permissionSettings => 'الإعدادات';
+
+  @override
+  String get permissionsHandoverTitle => 'هل أنت مستعد لتسليم الهاتف؟';
+
+  @override
+  String get permissionsHandoverPending =>
+      'سيتاح تسليم الهاتف للمريض عندما يصبح اتصال النظارة جاهزًا. يمكنك المتابعة في وضع مقدم الرعاية الآن.';
+
+  @override
+  String get permissionsPatientMode => 'إعطاء الهاتف للمريض ← وضع المريض';
+
+  @override
+  String get permissionsCaregiverMode => 'المتابعة في وضع مقدم الرعاية';
+
+  @override
+  String get permissionsReadFailed => 'تعذر تحديث الأذونات. حاول مرة أخرى.';
+
+  @override
+  String get permissionsUnsupported =>
+      'يمكن إدارة الأذونات على هاتف أندرويد أو آيفون. يمكنك المتابعة في وضع مقدم الرعاية.';
 }

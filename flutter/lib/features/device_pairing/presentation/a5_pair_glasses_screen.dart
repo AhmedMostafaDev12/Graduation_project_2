@@ -260,7 +260,7 @@ class _A5PairGlassesScreenState extends ConsumerState<A5PairGlassesScreen> {
                   child: RemoriButton(
                     label: s.continueLabel,
                     onPressed: linked
-                        ? () => context.goNamed(
+                        ? () => context.pushNamed(
                             RemoriScreen.a6.name,
                             extra: widget.patientId,
                           )
