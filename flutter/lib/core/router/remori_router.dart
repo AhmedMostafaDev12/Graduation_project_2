@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/a0_splash_screen.dart';
+import '../../features/auth/presentation/a1_mode_select_screen.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/locale_providers.dart';
 import '../theme/remori_background.dart';
@@ -30,6 +31,10 @@ typedef RemoriScreenBuilder = Widget Function(BuildContext, GoRouterState);
 /// Feature PRs replace empty slots with the screen-ID presentation widgets.
 final screenBuildersProvider = Provider<Map<RemoriScreen, RemoriScreenBuilder>>(
   (ref) => {
+    RemoriScreen.a1: (context, state) => A1ModeSelectScreen(
+      onCaregiver: () => context.goNamed(RemoriScreen.a2.name),
+      onPatientPhone: () => context.goNamed(RemoriScreen.a2.name),
+    ),
     RemoriScreen.a0: (context, state) => A0SplashScreen(
       onGetStarted: () => context.goNamed(RemoriScreen.a1.name),
     ),

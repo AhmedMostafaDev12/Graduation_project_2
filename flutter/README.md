@@ -218,7 +218,7 @@ English ARBs. System bars are native; SafeArea reserves their space.
 
 The 390 x 844 layout matches the reference metrics. Short/narrow screens or larger
 text can scroll to keep the action reachable. Get Started opens the existing A1
-route; A1 is still an empty slot until its screen PR is implemented. A0 calls no
+route, which now renders Mode Select. A0 calls no
 API endpoint and has no repository/data model.
 
 Review artifacts:
@@ -246,3 +246,21 @@ validation remains pending.
 
 If the local debugger reports a DDS/service-protocol connection error, add
 `--no-dds` to the run command. That workaround was validated on this emulator.
+
+## A1 Mode Select
+
+A1 renders the exported 210dp logo, introduction, and two 52dp pill buttons
+with the HTML spacing. Arabic and English copy comes from the ARBs; the router
+owns the onboarding background and native safe area. Both choices open A2 Login
+as the design specifies. A2 remains an empty route until its screen PR.
+
+A1 has no API calls or stored mode selection. The existing router continues to
+handle authenticated mode entry. Short screens and enlarged text can scroll to
+both actions. Tests cover both links, Arabic RTL, safe areas, and 2x text in both
+languages on a 320 x 480 viewport.
+
+Review captures: [English](test/goldens/a1_en.png),
+[Arabic](test/goldens/a1_ar.png). Native A1 validation remains pending because
+Pixel 9a was offline in ADB during this change.
+Regenerate the widget captures with
+`flutter test test/a1_mode_select_test.dart --update-goldens`.

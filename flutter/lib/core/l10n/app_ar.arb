@@ -12,5 +12,8 @@
   "appName": "ريموري",
   "splashTagline": "طبقة هادئة من الذاكرة\nترافقك دائمًا.",
   "getStarted": "ابدأ الآن",
-  "splashSupport": "دعم للحظاتك اليومية."
+  "splashSupport": "دعم للحظاتك اليومية.",
+  "modeSelectIntro": "دعم للذاكرة للأشخاص الذين يعيشون مع ألزهايمر، ولمن يعتنون بهم.",
+  "modeCaregiver": "أنا مقدم رعاية",
+  "modePatientPhone": "هذا هاتف المريض"
 }
