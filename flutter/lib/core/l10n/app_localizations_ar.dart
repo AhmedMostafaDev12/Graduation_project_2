@@ -121,4 +121,47 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get loginRetry => 'تعذر تسجيل الدخول. حاول مرة أخرى بعد قليل.';
+
+  @override
+  String get signupTitle => 'إنشاء حساب مقدم الرعاية';
+
+  @override
+  String get fullNameLabel => 'الاسم الكامل';
+
+  @override
+  String get fullNameHint => 'آية وليد محمد';
+
+  @override
+  String get phoneLabel => 'الهاتف';
+
+  @override
+  String get phoneHint => '+201000000000';
+
+  @override
+  String get alreadyAccount => 'لديك حساب بالفعل؟';
+
+  @override
+  String get signupLogIn => 'تسجيل الدخول';
+
+  @override
+  String get signingUp => 'جارٍ إنشاء الحساب…';
+
+  @override
+  String get signupPasswordLength => 'استخدم من 8 إلى 128 حرفًا';
+
+  @override
+  String get signupEmailTaken =>
+      'يوجد حساب بهذا البريد الإلكتروني. سجّل الدخول.';
+
+  @override
+  String get signupCheckFields => 'تحقق من الحقول المحددة وحاول مرة أخرى.';
+
+  @override
+  String get signupInvalidField => 'تحقق من هذا الحقل';
+
+  @override
+  String get signupRetry => 'تعذر إنشاء الحساب. حاول مرة أخرى بعد قليل.';
+
+  @override
+  String get signupAccountCreated => 'تم إنشاء حسابك. سجّل الدخول للمتابعة.';
 }

@@ -319,6 +319,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unable to log in. Please try again in a moment.'**
   String get loginRetry;
+
+  /// No description provided for @signupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Caregiver sign up'**
+  String get signupTitle;
+
+  /// No description provided for @fullNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get fullNameLabel;
+
+  /// No description provided for @fullNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Aya Waleed Mohamed'**
+  String get fullNameHint;
+
+  /// No description provided for @phoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get phoneLabel;
+
+  /// No description provided for @phoneHint.
+  ///
+  /// In en, this message translates to:
+  /// **'+201000000000'**
+  String get phoneHint;
+
+  /// No description provided for @alreadyAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account?'**
+  String get alreadyAccount;
+
+  /// No description provided for @signupLogIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Log in'**
+  String get signupLogIn;
+
+  /// No description provided for @signingUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing up…'**
+  String get signingUp;
+
+  /// No description provided for @signupPasswordLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Use 8–128 characters'**
+  String get signupPasswordLength;
+
+  /// No description provided for @signupEmailTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'An account with this email already exists. Please log in.'**
+  String get signupEmailTaken;
+
+  /// No description provided for @signupCheckFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the highlighted fields and try again.'**
+  String get signupCheckFields;
+
+  /// No description provided for @signupInvalidField.
+  ///
+  /// In en, this message translates to:
+  /// **'Check this field'**
+  String get signupInvalidField;
+
+  /// No description provided for @signupRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to sign up. Please try again in a moment.'**
+  String get signupRetry;
+
+  /// No description provided for @signupAccountCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account was created. Please log in to continue.'**
+  String get signupAccountCreated;
 }
 
 class _AppLocalizationsDelegate

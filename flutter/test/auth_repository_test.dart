@@ -235,6 +235,77 @@ void main() {
       expect(store.caregiver, _oldTokens);
     },
   );
+  test('registration uses anonymous JSON and never stores tokens', () async {
+    for (final phone in [null, '', '  +201000000000  ']) {
+      final store = _Store()..caregiver = null;
+      final client = _client(store, (request) {
+        expect(request.path, '/auth/register');
+        expect(request.headers['Authorization'], isNull);
+        expect(request.contentType, 'application/json');
+        final data = jsonDecode(
+          utf8.decode(request.extra['test.wire'] as List<int>),
+        );
+        expect(data, {
+          'full_name': 'Test Carer',
+          'email': 'carer@example.test',
+          'password': ' p&+word ',
+          if (phone != null && phone.trim().isNotEmpty)
+            'phone': '+201000000000',
+        });
+        return _json(201, {'id': 'caregiver-id', 'role': 'caregiver'});
+      });
+      await AuthRepository(client, store).register(
+        name: ' Test Carer ',
+        email: ' carer@example.test ',
+        password: ' p&+word ',
+        phone: phone,
+      );
+      expect(store.caregiver, isNull);
+    }
+  });
+  test(
+    'duplicate email and field errors keep the user unauthenticated',
+    () async {
+      for (final (status, code) in [
+        (409, 'EMAIL_TAKEN'),
+        (422, 'VALIDATION_ERROR'),
+      ]) {
+        final store = _Store()..caregiver = null;
+        final client = _client(store, (_) => _error(status, code));
+        await expectLater(
+          AuthRepository(client, store).register(
+            name: 'Test Carer',
+            email: 'carer@example.test',
+            password: 'password',
+          ),
+          throwsA(isA<ApiFailure>().having((e) => e.code, 'code', code)),
+        );
+        expect(store.caregiver, isNull);
+      }
+    },
+  );
+  test('malformed registration response is rejected', () async {
+    final store = _Store()..caregiver = null;
+    final client = _client(
+      store,
+      (_) => _json(201, {'id': '', 'role': 'caregiver'}),
+    );
+    await expectLater(
+      AuthRepository(client, store).register(
+        name: 'Test Carer',
+        email: 'carer@example.test',
+        password: 'password',
+      ),
+      throwsA(
+        isA<ApiFailure>().having(
+          (e) => e.kind,
+          'kind',
+          ApiFailureKind.invalidResponse,
+        ),
+      ),
+    );
+    expect(store.caregiver, isNull);
+  });
 }
 
 class _FailingStore extends _Store {

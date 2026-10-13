@@ -121,4 +121,48 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginRetry => 'Unable to log in. Please try again in a moment.';
+
+  @override
+  String get signupTitle => 'Caregiver sign up';
+
+  @override
+  String get fullNameLabel => 'Full name';
+
+  @override
+  String get fullNameHint => 'Aya Waleed Mohamed';
+
+  @override
+  String get phoneLabel => 'Phone';
+
+  @override
+  String get phoneHint => '+201000000000';
+
+  @override
+  String get alreadyAccount => 'Already have an account?';
+
+  @override
+  String get signupLogIn => 'Log in';
+
+  @override
+  String get signingUp => 'Signing up…';
+
+  @override
+  String get signupPasswordLength => 'Use 8–128 characters';
+
+  @override
+  String get signupEmailTaken =>
+      'An account with this email already exists. Please log in.';
+
+  @override
+  String get signupCheckFields => 'Check the highlighted fields and try again.';
+
+  @override
+  String get signupInvalidField => 'Check this field';
+
+  @override
+  String get signupRetry => 'Unable to sign up. Please try again in a moment.';
+
+  @override
+  String get signupAccountCreated =>
+      'Your account was created. Please log in to continue.';
 }

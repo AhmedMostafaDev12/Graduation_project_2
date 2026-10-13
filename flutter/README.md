@@ -292,3 +292,28 @@ Review captures: [English](test/goldens/a2_en.png) and
 `flutter test test/a2_login_test.dart --update-goldens`.
 Native A2 validation remains pending; emulator launch permission was declined.
 Live credential-based smoke testing and iOS validation remain pending.
+## A3 Caregiver Sign up
+
+A3 follows its exported PNG/HTML: 120dp logo, four fields, 11dp spacing,
+sign-up pill, provider controls, and Log in link. Arabic and English copy uses
+ARBs; native safe areas and scrolling keep enlarged text and keyboard layouts
+usable. The phone field is optional; name/email are required, and passwords
+must be 8–128 characters. Server validation details highlight their fields
+with local translations rather than raw messages.
+
+The repository sends anonymous JSON to `POST /auth/register`. Registration
+returns an account without storing tokens. The controller then calls the existing
+`POST /auth/login` flow and opens A4 only after secure token persistence succeeds.
+If login fails after account creation, registration is disabled and the user is
+directed to the existing Log in link. Duplicate emails also offer login.
+No authentication payload enters drift or the outbox.
+
+Google and Facebook remain visible and disabled under the existing auth-screen
+approval, while their backend integration is postponed. Email verification policy
+is unchanged; the app uses the current backend contract.
+
+Review captures: [English](test/goldens/a3_en.png) and
+[Arabic](test/goldens/a3_ar.png). Regenerate with
+`flutter test test/a3_signup_test.dart --update-goldens`.
+A4 remains a route slot. Native Android/iOS and live registration smoke testing
+remain pending; no emulator was connected during this change.

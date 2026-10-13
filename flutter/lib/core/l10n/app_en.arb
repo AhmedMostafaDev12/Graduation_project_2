@@ -52,5 +52,19 @@
   "requiredField": "This field is required",
   "loginInvalidCredentials": "Wrong email or password",
   "loginConnectionError": "Check your connection and try again",
-  "loginRetry": "Unable to log in. Please try again in a moment."
+  "loginRetry": "Unable to log in. Please try again in a moment.",
+  "signupTitle": "Caregiver sign up",
+  "fullNameLabel": "Full name",
+  "fullNameHint": "Aya Waleed Mohamed",
+  "phoneLabel": "Phone",
+  "phoneHint": "+201000000000",
+  "alreadyAccount": "Already have an account?",
+  "signupLogIn": "Log in",
+  "signingUp": "Signing up…",
+  "signupPasswordLength": "Use 8–128 characters",
+  "signupEmailTaken": "An account with this email already exists. Please log in.",
+  "signupCheckFields": "Check the highlighted fields and try again.",
+  "signupInvalidField": "Check this field",
+  "signupRetry": "Unable to sign up. Please try again in a moment.",
+  "signupAccountCreated": "Your account was created. Please log in to continue."
 }
