@@ -10,11 +10,13 @@ import 'package:remori/core/api/api_config.dart';
 import 'package:remori/core/api/api_failure.dart';
 import 'package:remori/core/api/credential_store.dart';
 import 'package:remori/core/l10n/locale_providers.dart';
+import 'package:remori/core/relay/permission_service.dart';
 import 'package:remori/core/router/remori_router.dart';
 import 'package:remori/core/router/remori_routes.dart';
 import 'package:remori/features/device_pairing/domain/pairing_info.dart';
 import 'package:remori/features/device_pairing/data/pairing_repository.dart';
 import 'package:remori/features/device_pairing/presentation/a5_pair_glasses_screen.dart';
+import 'package:remori/features/device_pairing/presentation/a6_permissions_screen.dart';
 import 'package:remori/features/device_pairing/presentation/pairing_providers.dart';
 import 'package:remori/features/device_pairing/presentation/glasses_qr_scanner.dart';
 
@@ -66,6 +68,9 @@ Future<ProviderContainer> mount(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
+        permissionPlatformProvider.overrideWithValue(
+          PermissionPlatform.unsupported,
+        ),
         appLocaleProvider.overrideWithValue(Locale(language)),
         routeAccessProvider.overrideWithValue(
           const RouteAccess(caregiverAuthenticated: true),
@@ -138,9 +143,13 @@ void main() {
       await tester.ensureVisible(find.text('Continue'));
       await tester.tap(find.text('Continue'));
       await tester.pumpAndSettle();
-      final router = container.read(remoriRouterProvider);
-      expect(router.routeInformationProvider.value.uri.path, '/a6');
-      expect(router.routerDelegate.currentConfiguration.extra, patientId);
+      expect(find.byType(A6PermissionsScreen), findsOneWidget);
+      expect(
+        tester
+            .widget<A6PermissionsScreen>(find.byType(A6PermissionsScreen))
+            .patientId,
+        patientId,
+      );
     },
   );
   testWidgets('missing patient cannot scan or Continue', (tester) async {
@@ -212,6 +221,26 @@ void main() {
           .path,
       '/a4',
     );
+  });
+  testWidgets('A6 back preserves linked A5 without another pairing request', (
+    tester,
+  ) async {
+    final repository = TestPairingRepository();
+    await mount(tester, repository);
+    await scan(tester);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Continue'));
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Permissions'));
+    await tester.pumpAndSettle();
+    expect(find.byType(A5PairGlassesScreen), findsOneWidget);
+    expect(
+      find.text('Glasses linked. Bluetooth connection is still pending.'),
+      findsOneWidget,
+    );
+    expect(repository.calls, 1);
+    expect(continueButton(tester).onPressed, isNotNull);
   });
   for (final language in ['en', 'ar']) {
     testWidgets('A5 $language linked state still shows Bluetooth pending', (

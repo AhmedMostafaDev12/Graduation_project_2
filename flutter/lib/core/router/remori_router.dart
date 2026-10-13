@@ -8,6 +8,7 @@ import '../../features/auth/presentation/a2_login_screen.dart';
 import '../../features/auth/presentation/a3_signup_screen.dart';
 import '../../features/enrollment/presentation/a4_patient_profile_screen.dart';
 import '../../features/device_pairing/presentation/a5_pair_glasses_screen.dart';
+import '../../features/device_pairing/presentation/a6_permissions_screen.dart';
 import '../api/api_providers.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/locale_providers.dart';
@@ -43,6 +44,9 @@ typedef RemoriScreenBuilder = Widget Function(BuildContext, GoRouterState);
 /// Feature PRs replace empty slots with the screen-ID presentation widgets.
 final screenBuildersProvider = Provider<Map<RemoriScreen, RemoriScreenBuilder>>(
   (ref) => {
+    RemoriScreen.a6: (context, state) => A6PermissionsScreen(
+      patientId: state.extra is String ? state.extra as String : null,
+    ),
     RemoriScreen.a5: (context, state) => A5PairGlassesScreen(
       patientId: state.extra is String ? state.extra as String : null,
     ),

@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "org.AI.remori"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 37 // Required by the approved permission_handler_android dependency.
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
