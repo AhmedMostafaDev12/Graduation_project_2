@@ -41,6 +41,7 @@ Last updated: 13 Oct 2026, after Phases 5 and 6 went live.
 | **Names** | JSON fields are `snake_case`, the same as database columns. Enum values are lowercase `snake_case` exactly as spec §6 (`pending_review`, `memory_paused`) |
 | **Media** | never in a JSON body: request an upload URL, upload to S3, then call `complete` (planned, spec §7.2) |
 | **Empty optional fields** | sent as `null` in responses. In requests they may be left out |
+| **Emails** | stored and returned in **lowercase** (`Aya@gmail.com` → `aya@gmail.com`). Login and caregiver invites match any capitalization, so one inbox is one account |
 
 ---
 
@@ -195,7 +196,7 @@ Required: `full_name`, `relationship` (**your** relationship to the patient). De
 
 ### `POST /devices/pair` (managing caregiver) · screen A5
 ```json
-// request: serial from the QR code on the glasses case
+// request: the plain serial read from the QR on the glasses case (spec §7.1)
 { "serial_number": "RMR-0007", "patient_id": "…" }
 // 201: device_token appears ONLY here
 { "device_id": "…", "serial_number": "RMR-0007", "patient_id": "…",
@@ -432,6 +433,7 @@ Flutter always calls the live API: if a screen needs an endpoint that isn't live
 | Patient | Fatma, `00000001-0000-4000-8000-000000000001` |
 | Glasses | RMR-0007, `00000003-0000-4000-8000-000000000001`, device token = `SEED_DEVICE_TOKEN` (shared privately) |
 | All fixed IDs | `backend-ai/docs/SEED_DATA.md` |
+| Pairing tests (A5) | pair a **new serial for each test patient** (test QR codes RMR-0008 … RMR-0015 from the lead). Any new serial works; RMR-0007 already belongs to Fatma (`409 DEVICE_ALREADY_PAIRED`) |
 
 Locally (Docker), the password is `remori-local` and the device token is `local-device-token-RMR-0007`.
 
