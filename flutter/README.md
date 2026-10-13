@@ -406,8 +406,8 @@ permission, and it does not start a foreground service. Android compile SDK is 3
 as required by the permission plugin; minimum and target SDK stay at Flutter defaults.
 
 As approved, iOS shows notifications and caregiver continuation only. Android
-shows the four rows and handover card, but patient handover remains disabled until
-BLE/relay integration is ready. Permission grants alone never enable Patient Mode.
+shows the four rows and handover card. D31 enables handover when the successfully
+paired glasses connection is ready (see below). Permission grants alone never enable Patient Mode.
 Caregiver continuation opens C1 regardless of optional permission denial; C1 is
 still a route slot. A6 calls no REST endpoint and stores no fake permission state.
 
@@ -457,3 +457,37 @@ A5/A6 behavior is unchanged. A6 patient handover is the next separate PR.
 
 Run flutter test test/glasses_connection_test.dart for protocol round trips,
 fake timers, acknowledgement/retry, lifecycle, debug hooks and release selection.
+## A6 patient handover (D31)
+
+On Android, A6 prepares the connection for the serial successfully paired on A5.
+The development fake connects immediately when REMORI_FAKE_GLASSES=true in a
+non-release build; the BLE placeholder leaves the existing pending text and
+disabled handover button. iOS remains caregiver-only. A6 sends time_sync after
+hello in UTC; profile timezone synchronization belongs to the full relay.
+
+Handover verifies A5's saved device token using GET /patients/{id}/devices and
+matches patient ID, device ID and serial. It records secure local session context,
+clears caregiver credentials and opens the existing P1 Patient shell. Patient
+routes use the device token; caregiver requests, late responses and token refresh
+are blocked in Patient Mode. Caregiver/setup/login routes redirect to P1, and
+handover replaces the onboarding stack. A5 still requires real API association;
+fake BLE never fabricates a device token or bypasses pairing.
+
+Patient session context is restored from secure storage with the saved device
+token, allowing offline re-entry after restart. Device-token 401s clear the context
+and revoke access. Losing the glasses connection disables A6 handover but does not
+sign out a patient who has already handed over. P1 content, complete relay,
+message persistence/upload, real BLE and caregiver re-entry are later work.
+
+For Android development:
+    flutter run -d emulator-5554 --dart-define=REMORI_API_BASE_URL=https://remori-ai.duckdns.org/api/v1 --dart-define=REMORI_FAKE_GLASSES=true
+
+Pair a fresh plain-serial QR on A5, then open A6. Reusing a serial assigned to
+another patient is rejected by the API. No passwords or device tokens belong in
+build flags, screenshots, logs or this repository.
+
+Connected review captures:
+[English](test/goldens/a6_connected_en.png),
+[Arabic](test/goldens/a6_connected_ar.png).
+Regenerate with flutter test test/a6_handover_test.dart --update-goldens.
+Runtime validation on a real Android device remains pending.

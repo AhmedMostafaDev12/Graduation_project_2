@@ -139,5 +139,7 @@
   "permissionsPatientMode": "Give phone to patient → patient mode",
   "permissionsCaregiverMode": "Continue on caregiver mode",
   "permissionsReadFailed": "Unable to update permissions. Please try again.",
-  "permissionsUnsupported": "Manage permissions on an Android or iOS phone. You can continue in caregiver mode."
+  "permissionsUnsupported": "Manage permissions on an Android or iOS phone. You can continue in caregiver mode.",
+  "permissionsHandoverReady": "Once setup is complete, hand this phone to the patient to enter Patient Mode.",
+  "permissionsHandoverFailed": "Unable to enter Patient Mode. Check your connection and try again."
 }

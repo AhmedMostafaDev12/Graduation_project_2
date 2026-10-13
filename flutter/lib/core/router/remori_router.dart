@@ -10,6 +10,7 @@ import '../../features/enrollment/presentation/a4_patient_profile_screen.dart';
 import '../../features/device_pairing/presentation/a5_pair_glasses_screen.dart';
 import '../../features/device_pairing/presentation/a6_permissions_screen.dart';
 import '../api/api_providers.dart';
+import '../api/patient_session_provider.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/locale_providers.dart';
 import '../theme/remori_background.dart';
@@ -30,15 +31,19 @@ class RouteAccess {
   final RemoriMode? entryMode;
 }
 
-final routeAccessProvider = Provider<RouteAccess>(
-  (ref) => RouteAccess(
-    caregiverAuthenticated: ref.watch(caregiverSessionProvider),
-    entryMode: ref.watch(caregiverSessionProvider)
+final routeAccessProvider = Provider<RouteAccess>((ref) {
+  final patient = ref.watch(patientSessionProvider).active;
+  final caregiver = ref.watch(caregiverSessionProvider);
+  return RouteAccess(
+    caregiverAuthenticated: !patient && caregiver,
+    devicePaired: patient,
+    entryMode: patient
+        ? RemoriMode.patient
+        : caregiver
         ? RemoriMode.caregiver
         : null,
-  ),
-);
-
+  );
+});
 typedef RemoriScreenBuilder = Widget Function(BuildContext, GoRouterState);
 
 /// Feature PRs replace empty slots with the screen-ID presentation widgets.
@@ -90,6 +95,11 @@ final remoriRouterProvider = Provider<GoRouter>((ref) {
       final screen = RemoriScreen.fromPath(state.uri.path);
       if (screen == null) return RemoriScreen.a0.path;
       final access = ref.read(routeAccessProvider);
+      if (access.entryMode == RemoriMode.patient &&
+          access.devicePaired &&
+          !screen.isPatient) {
+        return RemoriScreen.p1.path;
+      }
       if ((screen.isCaregiver || screen.isSetup) &&
           !access.caregiverAuthenticated) {
         return RemoriScreen.a2.path;

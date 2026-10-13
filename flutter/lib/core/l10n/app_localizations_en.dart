@@ -403,4 +403,12 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get permissionsUnsupported =>
       'Manage permissions on an Android or iOS phone. You can continue in caregiver mode.';
+
+  @override
+  String get permissionsHandoverReady =>
+      'Once setup is complete, hand this phone to the patient to enter Patient Mode.';
+
+  @override
+  String get permissionsHandoverFailed =>
+      'Unable to enter Patient Mode. Check your connection and try again.';
 }

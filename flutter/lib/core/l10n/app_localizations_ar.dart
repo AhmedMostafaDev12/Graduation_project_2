@@ -397,4 +397,12 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get permissionsUnsupported =>
       'يمكن إدارة الأذونات على هاتف أندرويد أو آيفون. يمكنك المتابعة في وضع مقدم الرعاية.';
+
+  @override
+  String get permissionsHandoverReady =>
+      'بعد اكتمال الإعداد، أعطِ هذا الهاتف للمريض للدخول إلى وضع المريض.';
+
+  @override
+  String get permissionsHandoverFailed =>
+      'تعذّر الدخول إلى وضع المريض. تحقق من اتصالك وحاول مرة أخرى.';
 }
