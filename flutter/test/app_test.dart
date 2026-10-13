@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:remori/main.dart' as entry;
-import 'package:remori/core/router/remori_routes.dart';
+import 'package:remori/features/auth/presentation/a0_splash_screen.dart';
 
 void main() {
   testWidgets('application starts and respects system safe areas', (
@@ -15,11 +15,8 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.byType(SafeArea), findsOneWidget);
-    expect(
-      tester.getTopLeft(find.byKey(const ValueKey(RemoriScreen.a0))).dy,
-      greaterThan(0),
-    );
-    expect(find.byType(Text), findsNothing);
+    expect(tester.getTopLeft(find.byType(A0SplashScreen)).dy, greaterThan(0));
+    expect(find.text('Get Started'), findsOneWidget);
     expect(find.byType(Banner), findsNothing);
   });
 }

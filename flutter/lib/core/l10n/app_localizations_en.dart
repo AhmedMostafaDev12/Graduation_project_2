@@ -35,4 +35,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ask => 'Ask';
+
+  @override
+  String get appName => 'Remori';
+
+  @override
+  String get splashTagline => 'A quiet layer of memory\nthat stays with you.';
+
+  @override
+  String get getStarted => 'Get Started';
+
+  @override
+  String get splashSupport => 'Support for everyday moments.';
 }

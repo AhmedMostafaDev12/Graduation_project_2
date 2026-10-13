@@ -35,4 +35,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get ask => 'اسأل';
+
+  @override
+  String get appName => 'ريموري';
+
+  @override
+  String get splashTagline => 'طبقة هادئة من الذاكرة\nترافقك دائمًا.';
+
+  @override
+  String get getStarted => 'ابدأ الآن';
+
+  @override
+  String get splashSupport => 'دعم للحظاتك اليومية.';
 }

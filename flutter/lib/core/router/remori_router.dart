@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/auth/presentation/a0_splash_screen.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/locale_providers.dart';
 import '../theme/remori_background.dart';
@@ -28,7 +29,11 @@ typedef RemoriScreenBuilder = Widget Function(BuildContext, GoRouterState);
 
 /// Feature PRs replace empty slots with the screen-ID presentation widgets.
 final screenBuildersProvider = Provider<Map<RemoriScreen, RemoriScreenBuilder>>(
-  (ref) => const {},
+  (ref) => {
+    RemoriScreen.a0: (context, state) => A0SplashScreen(
+      onGetStarted: () => context.goNamed(RemoriScreen.a1.name),
+    ),
+  },
 );
 
 class RemoriShellLabels {

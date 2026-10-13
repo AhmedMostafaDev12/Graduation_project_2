@@ -151,6 +151,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Ask'**
   String get ask;
+
+  /// App brand accessibility label
+  ///
+  /// In en, this message translates to:
+  /// **'Remori'**
+  String get appName;
+
+  /// A0 two-line tagline
+  ///
+  /// In en, this message translates to:
+  /// **'A quiet layer of memory\nthat stays with you.'**
+  String get splashTagline;
+
+  /// A0 button opening A1
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get getStarted;
+
+  /// A0 support caption
+  ///
+  /// In en, this message translates to:
+  /// **'Support for everyday moments.'**
+  String get splashSupport;
 }
 
 class _AppLocalizationsDelegate
