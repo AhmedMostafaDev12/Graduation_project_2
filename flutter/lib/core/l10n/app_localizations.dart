@@ -175,6 +175,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Support for everyday moments.'**
   String get splashSupport;
+
+  /// A1 introduction
+  ///
+  /// In en, this message translates to:
+  /// **'Memory support for people living with Alzheimer\'s, and for the people who care for them.'**
+  String get modeSelectIntro;
+
+  /// A1 caregiver choice opening A2
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m a caregiver'**
+  String get modeCaregiver;
+
+  /// A1 patient phone choice opening A2 for caregiver setup
+  ///
+  /// In en, this message translates to:
+  /// **'This is the patient\'s phone'**
+  String get modePatientPhone;
 }
 
 class _AppLocalizationsDelegate

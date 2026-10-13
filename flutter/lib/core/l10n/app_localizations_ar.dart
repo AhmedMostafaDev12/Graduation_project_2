@@ -47,4 +47,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get splashSupport => 'دعم للحظاتك اليومية.';
+
+  @override
+  String get modeSelectIntro =>
+      'دعم للذاكرة للأشخاص الذين يعيشون مع ألزهايمر، ولمن يعتنون بهم.';
+
+  @override
+  String get modeCaregiver => 'أنا مقدم رعاية';
+
+  @override
+  String get modePatientPhone => 'هذا هاتف المريض';
 }

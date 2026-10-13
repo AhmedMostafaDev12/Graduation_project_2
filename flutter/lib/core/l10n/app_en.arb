@@ -25,5 +25,11 @@
   "getStarted": "Get Started",
   "@getStarted": {"description": "A0 button opening A1"},
   "splashSupport": "Support for everyday moments.",
-  "@splashSupport": {"description": "A0 support caption"}
+  "@splashSupport": {"description": "A0 support caption"},
+  "modeSelectIntro": "Memory support for people living with Alzheimer's, and for the people who care for them.",
+  "@modeSelectIntro": {"description": "A1 introduction"},
+  "modeCaregiver": "I'm a caregiver",
+  "@modeCaregiver": {"description": "A1 caregiver choice opening A2"},
+  "modePatientPhone": "This is the patient's phone",
+  "@modePatientPhone": {"description": "A1 patient phone choice opening A2 for caregiver setup"}
 }
