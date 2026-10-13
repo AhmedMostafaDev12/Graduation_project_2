@@ -164,4 +164,74 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get signupAccountCreated => 'تم إنشاء حسابك. سجّل الدخول للمتابعة.';
+
+  @override
+  String get newPatient => 'مريض جديد';
+
+  @override
+  String get patientStepOne => 'الخطوة 1 من 3';
+
+  @override
+  String get patientName => 'اسم المريض الكامل';
+
+  @override
+  String get patientNameHint => 'فاطمة محمود';
+
+  @override
+  String get patientRelationship => 'علاقتك بالمريض';
+
+  @override
+  String get patientBirthDate => 'تاريخ الميلاد (اختياري)';
+
+  @override
+  String get patientDateHint => 'DD / MM / YYYY';
+
+  @override
+  String get patientLanguage => 'اللغة المفضلة';
+
+  @override
+  String get patientEnglish => 'English الإنجليزية';
+
+  @override
+  String get patientArabic => 'العربية';
+
+  @override
+  String get patientTimezone => 'المنطقة الزمنية';
+
+  @override
+  String get patientConsent => 'الموافقة';
+
+  @override
+  String get conversationMemory => 'ذاكرة المحادثات';
+
+  @override
+  String get conversationMemoryDetail =>
+      'توافق الأسرة على حفظ ذاكرة المحادثات. يُحذف الصوت بعد تحويله إلى نص.';
+
+  @override
+  String get cloudProcessing => 'السماح بمعالجة الذكاء الاصطناعي السحابية';
+
+  @override
+  String get cloudProcessingDetail =>
+      'تحويل الصوت إلى نص، ومراجعة الصور، والملخصات';
+
+  @override
+  String get consentLater =>
+      'يمكن تغيير الموافقة أو سحبها لاحقًا من المزيد ← الموافقة.';
+
+  @override
+  String get continueLabel => 'متابعة';
+
+  @override
+  String get patientCreating => 'جارٍ إنشاء ملف المريض…';
+
+  @override
+  String get patientCreateRetry =>
+      'تعذر إنشاء ملف المريض. حاول مرة أخرى بعد قليل.';
+
+  @override
+  String get patientInvalidDate => 'أدخل تاريخًا صحيحًا بصيغة DD / MM / YYYY';
+
+  @override
+  String get patientLoginAgain => 'سجّل الدخول مرة أخرى للمتابعة.';
 }

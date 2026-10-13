@@ -273,8 +273,7 @@ keyboard. The field and provider SVGs are copied from the design export.
 The repository calls `POST /auth/login` anonymously using URL-encoded `username`
 and `password`. Both tokens are saved in secure storage before route access is
 granted. Authentication never uses drift or the outbox. The normal login opens
-C1; the patient setup login opens A4. Sign up opens A3. These destination screens
-remain route slots until their own PRs.
+C1; the patient setup login opens A4. Sign up opens A3. A3 and A4 are implemented; C1 remains a route slot.
 
 Stored caregiver credentials are checked using `GET /auth/me` on startup, with
 the existing ApiClient handling token refresh. Invalidated credentials revoke
@@ -315,5 +314,37 @@ is unchanged; the app uses the current backend contract.
 Review captures: [English](test/goldens/a3_en.png) and
 [Arabic](test/goldens/a3_ar.png). Regenerate with
 `flutter test test/a3_signup_test.dart --update-goldens`.
-A4 remains a route slot. Native Android/iOS and live registration smoke testing
+A4 now renders patient profile and consent. Native Android/iOS and live registration smoke testing
 remain pending; no emulator was connected during this change.
+## A4 Patient Profile and Consent
+
+A4 uses its exported PNG/HTML layout with one approved addition: the required
+“Your relationship to the patient” text field, because `POST /patients` requires
+it. The design export stays untouched. Name and relationship are required;
+birth date is optional, uses DD / MM / YYYY, accepts Arabic digits, and rejects
+calendar rollover. English is initially selected as in the design; timezone
+starts with the API's Africa/Cairo default. Empty timezone uses the server default.
+
+Consent starts unchecked. The JSON sends `ambient_audio_household` and
+`cloud_processing` only when their respective boxes are checked. The UI does not
+require either consent to create a profile, matching the API's empty-consent
+default. Conversation capture still depends on backend consent and memory rules.
+
+The repository calls authenticated `POST /patients`. Continue opens A5 only after
+a valid server-issued patient UUID is returned, passing that ID in route state.
+A5 remains a route slot. Duplicate in-flight submits are blocked; there is no
+background retry or offline queue for this non-idempotent identity-creation call.
+No server profile data is rendered by A4; local profile caching/sync belongs to
+the profile-reading screens. The next pairing screen must consume this patient ID;
+resuming an interrupted setup after app restart remains integration work.
+
+Every string uses Arabic/English ARBs. Field validation is translated locally,
+and raw server messages are never displayed. The form, language chips, and
+consent controls scroll with enlarged text and keyboard. The header returns to
+A2 as specified by the design.
+
+Review captures: [English](test/goldens/a4_en.png) and
+[Arabic](test/goldens/a4_ar.png). Regenerate with
+`flutter test test/a4_patient_profile_test.dart --update-goldens`.
+Native Android/iOS and live patient-creation smoke testing remain pending;
+no emulator was connected during this change.
