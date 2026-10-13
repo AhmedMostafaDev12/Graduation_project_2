@@ -426,3 +426,34 @@ All 135 tests and analysis pass; the Android debug APK builds successfully.
 Real-device permission dialogs/battery settings and iOS build/runtime validation
 remain pending. BLE connection, key provisioning, and relay startup remain pending
 under the previously approved staged pairing scope.
+## Glasses connection foundation (D31)
+
+All control messages use the typed §7.1 models in core/relay/glasses_message.dart.
+glassesConnectionProvider owns one disposable connection. It selects the fake
+only in non-release builds with --dart-define=REMORI_FAKE_GLASSES=true; default
+and release builds select the explicitly unimplemented BLE transport. No real
+BLE dependency, bonding, bulk transfer, relay service or screen wiring is added.
+
+The fake emits connecting → connected and hello with the supplied serial. The
+consumer must send time_sync immediately after hello: timers start only after
+that handshake. Telemetry arrives every 60 seconds; battery starts at 76 and
+falls one point every five minutes. Every three minutes it queues an unknown
+encounter (no embedding), and every four minutes a completed reminder state.
+UUIDs identify the encounter and reminder log; session and telemetry messages
+retain the spec's ID-free shapes. These are simulated fixtures, not API records
+or a substitute for real people/reminder synchronization.
+
+Unacknowledged items are retried unchanged each minute and after reconnecting.
+ack.ids removes queued items; ack.refs independently releases keyframe references.
+Changing serial while items/references remain pending is rejected to avoid
+replaying one device's data for another. Disconnect stops timers and preserves
+the in-memory queue; disposal closes streams and cancels timers. The queue is
+not persisted across process restarts. No message contents are logged.
+
+debugGlassesDisconnectProvider supplies a disconnect callback only when the
+active connection is fake in a non-release build. It supports tests and a future
+debug toggle without adding any screen controls in this foundation PR.
+A5/A6 behavior is unchanged. A6 patient handover is the next separate PR.
+
+Run flutter test test/glasses_connection_test.dart for protocol round trips,
+fake timers, acknowledgement/retry, lifecycle, debug hooks and release selection.
