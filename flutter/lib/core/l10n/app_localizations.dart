@@ -1411,6 +1411,210 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unable to confirm the change. Refresh to check the current details before trying again.'**
   String get detailRetryMessage;
+
+  /// No description provided for @reminderAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'+ Add'**
+  String get reminderAdd;
+
+  /// No description provided for @reminderToday.
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY'**
+  String get reminderToday;
+
+  /// No description provided for @reminderTodayDate.
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY · {date}'**
+  String reminderTodayDate(String date);
+
+  /// No description provided for @reminderAll.
+  ///
+  /// In en, this message translates to:
+  /// **'ALL REMINDERS'**
+  String get reminderAll;
+
+  /// No description provided for @reminderMed.
+  ///
+  /// In en, this message translates to:
+  /// **'Med'**
+  String get reminderMed;
+
+  /// No description provided for @reminderAppt.
+  ///
+  /// In en, this message translates to:
+  /// **'Appt'**
+  String get reminderAppt;
+
+  /// No description provided for @reminderTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Task'**
+  String get reminderTask;
+
+  /// No description provided for @reminderDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get reminderDone;
+
+  /// No description provided for @reminderDoneVia.
+  ///
+  /// In en, this message translates to:
+  /// **'Done · {via}'**
+  String reminderDoneVia(String via);
+
+  /// No description provided for @reminderVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'voice'**
+  String get reminderVoice;
+
+  /// No description provided for @reminderApp.
+  ///
+  /// In en, this message translates to:
+  /// **'app'**
+  String get reminderApp;
+
+  /// No description provided for @reminderCaregiver.
+  ///
+  /// In en, this message translates to:
+  /// **'caregiver'**
+  String get reminderCaregiver;
+
+  /// No description provided for @reminderPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get reminderPending;
+
+  /// No description provided for @reminderMissed.
+  ///
+  /// In en, this message translates to:
+  /// **'Missed'**
+  String get reminderMissed;
+
+  /// No description provided for @reminderSnoozed.
+  ///
+  /// In en, this message translates to:
+  /// **'Snoozed'**
+  String get reminderSnoozed;
+
+  /// No description provided for @reminderSnoozedUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Snoozed → {time}'**
+  String reminderSnoozedUntil(String time);
+
+  /// No description provided for @reminderNoLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'No reminder activity recorded today.'**
+  String get reminderNoLogs;
+
+  /// No description provided for @reminderNoSavedToday.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved reminder activity for today.'**
+  String get reminderNoSavedToday;
+
+  /// No description provided for @reminderNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No reminders have been added yet.'**
+  String get reminderNone;
+
+  /// No description provided for @reminderCustomSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled reminder'**
+  String get reminderCustomSchedule;
+
+  /// No description provided for @reminderDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Every day at {times}'**
+  String reminderDaily(String times);
+
+  /// No description provided for @reminderWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} at {times}'**
+  String reminderWeekly(String days, String times);
+
+  /// No description provided for @reminderJoin.
+  ///
+  /// In en, this message translates to:
+  /// **'{first} and {last}'**
+  String reminderJoin(String first, String last);
+
+  /// No description provided for @reminderMonday.
+  ///
+  /// In en, this message translates to:
+  /// **'Mondays'**
+  String get reminderMonday;
+
+  /// No description provided for @reminderTuesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Tuesdays'**
+  String get reminderTuesday;
+
+  /// No description provided for @reminderWednesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Wednesdays'**
+  String get reminderWednesday;
+
+  /// No description provided for @reminderThursday.
+  ///
+  /// In en, this message translates to:
+  /// **'Thursdays'**
+  String get reminderThursday;
+
+  /// No description provided for @reminderFriday.
+  ///
+  /// In en, this message translates to:
+  /// **'Fridays'**
+  String get reminderFriday;
+
+  /// No description provided for @reminderSaturday.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturdays'**
+  String get reminderSaturday;
+
+  /// No description provided for @reminderSunday.
+  ///
+  /// In en, this message translates to:
+  /// **'Sundays'**
+  String get reminderSunday;
+
+  /// No description provided for @reminderEnabledLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled: {title}'**
+  String reminderEnabledLabel(String title);
+
+  /// No description provided for @reminderSavedRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Change saved. Retry to finish updating the list.'**
+  String get reminderSavedRetry;
+
+  /// No description provided for @reminderOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing saved reminders. Unable to update; retry to check the latest state.'**
+  String get reminderOffline;
+
+  /// No description provided for @reminderLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load reminders. Check your connection and try again.'**
+  String get reminderLoadFailed;
 }
 
 class _AppLocalizationsDelegate

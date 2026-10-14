@@ -132,7 +132,7 @@ and native Android/iOS build validation remain for their integration PRs.
 
 ## Drift and outbox foundation
 
-`databaseProvider` lazily opens schema version 4 in the private application-support
+`databaseProvider` lazily opens schema version 5 in the private application-support
 folder (`remori.sqlite`) using drift's background native executor. SQL logging is
 disabled. Tests override the executor with in-memory SQLite or a temporary file.
 Tokens remain exclusively in secure storage.
@@ -686,3 +686,49 @@ device-validation tasks; automated checks do not create or modify live faces.
 
 Validation: dart format ., flutter analyze (clean), flutter test (243 passed,
 28 new C5 tests), Android debug APK build (successful).
+
+## C8 Reminders
+
+C8 reads reminder definitions and recorded daily occurrences from Drift, and
+refreshes GET /patients/{id}/reminders plus GET /patients/{id}/reminder-logs with
+an explicit patient-local date. It shows completed/voice, snoozed, pending and
+missed statuses supplied by the API. Today does not invent pending occurrences:
+the backend currently returns recorded logs, so the section may be empty until
+the patient phone/glasses relay records activity. Older-day logs are hidden
+after midnight even when a fresh request fails; cached definitions remain visible.
+
+Ahmed approved timezone 0.11.2 with bundled IANA data, three caregiver/patient
+read caches (CachedReminders, CachedReminderOccurrences, ReminderCacheStates),
+and online manager-only active toggles followed by local cache updates. Schema
+v5 preserves existing reminder logs, outbox, People and dashboard caches. C8
+uses separate caregiver occurrence caches and never changes the patient log
+merge rules or writes to the outbox. Home clears C8 metadata on removed/revoked
+patient links; known PATIENT_NOT_FOUND clears the affected reminder cache.
+
+Times and today's date use the patient's timezone, including DST. The clock
+checks for day changes every minute and on resume. Daily/weekly rules receive
+localized summaries (including multiple times); bounded, interval, monthly,
+ordinal, cross-timezone and other complex rules use a generic Scheduled reminder
+description. This formatter describes schedules only; it is not a recurrence
+engine. Unknown rules are never exposed as technical RRULE text or truncated
+into an inaccurate schedule.
+
+Managers can enable/disable reminders through PATCH with active only; viewers
+can read but cannot toggle, add or edit. Duplicate taps are blocked. Confirmed
+writes that fail to update the cache retain their receipt and retry the cache
+only, including across midnight. Stale refresh responses cannot replace newer
+day snapshots or newer confirmed definition timestamps. Account/patient changes
+clear pending state and stop displaying the previous scope's data.
+
+Header Add, reminder cards and the caregiver center action pass patient/reminder
+context to C9. C9 is still a route slot and its add/edit form is the next PR.
+Both languages follow the C8 design and scroll/reflow for enlarged text at 320dp.
+Review captures: [English](test/goldens/c8_en.png), [Arabic](test/goldens/c8_ar.png).
+Regenerate with flutter test test/c8_reminders_test.dart --update-goldens.
+Reminder names and statuses in captures are test fixtures only; runtime values
+come from the live API. Tests cover scoped/atomic caches, DST/day rollover,
+stale responses, v4 migration, retries, permissions, navigation and RTL layouts.
+Live-account toggle testing on Android/iOS and an iOS build remain pending.
+
+Validation: dart format ., flutter analyze (clean), flutter test (270 passed,
+27 new C8 tests), Android debug APK build (successful).

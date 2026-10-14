@@ -249,6 +249,95 @@
         "type": "String"
       }
     }
+  },
+  "reminderAdd": "+ إضافة",
+  "reminderToday": "اليوم",
+  "reminderTodayDate": "اليوم · {date}",
+  "reminderAll": "كل التذكيرات",
+  "reminderMed": "دواء",
+  "reminderAppt": "موعد",
+  "reminderTask": "مهمة",
+  "reminderDone": "تم",
+  "reminderDoneVia": "تم · {via}",
+  "reminderVoice": "بالصوت",
+  "reminderApp": "بالتطبيق",
+  "reminderCaregiver": "بمقدم الرعاية",
+  "reminderPending": "قيد الانتظار",
+  "reminderMissed": "فات الموعد",
+  "reminderSnoozed": "مؤجّل",
+  "reminderSnoozedUntil": "مؤجّل ← {time}",
+  "reminderNoLogs": "لم يُسجَّل نشاط للتذكيرات اليوم.",
+  "reminderNoSavedToday": "لا يوجد نشاط محفوظ للتذكيرات اليوم.",
+  "reminderNone": "لم تتم إضافة تذكيرات بعد.",
+  "reminderCustomSchedule": "تذكير مجدول",
+  "reminderDaily": "يوميًا الساعة {times}",
+  "reminderWeekly": "{days} الساعة {times}",
+  "reminderJoin": "{first} و{last}",
+  "reminderMonday": "كل يوم اثنين",
+  "reminderTuesday": "كل يوم ثلاثاء",
+  "reminderWednesday": "كل يوم أربعاء",
+  "reminderThursday": "كل يوم خميس",
+  "reminderFriday": "كل يوم جمعة",
+  "reminderSaturday": "كل يوم سبت",
+  "reminderSunday": "كل يوم أحد",
+  "reminderEnabledLabel": "مفعّل: {title}",
+  "reminderSavedRetry": "تم حفظ التغيير. حاول مجددًا لإكمال تحديث القائمة.",
+  "reminderOffline": "نعرض التذكيرات المحفوظة. تعذّر تحديثها؛ حاول مجددًا للتحقق من الحالة الحالية.",
+  "reminderLoadFailed": "تعذّر تحميل التذكيرات. تحقق من اتصالك وحاول مرة أخرى.",
+  "@reminderTodayDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@reminderDoneVia": {
+    "placeholders": {
+      "via": {
+        "type": "String"
+      }
+    }
+  },
+  "@reminderSnoozedUntil": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "@reminderDaily": {
+    "placeholders": {
+      "times": {
+        "type": "String"
+      }
+    }
+  },
+  "@reminderWeekly": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      },
+      "times": {
+        "type": "String"
+      }
+    }
+  },
+  "@reminderJoin": {
+    "placeholders": {
+      "first": {
+        "type": "String"
+      },
+      "last": {
+        "type": "String"
+      }
+    }
+  },
+  "@reminderEnabledLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
   }
 
 }

@@ -4932,6 +4932,1889 @@ class CachedPersonPhotosCompanion extends UpdateCompanion<CachedPersonPhoto> {
   }
 }
 
+class $CachedRemindersTable extends CachedReminders
+    with TableInfo<$CachedRemindersTable, CachedReminder> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedRemindersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _spokenTextMeta = const VerificationMeta(
+    'spokenText',
+  );
+  @override
+  late final GeneratedColumn<String> spokenText = GeneratedColumn<String>(
+    'spoken_text',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<String> type = GeneratedColumn<String>(
+    'type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _rruleMeta = const VerificationMeta('rrule');
+  @override
+  late final GeneratedColumn<String> rrule = GeneratedColumn<String>(
+    'rrule',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> dtstart =
+      GeneratedColumn<int>(
+        'dtstart',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>($CachedRemindersTable.$converterdtstart);
+  static const VerificationMeta _timezoneMeta = const VerificationMeta(
+    'timezone',
+  );
+  @override
+  late final GeneratedColumn<String> timezone = GeneratedColumn<String>(
+    'timezone',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _activeMeta = const VerificationMeta('active');
+  @override
+  late final GeneratedColumn<bool> active = GeneratedColumn<bool>(
+    'active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("active" IN (0, 1))',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> updatedAt =
+      GeneratedColumn<int>(
+        'updated_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>($CachedRemindersTable.$converterupdatedAt);
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    caregiverId,
+    patientId,
+    id,
+    title,
+    spokenText,
+    type,
+    rrule,
+    dtstart,
+    timezone,
+    active,
+    updatedAt,
+    position,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_reminders';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedReminder> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('spoken_text')) {
+      context.handle(
+        _spokenTextMeta,
+        spokenText.isAcceptableOrUnknown(data['spoken_text']!, _spokenTextMeta),
+      );
+    }
+    if (data.containsKey('type')) {
+      context.handle(
+        _typeMeta,
+        type.isAcceptableOrUnknown(data['type']!, _typeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_typeMeta);
+    }
+    if (data.containsKey('rrule')) {
+      context.handle(
+        _rruleMeta,
+        rrule.isAcceptableOrUnknown(data['rrule']!, _rruleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_rruleMeta);
+    }
+    if (data.containsKey('timezone')) {
+      context.handle(
+        _timezoneMeta,
+        timezone.isAcceptableOrUnknown(data['timezone']!, _timezoneMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_timezoneMeta);
+    }
+    if (data.containsKey('active')) {
+      context.handle(
+        _activeMeta,
+        active.isAcceptableOrUnknown(data['active']!, _activeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_activeMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, patientId, id};
+  @override
+  CachedReminder map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedReminder(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      spokenText: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}spoken_text'],
+      ),
+      type: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}type'],
+      )!,
+      rrule: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}rrule'],
+      )!,
+      dtstart: $CachedRemindersTable.$converterdtstart.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}dtstart'],
+        )!,
+      ),
+      timezone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}timezone'],
+      )!,
+      active: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}active'],
+      )!,
+      updatedAt: $CachedRemindersTable.$converterupdatedAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}updated_at'],
+        )!,
+      ),
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+    );
+  }
+
+  @override
+  $CachedRemindersTable createAlias(String alias) {
+    return $CachedRemindersTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converterdtstart = const UtcMicros();
+  static TypeConverter<DateTime, int> $converterupdatedAt = const UtcMicros();
+}
+
+class CachedReminder extends DataClass implements Insertable<CachedReminder> {
+  final String caregiverId;
+  final String patientId;
+  final String id;
+  final String title;
+  final String? spokenText;
+  final String type;
+  final String rrule;
+  final DateTime dtstart;
+  final String timezone;
+  final bool active;
+  final DateTime updatedAt;
+  final int position;
+  const CachedReminder({
+    required this.caregiverId,
+    required this.patientId,
+    required this.id,
+    required this.title,
+    this.spokenText,
+    required this.type,
+    required this.rrule,
+    required this.dtstart,
+    required this.timezone,
+    required this.active,
+    required this.updatedAt,
+    required this.position,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    map['id'] = Variable<String>(id);
+    map['title'] = Variable<String>(title);
+    if (!nullToAbsent || spokenText != null) {
+      map['spoken_text'] = Variable<String>(spokenText);
+    }
+    map['type'] = Variable<String>(type);
+    map['rrule'] = Variable<String>(rrule);
+    {
+      map['dtstart'] = Variable<int>(
+        $CachedRemindersTable.$converterdtstart.toSql(dtstart),
+      );
+    }
+    map['timezone'] = Variable<String>(timezone);
+    map['active'] = Variable<bool>(active);
+    {
+      map['updated_at'] = Variable<int>(
+        $CachedRemindersTable.$converterupdatedAt.toSql(updatedAt),
+      );
+    }
+    map['position'] = Variable<int>(position);
+    return map;
+  }
+
+  CachedRemindersCompanion toCompanion(bool nullToAbsent) {
+    return CachedRemindersCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      id: Value(id),
+      title: Value(title),
+      spokenText: spokenText == null && nullToAbsent
+          ? const Value.absent()
+          : Value(spokenText),
+      type: Value(type),
+      rrule: Value(rrule),
+      dtstart: Value(dtstart),
+      timezone: Value(timezone),
+      active: Value(active),
+      updatedAt: Value(updatedAt),
+      position: Value(position),
+    );
+  }
+
+  factory CachedReminder.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedReminder(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      id: serializer.fromJson<String>(json['id']),
+      title: serializer.fromJson<String>(json['title']),
+      spokenText: serializer.fromJson<String?>(json['spokenText']),
+      type: serializer.fromJson<String>(json['type']),
+      rrule: serializer.fromJson<String>(json['rrule']),
+      dtstart: serializer.fromJson<DateTime>(json['dtstart']),
+      timezone: serializer.fromJson<String>(json['timezone']),
+      active: serializer.fromJson<bool>(json['active']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      position: serializer.fromJson<int>(json['position']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'id': serializer.toJson<String>(id),
+      'title': serializer.toJson<String>(title),
+      'spokenText': serializer.toJson<String?>(spokenText),
+      'type': serializer.toJson<String>(type),
+      'rrule': serializer.toJson<String>(rrule),
+      'dtstart': serializer.toJson<DateTime>(dtstart),
+      'timezone': serializer.toJson<String>(timezone),
+      'active': serializer.toJson<bool>(active),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'position': serializer.toJson<int>(position),
+    };
+  }
+
+  CachedReminder copyWith({
+    String? caregiverId,
+    String? patientId,
+    String? id,
+    String? title,
+    Value<String?> spokenText = const Value.absent(),
+    String? type,
+    String? rrule,
+    DateTime? dtstart,
+    String? timezone,
+    bool? active,
+    DateTime? updatedAt,
+    int? position,
+  }) => CachedReminder(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    id: id ?? this.id,
+    title: title ?? this.title,
+    spokenText: spokenText.present ? spokenText.value : this.spokenText,
+    type: type ?? this.type,
+    rrule: rrule ?? this.rrule,
+    dtstart: dtstart ?? this.dtstart,
+    timezone: timezone ?? this.timezone,
+    active: active ?? this.active,
+    updatedAt: updatedAt ?? this.updatedAt,
+    position: position ?? this.position,
+  );
+  CachedReminder copyWithCompanion(CachedRemindersCompanion data) {
+    return CachedReminder(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      spokenText: data.spokenText.present
+          ? data.spokenText.value
+          : this.spokenText,
+      type: data.type.present ? data.type.value : this.type,
+      rrule: data.rrule.present ? data.rrule.value : this.rrule,
+      dtstart: data.dtstart.present ? data.dtstart.value : this.dtstart,
+      timezone: data.timezone.present ? data.timezone.value : this.timezone,
+      active: data.active.present ? data.active.value : this.active,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      position: data.position.present ? data.position.value : this.position,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedReminder(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('spokenText: $spokenText, ')
+          ..write('type: $type, ')
+          ..write('rrule: $rrule, ')
+          ..write('dtstart: $dtstart, ')
+          ..write('timezone: $timezone, ')
+          ..write('active: $active, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('position: $position')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    caregiverId,
+    patientId,
+    id,
+    title,
+    spokenText,
+    type,
+    rrule,
+    dtstart,
+    timezone,
+    active,
+    updatedAt,
+    position,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedReminder &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.spokenText == this.spokenText &&
+          other.type == this.type &&
+          other.rrule == this.rrule &&
+          other.dtstart == this.dtstart &&
+          other.timezone == this.timezone &&
+          other.active == this.active &&
+          other.updatedAt == this.updatedAt &&
+          other.position == this.position);
+}
+
+class CachedRemindersCompanion extends UpdateCompanion<CachedReminder> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<String> id;
+  final Value<String> title;
+  final Value<String?> spokenText;
+  final Value<String> type;
+  final Value<String> rrule;
+  final Value<DateTime> dtstart;
+  final Value<String> timezone;
+  final Value<bool> active;
+  final Value<DateTime> updatedAt;
+  final Value<int> position;
+  final Value<int> rowid;
+  const CachedRemindersCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.title = const Value.absent(),
+    this.spokenText = const Value.absent(),
+    this.type = const Value.absent(),
+    this.rrule = const Value.absent(),
+    this.dtstart = const Value.absent(),
+    this.timezone = const Value.absent(),
+    this.active = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.position = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedRemindersCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required String id,
+    required String title,
+    this.spokenText = const Value.absent(),
+    required String type,
+    required String rrule,
+    required DateTime dtstart,
+    required String timezone,
+    required bool active,
+    required DateTime updatedAt,
+    required int position,
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       id = Value(id),
+       title = Value(title),
+       type = Value(type),
+       rrule = Value(rrule),
+       dtstart = Value(dtstart),
+       timezone = Value(timezone),
+       active = Value(active),
+       updatedAt = Value(updatedAt),
+       position = Value(position);
+  static Insertable<CachedReminder> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<String>? id,
+    Expression<String>? title,
+    Expression<String>? spokenText,
+    Expression<String>? type,
+    Expression<String>? rrule,
+    Expression<int>? dtstart,
+    Expression<String>? timezone,
+    Expression<bool>? active,
+    Expression<int>? updatedAt,
+    Expression<int>? position,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (id != null) 'id': id,
+      if (title != null) 'title': title,
+      if (spokenText != null) 'spoken_text': spokenText,
+      if (type != null) 'type': type,
+      if (rrule != null) 'rrule': rrule,
+      if (dtstart != null) 'dtstart': dtstart,
+      if (timezone != null) 'timezone': timezone,
+      if (active != null) 'active': active,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (position != null) 'position': position,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedRemindersCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<String>? id,
+    Value<String>? title,
+    Value<String?>? spokenText,
+    Value<String>? type,
+    Value<String>? rrule,
+    Value<DateTime>? dtstart,
+    Value<String>? timezone,
+    Value<bool>? active,
+    Value<DateTime>? updatedAt,
+    Value<int>? position,
+    Value<int>? rowid,
+  }) {
+    return CachedRemindersCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      id: id ?? this.id,
+      title: title ?? this.title,
+      spokenText: spokenText ?? this.spokenText,
+      type: type ?? this.type,
+      rrule: rrule ?? this.rrule,
+      dtstart: dtstart ?? this.dtstart,
+      timezone: timezone ?? this.timezone,
+      active: active ?? this.active,
+      updatedAt: updatedAt ?? this.updatedAt,
+      position: position ?? this.position,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (spokenText.present) {
+      map['spoken_text'] = Variable<String>(spokenText.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(type.value);
+    }
+    if (rrule.present) {
+      map['rrule'] = Variable<String>(rrule.value);
+    }
+    if (dtstart.present) {
+      map['dtstart'] = Variable<int>(
+        $CachedRemindersTable.$converterdtstart.toSql(dtstart.value),
+      );
+    }
+    if (timezone.present) {
+      map['timezone'] = Variable<String>(timezone.value);
+    }
+    if (active.present) {
+      map['active'] = Variable<bool>(active.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(
+        $CachedRemindersTable.$converterupdatedAt.toSql(updatedAt.value),
+      );
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedRemindersCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('spokenText: $spokenText, ')
+          ..write('type: $type, ')
+          ..write('rrule: $rrule, ')
+          ..write('dtstart: $dtstart, ')
+          ..write('timezone: $timezone, ')
+          ..write('active: $active, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('position: $position, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CachedReminderOccurrencesTable extends CachedReminderOccurrences
+    with TableInfo<$CachedReminderOccurrencesTable, CachedReminderOccurrence> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedReminderOccurrencesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _reminderIdMeta = const VerificationMeta(
+    'reminderId',
+  );
+  @override
+  late final GeneratedColumn<String> reminderId = GeneratedColumn<String>(
+    'reminder_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dayMeta = const VerificationMeta('day');
+  @override
+  late final GeneratedColumn<String> day = GeneratedColumn<String>(
+    'day',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<String> type = GeneratedColumn<String>(
+    'type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> scheduledAt =
+      GeneratedColumn<int>(
+        'scheduled_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>(
+        $CachedReminderOccurrencesTable.$converterscheduledAt,
+      );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime?, int> snoozedUntil =
+      GeneratedColumn<int>(
+        'snoozed_until',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      ).withConverter<DateTime?>(
+        $CachedReminderOccurrencesTable.$convertersnoozedUntiln,
+      );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime?, int> completedAt =
+      GeneratedColumn<int>(
+        'completed_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      ).withConverter<DateTime?>(
+        $CachedReminderOccurrencesTable.$convertercompletedAtn,
+      );
+  static const VerificationMeta _confirmedViaMeta = const VerificationMeta(
+    'confirmedVia',
+  );
+  @override
+  late final GeneratedColumn<String> confirmedVia = GeneratedColumn<String>(
+    'confirmed_via',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> updatedAt =
+      GeneratedColumn<int>(
+        'updated_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>(
+        $CachedReminderOccurrencesTable.$converterupdatedAt,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    caregiverId,
+    patientId,
+    id,
+    reminderId,
+    day,
+    title,
+    type,
+    scheduledAt,
+    status,
+    snoozedUntil,
+    completedAt,
+    confirmedVia,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_reminder_occurrences';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedReminderOccurrence> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('reminder_id')) {
+      context.handle(
+        _reminderIdMeta,
+        reminderId.isAcceptableOrUnknown(data['reminder_id']!, _reminderIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_reminderIdMeta);
+    }
+    if (data.containsKey('day')) {
+      context.handle(
+        _dayMeta,
+        day.isAcceptableOrUnknown(data['day']!, _dayMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dayMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('type')) {
+      context.handle(
+        _typeMeta,
+        type.isAcceptableOrUnknown(data['type']!, _typeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_typeMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('confirmed_via')) {
+      context.handle(
+        _confirmedViaMeta,
+        confirmedVia.isAcceptableOrUnknown(
+          data['confirmed_via']!,
+          _confirmedViaMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, patientId, id};
+  @override
+  CachedReminderOccurrence map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedReminderOccurrence(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      reminderId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reminder_id'],
+      )!,
+      day: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}day'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      type: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}type'],
+      )!,
+      scheduledAt: $CachedReminderOccurrencesTable.$converterscheduledAt
+          .fromSql(
+            attachedDatabase.typeMapping.read(
+              DriftSqlType.int,
+              data['${effectivePrefix}scheduled_at'],
+            )!,
+          ),
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      snoozedUntil: $CachedReminderOccurrencesTable.$convertersnoozedUntiln
+          .fromSql(
+            attachedDatabase.typeMapping.read(
+              DriftSqlType.int,
+              data['${effectivePrefix}snoozed_until'],
+            ),
+          ),
+      completedAt: $CachedReminderOccurrencesTable.$convertercompletedAtn
+          .fromSql(
+            attachedDatabase.typeMapping.read(
+              DriftSqlType.int,
+              data['${effectivePrefix}completed_at'],
+            ),
+          ),
+      confirmedVia: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}confirmed_via'],
+      ),
+      updatedAt: $CachedReminderOccurrencesTable.$converterupdatedAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}updated_at'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $CachedReminderOccurrencesTable createAlias(String alias) {
+    return $CachedReminderOccurrencesTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converterscheduledAt = const UtcMicros();
+  static TypeConverter<DateTime, int> $convertersnoozedUntil =
+      const UtcMicros();
+  static TypeConverter<DateTime?, int?> $convertersnoozedUntiln =
+      NullAwareTypeConverter.wrap($convertersnoozedUntil);
+  static TypeConverter<DateTime, int> $convertercompletedAt = const UtcMicros();
+  static TypeConverter<DateTime?, int?> $convertercompletedAtn =
+      NullAwareTypeConverter.wrap($convertercompletedAt);
+  static TypeConverter<DateTime, int> $converterupdatedAt = const UtcMicros();
+}
+
+class CachedReminderOccurrence extends DataClass
+    implements Insertable<CachedReminderOccurrence> {
+  final String caregiverId;
+  final String patientId;
+  final String id;
+  final String reminderId;
+  final String day;
+  final String title;
+  final String type;
+  final DateTime scheduledAt;
+  final String status;
+  final DateTime? snoozedUntil;
+  final DateTime? completedAt;
+  final String? confirmedVia;
+  final DateTime updatedAt;
+  const CachedReminderOccurrence({
+    required this.caregiverId,
+    required this.patientId,
+    required this.id,
+    required this.reminderId,
+    required this.day,
+    required this.title,
+    required this.type,
+    required this.scheduledAt,
+    required this.status,
+    this.snoozedUntil,
+    this.completedAt,
+    this.confirmedVia,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    map['id'] = Variable<String>(id);
+    map['reminder_id'] = Variable<String>(reminderId);
+    map['day'] = Variable<String>(day);
+    map['title'] = Variable<String>(title);
+    map['type'] = Variable<String>(type);
+    {
+      map['scheduled_at'] = Variable<int>(
+        $CachedReminderOccurrencesTable.$converterscheduledAt.toSql(
+          scheduledAt,
+        ),
+      );
+    }
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || snoozedUntil != null) {
+      map['snoozed_until'] = Variable<int>(
+        $CachedReminderOccurrencesTable.$convertersnoozedUntiln.toSql(
+          snoozedUntil,
+        ),
+      );
+    }
+    if (!nullToAbsent || completedAt != null) {
+      map['completed_at'] = Variable<int>(
+        $CachedReminderOccurrencesTable.$convertercompletedAtn.toSql(
+          completedAt,
+        ),
+      );
+    }
+    if (!nullToAbsent || confirmedVia != null) {
+      map['confirmed_via'] = Variable<String>(confirmedVia);
+    }
+    {
+      map['updated_at'] = Variable<int>(
+        $CachedReminderOccurrencesTable.$converterupdatedAt.toSql(updatedAt),
+      );
+    }
+    return map;
+  }
+
+  CachedReminderOccurrencesCompanion toCompanion(bool nullToAbsent) {
+    return CachedReminderOccurrencesCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      id: Value(id),
+      reminderId: Value(reminderId),
+      day: Value(day),
+      title: Value(title),
+      type: Value(type),
+      scheduledAt: Value(scheduledAt),
+      status: Value(status),
+      snoozedUntil: snoozedUntil == null && nullToAbsent
+          ? const Value.absent()
+          : Value(snoozedUntil),
+      completedAt: completedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(completedAt),
+      confirmedVia: confirmedVia == null && nullToAbsent
+          ? const Value.absent()
+          : Value(confirmedVia),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory CachedReminderOccurrence.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedReminderOccurrence(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      id: serializer.fromJson<String>(json['id']),
+      reminderId: serializer.fromJson<String>(json['reminderId']),
+      day: serializer.fromJson<String>(json['day']),
+      title: serializer.fromJson<String>(json['title']),
+      type: serializer.fromJson<String>(json['type']),
+      scheduledAt: serializer.fromJson<DateTime>(json['scheduledAt']),
+      status: serializer.fromJson<String>(json['status']),
+      snoozedUntil: serializer.fromJson<DateTime?>(json['snoozedUntil']),
+      completedAt: serializer.fromJson<DateTime?>(json['completedAt']),
+      confirmedVia: serializer.fromJson<String?>(json['confirmedVia']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'id': serializer.toJson<String>(id),
+      'reminderId': serializer.toJson<String>(reminderId),
+      'day': serializer.toJson<String>(day),
+      'title': serializer.toJson<String>(title),
+      'type': serializer.toJson<String>(type),
+      'scheduledAt': serializer.toJson<DateTime>(scheduledAt),
+      'status': serializer.toJson<String>(status),
+      'snoozedUntil': serializer.toJson<DateTime?>(snoozedUntil),
+      'completedAt': serializer.toJson<DateTime?>(completedAt),
+      'confirmedVia': serializer.toJson<String?>(confirmedVia),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  CachedReminderOccurrence copyWith({
+    String? caregiverId,
+    String? patientId,
+    String? id,
+    String? reminderId,
+    String? day,
+    String? title,
+    String? type,
+    DateTime? scheduledAt,
+    String? status,
+    Value<DateTime?> snoozedUntil = const Value.absent(),
+    Value<DateTime?> completedAt = const Value.absent(),
+    Value<String?> confirmedVia = const Value.absent(),
+    DateTime? updatedAt,
+  }) => CachedReminderOccurrence(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    id: id ?? this.id,
+    reminderId: reminderId ?? this.reminderId,
+    day: day ?? this.day,
+    title: title ?? this.title,
+    type: type ?? this.type,
+    scheduledAt: scheduledAt ?? this.scheduledAt,
+    status: status ?? this.status,
+    snoozedUntil: snoozedUntil.present ? snoozedUntil.value : this.snoozedUntil,
+    completedAt: completedAt.present ? completedAt.value : this.completedAt,
+    confirmedVia: confirmedVia.present ? confirmedVia.value : this.confirmedVia,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  CachedReminderOccurrence copyWithCompanion(
+    CachedReminderOccurrencesCompanion data,
+  ) {
+    return CachedReminderOccurrence(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      id: data.id.present ? data.id.value : this.id,
+      reminderId: data.reminderId.present
+          ? data.reminderId.value
+          : this.reminderId,
+      day: data.day.present ? data.day.value : this.day,
+      title: data.title.present ? data.title.value : this.title,
+      type: data.type.present ? data.type.value : this.type,
+      scheduledAt: data.scheduledAt.present
+          ? data.scheduledAt.value
+          : this.scheduledAt,
+      status: data.status.present ? data.status.value : this.status,
+      snoozedUntil: data.snoozedUntil.present
+          ? data.snoozedUntil.value
+          : this.snoozedUntil,
+      completedAt: data.completedAt.present
+          ? data.completedAt.value
+          : this.completedAt,
+      confirmedVia: data.confirmedVia.present
+          ? data.confirmedVia.value
+          : this.confirmedVia,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedReminderOccurrence(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('id: $id, ')
+          ..write('reminderId: $reminderId, ')
+          ..write('day: $day, ')
+          ..write('title: $title, ')
+          ..write('type: $type, ')
+          ..write('scheduledAt: $scheduledAt, ')
+          ..write('status: $status, ')
+          ..write('snoozedUntil: $snoozedUntil, ')
+          ..write('completedAt: $completedAt, ')
+          ..write('confirmedVia: $confirmedVia, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    caregiverId,
+    patientId,
+    id,
+    reminderId,
+    day,
+    title,
+    type,
+    scheduledAt,
+    status,
+    snoozedUntil,
+    completedAt,
+    confirmedVia,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedReminderOccurrence &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.id == this.id &&
+          other.reminderId == this.reminderId &&
+          other.day == this.day &&
+          other.title == this.title &&
+          other.type == this.type &&
+          other.scheduledAt == this.scheduledAt &&
+          other.status == this.status &&
+          other.snoozedUntil == this.snoozedUntil &&
+          other.completedAt == this.completedAt &&
+          other.confirmedVia == this.confirmedVia &&
+          other.updatedAt == this.updatedAt);
+}
+
+class CachedReminderOccurrencesCompanion
+    extends UpdateCompanion<CachedReminderOccurrence> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<String> id;
+  final Value<String> reminderId;
+  final Value<String> day;
+  final Value<String> title;
+  final Value<String> type;
+  final Value<DateTime> scheduledAt;
+  final Value<String> status;
+  final Value<DateTime?> snoozedUntil;
+  final Value<DateTime?> completedAt;
+  final Value<String?> confirmedVia;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const CachedReminderOccurrencesCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.reminderId = const Value.absent(),
+    this.day = const Value.absent(),
+    this.title = const Value.absent(),
+    this.type = const Value.absent(),
+    this.scheduledAt = const Value.absent(),
+    this.status = const Value.absent(),
+    this.snoozedUntil = const Value.absent(),
+    this.completedAt = const Value.absent(),
+    this.confirmedVia = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedReminderOccurrencesCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required String id,
+    required String reminderId,
+    required String day,
+    required String title,
+    required String type,
+    required DateTime scheduledAt,
+    required String status,
+    this.snoozedUntil = const Value.absent(),
+    this.completedAt = const Value.absent(),
+    this.confirmedVia = const Value.absent(),
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       id = Value(id),
+       reminderId = Value(reminderId),
+       day = Value(day),
+       title = Value(title),
+       type = Value(type),
+       scheduledAt = Value(scheduledAt),
+       status = Value(status),
+       updatedAt = Value(updatedAt);
+  static Insertable<CachedReminderOccurrence> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<String>? id,
+    Expression<String>? reminderId,
+    Expression<String>? day,
+    Expression<String>? title,
+    Expression<String>? type,
+    Expression<int>? scheduledAt,
+    Expression<String>? status,
+    Expression<int>? snoozedUntil,
+    Expression<int>? completedAt,
+    Expression<String>? confirmedVia,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (id != null) 'id': id,
+      if (reminderId != null) 'reminder_id': reminderId,
+      if (day != null) 'day': day,
+      if (title != null) 'title': title,
+      if (type != null) 'type': type,
+      if (scheduledAt != null) 'scheduled_at': scheduledAt,
+      if (status != null) 'status': status,
+      if (snoozedUntil != null) 'snoozed_until': snoozedUntil,
+      if (completedAt != null) 'completed_at': completedAt,
+      if (confirmedVia != null) 'confirmed_via': confirmedVia,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedReminderOccurrencesCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<String>? id,
+    Value<String>? reminderId,
+    Value<String>? day,
+    Value<String>? title,
+    Value<String>? type,
+    Value<DateTime>? scheduledAt,
+    Value<String>? status,
+    Value<DateTime?>? snoozedUntil,
+    Value<DateTime?>? completedAt,
+    Value<String?>? confirmedVia,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return CachedReminderOccurrencesCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      id: id ?? this.id,
+      reminderId: reminderId ?? this.reminderId,
+      day: day ?? this.day,
+      title: title ?? this.title,
+      type: type ?? this.type,
+      scheduledAt: scheduledAt ?? this.scheduledAt,
+      status: status ?? this.status,
+      snoozedUntil: snoozedUntil ?? this.snoozedUntil,
+      completedAt: completedAt ?? this.completedAt,
+      confirmedVia: confirmedVia ?? this.confirmedVia,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (reminderId.present) {
+      map['reminder_id'] = Variable<String>(reminderId.value);
+    }
+    if (day.present) {
+      map['day'] = Variable<String>(day.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(type.value);
+    }
+    if (scheduledAt.present) {
+      map['scheduled_at'] = Variable<int>(
+        $CachedReminderOccurrencesTable.$converterscheduledAt.toSql(
+          scheduledAt.value,
+        ),
+      );
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (snoozedUntil.present) {
+      map['snoozed_until'] = Variable<int>(
+        $CachedReminderOccurrencesTable.$convertersnoozedUntiln.toSql(
+          snoozedUntil.value,
+        ),
+      );
+    }
+    if (completedAt.present) {
+      map['completed_at'] = Variable<int>(
+        $CachedReminderOccurrencesTable.$convertercompletedAtn.toSql(
+          completedAt.value,
+        ),
+      );
+    }
+    if (confirmedVia.present) {
+      map['confirmed_via'] = Variable<String>(confirmedVia.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(
+        $CachedReminderOccurrencesTable.$converterupdatedAt.toSql(
+          updatedAt.value,
+        ),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedReminderOccurrencesCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('id: $id, ')
+          ..write('reminderId: $reminderId, ')
+          ..write('day: $day, ')
+          ..write('title: $title, ')
+          ..write('type: $type, ')
+          ..write('scheduledAt: $scheduledAt, ')
+          ..write('status: $status, ')
+          ..write('snoozedUntil: $snoozedUntil, ')
+          ..write('completedAt: $completedAt, ')
+          ..write('confirmedVia: $confirmedVia, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ReminderCacheStatesTable extends ReminderCacheStates
+    with TableInfo<$ReminderCacheStatesTable, ReminderCacheState> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ReminderCacheStatesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dayMeta = const VerificationMeta('day');
+  @override
+  late final GeneratedColumn<String> day = GeneratedColumn<String>(
+    'day',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _timezoneMeta = const VerificationMeta(
+    'timezone',
+  );
+  @override
+  late final GeneratedColumn<String> timezone = GeneratedColumn<String>(
+    'timezone',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> refreshedAt =
+      GeneratedColumn<int>(
+        'refreshed_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>(
+        $ReminderCacheStatesTable.$converterrefreshedAt,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    caregiverId,
+    patientId,
+    day,
+    timezone,
+    refreshedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'reminder_cache_states';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ReminderCacheState> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('day')) {
+      context.handle(
+        _dayMeta,
+        day.isAcceptableOrUnknown(data['day']!, _dayMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dayMeta);
+    }
+    if (data.containsKey('timezone')) {
+      context.handle(
+        _timezoneMeta,
+        timezone.isAcceptableOrUnknown(data['timezone']!, _timezoneMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_timezoneMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, patientId};
+  @override
+  ReminderCacheState map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ReminderCacheState(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      day: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}day'],
+      )!,
+      timezone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}timezone'],
+      )!,
+      refreshedAt: $ReminderCacheStatesTable.$converterrefreshedAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}refreshed_at'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $ReminderCacheStatesTable createAlias(String alias) {
+    return $ReminderCacheStatesTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converterrefreshedAt = const UtcMicros();
+}
+
+class ReminderCacheState extends DataClass
+    implements Insertable<ReminderCacheState> {
+  final String caregiverId;
+  final String patientId;
+  final String day;
+  final String timezone;
+  final DateTime refreshedAt;
+  const ReminderCacheState({
+    required this.caregiverId,
+    required this.patientId,
+    required this.day,
+    required this.timezone,
+    required this.refreshedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    map['day'] = Variable<String>(day);
+    map['timezone'] = Variable<String>(timezone);
+    {
+      map['refreshed_at'] = Variable<int>(
+        $ReminderCacheStatesTable.$converterrefreshedAt.toSql(refreshedAt),
+      );
+    }
+    return map;
+  }
+
+  ReminderCacheStatesCompanion toCompanion(bool nullToAbsent) {
+    return ReminderCacheStatesCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      day: Value(day),
+      timezone: Value(timezone),
+      refreshedAt: Value(refreshedAt),
+    );
+  }
+
+  factory ReminderCacheState.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ReminderCacheState(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      day: serializer.fromJson<String>(json['day']),
+      timezone: serializer.fromJson<String>(json['timezone']),
+      refreshedAt: serializer.fromJson<DateTime>(json['refreshedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'day': serializer.toJson<String>(day),
+      'timezone': serializer.toJson<String>(timezone),
+      'refreshedAt': serializer.toJson<DateTime>(refreshedAt),
+    };
+  }
+
+  ReminderCacheState copyWith({
+    String? caregiverId,
+    String? patientId,
+    String? day,
+    String? timezone,
+    DateTime? refreshedAt,
+  }) => ReminderCacheState(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    day: day ?? this.day,
+    timezone: timezone ?? this.timezone,
+    refreshedAt: refreshedAt ?? this.refreshedAt,
+  );
+  ReminderCacheState copyWithCompanion(ReminderCacheStatesCompanion data) {
+    return ReminderCacheState(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      day: data.day.present ? data.day.value : this.day,
+      timezone: data.timezone.present ? data.timezone.value : this.timezone,
+      refreshedAt: data.refreshedAt.present
+          ? data.refreshedAt.value
+          : this.refreshedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReminderCacheState(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('day: $day, ')
+          ..write('timezone: $timezone, ')
+          ..write('refreshedAt: $refreshedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(caregiverId, patientId, day, timezone, refreshedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ReminderCacheState &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.day == this.day &&
+          other.timezone == this.timezone &&
+          other.refreshedAt == this.refreshedAt);
+}
+
+class ReminderCacheStatesCompanion extends UpdateCompanion<ReminderCacheState> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<String> day;
+  final Value<String> timezone;
+  final Value<DateTime> refreshedAt;
+  final Value<int> rowid;
+  const ReminderCacheStatesCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.day = const Value.absent(),
+    this.timezone = const Value.absent(),
+    this.refreshedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ReminderCacheStatesCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required String day,
+    required String timezone,
+    required DateTime refreshedAt,
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       day = Value(day),
+       timezone = Value(timezone),
+       refreshedAt = Value(refreshedAt);
+  static Insertable<ReminderCacheState> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<String>? day,
+    Expression<String>? timezone,
+    Expression<int>? refreshedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (day != null) 'day': day,
+      if (timezone != null) 'timezone': timezone,
+      if (refreshedAt != null) 'refreshed_at': refreshedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ReminderCacheStatesCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<String>? day,
+    Value<String>? timezone,
+    Value<DateTime>? refreshedAt,
+    Value<int>? rowid,
+  }) {
+    return ReminderCacheStatesCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      day: day ?? this.day,
+      timezone: timezone ?? this.timezone,
+      refreshedAt: refreshedAt ?? this.refreshedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (day.present) {
+      map['day'] = Variable<String>(day.value);
+    }
+    if (timezone.present) {
+      map['timezone'] = Variable<String>(timezone.value);
+    }
+    if (refreshedAt.present) {
+      map['refreshed_at'] = Variable<int>(
+        $ReminderCacheStatesTable.$converterrefreshedAt.toSql(
+          refreshedAt.value,
+        ),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReminderCacheStatesCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('day: $day, ')
+          ..write('timezone: $timezone, ')
+          ..write('refreshedAt: $refreshedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$RemoriDatabase extends GeneratedDatabase {
   _$RemoriDatabase(QueryExecutor e) : super(e);
   $RemoriDatabaseManager get managers => $RemoriDatabaseManager(this);
@@ -4953,6 +6836,13 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
       $PersonDetailStatesTable(this);
   late final $CachedPersonPhotosTable cachedPersonPhotos =
       $CachedPersonPhotosTable(this);
+  late final $CachedRemindersTable cachedReminders = $CachedRemindersTable(
+    this,
+  );
+  late final $CachedReminderOccurrencesTable cachedReminderOccurrences =
+      $CachedReminderOccurrencesTable(this);
+  late final $ReminderCacheStatesTable reminderCacheStates =
+      $ReminderCacheStatesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4968,6 +6858,9 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
     peopleCacheStates,
     personDetailStates,
     cachedPersonPhotos,
+    cachedReminders,
+    cachedReminderOccurrences,
+    reminderCacheStates,
   ];
 }
 
@@ -7654,6 +9547,995 @@ typedef $$CachedPersonPhotosTableProcessedTableManager =
       CachedPersonPhoto,
       PrefetchHooks Function()
     >;
+typedef $$CachedRemindersTableCreateCompanionBuilder =
+    CachedRemindersCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required String id,
+      required String title,
+      Value<String?> spokenText,
+      required String type,
+      required String rrule,
+      required DateTime dtstart,
+      required String timezone,
+      required bool active,
+      required DateTime updatedAt,
+      required int position,
+      Value<int> rowid,
+    });
+typedef $$CachedRemindersTableUpdateCompanionBuilder =
+    CachedRemindersCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<String> id,
+      Value<String> title,
+      Value<String?> spokenText,
+      Value<String> type,
+      Value<String> rrule,
+      Value<DateTime> dtstart,
+      Value<String> timezone,
+      Value<bool> active,
+      Value<DateTime> updatedAt,
+      Value<int> position,
+      Value<int> rowid,
+    });
+
+class $$CachedRemindersTableFilterComposer
+    extends Composer<_$RemoriDatabase, $CachedRemindersTable> {
+  $$CachedRemindersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get spokenText => $composableBuilder(
+    column: $table.spokenText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get rrule => $composableBuilder(
+    column: $table.rrule,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get dtstart =>
+      $composableBuilder(
+        column: $table.dtstart,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get timezone => $composableBuilder(
+    column: $table.timezone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get active => $composableBuilder(
+    column: $table.active,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get updatedAt =>
+      $composableBuilder(
+        column: $table.updatedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedRemindersTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $CachedRemindersTable> {
+  $$CachedRemindersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get spokenText => $composableBuilder(
+    column: $table.spokenText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rrule => $composableBuilder(
+    column: $table.rrule,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get dtstart => $composableBuilder(
+    column: $table.dtstart,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get timezone => $composableBuilder(
+    column: $table.timezone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get active => $composableBuilder(
+    column: $table.active,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedRemindersTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $CachedRemindersTable> {
+  $$CachedRemindersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get spokenText => $composableBuilder(
+    column: $table.spokenText,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<String> get rrule =>
+      $composableBuilder(column: $table.rrule, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get dtstart =>
+      $composableBuilder(column: $table.dtstart, builder: (column) => column);
+
+  GeneratedColumn<String> get timezone =>
+      $composableBuilder(column: $table.timezone, builder: (column) => column);
+
+  GeneratedColumn<bool> get active =>
+      $composableBuilder(column: $table.active, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+}
+
+class $$CachedRemindersTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $CachedRemindersTable,
+          CachedReminder,
+          $$CachedRemindersTableFilterComposer,
+          $$CachedRemindersTableOrderingComposer,
+          $$CachedRemindersTableAnnotationComposer,
+          $$CachedRemindersTableCreateCompanionBuilder,
+          $$CachedRemindersTableUpdateCompanionBuilder,
+          (
+            CachedReminder,
+            BaseReferences<
+              _$RemoriDatabase,
+              $CachedRemindersTable,
+              CachedReminder
+            >,
+          ),
+          CachedReminder,
+          PrefetchHooks Function()
+        > {
+  $$CachedRemindersTableTableManager(
+    _$RemoriDatabase db,
+    $CachedRemindersTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedRemindersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedRemindersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CachedRemindersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String?> spokenText = const Value.absent(),
+                Value<String> type = const Value.absent(),
+                Value<String> rrule = const Value.absent(),
+                Value<DateTime> dtstart = const Value.absent(),
+                Value<String> timezone = const Value.absent(),
+                Value<bool> active = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedRemindersCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                id: id,
+                title: title,
+                spokenText: spokenText,
+                type: type,
+                rrule: rrule,
+                dtstart: dtstart,
+                timezone: timezone,
+                active: active,
+                updatedAt: updatedAt,
+                position: position,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required String id,
+                required String title,
+                Value<String?> spokenText = const Value.absent(),
+                required String type,
+                required String rrule,
+                required DateTime dtstart,
+                required String timezone,
+                required bool active,
+                required DateTime updatedAt,
+                required int position,
+                Value<int> rowid = const Value.absent(),
+              }) => CachedRemindersCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                id: id,
+                title: title,
+                spokenText: spokenText,
+                type: type,
+                rrule: rrule,
+                dtstart: dtstart,
+                timezone: timezone,
+                active: active,
+                updatedAt: updatedAt,
+                position: position,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CachedRemindersTable, CachedReminder>(table),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $CachedRemindersTable,
+                    CachedReminder
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedRemindersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $CachedRemindersTable,
+      CachedReminder,
+      $$CachedRemindersTableFilterComposer,
+      $$CachedRemindersTableOrderingComposer,
+      $$CachedRemindersTableAnnotationComposer,
+      $$CachedRemindersTableCreateCompanionBuilder,
+      $$CachedRemindersTableUpdateCompanionBuilder,
+      (
+        CachedReminder,
+        BaseReferences<_$RemoriDatabase, $CachedRemindersTable, CachedReminder>,
+      ),
+      CachedReminder,
+      PrefetchHooks Function()
+    >;
+typedef $$CachedReminderOccurrencesTableCreateCompanionBuilder =
+    CachedReminderOccurrencesCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required String id,
+      required String reminderId,
+      required String day,
+      required String title,
+      required String type,
+      required DateTime scheduledAt,
+      required String status,
+      Value<DateTime?> snoozedUntil,
+      Value<DateTime?> completedAt,
+      Value<String?> confirmedVia,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$CachedReminderOccurrencesTableUpdateCompanionBuilder =
+    CachedReminderOccurrencesCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<String> id,
+      Value<String> reminderId,
+      Value<String> day,
+      Value<String> title,
+      Value<String> type,
+      Value<DateTime> scheduledAt,
+      Value<String> status,
+      Value<DateTime?> snoozedUntil,
+      Value<DateTime?> completedAt,
+      Value<String?> confirmedVia,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$CachedReminderOccurrencesTableFilterComposer
+    extends Composer<_$RemoriDatabase, $CachedReminderOccurrencesTable> {
+  $$CachedReminderOccurrencesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reminderId => $composableBuilder(
+    column: $table.reminderId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get scheduledAt =>
+      $composableBuilder(
+        column: $table.scheduledAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime?, DateTime, int> get snoozedUntil =>
+      $composableBuilder(
+        column: $table.snoozedUntil,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnWithTypeConverterFilters<DateTime?, DateTime, int> get completedAt =>
+      $composableBuilder(
+        column: $table.completedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get confirmedVia => $composableBuilder(
+    column: $table.confirmedVia,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get updatedAt =>
+      $composableBuilder(
+        column: $table.updatedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+}
+
+class $$CachedReminderOccurrencesTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $CachedReminderOccurrencesTable> {
+  $$CachedReminderOccurrencesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reminderId => $composableBuilder(
+    column: $table.reminderId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get scheduledAt => $composableBuilder(
+    column: $table.scheduledAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get snoozedUntil => $composableBuilder(
+    column: $table.snoozedUntil,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get confirmedVia => $composableBuilder(
+    column: $table.confirmedVia,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedReminderOccurrencesTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $CachedReminderOccurrencesTable> {
+  $$CachedReminderOccurrencesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get reminderId => $composableBuilder(
+    column: $table.reminderId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get day =>
+      $composableBuilder(column: $table.day, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get scheduledAt =>
+      $composableBuilder(
+        column: $table.scheduledAt,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime?, int> get snoozedUntil =>
+      $composableBuilder(
+        column: $table.snoozedUntil,
+        builder: (column) => column,
+      );
+
+  GeneratedColumnWithTypeConverter<DateTime?, int> get completedAt =>
+      $composableBuilder(
+        column: $table.completedAt,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<String> get confirmedVia => $composableBuilder(
+    column: $table.confirmedVia,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$CachedReminderOccurrencesTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $CachedReminderOccurrencesTable,
+          CachedReminderOccurrence,
+          $$CachedReminderOccurrencesTableFilterComposer,
+          $$CachedReminderOccurrencesTableOrderingComposer,
+          $$CachedReminderOccurrencesTableAnnotationComposer,
+          $$CachedReminderOccurrencesTableCreateCompanionBuilder,
+          $$CachedReminderOccurrencesTableUpdateCompanionBuilder,
+          (
+            CachedReminderOccurrence,
+            BaseReferences<
+              _$RemoriDatabase,
+              $CachedReminderOccurrencesTable,
+              CachedReminderOccurrence
+            >,
+          ),
+          CachedReminderOccurrence,
+          PrefetchHooks Function()
+        > {
+  $$CachedReminderOccurrencesTableTableManager(
+    _$RemoriDatabase db,
+    $CachedReminderOccurrencesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedReminderOccurrencesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$CachedReminderOccurrencesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$CachedReminderOccurrencesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> reminderId = const Value.absent(),
+                Value<String> day = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> type = const Value.absent(),
+                Value<DateTime> scheduledAt = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<DateTime?> snoozedUntil = const Value.absent(),
+                Value<DateTime?> completedAt = const Value.absent(),
+                Value<String?> confirmedVia = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedReminderOccurrencesCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                id: id,
+                reminderId: reminderId,
+                day: day,
+                title: title,
+                type: type,
+                scheduledAt: scheduledAt,
+                status: status,
+                snoozedUntil: snoozedUntil,
+                completedAt: completedAt,
+                confirmedVia: confirmedVia,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required String id,
+                required String reminderId,
+                required String day,
+                required String title,
+                required String type,
+                required DateTime scheduledAt,
+                required String status,
+                Value<DateTime?> snoozedUntil = const Value.absent(),
+                Value<DateTime?> completedAt = const Value.absent(),
+                Value<String?> confirmedVia = const Value.absent(),
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CachedReminderOccurrencesCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                id: id,
+                reminderId: reminderId,
+                day: day,
+                title: title,
+                type: type,
+                scheduledAt: scheduledAt,
+                status: status,
+                snoozedUntil: snoozedUntil,
+                completedAt: completedAt,
+                confirmedVia: confirmedVia,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    $CachedReminderOccurrencesTable,
+                    CachedReminderOccurrence
+                  >(table),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $CachedReminderOccurrencesTable,
+                    CachedReminderOccurrence
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedReminderOccurrencesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $CachedReminderOccurrencesTable,
+      CachedReminderOccurrence,
+      $$CachedReminderOccurrencesTableFilterComposer,
+      $$CachedReminderOccurrencesTableOrderingComposer,
+      $$CachedReminderOccurrencesTableAnnotationComposer,
+      $$CachedReminderOccurrencesTableCreateCompanionBuilder,
+      $$CachedReminderOccurrencesTableUpdateCompanionBuilder,
+      (
+        CachedReminderOccurrence,
+        BaseReferences<
+          _$RemoriDatabase,
+          $CachedReminderOccurrencesTable,
+          CachedReminderOccurrence
+        >,
+      ),
+      CachedReminderOccurrence,
+      PrefetchHooks Function()
+    >;
+typedef $$ReminderCacheStatesTableCreateCompanionBuilder =
+    ReminderCacheStatesCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required String day,
+      required String timezone,
+      required DateTime refreshedAt,
+      Value<int> rowid,
+    });
+typedef $$ReminderCacheStatesTableUpdateCompanionBuilder =
+    ReminderCacheStatesCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<String> day,
+      Value<String> timezone,
+      Value<DateTime> refreshedAt,
+      Value<int> rowid,
+    });
+
+class $$ReminderCacheStatesTableFilterComposer
+    extends Composer<_$RemoriDatabase, $ReminderCacheStatesTable> {
+  $$ReminderCacheStatesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get timezone => $composableBuilder(
+    column: $table.timezone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+}
+
+class $$ReminderCacheStatesTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $ReminderCacheStatesTable> {
+  $$ReminderCacheStatesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get timezone => $composableBuilder(
+    column: $table.timezone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get refreshedAt => $composableBuilder(
+    column: $table.refreshedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ReminderCacheStatesTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $ReminderCacheStatesTable> {
+  $$ReminderCacheStatesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get day =>
+      $composableBuilder(column: $table.day, builder: (column) => column);
+
+  GeneratedColumn<String> get timezone =>
+      $composableBuilder(column: $table.timezone, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => column,
+      );
+}
+
+class $$ReminderCacheStatesTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $ReminderCacheStatesTable,
+          ReminderCacheState,
+          $$ReminderCacheStatesTableFilterComposer,
+          $$ReminderCacheStatesTableOrderingComposer,
+          $$ReminderCacheStatesTableAnnotationComposer,
+          $$ReminderCacheStatesTableCreateCompanionBuilder,
+          $$ReminderCacheStatesTableUpdateCompanionBuilder,
+          (
+            ReminderCacheState,
+            BaseReferences<
+              _$RemoriDatabase,
+              $ReminderCacheStatesTable,
+              ReminderCacheState
+            >,
+          ),
+          ReminderCacheState,
+          PrefetchHooks Function()
+        > {
+  $$ReminderCacheStatesTableTableManager(
+    _$RemoriDatabase db,
+    $ReminderCacheStatesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ReminderCacheStatesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ReminderCacheStatesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ReminderCacheStatesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<String> day = const Value.absent(),
+                Value<String> timezone = const Value.absent(),
+                Value<DateTime> refreshedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ReminderCacheStatesCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                day: day,
+                timezone: timezone,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required String day,
+                required String timezone,
+                required DateTime refreshedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => ReminderCacheStatesCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                day: day,
+                timezone: timezone,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ReminderCacheStatesTable, ReminderCacheState>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $ReminderCacheStatesTable,
+                    ReminderCacheState
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ReminderCacheStatesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $ReminderCacheStatesTable,
+      ReminderCacheState,
+      $$ReminderCacheStatesTableFilterComposer,
+      $$ReminderCacheStatesTableOrderingComposer,
+      $$ReminderCacheStatesTableAnnotationComposer,
+      $$ReminderCacheStatesTableCreateCompanionBuilder,
+      $$ReminderCacheStatesTableUpdateCompanionBuilder,
+      (
+        ReminderCacheState,
+        BaseReferences<
+          _$RemoriDatabase,
+          $ReminderCacheStatesTable,
+          ReminderCacheState
+        >,
+      ),
+      ReminderCacheState,
+      PrefetchHooks Function()
+    >;
 
 class $RemoriDatabaseManager {
   final _$RemoriDatabase _db;
@@ -7678,4 +10560,13 @@ class $RemoriDatabaseManager {
       $$PersonDetailStatesTableTableManager(_db, _db.personDetailStates);
   $$CachedPersonPhotosTableTableManager get cachedPersonPhotos =>
       $$CachedPersonPhotosTableTableManager(_db, _db.cachedPersonPhotos);
+  $$CachedRemindersTableTableManager get cachedReminders =>
+      $$CachedRemindersTableTableManager(_db, _db.cachedReminders);
+  $$CachedReminderOccurrencesTableTableManager get cachedReminderOccurrences =>
+      $$CachedReminderOccurrencesTableTableManager(
+        _db,
+        _db.cachedReminderOccurrences,
+      );
+  $$ReminderCacheStatesTableTableManager get reminderCacheStates =>
+      $$ReminderCacheStatesTableTableManager(_db, _db.reminderCacheStates);
 }
