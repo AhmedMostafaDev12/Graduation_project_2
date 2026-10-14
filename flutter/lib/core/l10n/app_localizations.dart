@@ -2059,6 +2059,101 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This patient\'s new faces are unavailable.'**
   String get unknownFacesUnavailable;
+
+  /// No description provided for @unknownDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Who is this?'**
+  String get unknownDetailTitle;
+
+  /// No description provided for @unknownDetailKnow.
+  ///
+  /// In en, this message translates to:
+  /// **'I know them'**
+  String get unknownDetailKnow;
+
+  /// No description provided for @unknownDetailNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Dr. Hany'**
+  String get unknownDetailNameHint;
+
+  /// No description provided for @unknownDetailRelationshipHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor'**
+  String get unknownDetailRelationshipHint;
+
+  /// No description provided for @unknownDetailConsent.
+  ///
+  /// In en, this message translates to:
+  /// **'This person agreed to be recognized.'**
+  String get unknownDetailConsent;
+
+  /// No description provided for @unknownDetailSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as a known person'**
+  String get unknownDetailSave;
+
+  /// No description provided for @unknownDetailDismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Stranger, dismiss'**
+  String get unknownDetailDismiss;
+
+  /// No description provided for @unknownDetailDeleteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismissing deletes these photos.'**
+  String get unknownDetailDeleteHint;
+
+  /// No description provided for @unknownDetailDismissConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss this stranger? Their photos will be deleted immediately. Journal sightings will remain without photos.'**
+  String get unknownDetailDismissConfirm;
+
+  /// No description provided for @unknownDetailUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This face is no longer available. Return to New faces to check the list.'**
+  String get unknownDetailUnavailable;
+
+  /// No description provided for @unknownDetailCacheRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Decision saved. Retry to finish updating this phone.'**
+  String get unknownDetailCacheRetry;
+
+  /// No description provided for @unknownDetailUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to confirm the decision. Refresh to check its current state before trying again.'**
+  String get unknownDetailUncertain;
+
+  /// No description provided for @unknownDetailNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a name (up to 80 characters).'**
+  String get unknownDetailNameRequired;
+
+  /// No description provided for @unknownDetailRelationshipRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a relationship (up to 40 characters).'**
+  String get unknownDetailRelationshipRequired;
+
+  /// No description provided for @unknownDetailSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Seen {times} times on {days} different days · first {first} · last {last}'**
+  String unknownDetailSummary(
+    String times,
+    String days,
+    String first,
+    String last,
+  );
 }
 
 class _AppLocalizationsDelegate

@@ -1121,4 +1121,61 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get unknownFacesUnavailable => 'الوجوه الجديدة لهذا المريض غير متاحة.';
+
+  @override
+  String get unknownDetailTitle => 'من هذا الشخص؟';
+
+  @override
+  String get unknownDetailKnow => 'أعرف هذا الشخص';
+
+  @override
+  String get unknownDetailNameHint => 'د. هاني';
+
+  @override
+  String get unknownDetailRelationshipHint => 'طبيب';
+
+  @override
+  String get unknownDetailConsent => 'وافق هذا الشخص على التعرّف عليه.';
+
+  @override
+  String get unknownDetailSave => 'حفظ كشخص معروف';
+
+  @override
+  String get unknownDetailDismiss => 'شخص غريب، تجاهل';
+
+  @override
+  String get unknownDetailDeleteHint => 'التجاهل يحذف هذه الصور.';
+
+  @override
+  String get unknownDetailDismissConfirm =>
+      'هل تريد تجاهل هذا الشخص الغريب؟ ستُحذف صوره فورًا. ستبقى مرات رؤيته في سجل اليوم دون صور.';
+
+  @override
+  String get unknownDetailUnavailable =>
+      'لم يعد هذا الوجه متاحًا. ارجع إلى الوجوه الجديدة للتحقق من القائمة.';
+
+  @override
+  String get unknownDetailCacheRetry =>
+      'تم حفظ القرار. أعد المحاولة لإكمال تحديث هذا الهاتف.';
+
+  @override
+  String get unknownDetailUncertain =>
+      'تعذّر تأكيد القرار. حدّث الصفحة للتحقق من حالته قبل المحاولة مجددًا.';
+
+  @override
+  String get unknownDetailNameRequired => 'أدخل اسمًا (حتى ٨٠ حرفًا).';
+
+  @override
+  String get unknownDetailRelationshipRequired =>
+      'أدخل صلة القرابة أو العلاقة (حتى ٤٠ حرفًا).';
+
+  @override
+  String unknownDetailSummary(
+    String times,
+    String days,
+    String first,
+    String last,
+  ) {
+    return 'شوهد $times مرات في $days أيام مختلفة · أول مرة $first · آخر مرة $last';
+  }
 }

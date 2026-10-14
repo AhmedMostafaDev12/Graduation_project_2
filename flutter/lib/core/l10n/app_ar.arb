@@ -412,5 +412,36 @@
   "unknownFacesOffline": "تُعرض الأعداد والتواريخ المحفوظة. تتطلب الصور تحديثًا ناجحًا.",
   "unknownFacePhoto": "صورة شخص غير معروف",
   "unknownFacePhotoUnavailable": "الصورة غير متاحة",
-  "unknownFacesUnavailable": "الوجوه الجديدة لهذا المريض غير متاحة."
+  "unknownFacesUnavailable": "الوجوه الجديدة لهذا المريض غير متاحة.",
+  "unknownDetailTitle": "من هذا الشخص؟",
+  "unknownDetailKnow": "أعرف هذا الشخص",
+  "unknownDetailNameHint": "د. هاني",
+  "unknownDetailRelationshipHint": "طبيب",
+  "unknownDetailConsent": "وافق هذا الشخص على التعرّف عليه.",
+  "unknownDetailSave": "حفظ كشخص معروف",
+  "unknownDetailDismiss": "شخص غريب، تجاهل",
+  "unknownDetailDeleteHint": "التجاهل يحذف هذه الصور.",
+  "unknownDetailDismissConfirm": "هل تريد تجاهل هذا الشخص الغريب؟ ستُحذف صوره فورًا. ستبقى مرات رؤيته في سجل اليوم دون صور.",
+  "unknownDetailUnavailable": "لم يعد هذا الوجه متاحًا. ارجع إلى الوجوه الجديدة للتحقق من القائمة.",
+  "unknownDetailCacheRetry": "تم حفظ القرار. أعد المحاولة لإكمال تحديث هذا الهاتف.",
+  "unknownDetailUncertain": "تعذّر تأكيد القرار. حدّث الصفحة للتحقق من حالته قبل المحاولة مجددًا.",
+  "unknownDetailNameRequired": "أدخل اسمًا (حتى ٨٠ حرفًا).",
+  "unknownDetailRelationshipRequired": "أدخل صلة القرابة أو العلاقة (حتى ٤٠ حرفًا).",
+  "unknownDetailSummary": "شوهد {times} مرات في {days} أيام مختلفة · أول مرة {first} · آخر مرة {last}",
+  "@unknownDetailSummary": {
+    "placeholders": {
+      "times": {
+        "type": "String"
+      },
+      "days": {
+        "type": "String"
+      },
+      "first": {
+        "type": "String"
+      },
+      "last": {
+        "type": "String"
+      }
+    }
+  }
 }

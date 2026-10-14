@@ -1126,4 +1126,61 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get unknownFacesUnavailable =>
       'This patient\'s new faces are unavailable.';
+
+  @override
+  String get unknownDetailTitle => 'Who is this?';
+
+  @override
+  String get unknownDetailKnow => 'I know them';
+
+  @override
+  String get unknownDetailNameHint => 'Dr. Hany';
+
+  @override
+  String get unknownDetailRelationshipHint => 'Doctor';
+
+  @override
+  String get unknownDetailConsent => 'This person agreed to be recognized.';
+
+  @override
+  String get unknownDetailSave => 'Save as a known person';
+
+  @override
+  String get unknownDetailDismiss => 'Stranger, dismiss';
+
+  @override
+  String get unknownDetailDeleteHint => 'Dismissing deletes these photos.';
+
+  @override
+  String get unknownDetailDismissConfirm =>
+      'Dismiss this stranger? Their photos will be deleted immediately. Journal sightings will remain without photos.';
+
+  @override
+  String get unknownDetailUnavailable =>
+      'This face is no longer available. Return to New faces to check the list.';
+
+  @override
+  String get unknownDetailCacheRetry =>
+      'Decision saved. Retry to finish updating this phone.';
+
+  @override
+  String get unknownDetailUncertain =>
+      'Unable to confirm the decision. Refresh to check its current state before trying again.';
+
+  @override
+  String get unknownDetailNameRequired => 'Enter a name (up to 80 characters).';
+
+  @override
+  String get unknownDetailRelationshipRequired =>
+      'Enter a relationship (up to 40 characters).';
+
+  @override
+  String unknownDetailSummary(
+    String times,
+    String days,
+    String first,
+    String last,
+  ) {
+    return 'Seen $times times on $days different days · first $first · last $last';
+  }
 }
