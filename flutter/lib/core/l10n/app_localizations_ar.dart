@@ -1071,4 +1071,54 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get alertsDestinationPending =>
       'تمت قراءة التنبيه. ستتوفر وجهته عند اكتمال الصفحة الخاصة بها.';
+
+  @override
+  String get unknownFacesTitle => 'وجوه جديدة للمراجعة';
+
+  @override
+  String get unknownFacesIntro =>
+      'أشخاص رأتهم النظارة في ثلاثة أيام مختلفة أو أكثر. أنت وحدك تسميهم؛ النظارة لا تخمّن أبدًا.';
+
+  @override
+  String unknownFacesSeen(String times, String days) {
+    return 'شوهد $times مرات في $days أيام';
+  }
+
+  @override
+  String unknownFacesDates(String first, String last) {
+    return 'أول ظهور $first · آخر ظهور $last';
+  }
+
+  @override
+  String unknownFacesTodayTime(String time) {
+    return 'اليوم $time';
+  }
+
+  @override
+  String get unknownFacesRetention =>
+      'تُحذف صور الأشخاص غير المعروفين بعد ٣٠ يومًا، أو فورًا إذا تجاهلتهم.';
+
+  @override
+  String get unknownFacesPending =>
+      'ستتوفر مراجعة الوجوه عند اكتمال صفحة المراجعة.';
+
+  @override
+  String get unknownFacesEmpty => 'لا توجد وجوه جديدة للمراجعة بعد.';
+
+  @override
+  String get unknownFacesLoadFailed =>
+      'تعذر تحديث الوجوه الجديدة. تحقق من اتصالك وحاول مرة أخرى.';
+
+  @override
+  String get unknownFacesOffline =>
+      'تُعرض الأعداد والتواريخ المحفوظة. تتطلب الصور تحديثًا ناجحًا.';
+
+  @override
+  String get unknownFacePhoto => 'صورة شخص غير معروف';
+
+  @override
+  String get unknownFacePhotoUnavailable => 'الصورة غير متاحة';
+
+  @override
+  String get unknownFacesUnavailable => 'الوجوه الجديدة لهذا المريض غير متاحة.';
 }

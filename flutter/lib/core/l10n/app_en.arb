@@ -429,5 +429,21 @@
   "alertsCached": "Showing saved alerts. Retry to check the latest state.",
   "alertsReadFailed": "Unable to mark the alert as read. Please try again.",
   "alertsCacheRetry": "Alert marked as read. Retry to finish updating this phone.",
-  "alertsDestinationPending": "Alert read. This destination will be available when its screen is ready."
+  "alertsDestinationPending": "Alert read. This destination will be available when its screen is ready.",
+  "unknownFacesTitle": "New faces to review",
+  "unknownFacesIntro": "People the glasses saw on 3 or more different days. Only you can name them; the glasses never guess.",
+  "unknownFacesSeen": "Seen {times} times on {days} days",
+  "@unknownFacesSeen": {"placeholders": {"times": {"type": "String"}, "days": {"type": "String"}}},
+  "unknownFacesDates": "First seen {first} · last seen {last}",
+  "@unknownFacesDates": {"placeholders": {"first": {"type": "String"}, "last": {"type": "String"}}},
+  "unknownFacesTodayTime": "today {time}",
+  "@unknownFacesTodayTime": {"placeholders": {"time": {"type": "String"}}},
+  "unknownFacesRetention": "Photos of unknown people are deleted after 30 days, or right away if you dismiss them.",
+  "unknownFacesPending": "Face review will be available when the review screen is ready.",
+  "unknownFacesEmpty": "No new faces to review yet.",
+  "unknownFacesLoadFailed": "Unable to update new faces. Check your connection and try again.",
+  "unknownFacesOffline": "Showing saved counts and dates. Photos require a successful refresh.",
+  "unknownFacePhoto": "Unknown person photo",
+  "unknownFacePhotoUnavailable": "Photo unavailable",
+  "unknownFacesUnavailable": "This patient's new faces are unavailable."
 }

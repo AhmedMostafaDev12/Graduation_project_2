@@ -6815,6 +6815,925 @@ class ReminderCacheStatesCompanion extends UpdateCompanion<ReminderCacheState> {
   }
 }
 
+class $CachedUnknownFacesTable extends CachedUnknownFaces
+    with TableInfo<$CachedUnknownFacesTable, CachedUnknownFace> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedUnknownFacesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sightingCountMeta = const VerificationMeta(
+    'sightingCount',
+  );
+  @override
+  late final GeneratedColumn<int> sightingCount = GeneratedColumn<int>(
+    'sighting_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _distinctDaysMeta = const VerificationMeta(
+    'distinctDays',
+  );
+  @override
+  late final GeneratedColumn<int> distinctDays = GeneratedColumn<int>(
+    'distinct_days',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> firstSeenAt =
+      GeneratedColumn<int>(
+        'first_seen_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>($CachedUnknownFacesTable.$converterfirstSeenAt);
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> lastSeenAt =
+      GeneratedColumn<int>(
+        'last_seen_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>($CachedUnknownFacesTable.$converterlastSeenAt);
+  static const VerificationMeta _sampleIdMeta = const VerificationMeta(
+    'sampleId',
+  );
+  @override
+  late final GeneratedColumn<String> sampleId = GeneratedColumn<String>(
+    'sample_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sampleUrlMeta = const VerificationMeta(
+    'sampleUrl',
+  );
+  @override
+  late final GeneratedColumn<String> sampleUrl = GeneratedColumn<String>(
+    'sample_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _thumbnailUrlMeta = const VerificationMeta(
+    'thumbnailUrl',
+  );
+  @override
+  late final GeneratedColumn<String> thumbnailUrl = GeneratedColumn<String>(
+    'thumbnail_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    caregiverId,
+    patientId,
+    id,
+    sightingCount,
+    distinctDays,
+    firstSeenAt,
+    lastSeenAt,
+    sampleId,
+    sampleUrl,
+    thumbnailUrl,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_unknown_faces';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedUnknownFace> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('sighting_count')) {
+      context.handle(
+        _sightingCountMeta,
+        sightingCount.isAcceptableOrUnknown(
+          data['sighting_count']!,
+          _sightingCountMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_sightingCountMeta);
+    }
+    if (data.containsKey('distinct_days')) {
+      context.handle(
+        _distinctDaysMeta,
+        distinctDays.isAcceptableOrUnknown(
+          data['distinct_days']!,
+          _distinctDaysMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_distinctDaysMeta);
+    }
+    if (data.containsKey('sample_id')) {
+      context.handle(
+        _sampleIdMeta,
+        sampleId.isAcceptableOrUnknown(data['sample_id']!, _sampleIdMeta),
+      );
+    }
+    if (data.containsKey('sample_url')) {
+      context.handle(
+        _sampleUrlMeta,
+        sampleUrl.isAcceptableOrUnknown(data['sample_url']!, _sampleUrlMeta),
+      );
+    }
+    if (data.containsKey('thumbnail_url')) {
+      context.handle(
+        _thumbnailUrlMeta,
+        thumbnailUrl.isAcceptableOrUnknown(
+          data['thumbnail_url']!,
+          _thumbnailUrlMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, patientId, id};
+  @override
+  CachedUnknownFace map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedUnknownFace(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      sightingCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sighting_count'],
+      )!,
+      distinctDays: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}distinct_days'],
+      )!,
+      firstSeenAt: $CachedUnknownFacesTable.$converterfirstSeenAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}first_seen_at'],
+        )!,
+      ),
+      lastSeenAt: $CachedUnknownFacesTable.$converterlastSeenAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}last_seen_at'],
+        )!,
+      ),
+      sampleId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sample_id'],
+      ),
+      sampleUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sample_url'],
+      ),
+      thumbnailUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}thumbnail_url'],
+      ),
+    );
+  }
+
+  @override
+  $CachedUnknownFacesTable createAlias(String alias) {
+    return $CachedUnknownFacesTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converterfirstSeenAt = const UtcMicros();
+  static TypeConverter<DateTime, int> $converterlastSeenAt = const UtcMicros();
+}
+
+class CachedUnknownFace extends DataClass
+    implements Insertable<CachedUnknownFace> {
+  final String caregiverId;
+  final String patientId;
+  final String id;
+  final int sightingCount;
+  final int distinctDays;
+  final DateTime firstSeenAt;
+  final DateTime lastSeenAt;
+  final String? sampleId;
+  final String? sampleUrl;
+  final String? thumbnailUrl;
+  const CachedUnknownFace({
+    required this.caregiverId,
+    required this.patientId,
+    required this.id,
+    required this.sightingCount,
+    required this.distinctDays,
+    required this.firstSeenAt,
+    required this.lastSeenAt,
+    this.sampleId,
+    this.sampleUrl,
+    this.thumbnailUrl,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    map['id'] = Variable<String>(id);
+    map['sighting_count'] = Variable<int>(sightingCount);
+    map['distinct_days'] = Variable<int>(distinctDays);
+    {
+      map['first_seen_at'] = Variable<int>(
+        $CachedUnknownFacesTable.$converterfirstSeenAt.toSql(firstSeenAt),
+      );
+    }
+    {
+      map['last_seen_at'] = Variable<int>(
+        $CachedUnknownFacesTable.$converterlastSeenAt.toSql(lastSeenAt),
+      );
+    }
+    if (!nullToAbsent || sampleId != null) {
+      map['sample_id'] = Variable<String>(sampleId);
+    }
+    if (!nullToAbsent || sampleUrl != null) {
+      map['sample_url'] = Variable<String>(sampleUrl);
+    }
+    if (!nullToAbsent || thumbnailUrl != null) {
+      map['thumbnail_url'] = Variable<String>(thumbnailUrl);
+    }
+    return map;
+  }
+
+  CachedUnknownFacesCompanion toCompanion(bool nullToAbsent) {
+    return CachedUnknownFacesCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      id: Value(id),
+      sightingCount: Value(sightingCount),
+      distinctDays: Value(distinctDays),
+      firstSeenAt: Value(firstSeenAt),
+      lastSeenAt: Value(lastSeenAt),
+      sampleId: sampleId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sampleId),
+      sampleUrl: sampleUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sampleUrl),
+      thumbnailUrl: thumbnailUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(thumbnailUrl),
+    );
+  }
+
+  factory CachedUnknownFace.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedUnknownFace(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      id: serializer.fromJson<String>(json['id']),
+      sightingCount: serializer.fromJson<int>(json['sightingCount']),
+      distinctDays: serializer.fromJson<int>(json['distinctDays']),
+      firstSeenAt: serializer.fromJson<DateTime>(json['firstSeenAt']),
+      lastSeenAt: serializer.fromJson<DateTime>(json['lastSeenAt']),
+      sampleId: serializer.fromJson<String?>(json['sampleId']),
+      sampleUrl: serializer.fromJson<String?>(json['sampleUrl']),
+      thumbnailUrl: serializer.fromJson<String?>(json['thumbnailUrl']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'id': serializer.toJson<String>(id),
+      'sightingCount': serializer.toJson<int>(sightingCount),
+      'distinctDays': serializer.toJson<int>(distinctDays),
+      'firstSeenAt': serializer.toJson<DateTime>(firstSeenAt),
+      'lastSeenAt': serializer.toJson<DateTime>(lastSeenAt),
+      'sampleId': serializer.toJson<String?>(sampleId),
+      'sampleUrl': serializer.toJson<String?>(sampleUrl),
+      'thumbnailUrl': serializer.toJson<String?>(thumbnailUrl),
+    };
+  }
+
+  CachedUnknownFace copyWith({
+    String? caregiverId,
+    String? patientId,
+    String? id,
+    int? sightingCount,
+    int? distinctDays,
+    DateTime? firstSeenAt,
+    DateTime? lastSeenAt,
+    Value<String?> sampleId = const Value.absent(),
+    Value<String?> sampleUrl = const Value.absent(),
+    Value<String?> thumbnailUrl = const Value.absent(),
+  }) => CachedUnknownFace(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    id: id ?? this.id,
+    sightingCount: sightingCount ?? this.sightingCount,
+    distinctDays: distinctDays ?? this.distinctDays,
+    firstSeenAt: firstSeenAt ?? this.firstSeenAt,
+    lastSeenAt: lastSeenAt ?? this.lastSeenAt,
+    sampleId: sampleId.present ? sampleId.value : this.sampleId,
+    sampleUrl: sampleUrl.present ? sampleUrl.value : this.sampleUrl,
+    thumbnailUrl: thumbnailUrl.present ? thumbnailUrl.value : this.thumbnailUrl,
+  );
+  CachedUnknownFace copyWithCompanion(CachedUnknownFacesCompanion data) {
+    return CachedUnknownFace(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      id: data.id.present ? data.id.value : this.id,
+      sightingCount: data.sightingCount.present
+          ? data.sightingCount.value
+          : this.sightingCount,
+      distinctDays: data.distinctDays.present
+          ? data.distinctDays.value
+          : this.distinctDays,
+      firstSeenAt: data.firstSeenAt.present
+          ? data.firstSeenAt.value
+          : this.firstSeenAt,
+      lastSeenAt: data.lastSeenAt.present
+          ? data.lastSeenAt.value
+          : this.lastSeenAt,
+      sampleId: data.sampleId.present ? data.sampleId.value : this.sampleId,
+      sampleUrl: data.sampleUrl.present ? data.sampleUrl.value : this.sampleUrl,
+      thumbnailUrl: data.thumbnailUrl.present
+          ? data.thumbnailUrl.value
+          : this.thumbnailUrl,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedUnknownFace(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('id: $id, ')
+          ..write('sightingCount: $sightingCount, ')
+          ..write('distinctDays: $distinctDays, ')
+          ..write('firstSeenAt: $firstSeenAt, ')
+          ..write('lastSeenAt: $lastSeenAt, ')
+          ..write('sampleId: $sampleId, ')
+          ..write('sampleUrl: $sampleUrl, ')
+          ..write('thumbnailUrl: $thumbnailUrl')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    caregiverId,
+    patientId,
+    id,
+    sightingCount,
+    distinctDays,
+    firstSeenAt,
+    lastSeenAt,
+    sampleId,
+    sampleUrl,
+    thumbnailUrl,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedUnknownFace &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.id == this.id &&
+          other.sightingCount == this.sightingCount &&
+          other.distinctDays == this.distinctDays &&
+          other.firstSeenAt == this.firstSeenAt &&
+          other.lastSeenAt == this.lastSeenAt &&
+          other.sampleId == this.sampleId &&
+          other.sampleUrl == this.sampleUrl &&
+          other.thumbnailUrl == this.thumbnailUrl);
+}
+
+class CachedUnknownFacesCompanion extends UpdateCompanion<CachedUnknownFace> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<String> id;
+  final Value<int> sightingCount;
+  final Value<int> distinctDays;
+  final Value<DateTime> firstSeenAt;
+  final Value<DateTime> lastSeenAt;
+  final Value<String?> sampleId;
+  final Value<String?> sampleUrl;
+  final Value<String?> thumbnailUrl;
+  final Value<int> rowid;
+  const CachedUnknownFacesCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.sightingCount = const Value.absent(),
+    this.distinctDays = const Value.absent(),
+    this.firstSeenAt = const Value.absent(),
+    this.lastSeenAt = const Value.absent(),
+    this.sampleId = const Value.absent(),
+    this.sampleUrl = const Value.absent(),
+    this.thumbnailUrl = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedUnknownFacesCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required String id,
+    required int sightingCount,
+    required int distinctDays,
+    required DateTime firstSeenAt,
+    required DateTime lastSeenAt,
+    this.sampleId = const Value.absent(),
+    this.sampleUrl = const Value.absent(),
+    this.thumbnailUrl = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       id = Value(id),
+       sightingCount = Value(sightingCount),
+       distinctDays = Value(distinctDays),
+       firstSeenAt = Value(firstSeenAt),
+       lastSeenAt = Value(lastSeenAt);
+  static Insertable<CachedUnknownFace> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<String>? id,
+    Expression<int>? sightingCount,
+    Expression<int>? distinctDays,
+    Expression<int>? firstSeenAt,
+    Expression<int>? lastSeenAt,
+    Expression<String>? sampleId,
+    Expression<String>? sampleUrl,
+    Expression<String>? thumbnailUrl,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (id != null) 'id': id,
+      if (sightingCount != null) 'sighting_count': sightingCount,
+      if (distinctDays != null) 'distinct_days': distinctDays,
+      if (firstSeenAt != null) 'first_seen_at': firstSeenAt,
+      if (lastSeenAt != null) 'last_seen_at': lastSeenAt,
+      if (sampleId != null) 'sample_id': sampleId,
+      if (sampleUrl != null) 'sample_url': sampleUrl,
+      if (thumbnailUrl != null) 'thumbnail_url': thumbnailUrl,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedUnknownFacesCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<String>? id,
+    Value<int>? sightingCount,
+    Value<int>? distinctDays,
+    Value<DateTime>? firstSeenAt,
+    Value<DateTime>? lastSeenAt,
+    Value<String?>? sampleId,
+    Value<String?>? sampleUrl,
+    Value<String?>? thumbnailUrl,
+    Value<int>? rowid,
+  }) {
+    return CachedUnknownFacesCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      id: id ?? this.id,
+      sightingCount: sightingCount ?? this.sightingCount,
+      distinctDays: distinctDays ?? this.distinctDays,
+      firstSeenAt: firstSeenAt ?? this.firstSeenAt,
+      lastSeenAt: lastSeenAt ?? this.lastSeenAt,
+      sampleId: sampleId ?? this.sampleId,
+      sampleUrl: sampleUrl ?? this.sampleUrl,
+      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (sightingCount.present) {
+      map['sighting_count'] = Variable<int>(sightingCount.value);
+    }
+    if (distinctDays.present) {
+      map['distinct_days'] = Variable<int>(distinctDays.value);
+    }
+    if (firstSeenAt.present) {
+      map['first_seen_at'] = Variable<int>(
+        $CachedUnknownFacesTable.$converterfirstSeenAt.toSql(firstSeenAt.value),
+      );
+    }
+    if (lastSeenAt.present) {
+      map['last_seen_at'] = Variable<int>(
+        $CachedUnknownFacesTable.$converterlastSeenAt.toSql(lastSeenAt.value),
+      );
+    }
+    if (sampleId.present) {
+      map['sample_id'] = Variable<String>(sampleId.value);
+    }
+    if (sampleUrl.present) {
+      map['sample_url'] = Variable<String>(sampleUrl.value);
+    }
+    if (thumbnailUrl.present) {
+      map['thumbnail_url'] = Variable<String>(thumbnailUrl.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedUnknownFacesCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('id: $id, ')
+          ..write('sightingCount: $sightingCount, ')
+          ..write('distinctDays: $distinctDays, ')
+          ..write('firstSeenAt: $firstSeenAt, ')
+          ..write('lastSeenAt: $lastSeenAt, ')
+          ..write('sampleId: $sampleId, ')
+          ..write('sampleUrl: $sampleUrl, ')
+          ..write('thumbnailUrl: $thumbnailUrl, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $UnknownFacesCacheStatesTable extends UnknownFacesCacheStates
+    with TableInfo<$UnknownFacesCacheStatesTable, UnknownFacesCacheState> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $UnknownFacesCacheStatesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> refreshedAt =
+      GeneratedColumn<int>(
+        'refreshed_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>(
+        $UnknownFacesCacheStatesTable.$converterrefreshedAt,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [caregiverId, patientId, refreshedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'unknown_faces_cache_states';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<UnknownFacesCacheState> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, patientId};
+  @override
+  UnknownFacesCacheState map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return UnknownFacesCacheState(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      refreshedAt: $UnknownFacesCacheStatesTable.$converterrefreshedAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}refreshed_at'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $UnknownFacesCacheStatesTable createAlias(String alias) {
+    return $UnknownFacesCacheStatesTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converterrefreshedAt = const UtcMicros();
+}
+
+class UnknownFacesCacheState extends DataClass
+    implements Insertable<UnknownFacesCacheState> {
+  final String caregiverId;
+  final String patientId;
+  final DateTime refreshedAt;
+  const UnknownFacesCacheState({
+    required this.caregiverId,
+    required this.patientId,
+    required this.refreshedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    {
+      map['refreshed_at'] = Variable<int>(
+        $UnknownFacesCacheStatesTable.$converterrefreshedAt.toSql(refreshedAt),
+      );
+    }
+    return map;
+  }
+
+  UnknownFacesCacheStatesCompanion toCompanion(bool nullToAbsent) {
+    return UnknownFacesCacheStatesCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      refreshedAt: Value(refreshedAt),
+    );
+  }
+
+  factory UnknownFacesCacheState.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return UnknownFacesCacheState(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      refreshedAt: serializer.fromJson<DateTime>(json['refreshedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'refreshedAt': serializer.toJson<DateTime>(refreshedAt),
+    };
+  }
+
+  UnknownFacesCacheState copyWith({
+    String? caregiverId,
+    String? patientId,
+    DateTime? refreshedAt,
+  }) => UnknownFacesCacheState(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    refreshedAt: refreshedAt ?? this.refreshedAt,
+  );
+  UnknownFacesCacheState copyWithCompanion(
+    UnknownFacesCacheStatesCompanion data,
+  ) {
+    return UnknownFacesCacheState(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      refreshedAt: data.refreshedAt.present
+          ? data.refreshedAt.value
+          : this.refreshedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UnknownFacesCacheState(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('refreshedAt: $refreshedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(caregiverId, patientId, refreshedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is UnknownFacesCacheState &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.refreshedAt == this.refreshedAt);
+}
+
+class UnknownFacesCacheStatesCompanion
+    extends UpdateCompanion<UnknownFacesCacheState> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<DateTime> refreshedAt;
+  final Value<int> rowid;
+  const UnknownFacesCacheStatesCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.refreshedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  UnknownFacesCacheStatesCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required DateTime refreshedAt,
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       refreshedAt = Value(refreshedAt);
+  static Insertable<UnknownFacesCacheState> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<int>? refreshedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (refreshedAt != null) 'refreshed_at': refreshedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  UnknownFacesCacheStatesCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<DateTime>? refreshedAt,
+    Value<int>? rowid,
+  }) {
+    return UnknownFacesCacheStatesCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      refreshedAt: refreshedAt ?? this.refreshedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (refreshedAt.present) {
+      map['refreshed_at'] = Variable<int>(
+        $UnknownFacesCacheStatesTable.$converterrefreshedAt.toSql(
+          refreshedAt.value,
+        ),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UnknownFacesCacheStatesCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('refreshedAt: $refreshedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$RemoriDatabase extends GeneratedDatabase {
   _$RemoriDatabase(QueryExecutor e) : super(e);
   $RemoriDatabaseManager get managers => $RemoriDatabaseManager(this);
@@ -6843,6 +7762,10 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
       $CachedReminderOccurrencesTable(this);
   late final $ReminderCacheStatesTable reminderCacheStates =
       $ReminderCacheStatesTable(this);
+  late final $CachedUnknownFacesTable cachedUnknownFaces =
+      $CachedUnknownFacesTable(this);
+  late final $UnknownFacesCacheStatesTable unknownFacesCacheStates =
+      $UnknownFacesCacheStatesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -6861,6 +7784,8 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
     cachedReminders,
     cachedReminderOccurrences,
     reminderCacheStates,
+    cachedUnknownFaces,
+    unknownFacesCacheStates,
   ];
 }
 
@@ -10536,6 +11461,540 @@ typedef $$ReminderCacheStatesTableProcessedTableManager =
       ReminderCacheState,
       PrefetchHooks Function()
     >;
+typedef $$CachedUnknownFacesTableCreateCompanionBuilder =
+    CachedUnknownFacesCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required String id,
+      required int sightingCount,
+      required int distinctDays,
+      required DateTime firstSeenAt,
+      required DateTime lastSeenAt,
+      Value<String?> sampleId,
+      Value<String?> sampleUrl,
+      Value<String?> thumbnailUrl,
+      Value<int> rowid,
+    });
+typedef $$CachedUnknownFacesTableUpdateCompanionBuilder =
+    CachedUnknownFacesCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<String> id,
+      Value<int> sightingCount,
+      Value<int> distinctDays,
+      Value<DateTime> firstSeenAt,
+      Value<DateTime> lastSeenAt,
+      Value<String?> sampleId,
+      Value<String?> sampleUrl,
+      Value<String?> thumbnailUrl,
+      Value<int> rowid,
+    });
+
+class $$CachedUnknownFacesTableFilterComposer
+    extends Composer<_$RemoriDatabase, $CachedUnknownFacesTable> {
+  $$CachedUnknownFacesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sightingCount => $composableBuilder(
+    column: $table.sightingCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get distinctDays => $composableBuilder(
+    column: $table.distinctDays,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get firstSeenAt =>
+      $composableBuilder(
+        column: $table.firstSeenAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get lastSeenAt =>
+      $composableBuilder(
+        column: $table.lastSeenAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get sampleId => $composableBuilder(
+    column: $table.sampleId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sampleUrl => $composableBuilder(
+    column: $table.sampleUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get thumbnailUrl => $composableBuilder(
+    column: $table.thumbnailUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedUnknownFacesTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $CachedUnknownFacesTable> {
+  $$CachedUnknownFacesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sightingCount => $composableBuilder(
+    column: $table.sightingCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get distinctDays => $composableBuilder(
+    column: $table.distinctDays,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get firstSeenAt => $composableBuilder(
+    column: $table.firstSeenAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lastSeenAt => $composableBuilder(
+    column: $table.lastSeenAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sampleId => $composableBuilder(
+    column: $table.sampleId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sampleUrl => $composableBuilder(
+    column: $table.sampleUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get thumbnailUrl => $composableBuilder(
+    column: $table.thumbnailUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedUnknownFacesTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $CachedUnknownFacesTable> {
+  $$CachedUnknownFacesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get sightingCount => $composableBuilder(
+    column: $table.sightingCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get distinctDays => $composableBuilder(
+    column: $table.distinctDays,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get firstSeenAt =>
+      $composableBuilder(
+        column: $table.firstSeenAt,
+        builder: (column) => column,
+      );
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get lastSeenAt =>
+      $composableBuilder(
+        column: $table.lastSeenAt,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<String> get sampleId =>
+      $composableBuilder(column: $table.sampleId, builder: (column) => column);
+
+  GeneratedColumn<String> get sampleUrl =>
+      $composableBuilder(column: $table.sampleUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get thumbnailUrl => $composableBuilder(
+    column: $table.thumbnailUrl,
+    builder: (column) => column,
+  );
+}
+
+class $$CachedUnknownFacesTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $CachedUnknownFacesTable,
+          CachedUnknownFace,
+          $$CachedUnknownFacesTableFilterComposer,
+          $$CachedUnknownFacesTableOrderingComposer,
+          $$CachedUnknownFacesTableAnnotationComposer,
+          $$CachedUnknownFacesTableCreateCompanionBuilder,
+          $$CachedUnknownFacesTableUpdateCompanionBuilder,
+          (
+            CachedUnknownFace,
+            BaseReferences<
+              _$RemoriDatabase,
+              $CachedUnknownFacesTable,
+              CachedUnknownFace
+            >,
+          ),
+          CachedUnknownFace,
+          PrefetchHooks Function()
+        > {
+  $$CachedUnknownFacesTableTableManager(
+    _$RemoriDatabase db,
+    $CachedUnknownFacesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedUnknownFacesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedUnknownFacesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CachedUnknownFacesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<int> sightingCount = const Value.absent(),
+                Value<int> distinctDays = const Value.absent(),
+                Value<DateTime> firstSeenAt = const Value.absent(),
+                Value<DateTime> lastSeenAt = const Value.absent(),
+                Value<String?> sampleId = const Value.absent(),
+                Value<String?> sampleUrl = const Value.absent(),
+                Value<String?> thumbnailUrl = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedUnknownFacesCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                id: id,
+                sightingCount: sightingCount,
+                distinctDays: distinctDays,
+                firstSeenAt: firstSeenAt,
+                lastSeenAt: lastSeenAt,
+                sampleId: sampleId,
+                sampleUrl: sampleUrl,
+                thumbnailUrl: thumbnailUrl,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required String id,
+                required int sightingCount,
+                required int distinctDays,
+                required DateTime firstSeenAt,
+                required DateTime lastSeenAt,
+                Value<String?> sampleId = const Value.absent(),
+                Value<String?> sampleUrl = const Value.absent(),
+                Value<String?> thumbnailUrl = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedUnknownFacesCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                id: id,
+                sightingCount: sightingCount,
+                distinctDays: distinctDays,
+                firstSeenAt: firstSeenAt,
+                lastSeenAt: lastSeenAt,
+                sampleId: sampleId,
+                sampleUrl: sampleUrl,
+                thumbnailUrl: thumbnailUrl,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CachedUnknownFacesTable, CachedUnknownFace>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $CachedUnknownFacesTable,
+                    CachedUnknownFace
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedUnknownFacesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $CachedUnknownFacesTable,
+      CachedUnknownFace,
+      $$CachedUnknownFacesTableFilterComposer,
+      $$CachedUnknownFacesTableOrderingComposer,
+      $$CachedUnknownFacesTableAnnotationComposer,
+      $$CachedUnknownFacesTableCreateCompanionBuilder,
+      $$CachedUnknownFacesTableUpdateCompanionBuilder,
+      (
+        CachedUnknownFace,
+        BaseReferences<
+          _$RemoriDatabase,
+          $CachedUnknownFacesTable,
+          CachedUnknownFace
+        >,
+      ),
+      CachedUnknownFace,
+      PrefetchHooks Function()
+    >;
+typedef $$UnknownFacesCacheStatesTableCreateCompanionBuilder =
+    UnknownFacesCacheStatesCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required DateTime refreshedAt,
+      Value<int> rowid,
+    });
+typedef $$UnknownFacesCacheStatesTableUpdateCompanionBuilder =
+    UnknownFacesCacheStatesCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<DateTime> refreshedAt,
+      Value<int> rowid,
+    });
+
+class $$UnknownFacesCacheStatesTableFilterComposer
+    extends Composer<_$RemoriDatabase, $UnknownFacesCacheStatesTable> {
+  $$UnknownFacesCacheStatesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+}
+
+class $$UnknownFacesCacheStatesTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $UnknownFacesCacheStatesTable> {
+  $$UnknownFacesCacheStatesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get refreshedAt => $composableBuilder(
+    column: $table.refreshedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$UnknownFacesCacheStatesTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $UnknownFacesCacheStatesTable> {
+  $$UnknownFacesCacheStatesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => column,
+      );
+}
+
+class $$UnknownFacesCacheStatesTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $UnknownFacesCacheStatesTable,
+          UnknownFacesCacheState,
+          $$UnknownFacesCacheStatesTableFilterComposer,
+          $$UnknownFacesCacheStatesTableOrderingComposer,
+          $$UnknownFacesCacheStatesTableAnnotationComposer,
+          $$UnknownFacesCacheStatesTableCreateCompanionBuilder,
+          $$UnknownFacesCacheStatesTableUpdateCompanionBuilder,
+          (
+            UnknownFacesCacheState,
+            BaseReferences<
+              _$RemoriDatabase,
+              $UnknownFacesCacheStatesTable,
+              UnknownFacesCacheState
+            >,
+          ),
+          UnknownFacesCacheState,
+          PrefetchHooks Function()
+        > {
+  $$UnknownFacesCacheStatesTableTableManager(
+    _$RemoriDatabase db,
+    $UnknownFacesCacheStatesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$UnknownFacesCacheStatesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$UnknownFacesCacheStatesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$UnknownFacesCacheStatesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<DateTime> refreshedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => UnknownFacesCacheStatesCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required DateTime refreshedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => UnknownFacesCacheStatesCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    $UnknownFacesCacheStatesTable,
+                    UnknownFacesCacheState
+                  >(table),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $UnknownFacesCacheStatesTable,
+                    UnknownFacesCacheState
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$UnknownFacesCacheStatesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $UnknownFacesCacheStatesTable,
+      UnknownFacesCacheState,
+      $$UnknownFacesCacheStatesTableFilterComposer,
+      $$UnknownFacesCacheStatesTableOrderingComposer,
+      $$UnknownFacesCacheStatesTableAnnotationComposer,
+      $$UnknownFacesCacheStatesTableCreateCompanionBuilder,
+      $$UnknownFacesCacheStatesTableUpdateCompanionBuilder,
+      (
+        UnknownFacesCacheState,
+        BaseReferences<
+          _$RemoriDatabase,
+          $UnknownFacesCacheStatesTable,
+          UnknownFacesCacheState
+        >,
+      ),
+      UnknownFacesCacheState,
+      PrefetchHooks Function()
+    >;
 
 class $RemoriDatabaseManager {
   final _$RemoriDatabase _db;
@@ -10569,4 +12028,11 @@ class $RemoriDatabaseManager {
       );
   $$ReminderCacheStatesTableTableManager get reminderCacheStates =>
       $$ReminderCacheStatesTableTableManager(_db, _db.reminderCacheStates);
+  $$CachedUnknownFacesTableTableManager get cachedUnknownFaces =>
+      $$CachedUnknownFacesTableTableManager(_db, _db.cachedUnknownFaces);
+  $$UnknownFacesCacheStatesTableTableManager get unknownFacesCacheStates =>
+      $$UnknownFacesCacheStatesTableTableManager(
+        _db,
+        _db.unknownFacesCacheStates,
+      );
 }

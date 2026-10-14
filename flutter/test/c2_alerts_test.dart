@@ -480,6 +480,8 @@ void main() {
         screenBuildersProvider.overrideWithValue({
           ...builders,
           RemoriScreen.c8: (_, _) => const Text('Reminder destination'),
+          RemoriScreen.c6: (_, state) =>
+              Text('New faces destination', key: ValueKey(state.extra)),
         }),
       ],
     );
@@ -520,7 +522,7 @@ void main() {
     (tester) async {
       final repository = fake()..data = fixture(viewer: true);
       await mount(tester, repository);
-      await tester.tap(find.byKey(const ValueKey('alert-alert-0')));
+      await tester.tap(find.byKey(const ValueKey('alert-alert-1')));
       await tester.pumpAndSettle();
       expect(repository.posts, 1);
       expect(find.text('1 unread'), findsOneWidget);
@@ -581,6 +583,22 @@ void main() {
     await tester.pumpAndSettle();
     expect(repository.posts, 1);
     expect(find.text('1 unread'), findsOneWidget);
+  });
+  testWidgets('unknown-person alert opens C6 with the alert patient selected', (
+    tester,
+  ) async {
+    final repository = fake();
+    final container = await mount(tester, repository);
+    await tester.tap(find.byKey(const ValueKey('alert-alert-0')));
+    await tester.pumpAndSettle();
+    expect(find.text('New faces destination'), findsOneWidget);
+    expect(
+      (tester.widget<Text>(find.text('New faces destination')).key as ValueKey)
+          .value,
+      c1.patient,
+    );
+    expect(container.read(selectedHomePatientIdProvider), c1.patient);
+    expect(repository.posts, 1);
   });
   testWidgets('account switch hides names and previous alert cards', (
     tester,

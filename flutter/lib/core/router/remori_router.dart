@@ -9,6 +9,7 @@ import '../../features/caregiver_dashboard/presentation/home_providers.dart';
 import '../../features/people/presentation/c3_people_screen.dart';
 import '../../features/people/presentation/c4_add_person_screen.dart';
 import '../../features/people/presentation/c5_person_detail_screen.dart';
+import '../../features/people/presentation/c6_unknown_faces_screen.dart';
 import '../../features/reminders/presentation/c8_reminders_screen.dart';
 import '../../features/reminders/presentation/c9_edit_reminder_screen.dart';
 import '../../features/auth/presentation/a1_mode_select_screen.dart';
@@ -57,6 +58,9 @@ typedef RemoriScreenBuilder = Widget Function(BuildContext, GoRouterState);
 /// Feature PRs replace empty slots with the screen-ID presentation widgets.
 final screenBuildersProvider = Provider<Map<RemoriScreen, RemoriScreenBuilder>>(
   (ref) => {
+    RemoriScreen.c6: (context, state) => C6UnknownFacesScreen(
+      patientId: state.extra is String ? state.extra as String : null,
+    ),
     RemoriScreen.c2: (context, state) =>
         const C2AlertsScreen(key: ValueKey(RemoriScreen.c2)),
     RemoriScreen.c9: (context, state) => C9EditReminderScreen(

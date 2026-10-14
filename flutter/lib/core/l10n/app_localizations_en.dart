@@ -1075,4 +1075,55 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get alertsDestinationPending =>
       'Alert read. This destination will be available when its screen is ready.';
+
+  @override
+  String get unknownFacesTitle => 'New faces to review';
+
+  @override
+  String get unknownFacesIntro =>
+      'People the glasses saw on 3 or more different days. Only you can name them; the glasses never guess.';
+
+  @override
+  String unknownFacesSeen(String times, String days) {
+    return 'Seen $times times on $days days';
+  }
+
+  @override
+  String unknownFacesDates(String first, String last) {
+    return 'First seen $first · last seen $last';
+  }
+
+  @override
+  String unknownFacesTodayTime(String time) {
+    return 'today $time';
+  }
+
+  @override
+  String get unknownFacesRetention =>
+      'Photos of unknown people are deleted after 30 days, or right away if you dismiss them.';
+
+  @override
+  String get unknownFacesPending =>
+      'Face review will be available when the review screen is ready.';
+
+  @override
+  String get unknownFacesEmpty => 'No new faces to review yet.';
+
+  @override
+  String get unknownFacesLoadFailed =>
+      'Unable to update new faces. Check your connection and try again.';
+
+  @override
+  String get unknownFacesOffline =>
+      'Showing saved counts and dates. Photos require a successful refresh.';
+
+  @override
+  String get unknownFacePhoto => 'Unknown person photo';
+
+  @override
+  String get unknownFacePhotoUnavailable => 'Photo unavailable';
+
+  @override
+  String get unknownFacesUnavailable =>
+      'This patient\'s new faces are unavailable.';
 }

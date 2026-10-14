@@ -399,5 +399,18 @@
   "alertsCached": "تُعرض التنبيهات المحفوظة. أعد المحاولة للتحقق من آخر تحديث.",
   "alertsReadFailed": "تعذر وضع علامة مقروء على التنبيه. حاول مرة أخرى.",
   "alertsCacheRetry": "تمت قراءة التنبيه. أعد المحاولة لإكمال التحديث على هذا الهاتف.",
-  "alertsDestinationPending": "تمت قراءة التنبيه. ستتوفر وجهته عند اكتمال الصفحة الخاصة بها."
+  "alertsDestinationPending": "تمت قراءة التنبيه. ستتوفر وجهته عند اكتمال الصفحة الخاصة بها.",
+  "unknownFacesTitle": "وجوه جديدة للمراجعة",
+  "unknownFacesIntro": "أشخاص رأتهم النظارة في ثلاثة أيام مختلفة أو أكثر. أنت وحدك تسميهم؛ النظارة لا تخمّن أبدًا.",
+  "unknownFacesSeen": "شوهد {times} مرات في {days} أيام",
+  "unknownFacesDates": "أول ظهور {first} · آخر ظهور {last}",
+  "unknownFacesTodayTime": "اليوم {time}",
+  "unknownFacesRetention": "تُحذف صور الأشخاص غير المعروفين بعد ٣٠ يومًا، أو فورًا إذا تجاهلتهم.",
+  "unknownFacesPending": "ستتوفر مراجعة الوجوه عند اكتمال صفحة المراجعة.",
+  "unknownFacesEmpty": "لا توجد وجوه جديدة للمراجعة بعد.",
+  "unknownFacesLoadFailed": "تعذر تحديث الوجوه الجديدة. تحقق من اتصالك وحاول مرة أخرى.",
+  "unknownFacesOffline": "تُعرض الأعداد والتواريخ المحفوظة. تتطلب الصور تحديثًا ناجحًا.",
+  "unknownFacePhoto": "صورة شخص غير معروف",
+  "unknownFacePhotoUnavailable": "الصورة غير متاحة",
+  "unknownFacesUnavailable": "الوجوه الجديدة لهذا المريض غير متاحة."
 }

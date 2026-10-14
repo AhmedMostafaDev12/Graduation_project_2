@@ -460,6 +460,8 @@ void main() {
     await db.customStatement('DROP TABLE cached_reminder_occurrences');
     await db.customStatement('DROP TABLE reminder_cache_states');
     await db.customStatement('PRAGMA user_version = 3');
+    await db.customStatement('DROP TABLE cached_unknown_faces');
+    await db.customStatement('DROP TABLE unknown_faces_cache_states');
     await db.close();
     db = RemoriDatabase(NativeDatabase(file));
     expect((await db.select(db.cachedPeople).get()).single.name, 'Ahmed');
