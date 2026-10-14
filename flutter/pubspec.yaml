@@ -7,6 +7,7 @@ environment:
   sdk: ^3.13.2
 
 dependencies:
+  cached_network_image: ^4.0.4
   dio: ^5.11.1
   drift: ^2.35.2
   flutter:

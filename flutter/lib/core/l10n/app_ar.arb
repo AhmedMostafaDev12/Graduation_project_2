@@ -160,5 +160,19 @@
   "homeDailySummary": "الملخص اليومي بالذكاء الاصطناعي",
   "homePhaseTwo": "المرحلة الثانية",
   "homeSummaryUnavailable": "ستتوفر الملخصات اليومية في المرحلة الثانية.",
-  "homeReadMore": "اقرأ المزيد ‹"
+  "homeReadMore": "اقرأ المزيد ‹",
+  "peopleAdd": "+ إضافة شخص",
+  "peopleActiveLabel": "النشطون",
+  "peopleActive": "النشطون ({count})",
+  "peopleArchived": "المؤرشفون",
+  "peopleReviewCount": "{count, plural, =1{وجه جديد للمراجعة} =2{وجهان جديدان للمراجعة} few{{count} وجوه جديدة للمراجعة} other{{count} وجهًا جديدًا للمراجعة}}",
+  "peopleLoading": "جارٍ تحميل الأشخاص…",
+  "peopleLoadFailed": "تعذّر تحميل الأشخاص. تحقق من اتصالك وحاول مرة أخرى.",
+  "peopleOffline": "نعرض الأشخاص المحفوظين. تعذّر تحديث القائمة.",
+  "peopleNoActive": "لم تتم إضافة أشخاص نشطين بعد.",
+  "peopleNoArchived": "لا يوجد أشخاص مؤرشفون.",
+  "peopleSon": "ابن",
+  "peopleDaughter": "ابنة",
+  "peopleDoctor": "طبيب",
+  "peopleNurse": "ممرضة"
 }

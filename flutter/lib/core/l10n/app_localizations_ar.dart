@@ -534,4 +534,59 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get homeReadMore => 'اقرأ المزيد ‹';
+
+  @override
+  String get peopleAdd => '+ إضافة شخص';
+
+  @override
+  String get peopleActiveLabel => 'النشطون';
+
+  @override
+  String peopleActive(String count) {
+    return 'النشطون ($count)';
+  }
+
+  @override
+  String get peopleArchived => 'المؤرشفون';
+
+  @override
+  String peopleReviewCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count وجهًا جديدًا للمراجعة',
+      few: '$count وجوه جديدة للمراجعة',
+      two: 'وجهان جديدان للمراجعة',
+      one: 'وجه جديد للمراجعة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get peopleLoading => 'جارٍ تحميل الأشخاص…';
+
+  @override
+  String get peopleLoadFailed =>
+      'تعذّر تحميل الأشخاص. تحقق من اتصالك وحاول مرة أخرى.';
+
+  @override
+  String get peopleOffline => 'نعرض الأشخاص المحفوظين. تعذّر تحديث القائمة.';
+
+  @override
+  String get peopleNoActive => 'لم تتم إضافة أشخاص نشطين بعد.';
+
+  @override
+  String get peopleNoArchived => 'لا يوجد أشخاص مؤرشفون.';
+
+  @override
+  String get peopleSon => 'ابن';
+
+  @override
+  String get peopleDaughter => 'ابنة';
+
+  @override
+  String get peopleDoctor => 'طبيب';
+
+  @override
+  String get peopleNurse => 'ممرضة';
 }

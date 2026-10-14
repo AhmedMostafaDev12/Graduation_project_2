@@ -1063,6 +1063,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Read more ›'**
   String get homeReadMore;
+
+  /// No description provided for @peopleAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'+ Add person'**
+  String get peopleAdd;
+
+  /// No description provided for @peopleActiveLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get peopleActiveLabel;
+
+  /// No description provided for @peopleActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active ({count})'**
+  String peopleActive(String count);
+
+  /// No description provided for @peopleArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get peopleArchived;
+
+  /// No description provided for @peopleReviewCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 new face to review} other{{count} new faces to review}}'**
+  String peopleReviewCount(int count);
+
+  /// No description provided for @peopleLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading people…'**
+  String get peopleLoading;
+
+  /// No description provided for @peopleLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load people. Check your connection and try again.'**
+  String get peopleLoadFailed;
+
+  /// No description provided for @peopleOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing saved people. Unable to update the list.'**
+  String get peopleOffline;
+
+  /// No description provided for @peopleNoActive.
+  ///
+  /// In en, this message translates to:
+  /// **'No active people have been added yet.'**
+  String get peopleNoActive;
+
+  /// No description provided for @peopleNoArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'No archived people.'**
+  String get peopleNoArchived;
+
+  /// No description provided for @peopleSon.
+  ///
+  /// In en, this message translates to:
+  /// **'Son'**
+  String get peopleSon;
+
+  /// No description provided for @peopleDaughter.
+  ///
+  /// In en, this message translates to:
+  /// **'Daughter'**
+  String get peopleDaughter;
+
+  /// No description provided for @peopleDoctor.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor'**
+  String get peopleDoctor;
+
+  /// No description provided for @peopleNurse.
+  ///
+  /// In en, this message translates to:
+  /// **'Nurse'**
+  String get peopleNurse;
 }
 
 class _AppLocalizationsDelegate
