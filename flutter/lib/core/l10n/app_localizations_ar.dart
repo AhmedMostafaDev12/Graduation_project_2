@@ -989,4 +989,86 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get reminderWeekdaySaturday => 'س';
+
+  @override
+  String get alertsTitle => 'التنبيهات';
+
+  @override
+  String alertsUnread(String count) {
+    return '$count غير مقروءة';
+  }
+
+  @override
+  String get alertsToday => 'اليوم';
+
+  @override
+  String get alertsYesterday => 'أمس';
+
+  @override
+  String get alertsSomeoneNew => 'شخص جديد';
+
+  @override
+  String get alertsLowBattery => 'بطارية منخفضة';
+
+  @override
+  String get alertsMissedMedication => 'دواء لم يُؤكد';
+
+  @override
+  String get alertsDeviceOffline => 'الجهاز غير متصل';
+
+  @override
+  String get alertsSummaryReady => 'ملخص اليوم جاهز';
+
+  @override
+  String alertsUnknownDescription(String patient) {
+    return 'تم رصد شخص جديد لدى $patient. يمكن مراجعته عند توفر الصفحة.';
+  }
+
+  @override
+  String alertsBatteryDescription(String patient) {
+    return 'بطارية نظارة $patient منخفضة.';
+  }
+
+  @override
+  String alertsMissedDescription(String patient) {
+    return 'لم يُؤكد تذكير دواء لدى $patient.';
+  }
+
+  @override
+  String alertsOfflineDescription(String patient) {
+    return 'انقطع الاتصال بجهاز $patient.';
+  }
+
+  @override
+  String alertsSummaryDescription(String patient) {
+    return 'ملخص يوم $patient جاهز.';
+  }
+
+  @override
+  String alertsOtherDescription(String patient) {
+    return 'يوجد تنبيه يخص $patient.';
+  }
+
+  @override
+  String get alertsNone => 'لا توجد تنبيهات بعد.';
+
+  @override
+  String get alertsLoadFailed =>
+      'تعذر تحديث التنبيهات. تحقق من اتصالك وحاول مرة أخرى.';
+
+  @override
+  String get alertsCached =>
+      'تُعرض التنبيهات المحفوظة. أعد المحاولة للتحقق من آخر تحديث.';
+
+  @override
+  String get alertsReadFailed =>
+      'تعذر وضع علامة مقروء على التنبيه. حاول مرة أخرى.';
+
+  @override
+  String get alertsCacheRetry =>
+      'تمت قراءة التنبيه. أعد المحاولة لإكمال التحديث على هذا الهاتف.';
+
+  @override
+  String get alertsDestinationPending =>
+      'تمت قراءة التنبيه. ستتوفر وجهته عند اكتمال الصفحة الخاصة بها.';
 }

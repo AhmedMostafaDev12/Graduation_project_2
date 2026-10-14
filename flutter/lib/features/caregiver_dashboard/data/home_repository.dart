@@ -14,6 +14,7 @@ class HomeRepository {
   final String caregiverId;
   final _cancel = CancelToken();
   bool _disposed = false;
+  int _alertGeneration = 0;
   void dispose() {
     _disposed = true;
     _cancel.cancel();
@@ -135,6 +136,7 @@ class HomeRepository {
   }
 
   Future<void> refresh(String? selectedId) async {
+    final alertGeneration = _alertGeneration;
     final patients = _list(await _get('/patients'));
     for (final p in patients) {
       for (final key in [
@@ -264,30 +266,19 @@ class HomeRepository {
                 d.patientId.isNotIn(allowedIds),
           ))
           .go();
-      await (db.delete(
-        db.dashboardAlerts,
-      )..where((a) => a.caregiverId.equals(caregiverId))).go();
-      for (final a in alerts.where(
-        (a) => allowedIds.contains(a['patient_id']),
-      )) {
-        await db
-            .into(db.dashboardAlerts)
-            .insert(
-              DashboardAlertsCompanion.insert(
-                caregiverId: caregiverId,
-                id: _string(a, 'id'),
-                patientId: _string(a, 'patient_id'),
-                alertType: _string(a, 'alert_type'),
-                message: _string(a, 'message'),
-                createdAt: _time(a, 'created_at'),
-                readAt: Value(
-                  a['read_at'] == null ? null : _time(a, 'read_at'),
-                ),
-                entityType: Value(a['entity_type'] as String?),
-                entityId: Value(a['entity_id'] as String?),
-              ),
-              mode: InsertMode.insertOrReplace,
-            );
+      // Home fetches only a preview. Keep C2's full history and purge revoked links.
+      await (db.delete(db.dashboardAlerts)..where(
+            (a) =>
+                a.caregiverId.equals(caregiverId) &
+                a.patientId.isNotIn(allowedIds),
+          ))
+          .go();
+      if (alertGeneration == _alertGeneration) {
+        for (final a in alerts.where(
+          (a) => allowedIds.contains(a['patient_id']),
+        )) {
+          await _mergeAlert(_alertRow(a));
+        }
       }
       if (patientId == null) return;
       await (db.delete(db.dashboardDevices)..where(
@@ -445,9 +436,149 @@ class HomeRepository {
               type: a.alertType,
               message: a.message,
               createdAt: a.createdAt,
+              readAt: a.readAt,
+              entityType: a.entityType,
+              entityId: a.entityId,
             ),
           )
           .toList(),
     );
+  });
+
+  DashboardAlertsCompanion _alertRow(Map raw) {
+    for (final key in ['entity_type', 'entity_id']) {
+      if (raw[key] != null &&
+          (raw[key] is! String || (raw[key] as String).isEmpty)) {
+        throw ApiFailure(ApiFailureKind.invalidResponse);
+      }
+    }
+    return DashboardAlertsCompanion.insert(
+      caregiverId: caregiverId,
+      id: _string(raw, 'id'),
+      patientId: _string(raw, 'patient_id'),
+      alertType: _string(raw, 'alert_type'),
+      message: _string(raw, 'message'),
+      createdAt: _time(raw, 'created_at'),
+      readAt: Value(raw['read_at'] == null ? null : _time(raw, 'read_at')),
+      entityType: Value(raw['entity_type'] as String?),
+      entityId: Value(raw['entity_id'] as String?),
+    );
+  }
+
+  Future<void> _mergeAlert(DashboardAlertsCompanion row) async {
+    final previous =
+        await (db.select(db.dashboardAlerts)..where(
+              (a) =>
+                  a.caregiverId.equals(caregiverId) & a.id.equals(row.id.value),
+            ))
+            .getSingleOrNull();
+    await db
+        .into(db.dashboardAlerts)
+        .insert(
+          previous?.readAt != null && row.readAt.value == null
+              ? row.copyWith(readAt: Value(previous!.readAt))
+              : row,
+          mode: InsertMode.insertOrReplace,
+        );
+  }
+
+  Future<void> refreshAlerts() async {
+    final generation = ++_alertGeneration;
+    final rows = <DashboardAlertsCompanion>[];
+    final ids = <String>{};
+    var offset = 0;
+    while (!_disposed) {
+      final page = _list(
+        await _get('/caregivers/me/alerts', {
+          'unread_only': false,
+          'limit': 50,
+          'offset': offset,
+        }),
+      );
+      for (final raw in page) {
+        final row = _alertRow(raw);
+        if (!ids.add(row.id.value)) {
+          throw ApiFailure(ApiFailureKind.invalidResponse);
+        }
+        rows.add(row);
+      }
+      if (page.length < 50) break;
+      offset += page.length;
+    }
+    if (_disposed || generation != _alertGeneration) return;
+    await db.transaction(() async {
+      final patients = await (db.select(
+        db.dashboardPatients,
+      )..where((p) => p.caregiverId.equals(caregiverId))).get();
+      if (_disposed || generation != _alertGeneration) return;
+      final allowed = patients.map((p) => p.id).toSet();
+      final visible = rows
+          .where((r) => allowed.contains(r.patientId.value))
+          .toList();
+      final visibleIds = visible.map((r) => r.id.value).toList();
+      await (db.delete(db.dashboardAlerts)..where(
+            (a) => a.caregiverId.equals(caregiverId) & a.id.isNotIn(visibleIds),
+          ))
+          .go();
+      for (final row in visible) {
+        await _mergeAlert(row);
+      }
+    });
+  }
+
+  Future<DashboardAlertsCompanion> markAlertRead(String id) async {
+    final existing =
+        await (db.select(db.dashboardAlerts)..where(
+              (a) => a.caregiverId.equals(caregiverId) & a.id.equals(id),
+            ))
+            .getSingleOrNull();
+    if (existing == null) throw ApiFailure(ApiFailureKind.invalidResponse);
+    try {
+      final response = await client.request<dynamic>(
+        '/alerts/$id/read',
+        method: 'POST',
+        credential: ApiCredential.caregiver,
+        cancelToken: _cancel,
+      );
+      if (response.statusCode != 200 || response.data is! Map) {
+        throw ApiFailure(ApiFailureKind.invalidResponse);
+      }
+      final row = _alertRow(response.data as Map);
+      if (row.id.value != id ||
+          row.patientId.value != existing.patientId ||
+          row.readAt.value == null) {
+        throw ApiFailure(ApiFailureKind.invalidResponse);
+      }
+      ++_alertGeneration;
+      return row;
+    } on ApiFailure catch (error) {
+      if (error.statusCode == 404 && error.code == 'ALERT_NOT_FOUND') {
+        ++_alertGeneration;
+        await (db.delete(db.dashboardAlerts)..where(
+              (a) => a.caregiverId.equals(caregiverId) & a.id.equals(id),
+            ))
+            .go();
+      }
+      rethrow;
+    }
+  }
+
+  Future<void> cacheAlertRead(
+    DashboardAlertsCompanion row,
+  ) => db.transaction(() async {
+    // Do not recreate an alert belonging to a link removed while the POST ran.
+    final patient =
+        await (db.select(db.dashboardPatients)..where(
+              (p) =>
+                  p.caregiverId.equals(caregiverId) &
+                  p.id.equals(row.patientId.value),
+            ))
+            .getSingleOrNull();
+    if (patient == null ||
+        row.caregiverId.value != caregiverId ||
+        row.readAt.value == null) {
+      return;
+    }
+    await _mergeAlert(row);
   });
 }

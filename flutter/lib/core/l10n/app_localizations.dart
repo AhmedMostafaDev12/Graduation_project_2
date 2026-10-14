@@ -1855,6 +1855,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'S'**
   String get reminderWeekdaySaturday;
+
+  /// No description provided for @alertsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts'**
+  String get alertsTitle;
+
+  /// No description provided for @alertsUnread.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} unread'**
+  String alertsUnread(String count);
+
+  /// No description provided for @alertsToday.
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY'**
+  String get alertsToday;
+
+  /// No description provided for @alertsYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'YESTERDAY'**
+  String get alertsYesterday;
+
+  /// No description provided for @alertsSomeoneNew.
+  ///
+  /// In en, this message translates to:
+  /// **'Someone new'**
+  String get alertsSomeoneNew;
+
+  /// No description provided for @alertsLowBattery.
+  ///
+  /// In en, this message translates to:
+  /// **'Low battery'**
+  String get alertsLowBattery;
+
+  /// No description provided for @alertsMissedMedication.
+  ///
+  /// In en, this message translates to:
+  /// **'Missed medication'**
+  String get alertsMissedMedication;
+
+  /// No description provided for @alertsDeviceOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Device offline'**
+  String get alertsDeviceOffline;
+
+  /// No description provided for @alertsSummaryReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily summary ready'**
+  String get alertsSummaryReady;
+
+  /// No description provided for @alertsUnknownDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Someone new has been flagged for {patient}. Review when available.'**
+  String alertsUnknownDescription(String patient);
+
+  /// No description provided for @alertsBatteryDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'The glasses battery is low for {patient}.'**
+  String alertsBatteryDescription(String patient);
+
+  /// No description provided for @alertsMissedDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'A medication reminder was not confirmed for {patient}.'**
+  String alertsMissedDescription(String patient);
+
+  /// No description provided for @alertsOfflineDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'The device has lost contact for {patient}.'**
+  String alertsOfflineDescription(String patient);
+
+  /// No description provided for @alertsSummaryDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'A daily summary is ready for {patient}.'**
+  String alertsSummaryDescription(String patient);
+
+  /// No description provided for @alertsOtherDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'There is an alert for {patient}.'**
+  String alertsOtherDescription(String patient);
+
+  /// No description provided for @alertsNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No alerts yet.'**
+  String get alertsNone;
+
+  /// No description provided for @alertsLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to update alerts. Check your connection and try again.'**
+  String get alertsLoadFailed;
+
+  /// No description provided for @alertsCached.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing saved alerts. Retry to check the latest state.'**
+  String get alertsCached;
+
+  /// No description provided for @alertsReadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to mark the alert as read. Please try again.'**
+  String get alertsReadFailed;
+
+  /// No description provided for @alertsCacheRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert marked as read. Retry to finish updating this phone.'**
+  String get alertsCacheRetry;
+
+  /// No description provided for @alertsDestinationPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert read. This destination will be available when its screen is ready.'**
+  String get alertsDestinationPending;
 }
 
 class _AppLocalizationsDelegate

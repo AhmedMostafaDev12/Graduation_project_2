@@ -48,9 +48,14 @@ class HomeAlert {
     required this.type,
     required this.message,
     required this.createdAt,
+    this.readAt,
+    this.entityType,
+    this.entityId,
   });
   final String id, patientId, type, message;
   final DateTime createdAt;
+  final DateTime? readAt;
+  final String? entityType, entityId;
 }
 
 class HomeData {
