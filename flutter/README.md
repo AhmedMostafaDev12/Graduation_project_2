@@ -132,7 +132,7 @@ and native Android/iOS build validation remain for their integration PRs.
 
 ## Drift and outbox foundation
 
-`databaseProvider` lazily opens schema version 2 in the private application-support
+`databaseProvider` lazily opens schema version 3 in the private application-support
 folder (`remori.sqlite`) using drift's background native executor. SQL logging is
 disabled. Tests override the executor with in-memory SQLite or a temporary file.
 Tokens remain exclusively in secure storage.
@@ -542,3 +542,54 @@ C1 tests cover cache ownership, atomic rollback, removed links, alert pagination
 v1 migration, revoked-link cache removal, patient switching, viewer access, offline/empty/error states,
 telemetry/disconnect, identity changes, RTL and large text.
 Live-account Android/iOS runtime validation remains pending.
+
+## C3 People
+
+C3 uses C1's selected patient and verified caregiver identity. It shows the
+exported two-column person grid, Active count / Archived filters, and a banner
+for distinct unknown-face clusters awaiting caregiver review. Names and custom
+relationships come from the API; Son/Daughter/Doctor/Nurse labels are localized.
+Only managers see Add person; viewers retain read navigation.
+
+The approved scoped Drift cache uses schema v3: known people and a review-count
+snapshot, keyed by caregiver and patient. The v2 upgrade preserves dashboard,
+reminder log and outbox data. Active people, archived people and unknown faces
+are fetched together through GET /patients/{id}/people?status=active|archived
+and GET /patients/{id}/unknown-faces, then committed atomically. The widget reads
+only SQLite. Switching filters needs no network request; switching patient or
+account resets the filter and changes cache scope. Empty/error/offline states
+use real cached data. Cold C3 entry without patient context uses the existing
+Home patient-selection bootstrap; refresh also runs on resume/pull/retry.
+
+As approved, cached_network_image 4.0.4 handles the API's signed photo_url
+thumbnail. Disk and memory keys use caregiver/patient/person IDs plus updated_at,
+so URL rotation preserves caching and changed photos get a new content key.
+UI keys hash the URL to restart the image stream on refreshed URLs without
+putting signed URLs into widget diagnostics. Native HTTP 403 evicts the scoped
+file and memory image and refreshes the list once per person/version; manual
+refresh/resume permits another attempt. Repeated errors cannot create a refresh
+loop. All other errors/missing photos show a neutral placeholder. Cache logging
+is disabled; no API bearer token is sent to photo hosts.
+
+Archived people have no retained photo URL; observed archive/removal/content
+changes evict old photos. PATIENT_NOT_FOUND purges that scope's metadata and
+images, including Home's patient context. Home link removal also clears related
+C3 metadata. No embeddings or unknown-face images are cached by C3.
+
+Add person opens C4 with the patient ID, person cards open C5 with patient/person
+IDs, and the review banner opens C6 with patient context. These target screens
+remain slots for separate PRs. No create/archive/promote endpoint is called here.
+
+Review captures: [English](test/goldens/c3_en.png), [Arabic](test/goldens/c3_ar.png).
+The captures use exported design portraits as test fixtures only; runtime people
+and photos always come from the API. No demo portraits are bundled in the app.
+Regenerate with flutter test test/c3_people_test.dart --update-goldens.
+
+Validation: dart format ., flutter analyze (clean), flutter test (201 passed,
+20 new C3 tests), Android debug APK build (successful).
+Tests cover both filters, cache scope, rollback, archived-photo eviction,
+revoked access, photo key/URL rotation and bounded 403 recovery, navigation
+context, viewer permissions, account/patient changes, v2 migration, late image
+callbacks, RTL and 2x text at 320dp.
+Live-account image loading on a real Android/iOS device and iOS build validation
+remain pending.

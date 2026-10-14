@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/a0_splash_screen.dart';
 import '../../features/caregiver_dashboard/presentation/c1_home_screen.dart';
 import '../../features/caregiver_dashboard/presentation/home_providers.dart';
+import '../../features/people/presentation/c3_people_screen.dart';
 import '../../features/auth/presentation/a1_mode_select_screen.dart';
 import '../../features/auth/presentation/a2_login_screen.dart';
 import '../../features/auth/presentation/a3_signup_screen.dart';
@@ -51,6 +52,8 @@ typedef RemoriScreenBuilder = Widget Function(BuildContext, GoRouterState);
 /// Feature PRs replace empty slots with the screen-ID presentation widgets.
 final screenBuildersProvider = Provider<Map<RemoriScreen, RemoriScreenBuilder>>(
   (ref) => {
+    RemoriScreen.c3: (context, state) =>
+        const C3PeopleScreen(key: ValueKey(RemoriScreen.c3)),
     RemoriScreen.c1: (context, state) =>
         const C1HomeScreen(key: ValueKey(RemoriScreen.c1)),
     RemoriScreen.a6: (context, state) => A6PermissionsScreen(

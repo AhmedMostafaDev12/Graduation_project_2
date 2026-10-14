@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 
 part 'remori_database.g.dart';
 part 'dashboard_tables.dart';
+part 'people_tables.dart';
 
 enum ReminderStatus { pending, completed, snoozed, missed }
 
@@ -56,12 +57,14 @@ class OutboxEntries extends Table {
     DashboardDevices,
     DashboardAlerts,
     DashboardDays,
+    CachedPeople,
+    PeopleCacheStates,
   ],
 )
 class RemoriDatabase extends _$RemoriDatabase {
   RemoriDatabase(super.executor);
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onUpgrade: (m, from, to) async {
@@ -70,6 +73,10 @@ class RemoriDatabase extends _$RemoriDatabase {
         await m.createTable(dashboardDevices);
         await m.createTable(dashboardAlerts);
         await m.createTable(dashboardDays);
+      }
+      if (from < 3) {
+        await m.createTable(cachedPeople);
+        await m.createTable(peopleCacheStates);
       }
     },
   );

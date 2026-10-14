@@ -63,6 +63,18 @@ class HomeRepository {
                     a.patientId.equals(patientId),
               ))
               .go();
+          await (db.delete(db.cachedPeople)..where(
+                (p) =>
+                    p.caregiverId.equals(caregiverId) &
+                    p.patientId.equals(patientId),
+              ))
+              .go();
+          await (db.delete(db.peopleCacheStates)..where(
+                (p) =>
+                    p.caregiverId.equals(caregiverId) &
+                    p.patientId.equals(patientId),
+              ))
+              .go();
         });
       }
       rethrow;
@@ -168,6 +180,18 @@ class HomeRepository {
             );
       }
       final allowedIds = patients.map((p) => p['id'] as String).toList();
+      await (db.delete(db.cachedPeople)..where(
+            (p) =>
+                p.caregiverId.equals(caregiverId) &
+                p.patientId.isNotIn(allowedIds),
+          ))
+          .go();
+      await (db.delete(db.peopleCacheStates)..where(
+            (p) =>
+                p.caregiverId.equals(caregiverId) &
+                p.patientId.isNotIn(allowedIds),
+          ))
+          .go();
       await (db.delete(db.dashboardDevices)..where(
             (d) =>
                 d.caregiverId.equals(caregiverId) &

@@ -536,4 +536,58 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeReadMore => 'Read more ›';
+
+  @override
+  String get peopleAdd => '+ Add person';
+
+  @override
+  String get peopleActiveLabel => 'Active';
+
+  @override
+  String peopleActive(String count) {
+    return 'Active ($count)';
+  }
+
+  @override
+  String get peopleArchived => 'Archived';
+
+  @override
+  String peopleReviewCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count new faces to review',
+      one: '1 new face to review',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get peopleLoading => 'Loading people…';
+
+  @override
+  String get peopleLoadFailed =>
+      'Unable to load people. Check your connection and try again.';
+
+  @override
+  String get peopleOffline =>
+      'Showing saved people. Unable to update the list.';
+
+  @override
+  String get peopleNoActive => 'No active people have been added yet.';
+
+  @override
+  String get peopleNoArchived => 'No archived people.';
+
+  @override
+  String get peopleSon => 'Son';
+
+  @override
+  String get peopleDaughter => 'Daughter';
+
+  @override
+  String get peopleDoctor => 'Doctor';
+
+  @override
+  String get peopleNurse => 'Nurse';
 }
