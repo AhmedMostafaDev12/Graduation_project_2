@@ -132,7 +132,7 @@ and native Android/iOS build validation remain for their integration PRs.
 
 ## Drift and outbox foundation
 
-`databaseProvider` lazily opens schema version 3 in the private application-support
+`databaseProvider` lazily opens schema version 4 in the private application-support
 folder (`remori.sqlite`) using drift's background native executor. SQL logging is
 disabled. Tests override the executor with in-memory SQLite or a temporary file.
 Tokens remain exclusively in secure storage.
@@ -578,7 +578,7 @@ C3 metadata. No embeddings or unknown-face images are cached by C3.
 
 Add person opens C4 with the patient ID, person cards open C5 with patient/person
 IDs, and the review banner opens C6 with patient context. C4 is implemented below;
-C5 and C6 remain slots for separate PRs. No create/archive/promote endpoint is
+C5 is implemented below; C6 remains a slot for a separate PR. No create/archive/promote endpoint is
 called from C3.
 
 Review captures: [English](test/goldens/c3_en.png), [Arabic](test/goldens/c3_ar.png).
@@ -639,3 +639,50 @@ device validation; no account or face data was created for automated checks.
 
 Validation: dart format ., flutter analyze (clean), flutter test (215 passed,
 14 new C4 tests), Android debug APK build (successful).
+
+## C5 Person detail
+
+C5 opens from a C3 card using its patient/person IDs and reads only from Drift.
+It shows the person's actual name, relationship, enrollment caregiver (when the
+API supplies one), first full photo, and enrolled-photo thumbnails. The existing
+cached_network_image package uses account/patient/person/photo IDs as keys, with
+separate full/thumbnail entries; signed-URL changes replace the image stream.
+Native HTTP 403 evicts and refreshes once per photo until an explicit refresh.
+There are no per-photo API requests or sample runtime portraits.
+
+Ahmed approved two scoped read caches: PersonDetailStates (enrolled-by name and
+refresh timestamp) and CachedPersonPhotos (IDs, signed URLs and order). Schema v4
+adds these without changing existing People, dashboard, reminder or outbox data.
+Detail refresh atomically updates these and the C3 person row. C3 clears stale
+details after observed archive/removal/content changes; Home clears detail
+metadata when a patient link is removed or revoked. Removed/archived photos are
+evicted from the detail image cache. Archived details never display photos.
+
+Ahmed approved focused dialogs and online C5 writes followed by local cache
+updates. Edit changes name/relationship through PATCH /people/{id}; Add photos
+uses the existing approved image_picker and POST /people/{id}/photos (1–5
+JPEG/PNG files per request, at most 4 MB each, at most 20 enrolled total). Tap an
+enrolled thumbnail to remove it with confirmation; the last photo cannot be
+removed. Archive requires confirmation and calls DELETE /people/{id}; it removes
+face metadata locally and returns to C3, retaining the historical name.
+Viewers and archived people have no write controls. Account/patient changes hide
+dialog data and ignore late callbacks. Both languages and enlarged layouts are
+supported, and structured photo errors mark their corresponding slots.
+
+There is no automatic retry of an uncertain upload. A confirmed write followed
+by a cache/refresh failure blocks further writes and offers refresh/cache retry
+without sending the write again. While that update is pending, photos are
+hidden. Selected new photo bytes are ephemeral and previews are evicted when
+the dialog closes. No embeddings or photo bytes are stored in Drift/outbox.
+
+Review captures: [English](test/goldens/c5_en.png), [Arabic](test/goldens/c5_ar.png).
+Regenerate with flutter test test/c5_person_detail_test.dart --update-goldens.
+The design portraits in captures are test fixtures only. Automated checks cover
+cache atomicity/scope, v3 migration, contract payloads, edit/upload/remove/archive,
+last-photo protection, cache/refresh retry, bounded 403 recovery, viewer access,
+dialog privacy, archive confirmation, URL rotation, and 2x text at 320dp.
+Real-device camera/gallery, live-account person changes, and an iOS build remain
+device-validation tasks; automated checks do not create or modify live faces.
+
+Validation: dart format ., flutter analyze (clean), flutter test (243 passed,
+28 new C5 tests), Android debug APK build (successful).

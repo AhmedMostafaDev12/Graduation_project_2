@@ -59,12 +59,14 @@ class OutboxEntries extends Table {
     DashboardDays,
     CachedPeople,
     PeopleCacheStates,
+    PersonDetailStates,
+    CachedPersonPhotos,
   ],
 )
 class RemoriDatabase extends _$RemoriDatabase {
   RemoriDatabase(super.executor);
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onUpgrade: (m, from, to) async {
@@ -77,6 +79,10 @@ class RemoriDatabase extends _$RemoriDatabase {
       if (from < 3) {
         await m.createTable(cachedPeople);
         await m.createTable(peopleCacheStates);
+      }
+      if (from < 4) {
+        await m.createTable(personDetailStates);
+        await m.createTable(cachedPersonPhotos);
       }
     },
   );

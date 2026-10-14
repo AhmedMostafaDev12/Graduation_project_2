@@ -671,4 +671,76 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get personSave => 'حفظ الشخص';
+
+  @override
+  String get detailTitle => 'تفاصيل الشخص';
+
+  @override
+  String get detailEdit => 'تعديل';
+
+  @override
+  String get detailSave => 'حفظ التغييرات';
+
+  @override
+  String get detailCancel => 'إلغاء';
+
+  @override
+  String get detailAddPhotos => '+ إضافة صور';
+
+  @override
+  String get detailSavePhotos => 'حفظ الصور';
+
+  @override
+  String detailEnrolledBy(String relationship, String name) {
+    return '$relationship · أضافه $name';
+  }
+
+  @override
+  String detailPhotoCount(String count) {
+    return 'الصور المسجلة ($count)';
+  }
+
+  @override
+  String get detailPhotoLabel => 'صورة مسجلة';
+
+  @override
+  String get detailPhotoTip =>
+      'تساعد الصور الإضافية من زوايا مختلفة على تحسين التعرّف.';
+
+  @override
+  String get detailArchive => 'أرشفة الشخص';
+
+  @override
+  String get detailArchiveHint =>
+      'لن يتم الإعلان عن الأشخاص المؤرشفين. سيُطلب منك التأكيد.';
+
+  @override
+  String get detailArchiveConfirm =>
+      'هل تريد أرشفة هذا الشخص؟ ستُحذف صوره وبيانات وجهه. تحتفظ اليوميات السابقة باسمه.';
+
+  @override
+  String get detailRemoveConfirm =>
+      'هل تريد حذف هذه الصورة المسجلة وبيانات وجهها؟';
+
+  @override
+  String get detailArchived => 'هذا الشخص مؤرشف.';
+
+  @override
+  String get detailLastPhoto => 'أضف صورة أخرى أولًا، أو أرشف الشخص.';
+
+  @override
+  String get detailTooManyPhotos =>
+      'يمكن تسجيل ٢٠ صورة للشخص. احذف صورة أولًا.';
+
+  @override
+  String get detailGone =>
+      'لم يعد هذا الشخص أو هذه الصورة متاحًا. حدّث القائمة.';
+
+  @override
+  String get detailSavedRefresh =>
+      'تم حفظ التغييرات. حدّث الصفحة لإكمال عرضها.';
+
+  @override
+  String get detailRetryMessage =>
+      'تعذّر تأكيد التغيير. حدّث الصفحة للتحقق من التفاصيل الحالية قبل المحاولة مجددًا.';
 }

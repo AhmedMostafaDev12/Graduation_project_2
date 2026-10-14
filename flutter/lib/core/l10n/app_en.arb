@@ -235,6 +235,43 @@
         "type": "int"
       }
     }
+  },
+  "detailTitle": "Person detail",
+  "detailEdit": "Edit",
+  "detailSave": "Save changes",
+  "detailCancel": "Cancel",
+  "detailAddPhotos": "+ Add photos",
+  "detailSavePhotos": "Save photos",
+  "detailEnrolledBy": "{relationship} · enrolled by {name}",
+  "detailPhotoCount": "Enrolled photos ({count})",
+  "detailPhotoLabel": "Enrolled photo",
+  "detailPhotoTip": "More photos from different angles improve recognition.",
+  "detailArchive": "Archive person",
+  "detailArchiveHint": "Archived people are no longer announced. You'll be asked to confirm.",
+  "detailArchiveConfirm": "Archive this person? Their photos and face data will be deleted. Past journal entries keep their name.",
+  "detailRemoveConfirm": "Remove this enrolled photo and its face data?",
+  "detailArchived": "This person is archived.",
+  "detailLastPhoto": "Add another photo first, or archive the person.",
+  "detailTooManyPhotos": "A person can have up to 20 photos. Remove a photo first.",
+  "detailGone": "This person or photo is no longer available. Refresh the list.",
+  "detailSavedRefresh": "Changes saved. Refresh to finish updating this page.",
+  "detailRetryMessage": "Unable to confirm the change. Refresh to check the current details before trying again.",
+  "@detailEnrolledBy": {
+    "placeholders": {
+      "relationship": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@detailPhotoCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
   }
 
 }

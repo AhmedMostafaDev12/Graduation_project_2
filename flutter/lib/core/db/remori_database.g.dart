@@ -4064,6 +4064,874 @@ class PeopleCacheStatesCompanion extends UpdateCompanion<PeopleCacheState> {
   }
 }
 
+class $PersonDetailStatesTable extends PersonDetailStates
+    with TableInfo<$PersonDetailStatesTable, PersonDetailState> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PersonDetailStatesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _personIdMeta = const VerificationMeta(
+    'personId',
+  );
+  @override
+  late final GeneratedColumn<String> personId = GeneratedColumn<String>(
+    'person_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _enrolledByNameMeta = const VerificationMeta(
+    'enrolledByName',
+  );
+  @override
+  late final GeneratedColumn<String> enrolledByName = GeneratedColumn<String>(
+    'enrolled_by_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> refreshedAt =
+      GeneratedColumn<int>(
+        'refreshed_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>($PersonDetailStatesTable.$converterrefreshedAt);
+  @override
+  List<GeneratedColumn> get $columns => [
+    caregiverId,
+    patientId,
+    personId,
+    enrolledByName,
+    refreshedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'person_detail_states';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PersonDetailState> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('person_id')) {
+      context.handle(
+        _personIdMeta,
+        personId.isAcceptableOrUnknown(data['person_id']!, _personIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_personIdMeta);
+    }
+    if (data.containsKey('enrolled_by_name')) {
+      context.handle(
+        _enrolledByNameMeta,
+        enrolledByName.isAcceptableOrUnknown(
+          data['enrolled_by_name']!,
+          _enrolledByNameMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, patientId, personId};
+  @override
+  PersonDetailState map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PersonDetailState(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      personId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}person_id'],
+      )!,
+      enrolledByName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}enrolled_by_name'],
+      ),
+      refreshedAt: $PersonDetailStatesTable.$converterrefreshedAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}refreshed_at'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $PersonDetailStatesTable createAlias(String alias) {
+    return $PersonDetailStatesTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converterrefreshedAt = const UtcMicros();
+}
+
+class PersonDetailState extends DataClass
+    implements Insertable<PersonDetailState> {
+  final String caregiverId;
+  final String patientId;
+  final String personId;
+  final String? enrolledByName;
+  final DateTime refreshedAt;
+  const PersonDetailState({
+    required this.caregiverId,
+    required this.patientId,
+    required this.personId,
+    this.enrolledByName,
+    required this.refreshedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    map['person_id'] = Variable<String>(personId);
+    if (!nullToAbsent || enrolledByName != null) {
+      map['enrolled_by_name'] = Variable<String>(enrolledByName);
+    }
+    {
+      map['refreshed_at'] = Variable<int>(
+        $PersonDetailStatesTable.$converterrefreshedAt.toSql(refreshedAt),
+      );
+    }
+    return map;
+  }
+
+  PersonDetailStatesCompanion toCompanion(bool nullToAbsent) {
+    return PersonDetailStatesCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      personId: Value(personId),
+      enrolledByName: enrolledByName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(enrolledByName),
+      refreshedAt: Value(refreshedAt),
+    );
+  }
+
+  factory PersonDetailState.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PersonDetailState(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      personId: serializer.fromJson<String>(json['personId']),
+      enrolledByName: serializer.fromJson<String?>(json['enrolledByName']),
+      refreshedAt: serializer.fromJson<DateTime>(json['refreshedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'personId': serializer.toJson<String>(personId),
+      'enrolledByName': serializer.toJson<String?>(enrolledByName),
+      'refreshedAt': serializer.toJson<DateTime>(refreshedAt),
+    };
+  }
+
+  PersonDetailState copyWith({
+    String? caregiverId,
+    String? patientId,
+    String? personId,
+    Value<String?> enrolledByName = const Value.absent(),
+    DateTime? refreshedAt,
+  }) => PersonDetailState(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    personId: personId ?? this.personId,
+    enrolledByName: enrolledByName.present
+        ? enrolledByName.value
+        : this.enrolledByName,
+    refreshedAt: refreshedAt ?? this.refreshedAt,
+  );
+  PersonDetailState copyWithCompanion(PersonDetailStatesCompanion data) {
+    return PersonDetailState(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      personId: data.personId.present ? data.personId.value : this.personId,
+      enrolledByName: data.enrolledByName.present
+          ? data.enrolledByName.value
+          : this.enrolledByName,
+      refreshedAt: data.refreshedAt.present
+          ? data.refreshedAt.value
+          : this.refreshedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PersonDetailState(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('personId: $personId, ')
+          ..write('enrolledByName: $enrolledByName, ')
+          ..write('refreshedAt: $refreshedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    caregiverId,
+    patientId,
+    personId,
+    enrolledByName,
+    refreshedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PersonDetailState &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.personId == this.personId &&
+          other.enrolledByName == this.enrolledByName &&
+          other.refreshedAt == this.refreshedAt);
+}
+
+class PersonDetailStatesCompanion extends UpdateCompanion<PersonDetailState> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<String> personId;
+  final Value<String?> enrolledByName;
+  final Value<DateTime> refreshedAt;
+  final Value<int> rowid;
+  const PersonDetailStatesCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.personId = const Value.absent(),
+    this.enrolledByName = const Value.absent(),
+    this.refreshedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PersonDetailStatesCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required String personId,
+    this.enrolledByName = const Value.absent(),
+    required DateTime refreshedAt,
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       personId = Value(personId),
+       refreshedAt = Value(refreshedAt);
+  static Insertable<PersonDetailState> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<String>? personId,
+    Expression<String>? enrolledByName,
+    Expression<int>? refreshedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (personId != null) 'person_id': personId,
+      if (enrolledByName != null) 'enrolled_by_name': enrolledByName,
+      if (refreshedAt != null) 'refreshed_at': refreshedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PersonDetailStatesCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<String>? personId,
+    Value<String?>? enrolledByName,
+    Value<DateTime>? refreshedAt,
+    Value<int>? rowid,
+  }) {
+    return PersonDetailStatesCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      personId: personId ?? this.personId,
+      enrolledByName: enrolledByName ?? this.enrolledByName,
+      refreshedAt: refreshedAt ?? this.refreshedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (personId.present) {
+      map['person_id'] = Variable<String>(personId.value);
+    }
+    if (enrolledByName.present) {
+      map['enrolled_by_name'] = Variable<String>(enrolledByName.value);
+    }
+    if (refreshedAt.present) {
+      map['refreshed_at'] = Variable<int>(
+        $PersonDetailStatesTable.$converterrefreshedAt.toSql(refreshedAt.value),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PersonDetailStatesCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('personId: $personId, ')
+          ..write('enrolledByName: $enrolledByName, ')
+          ..write('refreshedAt: $refreshedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CachedPersonPhotosTable extends CachedPersonPhotos
+    with TableInfo<$CachedPersonPhotosTable, CachedPersonPhoto> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedPersonPhotosTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _personIdMeta = const VerificationMeta(
+    'personId',
+  );
+  @override
+  late final GeneratedColumn<String> personId = GeneratedColumn<String>(
+    'person_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _urlMeta = const VerificationMeta('url');
+  @override
+  late final GeneratedColumn<String> url = GeneratedColumn<String>(
+    'url',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _thumbnailUrlMeta = const VerificationMeta(
+    'thumbnailUrl',
+  );
+  @override
+  late final GeneratedColumn<String> thumbnailUrl = GeneratedColumn<String>(
+    'thumbnail_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    caregiverId,
+    patientId,
+    personId,
+    id,
+    url,
+    thumbnailUrl,
+    position,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_person_photos';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedPersonPhoto> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('person_id')) {
+      context.handle(
+        _personIdMeta,
+        personId.isAcceptableOrUnknown(data['person_id']!, _personIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_personIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('url')) {
+      context.handle(
+        _urlMeta,
+        url.isAcceptableOrUnknown(data['url']!, _urlMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_urlMeta);
+    }
+    if (data.containsKey('thumbnail_url')) {
+      context.handle(
+        _thumbnailUrlMeta,
+        thumbnailUrl.isAcceptableOrUnknown(
+          data['thumbnail_url']!,
+          _thumbnailUrlMeta,
+        ),
+      );
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {
+    caregiverId,
+    patientId,
+    personId,
+    id,
+  };
+  @override
+  CachedPersonPhoto map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedPersonPhoto(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      personId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}person_id'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      url: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}url'],
+      )!,
+      thumbnailUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}thumbnail_url'],
+      ),
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+    );
+  }
+
+  @override
+  $CachedPersonPhotosTable createAlias(String alias) {
+    return $CachedPersonPhotosTable(attachedDatabase, alias);
+  }
+}
+
+class CachedPersonPhoto extends DataClass
+    implements Insertable<CachedPersonPhoto> {
+  final String caregiverId;
+  final String patientId;
+  final String personId;
+  final String id;
+  final String url;
+  final String? thumbnailUrl;
+  final int position;
+  const CachedPersonPhoto({
+    required this.caregiverId,
+    required this.patientId,
+    required this.personId,
+    required this.id,
+    required this.url,
+    this.thumbnailUrl,
+    required this.position,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    map['person_id'] = Variable<String>(personId);
+    map['id'] = Variable<String>(id);
+    map['url'] = Variable<String>(url);
+    if (!nullToAbsent || thumbnailUrl != null) {
+      map['thumbnail_url'] = Variable<String>(thumbnailUrl);
+    }
+    map['position'] = Variable<int>(position);
+    return map;
+  }
+
+  CachedPersonPhotosCompanion toCompanion(bool nullToAbsent) {
+    return CachedPersonPhotosCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      personId: Value(personId),
+      id: Value(id),
+      url: Value(url),
+      thumbnailUrl: thumbnailUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(thumbnailUrl),
+      position: Value(position),
+    );
+  }
+
+  factory CachedPersonPhoto.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedPersonPhoto(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      personId: serializer.fromJson<String>(json['personId']),
+      id: serializer.fromJson<String>(json['id']),
+      url: serializer.fromJson<String>(json['url']),
+      thumbnailUrl: serializer.fromJson<String?>(json['thumbnailUrl']),
+      position: serializer.fromJson<int>(json['position']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'personId': serializer.toJson<String>(personId),
+      'id': serializer.toJson<String>(id),
+      'url': serializer.toJson<String>(url),
+      'thumbnailUrl': serializer.toJson<String?>(thumbnailUrl),
+      'position': serializer.toJson<int>(position),
+    };
+  }
+
+  CachedPersonPhoto copyWith({
+    String? caregiverId,
+    String? patientId,
+    String? personId,
+    String? id,
+    String? url,
+    Value<String?> thumbnailUrl = const Value.absent(),
+    int? position,
+  }) => CachedPersonPhoto(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    personId: personId ?? this.personId,
+    id: id ?? this.id,
+    url: url ?? this.url,
+    thumbnailUrl: thumbnailUrl.present ? thumbnailUrl.value : this.thumbnailUrl,
+    position: position ?? this.position,
+  );
+  CachedPersonPhoto copyWithCompanion(CachedPersonPhotosCompanion data) {
+    return CachedPersonPhoto(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      personId: data.personId.present ? data.personId.value : this.personId,
+      id: data.id.present ? data.id.value : this.id,
+      url: data.url.present ? data.url.value : this.url,
+      thumbnailUrl: data.thumbnailUrl.present
+          ? data.thumbnailUrl.value
+          : this.thumbnailUrl,
+      position: data.position.present ? data.position.value : this.position,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedPersonPhoto(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('personId: $personId, ')
+          ..write('id: $id, ')
+          ..write('url: $url, ')
+          ..write('thumbnailUrl: $thumbnailUrl, ')
+          ..write('position: $position')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    caregiverId,
+    patientId,
+    personId,
+    id,
+    url,
+    thumbnailUrl,
+    position,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedPersonPhoto &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.personId == this.personId &&
+          other.id == this.id &&
+          other.url == this.url &&
+          other.thumbnailUrl == this.thumbnailUrl &&
+          other.position == this.position);
+}
+
+class CachedPersonPhotosCompanion extends UpdateCompanion<CachedPersonPhoto> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<String> personId;
+  final Value<String> id;
+  final Value<String> url;
+  final Value<String?> thumbnailUrl;
+  final Value<int> position;
+  final Value<int> rowid;
+  const CachedPersonPhotosCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.personId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.url = const Value.absent(),
+    this.thumbnailUrl = const Value.absent(),
+    this.position = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedPersonPhotosCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required String personId,
+    required String id,
+    required String url,
+    this.thumbnailUrl = const Value.absent(),
+    required int position,
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       personId = Value(personId),
+       id = Value(id),
+       url = Value(url),
+       position = Value(position);
+  static Insertable<CachedPersonPhoto> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<String>? personId,
+    Expression<String>? id,
+    Expression<String>? url,
+    Expression<String>? thumbnailUrl,
+    Expression<int>? position,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (personId != null) 'person_id': personId,
+      if (id != null) 'id': id,
+      if (url != null) 'url': url,
+      if (thumbnailUrl != null) 'thumbnail_url': thumbnailUrl,
+      if (position != null) 'position': position,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedPersonPhotosCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<String>? personId,
+    Value<String>? id,
+    Value<String>? url,
+    Value<String?>? thumbnailUrl,
+    Value<int>? position,
+    Value<int>? rowid,
+  }) {
+    return CachedPersonPhotosCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      personId: personId ?? this.personId,
+      id: id ?? this.id,
+      url: url ?? this.url,
+      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
+      position: position ?? this.position,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (personId.present) {
+      map['person_id'] = Variable<String>(personId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (url.present) {
+      map['url'] = Variable<String>(url.value);
+    }
+    if (thumbnailUrl.present) {
+      map['thumbnail_url'] = Variable<String>(thumbnailUrl.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedPersonPhotosCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('personId: $personId, ')
+          ..write('id: $id, ')
+          ..write('url: $url, ')
+          ..write('thumbnailUrl: $thumbnailUrl, ')
+          ..write('position: $position, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$RemoriDatabase extends GeneratedDatabase {
   _$RemoriDatabase(QueryExecutor e) : super(e);
   $RemoriDatabaseManager get managers => $RemoriDatabaseManager(this);
@@ -4081,6 +4949,10 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
   late final $CachedPeopleTable cachedPeople = $CachedPeopleTable(this);
   late final $PeopleCacheStatesTable peopleCacheStates =
       $PeopleCacheStatesTable(this);
+  late final $PersonDetailStatesTable personDetailStates =
+      $PersonDetailStatesTable(this);
+  late final $CachedPersonPhotosTable cachedPersonPhotos =
+      $CachedPersonPhotosTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4094,6 +4966,8 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
     dashboardDays,
     cachedPeople,
     peopleCacheStates,
+    personDetailStates,
+    cachedPersonPhotos,
   ];
 }
 
@@ -6282,6 +7156,504 @@ typedef $$PeopleCacheStatesTableProcessedTableManager =
       PeopleCacheState,
       PrefetchHooks Function()
     >;
+typedef $$PersonDetailStatesTableCreateCompanionBuilder =
+    PersonDetailStatesCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required String personId,
+      Value<String?> enrolledByName,
+      required DateTime refreshedAt,
+      Value<int> rowid,
+    });
+typedef $$PersonDetailStatesTableUpdateCompanionBuilder =
+    PersonDetailStatesCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<String> personId,
+      Value<String?> enrolledByName,
+      Value<DateTime> refreshedAt,
+      Value<int> rowid,
+    });
+
+class $$PersonDetailStatesTableFilterComposer
+    extends Composer<_$RemoriDatabase, $PersonDetailStatesTable> {
+  $$PersonDetailStatesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get personId => $composableBuilder(
+    column: $table.personId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get enrolledByName => $composableBuilder(
+    column: $table.enrolledByName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+}
+
+class $$PersonDetailStatesTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $PersonDetailStatesTable> {
+  $$PersonDetailStatesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get personId => $composableBuilder(
+    column: $table.personId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get enrolledByName => $composableBuilder(
+    column: $table.enrolledByName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get refreshedAt => $composableBuilder(
+    column: $table.refreshedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PersonDetailStatesTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $PersonDetailStatesTable> {
+  $$PersonDetailStatesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get personId =>
+      $composableBuilder(column: $table.personId, builder: (column) => column);
+
+  GeneratedColumn<String> get enrolledByName => $composableBuilder(
+    column: $table.enrolledByName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => column,
+      );
+}
+
+class $$PersonDetailStatesTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $PersonDetailStatesTable,
+          PersonDetailState,
+          $$PersonDetailStatesTableFilterComposer,
+          $$PersonDetailStatesTableOrderingComposer,
+          $$PersonDetailStatesTableAnnotationComposer,
+          $$PersonDetailStatesTableCreateCompanionBuilder,
+          $$PersonDetailStatesTableUpdateCompanionBuilder,
+          (
+            PersonDetailState,
+            BaseReferences<
+              _$RemoriDatabase,
+              $PersonDetailStatesTable,
+              PersonDetailState
+            >,
+          ),
+          PersonDetailState,
+          PrefetchHooks Function()
+        > {
+  $$PersonDetailStatesTableTableManager(
+    _$RemoriDatabase db,
+    $PersonDetailStatesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PersonDetailStatesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PersonDetailStatesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PersonDetailStatesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<String> personId = const Value.absent(),
+                Value<String?> enrolledByName = const Value.absent(),
+                Value<DateTime> refreshedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PersonDetailStatesCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                personId: personId,
+                enrolledByName: enrolledByName,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required String personId,
+                Value<String?> enrolledByName = const Value.absent(),
+                required DateTime refreshedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => PersonDetailStatesCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                personId: personId,
+                enrolledByName: enrolledByName,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PersonDetailStatesTable, PersonDetailState>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $PersonDetailStatesTable,
+                    PersonDetailState
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PersonDetailStatesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $PersonDetailStatesTable,
+      PersonDetailState,
+      $$PersonDetailStatesTableFilterComposer,
+      $$PersonDetailStatesTableOrderingComposer,
+      $$PersonDetailStatesTableAnnotationComposer,
+      $$PersonDetailStatesTableCreateCompanionBuilder,
+      $$PersonDetailStatesTableUpdateCompanionBuilder,
+      (
+        PersonDetailState,
+        BaseReferences<
+          _$RemoriDatabase,
+          $PersonDetailStatesTable,
+          PersonDetailState
+        >,
+      ),
+      PersonDetailState,
+      PrefetchHooks Function()
+    >;
+typedef $$CachedPersonPhotosTableCreateCompanionBuilder =
+    CachedPersonPhotosCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required String personId,
+      required String id,
+      required String url,
+      Value<String?> thumbnailUrl,
+      required int position,
+      Value<int> rowid,
+    });
+typedef $$CachedPersonPhotosTableUpdateCompanionBuilder =
+    CachedPersonPhotosCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<String> personId,
+      Value<String> id,
+      Value<String> url,
+      Value<String?> thumbnailUrl,
+      Value<int> position,
+      Value<int> rowid,
+    });
+
+class $$CachedPersonPhotosTableFilterComposer
+    extends Composer<_$RemoriDatabase, $CachedPersonPhotosTable> {
+  $$CachedPersonPhotosTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get personId => $composableBuilder(
+    column: $table.personId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get url => $composableBuilder(
+    column: $table.url,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get thumbnailUrl => $composableBuilder(
+    column: $table.thumbnailUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedPersonPhotosTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $CachedPersonPhotosTable> {
+  $$CachedPersonPhotosTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get personId => $composableBuilder(
+    column: $table.personId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get url => $composableBuilder(
+    column: $table.url,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get thumbnailUrl => $composableBuilder(
+    column: $table.thumbnailUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedPersonPhotosTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $CachedPersonPhotosTable> {
+  $$CachedPersonPhotosTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get personId =>
+      $composableBuilder(column: $table.personId, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get url =>
+      $composableBuilder(column: $table.url, builder: (column) => column);
+
+  GeneratedColumn<String> get thumbnailUrl => $composableBuilder(
+    column: $table.thumbnailUrl,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+}
+
+class $$CachedPersonPhotosTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $CachedPersonPhotosTable,
+          CachedPersonPhoto,
+          $$CachedPersonPhotosTableFilterComposer,
+          $$CachedPersonPhotosTableOrderingComposer,
+          $$CachedPersonPhotosTableAnnotationComposer,
+          $$CachedPersonPhotosTableCreateCompanionBuilder,
+          $$CachedPersonPhotosTableUpdateCompanionBuilder,
+          (
+            CachedPersonPhoto,
+            BaseReferences<
+              _$RemoriDatabase,
+              $CachedPersonPhotosTable,
+              CachedPersonPhoto
+            >,
+          ),
+          CachedPersonPhoto,
+          PrefetchHooks Function()
+        > {
+  $$CachedPersonPhotosTableTableManager(
+    _$RemoriDatabase db,
+    $CachedPersonPhotosTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedPersonPhotosTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedPersonPhotosTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CachedPersonPhotosTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<String> personId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> url = const Value.absent(),
+                Value<String?> thumbnailUrl = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedPersonPhotosCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                personId: personId,
+                id: id,
+                url: url,
+                thumbnailUrl: thumbnailUrl,
+                position: position,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required String personId,
+                required String id,
+                required String url,
+                Value<String?> thumbnailUrl = const Value.absent(),
+                required int position,
+                Value<int> rowid = const Value.absent(),
+              }) => CachedPersonPhotosCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                personId: personId,
+                id: id,
+                url: url,
+                thumbnailUrl: thumbnailUrl,
+                position: position,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CachedPersonPhotosTable, CachedPersonPhoto>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $CachedPersonPhotosTable,
+                    CachedPersonPhoto
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedPersonPhotosTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $CachedPersonPhotosTable,
+      CachedPersonPhoto,
+      $$CachedPersonPhotosTableFilterComposer,
+      $$CachedPersonPhotosTableOrderingComposer,
+      $$CachedPersonPhotosTableAnnotationComposer,
+      $$CachedPersonPhotosTableCreateCompanionBuilder,
+      $$CachedPersonPhotosTableUpdateCompanionBuilder,
+      (
+        CachedPersonPhoto,
+        BaseReferences<
+          _$RemoriDatabase,
+          $CachedPersonPhotosTable,
+          CachedPersonPhoto
+        >,
+      ),
+      CachedPersonPhoto,
+      PrefetchHooks Function()
+    >;
 
 class $RemoriDatabaseManager {
   final _$RemoriDatabase _db;
@@ -6302,4 +7674,8 @@ class $RemoriDatabaseManager {
       $$CachedPeopleTableTableManager(_db, _db.cachedPeople);
   $$PeopleCacheStatesTableTableManager get peopleCacheStates =>
       $$PeopleCacheStatesTableTableManager(_db, _db.peopleCacheStates);
+  $$PersonDetailStatesTableTableManager get personDetailStates =>
+      $$PersonDetailStatesTableTableManager(_db, _db.personDetailStates);
+  $$CachedPersonPhotosTableTableManager get cachedPersonPhotos =>
+      $$CachedPersonPhotosTableTableManager(_db, _db.cachedPersonPhotos);
 }
