@@ -23,3 +23,16 @@ class UnknownFacesCacheStates extends Table {
   @override
   Set<Column> get primaryKey => {caregiverId, patientId};
 }
+
+/// C7 signed-photo metadata only; images are fetched into memory, never disk.
+class CachedUnknownFaceSamples extends Table {
+  TextColumn get caregiverId => text()();
+  TextColumn get patientId => text()();
+  TextColumn get clusterId => text()();
+  TextColumn get id => text()();
+  TextColumn get url => text()();
+  TextColumn get thumbnailUrl => text().nullable()();
+  IntColumn get position => integer()();
+  @override
+  Set<Column> get primaryKey => {caregiverId, patientId, clusterId, id};
+}

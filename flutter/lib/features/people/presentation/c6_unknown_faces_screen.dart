@@ -168,65 +168,73 @@ class _C6UnknownFacesScreenState extends ConsumerState<C6UnknownFacesScreen>
                       padding: const EdgeInsets.only(bottom: 12),
                       child: Semantics(
                         button: true,
-                        enabled: false,
-                        child: Container(
-                          key: ValueKey('unknown-face-${face.id}'),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 12,
+                        enabled: true,
+                        child: GestureDetector(
+                          onTap: () => context.pushNamed(
+                            RemoriScreen.c7.name,
+                            extra: {
+                              'patient_id': scope.patientId,
+                              'cluster_id': face.id,
+                            },
                           ),
-                          decoration: BoxDecoration(
-                            color: RemoriColors.surface,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: RemoriColors.border),
-                          ),
-                          child: Row(
-                            children: [
-                              _Preview(
-                                key: ValueKey(
-                                  '${scope!.caregiverId}:${scope.patientId}:${face.id}:${state.revision}',
+                          child: Container(
+                            key: ValueKey('unknown-face-${face.id}'),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: RemoriColors.surface,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: RemoriColors.border),
+                            ),
+                            child: Row(
+                              children: [
+                                _Preview(
+                                  key: ValueKey(
+                                    '${scope!.caregiverId}:${scope.patientId}:${face.id}:${state.revision}',
+                                  ),
+                                  scope: scope,
+                                  face: face,
+                                  allowed:
+                                      _visible &&
+                                      state.previewsAllowed &&
+                                      !state.busy,
                                 ),
-                                scope: scope,
-                                face: face,
-                                allowed:
-                                    _visible &&
-                                    state.previewsAllowed &&
-                                    !state.busy,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      s.unknownFacesSeen(
-                                        number.format(face.sightingCount),
-                                        number.format(face.distinctDays),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        s.unknownFacesSeen(
+                                          number.format(face.sightingCount),
+                                          number.format(face.distinctDays),
+                                        ),
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    Text(dates(face), style: _small),
-                                  ],
+                                      Text(dates(face), style: _small),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 8),
-                              const Icon(
-                                Icons.chevron_right,
-                                size: 18,
-                                color: RemoriColors.muted,
-                              ),
-                            ],
+                                const SizedBox(width: 8),
+                                const Icon(
+                                  Icons.chevron_right,
+                                  size: 18,
+                                  color: RemoriColors.muted,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   const SizedBox(height: 8),
                   Text(s.unknownFacesRetention, style: _small),
-                  const SizedBox(height: 12),
-                  Text(s.unknownFacesPending, style: _small),
                 ],
               ),
             ),

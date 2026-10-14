@@ -68,12 +68,13 @@ class OutboxEntries extends Table {
     ReminderCacheStates,
     CachedUnknownFaces,
     UnknownFacesCacheStates,
+    CachedUnknownFaceSamples,
   ],
 )
 class RemoriDatabase extends _$RemoriDatabase {
   RemoriDatabase(super.executor);
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onUpgrade: (m, from, to) async {
@@ -99,6 +100,9 @@ class RemoriDatabase extends _$RemoriDatabase {
       if (from < 6) {
         await m.createTable(cachedUnknownFaces);
         await m.createTable(unknownFacesCacheStates);
+      }
+      if (from < 7) {
+        await m.createTable(cachedUnknownFaceSamples);
       }
     },
   );

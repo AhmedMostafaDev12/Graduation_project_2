@@ -7734,6 +7734,491 @@ class UnknownFacesCacheStatesCompanion
   }
 }
 
+class $CachedUnknownFaceSamplesTable extends CachedUnknownFaceSamples
+    with TableInfo<$CachedUnknownFaceSamplesTable, CachedUnknownFaceSample> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedUnknownFaceSamplesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _clusterIdMeta = const VerificationMeta(
+    'clusterId',
+  );
+  @override
+  late final GeneratedColumn<String> clusterId = GeneratedColumn<String>(
+    'cluster_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _urlMeta = const VerificationMeta('url');
+  @override
+  late final GeneratedColumn<String> url = GeneratedColumn<String>(
+    'url',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _thumbnailUrlMeta = const VerificationMeta(
+    'thumbnailUrl',
+  );
+  @override
+  late final GeneratedColumn<String> thumbnailUrl = GeneratedColumn<String>(
+    'thumbnail_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    caregiverId,
+    patientId,
+    clusterId,
+    id,
+    url,
+    thumbnailUrl,
+    position,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_unknown_face_samples';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedUnknownFaceSample> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('cluster_id')) {
+      context.handle(
+        _clusterIdMeta,
+        clusterId.isAcceptableOrUnknown(data['cluster_id']!, _clusterIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_clusterIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('url')) {
+      context.handle(
+        _urlMeta,
+        url.isAcceptableOrUnknown(data['url']!, _urlMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_urlMeta);
+    }
+    if (data.containsKey('thumbnail_url')) {
+      context.handle(
+        _thumbnailUrlMeta,
+        thumbnailUrl.isAcceptableOrUnknown(
+          data['thumbnail_url']!,
+          _thumbnailUrlMeta,
+        ),
+      );
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {
+    caregiverId,
+    patientId,
+    clusterId,
+    id,
+  };
+  @override
+  CachedUnknownFaceSample map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedUnknownFaceSample(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      clusterId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cluster_id'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      url: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}url'],
+      )!,
+      thumbnailUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}thumbnail_url'],
+      ),
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+    );
+  }
+
+  @override
+  $CachedUnknownFaceSamplesTable createAlias(String alias) {
+    return $CachedUnknownFaceSamplesTable(attachedDatabase, alias);
+  }
+}
+
+class CachedUnknownFaceSample extends DataClass
+    implements Insertable<CachedUnknownFaceSample> {
+  final String caregiverId;
+  final String patientId;
+  final String clusterId;
+  final String id;
+  final String url;
+  final String? thumbnailUrl;
+  final int position;
+  const CachedUnknownFaceSample({
+    required this.caregiverId,
+    required this.patientId,
+    required this.clusterId,
+    required this.id,
+    required this.url,
+    this.thumbnailUrl,
+    required this.position,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    map['cluster_id'] = Variable<String>(clusterId);
+    map['id'] = Variable<String>(id);
+    map['url'] = Variable<String>(url);
+    if (!nullToAbsent || thumbnailUrl != null) {
+      map['thumbnail_url'] = Variable<String>(thumbnailUrl);
+    }
+    map['position'] = Variable<int>(position);
+    return map;
+  }
+
+  CachedUnknownFaceSamplesCompanion toCompanion(bool nullToAbsent) {
+    return CachedUnknownFaceSamplesCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      clusterId: Value(clusterId),
+      id: Value(id),
+      url: Value(url),
+      thumbnailUrl: thumbnailUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(thumbnailUrl),
+      position: Value(position),
+    );
+  }
+
+  factory CachedUnknownFaceSample.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedUnknownFaceSample(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      clusterId: serializer.fromJson<String>(json['clusterId']),
+      id: serializer.fromJson<String>(json['id']),
+      url: serializer.fromJson<String>(json['url']),
+      thumbnailUrl: serializer.fromJson<String?>(json['thumbnailUrl']),
+      position: serializer.fromJson<int>(json['position']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'clusterId': serializer.toJson<String>(clusterId),
+      'id': serializer.toJson<String>(id),
+      'url': serializer.toJson<String>(url),
+      'thumbnailUrl': serializer.toJson<String?>(thumbnailUrl),
+      'position': serializer.toJson<int>(position),
+    };
+  }
+
+  CachedUnknownFaceSample copyWith({
+    String? caregiverId,
+    String? patientId,
+    String? clusterId,
+    String? id,
+    String? url,
+    Value<String?> thumbnailUrl = const Value.absent(),
+    int? position,
+  }) => CachedUnknownFaceSample(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    clusterId: clusterId ?? this.clusterId,
+    id: id ?? this.id,
+    url: url ?? this.url,
+    thumbnailUrl: thumbnailUrl.present ? thumbnailUrl.value : this.thumbnailUrl,
+    position: position ?? this.position,
+  );
+  CachedUnknownFaceSample copyWithCompanion(
+    CachedUnknownFaceSamplesCompanion data,
+  ) {
+    return CachedUnknownFaceSample(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      clusterId: data.clusterId.present ? data.clusterId.value : this.clusterId,
+      id: data.id.present ? data.id.value : this.id,
+      url: data.url.present ? data.url.value : this.url,
+      thumbnailUrl: data.thumbnailUrl.present
+          ? data.thumbnailUrl.value
+          : this.thumbnailUrl,
+      position: data.position.present ? data.position.value : this.position,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedUnknownFaceSample(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('clusterId: $clusterId, ')
+          ..write('id: $id, ')
+          ..write('url: $url, ')
+          ..write('thumbnailUrl: $thumbnailUrl, ')
+          ..write('position: $position')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    caregiverId,
+    patientId,
+    clusterId,
+    id,
+    url,
+    thumbnailUrl,
+    position,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedUnknownFaceSample &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.clusterId == this.clusterId &&
+          other.id == this.id &&
+          other.url == this.url &&
+          other.thumbnailUrl == this.thumbnailUrl &&
+          other.position == this.position);
+}
+
+class CachedUnknownFaceSamplesCompanion
+    extends UpdateCompanion<CachedUnknownFaceSample> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<String> clusterId;
+  final Value<String> id;
+  final Value<String> url;
+  final Value<String?> thumbnailUrl;
+  final Value<int> position;
+  final Value<int> rowid;
+  const CachedUnknownFaceSamplesCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.clusterId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.url = const Value.absent(),
+    this.thumbnailUrl = const Value.absent(),
+    this.position = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedUnknownFaceSamplesCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required String clusterId,
+    required String id,
+    required String url,
+    this.thumbnailUrl = const Value.absent(),
+    required int position,
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       clusterId = Value(clusterId),
+       id = Value(id),
+       url = Value(url),
+       position = Value(position);
+  static Insertable<CachedUnknownFaceSample> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<String>? clusterId,
+    Expression<String>? id,
+    Expression<String>? url,
+    Expression<String>? thumbnailUrl,
+    Expression<int>? position,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (clusterId != null) 'cluster_id': clusterId,
+      if (id != null) 'id': id,
+      if (url != null) 'url': url,
+      if (thumbnailUrl != null) 'thumbnail_url': thumbnailUrl,
+      if (position != null) 'position': position,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedUnknownFaceSamplesCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<String>? clusterId,
+    Value<String>? id,
+    Value<String>? url,
+    Value<String?>? thumbnailUrl,
+    Value<int>? position,
+    Value<int>? rowid,
+  }) {
+    return CachedUnknownFaceSamplesCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      clusterId: clusterId ?? this.clusterId,
+      id: id ?? this.id,
+      url: url ?? this.url,
+      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
+      position: position ?? this.position,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (clusterId.present) {
+      map['cluster_id'] = Variable<String>(clusterId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (url.present) {
+      map['url'] = Variable<String>(url.value);
+    }
+    if (thumbnailUrl.present) {
+      map['thumbnail_url'] = Variable<String>(thumbnailUrl.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedUnknownFaceSamplesCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('clusterId: $clusterId, ')
+          ..write('id: $id, ')
+          ..write('url: $url, ')
+          ..write('thumbnailUrl: $thumbnailUrl, ')
+          ..write('position: $position, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$RemoriDatabase extends GeneratedDatabase {
   _$RemoriDatabase(QueryExecutor e) : super(e);
   $RemoriDatabaseManager get managers => $RemoriDatabaseManager(this);
@@ -7766,6 +8251,8 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
       $CachedUnknownFacesTable(this);
   late final $UnknownFacesCacheStatesTable unknownFacesCacheStates =
       $UnknownFacesCacheStatesTable(this);
+  late final $CachedUnknownFaceSamplesTable cachedUnknownFaceSamples =
+      $CachedUnknownFaceSamplesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -7786,6 +8273,7 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
     reminderCacheStates,
     cachedUnknownFaces,
     unknownFacesCacheStates,
+    cachedUnknownFaceSamples,
   ];
 }
 
@@ -11995,6 +12483,279 @@ typedef $$UnknownFacesCacheStatesTableProcessedTableManager =
       UnknownFacesCacheState,
       PrefetchHooks Function()
     >;
+typedef $$CachedUnknownFaceSamplesTableCreateCompanionBuilder =
+    CachedUnknownFaceSamplesCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required String clusterId,
+      required String id,
+      required String url,
+      Value<String?> thumbnailUrl,
+      required int position,
+      Value<int> rowid,
+    });
+typedef $$CachedUnknownFaceSamplesTableUpdateCompanionBuilder =
+    CachedUnknownFaceSamplesCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<String> clusterId,
+      Value<String> id,
+      Value<String> url,
+      Value<String?> thumbnailUrl,
+      Value<int> position,
+      Value<int> rowid,
+    });
+
+class $$CachedUnknownFaceSamplesTableFilterComposer
+    extends Composer<_$RemoriDatabase, $CachedUnknownFaceSamplesTable> {
+  $$CachedUnknownFaceSamplesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get clusterId => $composableBuilder(
+    column: $table.clusterId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get url => $composableBuilder(
+    column: $table.url,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get thumbnailUrl => $composableBuilder(
+    column: $table.thumbnailUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedUnknownFaceSamplesTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $CachedUnknownFaceSamplesTable> {
+  $$CachedUnknownFaceSamplesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get clusterId => $composableBuilder(
+    column: $table.clusterId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get url => $composableBuilder(
+    column: $table.url,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get thumbnailUrl => $composableBuilder(
+    column: $table.thumbnailUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedUnknownFaceSamplesTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $CachedUnknownFaceSamplesTable> {
+  $$CachedUnknownFaceSamplesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get clusterId =>
+      $composableBuilder(column: $table.clusterId, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get url =>
+      $composableBuilder(column: $table.url, builder: (column) => column);
+
+  GeneratedColumn<String> get thumbnailUrl => $composableBuilder(
+    column: $table.thumbnailUrl,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+}
+
+class $$CachedUnknownFaceSamplesTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $CachedUnknownFaceSamplesTable,
+          CachedUnknownFaceSample,
+          $$CachedUnknownFaceSamplesTableFilterComposer,
+          $$CachedUnknownFaceSamplesTableOrderingComposer,
+          $$CachedUnknownFaceSamplesTableAnnotationComposer,
+          $$CachedUnknownFaceSamplesTableCreateCompanionBuilder,
+          $$CachedUnknownFaceSamplesTableUpdateCompanionBuilder,
+          (
+            CachedUnknownFaceSample,
+            BaseReferences<
+              _$RemoriDatabase,
+              $CachedUnknownFaceSamplesTable,
+              CachedUnknownFaceSample
+            >,
+          ),
+          CachedUnknownFaceSample,
+          PrefetchHooks Function()
+        > {
+  $$CachedUnknownFaceSamplesTableTableManager(
+    _$RemoriDatabase db,
+    $CachedUnknownFaceSamplesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedUnknownFaceSamplesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$CachedUnknownFaceSamplesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$CachedUnknownFaceSamplesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<String> clusterId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> url = const Value.absent(),
+                Value<String?> thumbnailUrl = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedUnknownFaceSamplesCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                clusterId: clusterId,
+                id: id,
+                url: url,
+                thumbnailUrl: thumbnailUrl,
+                position: position,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required String clusterId,
+                required String id,
+                required String url,
+                Value<String?> thumbnailUrl = const Value.absent(),
+                required int position,
+                Value<int> rowid = const Value.absent(),
+              }) => CachedUnknownFaceSamplesCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                clusterId: clusterId,
+                id: id,
+                url: url,
+                thumbnailUrl: thumbnailUrl,
+                position: position,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    $CachedUnknownFaceSamplesTable,
+                    CachedUnknownFaceSample
+                  >(table),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $CachedUnknownFaceSamplesTable,
+                    CachedUnknownFaceSample
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedUnknownFaceSamplesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $CachedUnknownFaceSamplesTable,
+      CachedUnknownFaceSample,
+      $$CachedUnknownFaceSamplesTableFilterComposer,
+      $$CachedUnknownFaceSamplesTableOrderingComposer,
+      $$CachedUnknownFaceSamplesTableAnnotationComposer,
+      $$CachedUnknownFaceSamplesTableCreateCompanionBuilder,
+      $$CachedUnknownFaceSamplesTableUpdateCompanionBuilder,
+      (
+        CachedUnknownFaceSample,
+        BaseReferences<
+          _$RemoriDatabase,
+          $CachedUnknownFaceSamplesTable,
+          CachedUnknownFaceSample
+        >,
+      ),
+      CachedUnknownFaceSample,
+      PrefetchHooks Function()
+    >;
 
 class $RemoriDatabaseManager {
   final _$RemoriDatabase _db;
@@ -12034,5 +12795,10 @@ class $RemoriDatabaseManager {
       $$UnknownFacesCacheStatesTableTableManager(
         _db,
         _db.unknownFacesCacheStates,
+      );
+  $$CachedUnknownFaceSamplesTableTableManager get cachedUnknownFaceSamples =>
+      $$CachedUnknownFaceSamplesTableTableManager(
+        _db,
+        _db.cachedUnknownFaceSamples,
       );
 }

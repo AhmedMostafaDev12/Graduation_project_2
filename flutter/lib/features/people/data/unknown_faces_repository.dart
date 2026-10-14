@@ -7,6 +7,13 @@ import '../../../core/db/remori_database.dart';
 import '../domain/people_data.dart';
 import '../domain/unknown_faces_data.dart';
 
+/// An acknowledged server decision. Retrying this receipt writes SQLite only.
+class UnknownFaceDecision {
+  const UnknownFaceDecision(this.clusterId, this.person);
+  final String clusterId;
+  final CachedPeopleCompanion? person;
+}
+
 class UnknownFacesRepository {
   UnknownFacesRepository(this.client, this.db, this.scope);
   final ApiClient client;
@@ -24,6 +31,9 @@ class UnknownFacesRepository {
       r.caregiverId.equals(scope.caregiverId) &
       r.patientId.equals(scope.patientId);
   Expression<bool> _states(UnknownFacesCacheStates r) =>
+      r.caregiverId.equals(scope.caregiverId) &
+      r.patientId.equals(scope.patientId);
+  Expression<bool> _samples(CachedUnknownFaceSamples r) =>
       r.caregiverId.equals(scope.caregiverId) &
       r.patientId.equals(scope.patientId);
   ApiFailure get _invalid => ApiFailure(ApiFailureKind.invalidResponse);
@@ -65,6 +75,7 @@ class UnknownFacesRepository {
         throw _invalid;
       }
       final rows = <CachedUnknownFacesCompanion>[];
+      final photoRows = <CachedUnknownFaceSamplesCompanion>[];
       final ids = <String>{};
       for (final raw in (response.data as List).cast<Map>()) {
         final id = _text(raw, 'id'),
@@ -107,6 +118,20 @@ class UnknownFacesRepository {
         }
         // The board/spec exposes faces only after sightings on three days.
         if (days < 3) continue;
+        for (var position = 0; position < samples.length; position++) {
+          final photo = samples[position] as Map;
+          photoRows.add(
+            CachedUnknownFaceSamplesCompanion.insert(
+              caregiverId: scope.caregiverId,
+              patientId: scope.patientId,
+              clusterId: id,
+              id: photo['id'] as String,
+              url: photo['url'] as String,
+              thumbnailUrl: Value(photo['thumbnail_url'] as String?),
+              position: position,
+            ),
+          );
+        }
         rows.add(
           CachedUnknownFacesCompanion.insert(
             caregiverId: scope.caregiverId,
@@ -126,6 +151,10 @@ class UnknownFacesRepository {
       await db.transaction(() async {
         if (_disposed || generation != _generation) return;
         await (db.delete(db.cachedUnknownFaces)..where(_rows)).go();
+        await (db.delete(db.cachedUnknownFaceSamples)..where(_samples)).go();
+        for (final photo in photoRows) {
+          await db.into(db.cachedUnknownFaceSamples).insert(photo);
+        }
         for (final row in rows) {
           await db.into(db.cachedUnknownFaces).insert(row);
         }
@@ -160,12 +189,17 @@ class UnknownFacesRepository {
   Future<void> purge() => db.transaction(() async {
     ++_generation;
     await (db.delete(db.cachedUnknownFaces)..where(_rows)).go();
+    await (db.delete(db.cachedUnknownFaceSamples)..where(_samples)).go();
     await (db.delete(db.unknownFacesCacheStates)..where(_states)).go();
   });
   Stream<UnknownFacesData> watch() => db
       .customSelect(
         'SELECT 1',
-        readsFrom: {db.cachedUnknownFaces, db.unknownFacesCacheStates},
+        readsFrom: {
+          db.cachedUnknownFaces,
+          db.unknownFacesCacheStates,
+          db.cachedUnknownFaceSamples,
+        },
       )
       .watch()
       .asyncMap((_) => read());
@@ -178,6 +212,11 @@ class UnknownFacesRepository {
     final state = await (db.select(
       db.unknownFacesCacheStates,
     )..where(_states)).getSingleOrNull();
+    final samples =
+        await (db.select(db.cachedUnknownFaceSamples)
+              ..where(_samples)
+              ..orderBy([(r) => OrderingTerm.asc(r.position)]))
+            .get();
     return UnknownFacesData(
       refreshedAt: state?.refreshedAt,
       faces: [
@@ -191,8 +230,121 @@ class UnknownFacesRepository {
             sampleId: r.sampleId,
             sampleUrl: r.sampleUrl,
             thumbnailUrl: r.thumbnailUrl,
+            samples: [
+              for (final p in samples.where((p) => p.clusterId == r.id))
+                UnknownFaceSample(p.id, p.url, p.thumbnailUrl),
+            ],
           ),
       ],
     );
   });
+
+  Future<UnknownFaceDecision> decide(
+    String id, {
+    String? name,
+    String? relationship,
+    bool consent = false,
+  }) async {
+    final promote = name != null;
+    if (id.isEmpty ||
+        (promote &&
+            (!consent ||
+                name.trim().isEmpty ||
+                name.trim().runes.length > 80 ||
+                relationship == null ||
+                relationship.trim().isEmpty ||
+                relationship.trim().runes.length > 40))) {
+      throw ApiFailure(ApiFailureKind.server, code: 'VALIDATION_ERROR');
+    }
+    ++_generation;
+    final response = await client.request<dynamic>(
+      '/unknown-faces/$id/${promote ? 'promote' : 'dismiss'}',
+      method: 'POST',
+      credential: ApiCredential.caregiver,
+      cancelToken: _cancel,
+      data: promote
+          ? {
+              'name': name.trim(),
+              'relationship': relationship!.trim(),
+              'consent_given': true,
+            }
+          : null,
+    );
+    ++_generation;
+    final body = response.data;
+    final cluster = promote && body is Map ? body['cluster'] : body;
+    if (response.statusCode != 200 ||
+        cluster is! Map ||
+        cluster['id'] != id ||
+        cluster['patient_id'] != scope.patientId ||
+        cluster['status'] != (promote ? 'promoted' : 'dismissed')) {
+      throw _invalid;
+    }
+    if (!promote) {
+      if (cluster['samples'] is! List ||
+          (cluster['samples'] as List).isNotEmpty ||
+          cluster['sample_url'] != null ||
+          cluster['sample_thumbnail_url'] != null) {
+        throw _invalid;
+      }
+      return UnknownFaceDecision(id, null);
+    }
+    final person = (body as Map)['person'];
+    if (person is! Map ||
+        person['patient_id'] != scope.patientId ||
+        person['status'] != 'active' ||
+        person['embedding_count'] is! int ||
+        (person['embedding_count'] as int) < 0) {
+      throw _invalid;
+    }
+    return UnknownFaceDecision(
+      id,
+      CachedPeopleCompanion.insert(
+        caregiverId: scope.caregiverId,
+        patientId: scope.patientId,
+        id: _text(person, 'id'),
+        name: _text(person, 'name'),
+        relationship: _text(person, 'relationship'),
+        status: 'active',
+        embeddingCount: person['embedding_count'] as int,
+        updatedAt: _time(person, 'updated_at'),
+        position: -1,
+        photoUrl: Value(_url(person['photo_url'])),
+      ),
+    );
+  }
+
+  Future<void> cacheDecision(UnknownFaceDecision decision) =>
+      db.transaction(() async {
+        if (_disposed) throw ApiFailure(ApiFailureKind.cancelled);
+        ++_generation;
+        if (decision.person != null) {
+          final p = decision.person!;
+          if (p.caregiverId.value != scope.caregiverId ||
+              p.patientId.value != scope.patientId) {
+            throw _invalid;
+          }
+          await db
+              .into(db.cachedPeople)
+              .insert(p, mode: InsertMode.insertOrReplace);
+        }
+        await (db.delete(db.cachedUnknownFaceSamples)..where(
+              (r) => _samples(r) & r.clusterId.equals(decision.clusterId),
+            ))
+            .go();
+        await (db.delete(
+          db.cachedUnknownFaces,
+        )..where((r) => _rows(r) & r.id.equals(decision.clusterId))).go();
+        final remaining = await (db.select(
+          db.cachedUnknownFaces,
+        )..where(_rows)).get();
+        await (db.update(db.peopleCacheStates)..where(
+              (r) =>
+                  r.caregiverId.equals(scope.caregiverId) &
+                  r.patientId.equals(scope.patientId),
+            ))
+            .write(
+              PeopleCacheStatesCompanion(unknownCount: Value(remaining.length)),
+            );
+      });
 }

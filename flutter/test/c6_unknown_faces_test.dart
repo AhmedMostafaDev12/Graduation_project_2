@@ -353,6 +353,7 @@ void main() {
           at: now,
           status: ReminderStatus.pending,
         );
+        await db.customStatement('DROP TABLE cached_unknown_face_samples');
         await db.customStatement('DROP TABLE cached_unknown_faces');
         await db.customStatement('DROP TABLE unknown_faces_cache_states');
         await db.customStatement('PRAGMA user_version = 5');
@@ -532,6 +533,8 @@ void main() {
           ...builders,
           RemoriScreen.c3: (_, _) => const Text('People destination'),
           RemoriScreen.c9: (_, _) => const Text('Add reminder destination'),
+          RemoriScreen.c7: (_, state) =>
+              Text('Face review destination', key: ValueKey(state.extra)),
         }),
       ],
     );
@@ -570,7 +573,7 @@ void main() {
   }
 
   testWidgets(
-    'counts, dates and memory previews follow C6 and review cards stay disabled',
+    'counts, dates and memory previews follow C6 and cards open scoped C7',
     (tester) async {
       final fake = FakeRepository(client, db, scope),
           photos = FakePreviews(frames);
@@ -580,11 +583,14 @@ void main() {
       expect(find.byType(Image), findsNWidgets(2));
       await tester.tap(find.byKey(const ValueKey('unknown-face-unknown-0')));
       await tester.pumpAndSettle();
-      expect(find.text('New faces to review'), findsOneWidget);
+      expect(find.text('Face review destination'), findsOneWidget);
       expect(
-        find.textContaining('Face review will be available'),
-        findsOneWidget,
+        (tester.widget<Text>(find.text('Face review destination')).key
+                as ValueKey)
+            .value,
+        {'patient_id': scope.patientId, 'cluster_id': 'unknown-0'},
       );
+      expect(photos.pending, isEmpty);
     },
   );
   testWidgets('offline metadata shows placeholders and never loads photo URLs', (
@@ -712,8 +718,8 @@ void main() {
       await tester.scrollUntilVisible(
         find.text(
           language == 'en'
-              ? 'Face review will be available when the review screen is ready.'
-              : 'ستتوفر مراجعة الوجوه عند اكتمال صفحة المراجعة.',
+              ? 'Photos of unknown people are deleted after 30 days, or right away if you dismiss them.'
+              : 'تُحذف صور الأشخاص غير المعروفين بعد ٣٠ يومًا، أو فورًا إذا تجاهلتهم.',
         ),
         250,
         scrollable: find.byType(Scrollable).first,

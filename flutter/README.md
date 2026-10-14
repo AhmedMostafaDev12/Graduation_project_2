@@ -837,8 +837,8 @@ and pending image requests. Resume/return requires another successful refresh.
 Offline metadata remains visible with placeholders. HTTP 403 refreshes signed
 URLs once per sample until an explicit retry; errors never print signed URLs.
 
-Ahmed approved keeping review cards disabled with a localized pending notice
-until C7's separate PR. Viewers can read C6; they have no editing controls.
+Review cards now open C7 with the selected patient and cluster IDs. The former
+review-pending notice is removed. Viewers can read C6; they have no editing controls.
 Arabic/English layouts, enlarged text and scrolling follow the design and use
 the existing caregiver navigation. No packages or backend contracts are added.
 
@@ -854,3 +854,44 @@ device-validation tasks; automated checks do not modify live face data.
 
 Validation: dart format ., flutter analyze (clean), flutter test (352 passed:
 20 new C6 tests plus C2 navigation coverage), Android debug APK build (successful).
+
+## C7 Who is this?
+
+Tap a C6 review card to open its scoped detail. C7 reads the existing unknown-face
+cache and up to three ordered sample references from the approved
+CachedUnknownFaceSamples table. Schema v7 preserves earlier caches and outbox
+records; removed patient links also purge sample metadata. No embeddings or image
+bytes enter Drift, and no package or backend contract changes are required.
+
+Photos follow C6's memory-only policy, with a separate C7 session so covering C6
+cannot clear C7's images. Offline reads show saved counts/dates and placeholders.
+Backgrounding, covering/leaving the route and account/patient changes clear
+previews; a successful refresh is required to display them again. Signed URL 403
+recovery is bounded by sample ID. Runtime never uses the design's sample portraits.
+
+Ahmed approved manager-only online decisions. Promotion sends name, relationship
+and explicit consent to POST /unknown-faces/{id}/promote. Consent starts unchecked;
+name and relationship limits match the API. Dismissal asks for confirmation before
+POST /unknown-faces/{id}/dismiss deletes the stranger's photos. Viewers can inspect
+metadata/photos but cannot submit either decision. Both actions return to People
+after an atomic local update removes the face/samples, updates the review badge,
+and inserts the returned person when promoted.
+
+An acknowledged decision retains a receipt: a local failure offers cache-only
+retry and never sends another POST. An uncertain response or ALREADY_DECIDED
+requires a successful list refresh before another decision. Duplicate submissions
+are blocked, late refreshes cannot resurrect decided faces, and late responses
+cannot write into another account/patient scope. API failures are localized without
+showing names, signed URLs, server messages or credentials in diagnostic output.
+
+Review captures: [English](test/goldens/c7_en.png), [Arabic](test/goldens/c7_ar.png).
+Regenerate with flutter test test/c7_unknown_detail_test.dart --update-goldens.
+Tests cover scoped ordered metadata, migration, promotion/dismissal contracts,
+consent/length validation, malformed ownership, stale refreshes, confirmation,
+cache-only retries, uncertain outcomes, duplicate taps, viewers, offline reads,
+background cleanup, account changes, bounded 403 recovery and 2x text at 320dp.
+Live-account decisions and iOS validation remain device-validation tasks; automated
+tests do not enroll or dismiss real faces.
+
+Validation: dart format --set-exit-if-changed ., flutter analyze (clean),
+flutter test (378 passed, including 26 new C7 tests), Android debug APK build.

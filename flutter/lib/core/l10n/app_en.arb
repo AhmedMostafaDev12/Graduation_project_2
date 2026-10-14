@@ -445,5 +445,36 @@
   "unknownFacesOffline": "Showing saved counts and dates. Photos require a successful refresh.",
   "unknownFacePhoto": "Unknown person photo",
   "unknownFacePhotoUnavailable": "Photo unavailable",
-  "unknownFacesUnavailable": "This patient's new faces are unavailable."
+  "unknownFacesUnavailable": "This patient's new faces are unavailable.",
+  "unknownDetailTitle": "Who is this?",
+  "unknownDetailKnow": "I know them",
+  "unknownDetailNameHint": "Dr. Hany",
+  "unknownDetailRelationshipHint": "Doctor",
+  "unknownDetailConsent": "This person agreed to be recognized.",
+  "unknownDetailSave": "Save as a known person",
+  "unknownDetailDismiss": "Stranger, dismiss",
+  "unknownDetailDeleteHint": "Dismissing deletes these photos.",
+  "unknownDetailDismissConfirm": "Dismiss this stranger? Their photos will be deleted immediately. Journal sightings will remain without photos.",
+  "unknownDetailUnavailable": "This face is no longer available. Return to New faces to check the list.",
+  "unknownDetailCacheRetry": "Decision saved. Retry to finish updating this phone.",
+  "unknownDetailUncertain": "Unable to confirm the decision. Refresh to check its current state before trying again.",
+  "unknownDetailNameRequired": "Enter a name (up to 80 characters).",
+  "unknownDetailRelationshipRequired": "Enter a relationship (up to 40 characters).",
+  "unknownDetailSummary": "Seen {times} times on {days} different days · first {first} · last {last}",
+  "@unknownDetailSummary": {
+    "placeholders": {
+      "times": {
+        "type": "String"
+      },
+      "days": {
+        "type": "String"
+      },
+      "first": {
+        "type": "String"
+      },
+      "last": {
+        "type": "String"
+      }
+    }
+  }
 }
