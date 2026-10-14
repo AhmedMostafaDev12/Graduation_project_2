@@ -992,11 +992,2137 @@ class OutboxEntriesCompanion extends UpdateCompanion<PendingWrite> {
   }
 }
 
+class $DashboardPatientsTable extends DashboardPatients
+    with TableInfo<$DashboardPatientsTable, DashboardPatient> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DashboardPatientsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fullNameMeta = const VerificationMeta(
+    'fullName',
+  );
+  @override
+  late final GeneratedColumn<String> fullName = GeneratedColumn<String>(
+    'full_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _preferredLanguageMeta = const VerificationMeta(
+    'preferredLanguage',
+  );
+  @override
+  late final GeneratedColumn<String> preferredLanguage =
+      GeneratedColumn<String>(
+        'preferred_language',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _timezoneMeta = const VerificationMeta(
+    'timezone',
+  );
+  @override
+  late final GeneratedColumn<String> timezone = GeneratedColumn<String>(
+    'timezone',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _memoryCaptureEnabledMeta =
+      const VerificationMeta('memoryCaptureEnabled');
+  @override
+  late final GeneratedColumn<bool> memoryCaptureEnabled = GeneratedColumn<bool>(
+    'memory_capture_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("memory_capture_enabled" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _permissionMeta = const VerificationMeta(
+    'permission',
+  );
+  @override
+  late final GeneratedColumn<String> permission = GeneratedColumn<String>(
+    'permission',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    caregiverId,
+    id,
+    fullName,
+    preferredLanguage,
+    timezone,
+    memoryCaptureEnabled,
+    permission,
+    position,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'dashboard_patients';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DashboardPatient> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('full_name')) {
+      context.handle(
+        _fullNameMeta,
+        fullName.isAcceptableOrUnknown(data['full_name']!, _fullNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fullNameMeta);
+    }
+    if (data.containsKey('preferred_language')) {
+      context.handle(
+        _preferredLanguageMeta,
+        preferredLanguage.isAcceptableOrUnknown(
+          data['preferred_language']!,
+          _preferredLanguageMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_preferredLanguageMeta);
+    }
+    if (data.containsKey('timezone')) {
+      context.handle(
+        _timezoneMeta,
+        timezone.isAcceptableOrUnknown(data['timezone']!, _timezoneMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_timezoneMeta);
+    }
+    if (data.containsKey('memory_capture_enabled')) {
+      context.handle(
+        _memoryCaptureEnabledMeta,
+        memoryCaptureEnabled.isAcceptableOrUnknown(
+          data['memory_capture_enabled']!,
+          _memoryCaptureEnabledMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_memoryCaptureEnabledMeta);
+    }
+    if (data.containsKey('permission')) {
+      context.handle(
+        _permissionMeta,
+        permission.isAcceptableOrUnknown(data['permission']!, _permissionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_permissionMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, id};
+  @override
+  DashboardPatient map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DashboardPatient(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      fullName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}full_name'],
+      )!,
+      preferredLanguage: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}preferred_language'],
+      )!,
+      timezone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}timezone'],
+      )!,
+      memoryCaptureEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}memory_capture_enabled'],
+      )!,
+      permission: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}permission'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+    );
+  }
+
+  @override
+  $DashboardPatientsTable createAlias(String alias) {
+    return $DashboardPatientsTable(attachedDatabase, alias);
+  }
+}
+
+class DashboardPatient extends DataClass
+    implements Insertable<DashboardPatient> {
+  final String caregiverId;
+  final String id;
+  final String fullName;
+  final String preferredLanguage;
+  final String timezone;
+  final bool memoryCaptureEnabled;
+  final String permission;
+  final int position;
+  const DashboardPatient({
+    required this.caregiverId,
+    required this.id,
+    required this.fullName,
+    required this.preferredLanguage,
+    required this.timezone,
+    required this.memoryCaptureEnabled,
+    required this.permission,
+    required this.position,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['id'] = Variable<String>(id);
+    map['full_name'] = Variable<String>(fullName);
+    map['preferred_language'] = Variable<String>(preferredLanguage);
+    map['timezone'] = Variable<String>(timezone);
+    map['memory_capture_enabled'] = Variable<bool>(memoryCaptureEnabled);
+    map['permission'] = Variable<String>(permission);
+    map['position'] = Variable<int>(position);
+    return map;
+  }
+
+  DashboardPatientsCompanion toCompanion(bool nullToAbsent) {
+    return DashboardPatientsCompanion(
+      caregiverId: Value(caregiverId),
+      id: Value(id),
+      fullName: Value(fullName),
+      preferredLanguage: Value(preferredLanguage),
+      timezone: Value(timezone),
+      memoryCaptureEnabled: Value(memoryCaptureEnabled),
+      permission: Value(permission),
+      position: Value(position),
+    );
+  }
+
+  factory DashboardPatient.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DashboardPatient(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      id: serializer.fromJson<String>(json['id']),
+      fullName: serializer.fromJson<String>(json['fullName']),
+      preferredLanguage: serializer.fromJson<String>(json['preferredLanguage']),
+      timezone: serializer.fromJson<String>(json['timezone']),
+      memoryCaptureEnabled: serializer.fromJson<bool>(
+        json['memoryCaptureEnabled'],
+      ),
+      permission: serializer.fromJson<String>(json['permission']),
+      position: serializer.fromJson<int>(json['position']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'id': serializer.toJson<String>(id),
+      'fullName': serializer.toJson<String>(fullName),
+      'preferredLanguage': serializer.toJson<String>(preferredLanguage),
+      'timezone': serializer.toJson<String>(timezone),
+      'memoryCaptureEnabled': serializer.toJson<bool>(memoryCaptureEnabled),
+      'permission': serializer.toJson<String>(permission),
+      'position': serializer.toJson<int>(position),
+    };
+  }
+
+  DashboardPatient copyWith({
+    String? caregiverId,
+    String? id,
+    String? fullName,
+    String? preferredLanguage,
+    String? timezone,
+    bool? memoryCaptureEnabled,
+    String? permission,
+    int? position,
+  }) => DashboardPatient(
+    caregiverId: caregiverId ?? this.caregiverId,
+    id: id ?? this.id,
+    fullName: fullName ?? this.fullName,
+    preferredLanguage: preferredLanguage ?? this.preferredLanguage,
+    timezone: timezone ?? this.timezone,
+    memoryCaptureEnabled: memoryCaptureEnabled ?? this.memoryCaptureEnabled,
+    permission: permission ?? this.permission,
+    position: position ?? this.position,
+  );
+  DashboardPatient copyWithCompanion(DashboardPatientsCompanion data) {
+    return DashboardPatient(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      id: data.id.present ? data.id.value : this.id,
+      fullName: data.fullName.present ? data.fullName.value : this.fullName,
+      preferredLanguage: data.preferredLanguage.present
+          ? data.preferredLanguage.value
+          : this.preferredLanguage,
+      timezone: data.timezone.present ? data.timezone.value : this.timezone,
+      memoryCaptureEnabled: data.memoryCaptureEnabled.present
+          ? data.memoryCaptureEnabled.value
+          : this.memoryCaptureEnabled,
+      permission: data.permission.present
+          ? data.permission.value
+          : this.permission,
+      position: data.position.present ? data.position.value : this.position,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DashboardPatient(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('id: $id, ')
+          ..write('fullName: $fullName, ')
+          ..write('preferredLanguage: $preferredLanguage, ')
+          ..write('timezone: $timezone, ')
+          ..write('memoryCaptureEnabled: $memoryCaptureEnabled, ')
+          ..write('permission: $permission, ')
+          ..write('position: $position')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    caregiverId,
+    id,
+    fullName,
+    preferredLanguage,
+    timezone,
+    memoryCaptureEnabled,
+    permission,
+    position,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DashboardPatient &&
+          other.caregiverId == this.caregiverId &&
+          other.id == this.id &&
+          other.fullName == this.fullName &&
+          other.preferredLanguage == this.preferredLanguage &&
+          other.timezone == this.timezone &&
+          other.memoryCaptureEnabled == this.memoryCaptureEnabled &&
+          other.permission == this.permission &&
+          other.position == this.position);
+}
+
+class DashboardPatientsCompanion extends UpdateCompanion<DashboardPatient> {
+  final Value<String> caregiverId;
+  final Value<String> id;
+  final Value<String> fullName;
+  final Value<String> preferredLanguage;
+  final Value<String> timezone;
+  final Value<bool> memoryCaptureEnabled;
+  final Value<String> permission;
+  final Value<int> position;
+  final Value<int> rowid;
+  const DashboardPatientsCompanion({
+    this.caregiverId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.fullName = const Value.absent(),
+    this.preferredLanguage = const Value.absent(),
+    this.timezone = const Value.absent(),
+    this.memoryCaptureEnabled = const Value.absent(),
+    this.permission = const Value.absent(),
+    this.position = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DashboardPatientsCompanion.insert({
+    required String caregiverId,
+    required String id,
+    required String fullName,
+    required String preferredLanguage,
+    required String timezone,
+    required bool memoryCaptureEnabled,
+    required String permission,
+    required int position,
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       id = Value(id),
+       fullName = Value(fullName),
+       preferredLanguage = Value(preferredLanguage),
+       timezone = Value(timezone),
+       memoryCaptureEnabled = Value(memoryCaptureEnabled),
+       permission = Value(permission),
+       position = Value(position);
+  static Insertable<DashboardPatient> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? id,
+    Expression<String>? fullName,
+    Expression<String>? preferredLanguage,
+    Expression<String>? timezone,
+    Expression<bool>? memoryCaptureEnabled,
+    Expression<String>? permission,
+    Expression<int>? position,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (id != null) 'id': id,
+      if (fullName != null) 'full_name': fullName,
+      if (preferredLanguage != null) 'preferred_language': preferredLanguage,
+      if (timezone != null) 'timezone': timezone,
+      if (memoryCaptureEnabled != null)
+        'memory_capture_enabled': memoryCaptureEnabled,
+      if (permission != null) 'permission': permission,
+      if (position != null) 'position': position,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DashboardPatientsCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? id,
+    Value<String>? fullName,
+    Value<String>? preferredLanguage,
+    Value<String>? timezone,
+    Value<bool>? memoryCaptureEnabled,
+    Value<String>? permission,
+    Value<int>? position,
+    Value<int>? rowid,
+  }) {
+    return DashboardPatientsCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      id: id ?? this.id,
+      fullName: fullName ?? this.fullName,
+      preferredLanguage: preferredLanguage ?? this.preferredLanguage,
+      timezone: timezone ?? this.timezone,
+      memoryCaptureEnabled: memoryCaptureEnabled ?? this.memoryCaptureEnabled,
+      permission: permission ?? this.permission,
+      position: position ?? this.position,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (fullName.present) {
+      map['full_name'] = Variable<String>(fullName.value);
+    }
+    if (preferredLanguage.present) {
+      map['preferred_language'] = Variable<String>(preferredLanguage.value);
+    }
+    if (timezone.present) {
+      map['timezone'] = Variable<String>(timezone.value);
+    }
+    if (memoryCaptureEnabled.present) {
+      map['memory_capture_enabled'] = Variable<bool>(
+        memoryCaptureEnabled.value,
+      );
+    }
+    if (permission.present) {
+      map['permission'] = Variable<String>(permission.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DashboardPatientsCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('id: $id, ')
+          ..write('fullName: $fullName, ')
+          ..write('preferredLanguage: $preferredLanguage, ')
+          ..write('timezone: $timezone, ')
+          ..write('memoryCaptureEnabled: $memoryCaptureEnabled, ')
+          ..write('permission: $permission, ')
+          ..write('position: $position, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $DashboardDevicesTable extends DashboardDevices
+    with TableInfo<$DashboardDevicesTable, DashboardDevice> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DashboardDevicesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _serialMeta = const VerificationMeta('serial');
+  @override
+  late final GeneratedColumn<String> serial = GeneratedColumn<String>(
+    'serial',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _onlineMeta = const VerificationMeta('online');
+  @override
+  late final GeneratedColumn<bool> online = GeneratedColumn<bool>(
+    'online',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("online" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _batteryPctMeta = const VerificationMeta(
+    'batteryPct',
+  );
+  @override
+  late final GeneratedColumn<int> batteryPct = GeneratedColumn<int>(
+    'battery_pct',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime?, int> lastSeenAt =
+      GeneratedColumn<int>(
+        'last_seen_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      ).withConverter<DateTime?>($DashboardDevicesTable.$converterlastSeenAtn);
+  @override
+  List<GeneratedColumn> get $columns => [
+    caregiverId,
+    patientId,
+    id,
+    serial,
+    online,
+    batteryPct,
+    lastSeenAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'dashboard_devices';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DashboardDevice> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('serial')) {
+      context.handle(
+        _serialMeta,
+        serial.isAcceptableOrUnknown(data['serial']!, _serialMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_serialMeta);
+    }
+    if (data.containsKey('online')) {
+      context.handle(
+        _onlineMeta,
+        online.isAcceptableOrUnknown(data['online']!, _onlineMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_onlineMeta);
+    }
+    if (data.containsKey('battery_pct')) {
+      context.handle(
+        _batteryPctMeta,
+        batteryPct.isAcceptableOrUnknown(data['battery_pct']!, _batteryPctMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, id};
+  @override
+  DashboardDevice map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DashboardDevice(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      serial: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}serial'],
+      )!,
+      online: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}online'],
+      )!,
+      batteryPct: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}battery_pct'],
+      ),
+      lastSeenAt: $DashboardDevicesTable.$converterlastSeenAtn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}last_seen_at'],
+        ),
+      ),
+    );
+  }
+
+  @override
+  $DashboardDevicesTable createAlias(String alias) {
+    return $DashboardDevicesTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converterlastSeenAt = const UtcMicros();
+  static TypeConverter<DateTime?, int?> $converterlastSeenAtn =
+      NullAwareTypeConverter.wrap($converterlastSeenAt);
+}
+
+class DashboardDevice extends DataClass implements Insertable<DashboardDevice> {
+  final String caregiverId;
+  final String patientId;
+  final String id;
+  final String serial;
+  final bool online;
+  final int? batteryPct;
+  final DateTime? lastSeenAt;
+  const DashboardDevice({
+    required this.caregiverId,
+    required this.patientId,
+    required this.id,
+    required this.serial,
+    required this.online,
+    this.batteryPct,
+    this.lastSeenAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    map['id'] = Variable<String>(id);
+    map['serial'] = Variable<String>(serial);
+    map['online'] = Variable<bool>(online);
+    if (!nullToAbsent || batteryPct != null) {
+      map['battery_pct'] = Variable<int>(batteryPct);
+    }
+    if (!nullToAbsent || lastSeenAt != null) {
+      map['last_seen_at'] = Variable<int>(
+        $DashboardDevicesTable.$converterlastSeenAtn.toSql(lastSeenAt),
+      );
+    }
+    return map;
+  }
+
+  DashboardDevicesCompanion toCompanion(bool nullToAbsent) {
+    return DashboardDevicesCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      id: Value(id),
+      serial: Value(serial),
+      online: Value(online),
+      batteryPct: batteryPct == null && nullToAbsent
+          ? const Value.absent()
+          : Value(batteryPct),
+      lastSeenAt: lastSeenAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSeenAt),
+    );
+  }
+
+  factory DashboardDevice.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DashboardDevice(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      id: serializer.fromJson<String>(json['id']),
+      serial: serializer.fromJson<String>(json['serial']),
+      online: serializer.fromJson<bool>(json['online']),
+      batteryPct: serializer.fromJson<int?>(json['batteryPct']),
+      lastSeenAt: serializer.fromJson<DateTime?>(json['lastSeenAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'id': serializer.toJson<String>(id),
+      'serial': serializer.toJson<String>(serial),
+      'online': serializer.toJson<bool>(online),
+      'batteryPct': serializer.toJson<int?>(batteryPct),
+      'lastSeenAt': serializer.toJson<DateTime?>(lastSeenAt),
+    };
+  }
+
+  DashboardDevice copyWith({
+    String? caregiverId,
+    String? patientId,
+    String? id,
+    String? serial,
+    bool? online,
+    Value<int?> batteryPct = const Value.absent(),
+    Value<DateTime?> lastSeenAt = const Value.absent(),
+  }) => DashboardDevice(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    id: id ?? this.id,
+    serial: serial ?? this.serial,
+    online: online ?? this.online,
+    batteryPct: batteryPct.present ? batteryPct.value : this.batteryPct,
+    lastSeenAt: lastSeenAt.present ? lastSeenAt.value : this.lastSeenAt,
+  );
+  DashboardDevice copyWithCompanion(DashboardDevicesCompanion data) {
+    return DashboardDevice(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      id: data.id.present ? data.id.value : this.id,
+      serial: data.serial.present ? data.serial.value : this.serial,
+      online: data.online.present ? data.online.value : this.online,
+      batteryPct: data.batteryPct.present
+          ? data.batteryPct.value
+          : this.batteryPct,
+      lastSeenAt: data.lastSeenAt.present
+          ? data.lastSeenAt.value
+          : this.lastSeenAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DashboardDevice(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('id: $id, ')
+          ..write('serial: $serial, ')
+          ..write('online: $online, ')
+          ..write('batteryPct: $batteryPct, ')
+          ..write('lastSeenAt: $lastSeenAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    caregiverId,
+    patientId,
+    id,
+    serial,
+    online,
+    batteryPct,
+    lastSeenAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DashboardDevice &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.id == this.id &&
+          other.serial == this.serial &&
+          other.online == this.online &&
+          other.batteryPct == this.batteryPct &&
+          other.lastSeenAt == this.lastSeenAt);
+}
+
+class DashboardDevicesCompanion extends UpdateCompanion<DashboardDevice> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<String> id;
+  final Value<String> serial;
+  final Value<bool> online;
+  final Value<int?> batteryPct;
+  final Value<DateTime?> lastSeenAt;
+  final Value<int> rowid;
+  const DashboardDevicesCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.serial = const Value.absent(),
+    this.online = const Value.absent(),
+    this.batteryPct = const Value.absent(),
+    this.lastSeenAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DashboardDevicesCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required String id,
+    required String serial,
+    required bool online,
+    this.batteryPct = const Value.absent(),
+    this.lastSeenAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       id = Value(id),
+       serial = Value(serial),
+       online = Value(online);
+  static Insertable<DashboardDevice> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<String>? id,
+    Expression<String>? serial,
+    Expression<bool>? online,
+    Expression<int>? batteryPct,
+    Expression<int>? lastSeenAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (id != null) 'id': id,
+      if (serial != null) 'serial': serial,
+      if (online != null) 'online': online,
+      if (batteryPct != null) 'battery_pct': batteryPct,
+      if (lastSeenAt != null) 'last_seen_at': lastSeenAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DashboardDevicesCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<String>? id,
+    Value<String>? serial,
+    Value<bool>? online,
+    Value<int?>? batteryPct,
+    Value<DateTime?>? lastSeenAt,
+    Value<int>? rowid,
+  }) {
+    return DashboardDevicesCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      id: id ?? this.id,
+      serial: serial ?? this.serial,
+      online: online ?? this.online,
+      batteryPct: batteryPct ?? this.batteryPct,
+      lastSeenAt: lastSeenAt ?? this.lastSeenAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (serial.present) {
+      map['serial'] = Variable<String>(serial.value);
+    }
+    if (online.present) {
+      map['online'] = Variable<bool>(online.value);
+    }
+    if (batteryPct.present) {
+      map['battery_pct'] = Variable<int>(batteryPct.value);
+    }
+    if (lastSeenAt.present) {
+      map['last_seen_at'] = Variable<int>(
+        $DashboardDevicesTable.$converterlastSeenAtn.toSql(lastSeenAt.value),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DashboardDevicesCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('id: $id, ')
+          ..write('serial: $serial, ')
+          ..write('online: $online, ')
+          ..write('batteryPct: $batteryPct, ')
+          ..write('lastSeenAt: $lastSeenAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $DashboardAlertsTable extends DashboardAlerts
+    with TableInfo<$DashboardAlertsTable, DashboardAlert> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DashboardAlertsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _alertTypeMeta = const VerificationMeta(
+    'alertType',
+  );
+  @override
+  late final GeneratedColumn<String> alertType = GeneratedColumn<String>(
+    'alert_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _messageMeta = const VerificationMeta(
+    'message',
+  );
+  @override
+  late final GeneratedColumn<String> message = GeneratedColumn<String>(
+    'message',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> createdAt =
+      GeneratedColumn<int>(
+        'created_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>($DashboardAlertsTable.$convertercreatedAt);
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime?, int> readAt =
+      GeneratedColumn<int>(
+        'read_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      ).withConverter<DateTime?>($DashboardAlertsTable.$converterreadAtn);
+  static const VerificationMeta _entityTypeMeta = const VerificationMeta(
+    'entityType',
+  );
+  @override
+  late final GeneratedColumn<String> entityType = GeneratedColumn<String>(
+    'entity_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _entityIdMeta = const VerificationMeta(
+    'entityId',
+  );
+  @override
+  late final GeneratedColumn<String> entityId = GeneratedColumn<String>(
+    'entity_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    caregiverId,
+    id,
+    patientId,
+    alertType,
+    message,
+    createdAt,
+    readAt,
+    entityType,
+    entityId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'dashboard_alerts';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DashboardAlert> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('alert_type')) {
+      context.handle(
+        _alertTypeMeta,
+        alertType.isAcceptableOrUnknown(data['alert_type']!, _alertTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_alertTypeMeta);
+    }
+    if (data.containsKey('message')) {
+      context.handle(
+        _messageMeta,
+        message.isAcceptableOrUnknown(data['message']!, _messageMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_messageMeta);
+    }
+    if (data.containsKey('entity_type')) {
+      context.handle(
+        _entityTypeMeta,
+        entityType.isAcceptableOrUnknown(data['entity_type']!, _entityTypeMeta),
+      );
+    }
+    if (data.containsKey('entity_id')) {
+      context.handle(
+        _entityIdMeta,
+        entityId.isAcceptableOrUnknown(data['entity_id']!, _entityIdMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, id};
+  @override
+  DashboardAlert map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DashboardAlert(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      alertType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}alert_type'],
+      )!,
+      message: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}message'],
+      )!,
+      createdAt: $DashboardAlertsTable.$convertercreatedAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}created_at'],
+        )!,
+      ),
+      readAt: $DashboardAlertsTable.$converterreadAtn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}read_at'],
+        ),
+      ),
+      entityType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}entity_type'],
+      ),
+      entityId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}entity_id'],
+      ),
+    );
+  }
+
+  @override
+  $DashboardAlertsTable createAlias(String alias) {
+    return $DashboardAlertsTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $convertercreatedAt = const UtcMicros();
+  static TypeConverter<DateTime, int> $converterreadAt = const UtcMicros();
+  static TypeConverter<DateTime?, int?> $converterreadAtn =
+      NullAwareTypeConverter.wrap($converterreadAt);
+}
+
+class DashboardAlert extends DataClass implements Insertable<DashboardAlert> {
+  final String caregiverId;
+  final String id;
+  final String patientId;
+  final String alertType;
+  final String message;
+  final DateTime createdAt;
+  final DateTime? readAt;
+  final String? entityType;
+  final String? entityId;
+  const DashboardAlert({
+    required this.caregiverId,
+    required this.id,
+    required this.patientId,
+    required this.alertType,
+    required this.message,
+    required this.createdAt,
+    this.readAt,
+    this.entityType,
+    this.entityId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['id'] = Variable<String>(id);
+    map['patient_id'] = Variable<String>(patientId);
+    map['alert_type'] = Variable<String>(alertType);
+    map['message'] = Variable<String>(message);
+    {
+      map['created_at'] = Variable<int>(
+        $DashboardAlertsTable.$convertercreatedAt.toSql(createdAt),
+      );
+    }
+    if (!nullToAbsent || readAt != null) {
+      map['read_at'] = Variable<int>(
+        $DashboardAlertsTable.$converterreadAtn.toSql(readAt),
+      );
+    }
+    if (!nullToAbsent || entityType != null) {
+      map['entity_type'] = Variable<String>(entityType);
+    }
+    if (!nullToAbsent || entityId != null) {
+      map['entity_id'] = Variable<String>(entityId);
+    }
+    return map;
+  }
+
+  DashboardAlertsCompanion toCompanion(bool nullToAbsent) {
+    return DashboardAlertsCompanion(
+      caregiverId: Value(caregiverId),
+      id: Value(id),
+      patientId: Value(patientId),
+      alertType: Value(alertType),
+      message: Value(message),
+      createdAt: Value(createdAt),
+      readAt: readAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(readAt),
+      entityType: entityType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(entityType),
+      entityId: entityId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(entityId),
+    );
+  }
+
+  factory DashboardAlert.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DashboardAlert(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      id: serializer.fromJson<String>(json['id']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      alertType: serializer.fromJson<String>(json['alertType']),
+      message: serializer.fromJson<String>(json['message']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      readAt: serializer.fromJson<DateTime?>(json['readAt']),
+      entityType: serializer.fromJson<String?>(json['entityType']),
+      entityId: serializer.fromJson<String?>(json['entityId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'id': serializer.toJson<String>(id),
+      'patientId': serializer.toJson<String>(patientId),
+      'alertType': serializer.toJson<String>(alertType),
+      'message': serializer.toJson<String>(message),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'readAt': serializer.toJson<DateTime?>(readAt),
+      'entityType': serializer.toJson<String?>(entityType),
+      'entityId': serializer.toJson<String?>(entityId),
+    };
+  }
+
+  DashboardAlert copyWith({
+    String? caregiverId,
+    String? id,
+    String? patientId,
+    String? alertType,
+    String? message,
+    DateTime? createdAt,
+    Value<DateTime?> readAt = const Value.absent(),
+    Value<String?> entityType = const Value.absent(),
+    Value<String?> entityId = const Value.absent(),
+  }) => DashboardAlert(
+    caregiverId: caregiverId ?? this.caregiverId,
+    id: id ?? this.id,
+    patientId: patientId ?? this.patientId,
+    alertType: alertType ?? this.alertType,
+    message: message ?? this.message,
+    createdAt: createdAt ?? this.createdAt,
+    readAt: readAt.present ? readAt.value : this.readAt,
+    entityType: entityType.present ? entityType.value : this.entityType,
+    entityId: entityId.present ? entityId.value : this.entityId,
+  );
+  DashboardAlert copyWithCompanion(DashboardAlertsCompanion data) {
+    return DashboardAlert(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      id: data.id.present ? data.id.value : this.id,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      alertType: data.alertType.present ? data.alertType.value : this.alertType,
+      message: data.message.present ? data.message.value : this.message,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      readAt: data.readAt.present ? data.readAt.value : this.readAt,
+      entityType: data.entityType.present
+          ? data.entityType.value
+          : this.entityType,
+      entityId: data.entityId.present ? data.entityId.value : this.entityId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DashboardAlert(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('id: $id, ')
+          ..write('patientId: $patientId, ')
+          ..write('alertType: $alertType, ')
+          ..write('message: $message, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('readAt: $readAt, ')
+          ..write('entityType: $entityType, ')
+          ..write('entityId: $entityId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    caregiverId,
+    id,
+    patientId,
+    alertType,
+    message,
+    createdAt,
+    readAt,
+    entityType,
+    entityId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DashboardAlert &&
+          other.caregiverId == this.caregiverId &&
+          other.id == this.id &&
+          other.patientId == this.patientId &&
+          other.alertType == this.alertType &&
+          other.message == this.message &&
+          other.createdAt == this.createdAt &&
+          other.readAt == this.readAt &&
+          other.entityType == this.entityType &&
+          other.entityId == this.entityId);
+}
+
+class DashboardAlertsCompanion extends UpdateCompanion<DashboardAlert> {
+  final Value<String> caregiverId;
+  final Value<String> id;
+  final Value<String> patientId;
+  final Value<String> alertType;
+  final Value<String> message;
+  final Value<DateTime> createdAt;
+  final Value<DateTime?> readAt;
+  final Value<String?> entityType;
+  final Value<String?> entityId;
+  final Value<int> rowid;
+  const DashboardAlertsCompanion({
+    this.caregiverId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.alertType = const Value.absent(),
+    this.message = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.readAt = const Value.absent(),
+    this.entityType = const Value.absent(),
+    this.entityId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DashboardAlertsCompanion.insert({
+    required String caregiverId,
+    required String id,
+    required String patientId,
+    required String alertType,
+    required String message,
+    required DateTime createdAt,
+    this.readAt = const Value.absent(),
+    this.entityType = const Value.absent(),
+    this.entityId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       id = Value(id),
+       patientId = Value(patientId),
+       alertType = Value(alertType),
+       message = Value(message),
+       createdAt = Value(createdAt);
+  static Insertable<DashboardAlert> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? id,
+    Expression<String>? patientId,
+    Expression<String>? alertType,
+    Expression<String>? message,
+    Expression<int>? createdAt,
+    Expression<int>? readAt,
+    Expression<String>? entityType,
+    Expression<String>? entityId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (id != null) 'id': id,
+      if (patientId != null) 'patient_id': patientId,
+      if (alertType != null) 'alert_type': alertType,
+      if (message != null) 'message': message,
+      if (createdAt != null) 'created_at': createdAt,
+      if (readAt != null) 'read_at': readAt,
+      if (entityType != null) 'entity_type': entityType,
+      if (entityId != null) 'entity_id': entityId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DashboardAlertsCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? id,
+    Value<String>? patientId,
+    Value<String>? alertType,
+    Value<String>? message,
+    Value<DateTime>? createdAt,
+    Value<DateTime?>? readAt,
+    Value<String?>? entityType,
+    Value<String?>? entityId,
+    Value<int>? rowid,
+  }) {
+    return DashboardAlertsCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      id: id ?? this.id,
+      patientId: patientId ?? this.patientId,
+      alertType: alertType ?? this.alertType,
+      message: message ?? this.message,
+      createdAt: createdAt ?? this.createdAt,
+      readAt: readAt ?? this.readAt,
+      entityType: entityType ?? this.entityType,
+      entityId: entityId ?? this.entityId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (alertType.present) {
+      map['alert_type'] = Variable<String>(alertType.value);
+    }
+    if (message.present) {
+      map['message'] = Variable<String>(message.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(
+        $DashboardAlertsTable.$convertercreatedAt.toSql(createdAt.value),
+      );
+    }
+    if (readAt.present) {
+      map['read_at'] = Variable<int>(
+        $DashboardAlertsTable.$converterreadAtn.toSql(readAt.value),
+      );
+    }
+    if (entityType.present) {
+      map['entity_type'] = Variable<String>(entityType.value);
+    }
+    if (entityId.present) {
+      map['entity_id'] = Variable<String>(entityId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DashboardAlertsCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('id: $id, ')
+          ..write('patientId: $patientId, ')
+          ..write('alertType: $alertType, ')
+          ..write('message: $message, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('readAt: $readAt, ')
+          ..write('entityType: $entityType, ')
+          ..write('entityId: $entityId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $DashboardDaysTable extends DashboardDays
+    with TableInfo<$DashboardDaysTable, DashboardDay> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DashboardDaysTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dayMeta = const VerificationMeta('day');
+  @override
+  late final GeneratedColumn<String> day = GeneratedColumn<String>(
+    'day',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _peopleMetMeta = const VerificationMeta(
+    'peopleMet',
+  );
+  @override
+  late final GeneratedColumn<int> peopleMet = GeneratedColumn<int>(
+    'people_met',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _remindersDoneMeta = const VerificationMeta(
+    'remindersDone',
+  );
+  @override
+  late final GeneratedColumn<int> remindersDone = GeneratedColumn<int>(
+    'reminders_done',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _remindersTotalMeta = const VerificationMeta(
+    'remindersTotal',
+  );
+  @override
+  late final GeneratedColumn<int> remindersTotal = GeneratedColumn<int>(
+    'reminders_total',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _snoozedMeta = const VerificationMeta(
+    'snoozed',
+  );
+  @override
+  late final GeneratedColumn<int> snoozed = GeneratedColumn<int>(
+    'snoozed',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> refreshedAt =
+      GeneratedColumn<int>(
+        'refreshed_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>($DashboardDaysTable.$converterrefreshedAt);
+  @override
+  List<GeneratedColumn> get $columns => [
+    caregiverId,
+    patientId,
+    day,
+    peopleMet,
+    remindersDone,
+    remindersTotal,
+    snoozed,
+    refreshedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'dashboard_days';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DashboardDay> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('day')) {
+      context.handle(
+        _dayMeta,
+        day.isAcceptableOrUnknown(data['day']!, _dayMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dayMeta);
+    }
+    if (data.containsKey('people_met')) {
+      context.handle(
+        _peopleMetMeta,
+        peopleMet.isAcceptableOrUnknown(data['people_met']!, _peopleMetMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_peopleMetMeta);
+    }
+    if (data.containsKey('reminders_done')) {
+      context.handle(
+        _remindersDoneMeta,
+        remindersDone.isAcceptableOrUnknown(
+          data['reminders_done']!,
+          _remindersDoneMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_remindersDoneMeta);
+    }
+    if (data.containsKey('reminders_total')) {
+      context.handle(
+        _remindersTotalMeta,
+        remindersTotal.isAcceptableOrUnknown(
+          data['reminders_total']!,
+          _remindersTotalMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_remindersTotalMeta);
+    }
+    if (data.containsKey('snoozed')) {
+      context.handle(
+        _snoozedMeta,
+        snoozed.isAcceptableOrUnknown(data['snoozed']!, _snoozedMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_snoozedMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, patientId, day};
+  @override
+  DashboardDay map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DashboardDay(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      day: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}day'],
+      )!,
+      peopleMet: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}people_met'],
+      )!,
+      remindersDone: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reminders_done'],
+      )!,
+      remindersTotal: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reminders_total'],
+      )!,
+      snoozed: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}snoozed'],
+      )!,
+      refreshedAt: $DashboardDaysTable.$converterrefreshedAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}refreshed_at'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $DashboardDaysTable createAlias(String alias) {
+    return $DashboardDaysTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converterrefreshedAt = const UtcMicros();
+}
+
+class DashboardDay extends DataClass implements Insertable<DashboardDay> {
+  final String caregiverId;
+  final String patientId;
+  final String day;
+  final int peopleMet;
+  final int remindersDone;
+  final int remindersTotal;
+  final int snoozed;
+  final DateTime refreshedAt;
+  const DashboardDay({
+    required this.caregiverId,
+    required this.patientId,
+    required this.day,
+    required this.peopleMet,
+    required this.remindersDone,
+    required this.remindersTotal,
+    required this.snoozed,
+    required this.refreshedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    map['day'] = Variable<String>(day);
+    map['people_met'] = Variable<int>(peopleMet);
+    map['reminders_done'] = Variable<int>(remindersDone);
+    map['reminders_total'] = Variable<int>(remindersTotal);
+    map['snoozed'] = Variable<int>(snoozed);
+    {
+      map['refreshed_at'] = Variable<int>(
+        $DashboardDaysTable.$converterrefreshedAt.toSql(refreshedAt),
+      );
+    }
+    return map;
+  }
+
+  DashboardDaysCompanion toCompanion(bool nullToAbsent) {
+    return DashboardDaysCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      day: Value(day),
+      peopleMet: Value(peopleMet),
+      remindersDone: Value(remindersDone),
+      remindersTotal: Value(remindersTotal),
+      snoozed: Value(snoozed),
+      refreshedAt: Value(refreshedAt),
+    );
+  }
+
+  factory DashboardDay.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DashboardDay(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      day: serializer.fromJson<String>(json['day']),
+      peopleMet: serializer.fromJson<int>(json['peopleMet']),
+      remindersDone: serializer.fromJson<int>(json['remindersDone']),
+      remindersTotal: serializer.fromJson<int>(json['remindersTotal']),
+      snoozed: serializer.fromJson<int>(json['snoozed']),
+      refreshedAt: serializer.fromJson<DateTime>(json['refreshedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'day': serializer.toJson<String>(day),
+      'peopleMet': serializer.toJson<int>(peopleMet),
+      'remindersDone': serializer.toJson<int>(remindersDone),
+      'remindersTotal': serializer.toJson<int>(remindersTotal),
+      'snoozed': serializer.toJson<int>(snoozed),
+      'refreshedAt': serializer.toJson<DateTime>(refreshedAt),
+    };
+  }
+
+  DashboardDay copyWith({
+    String? caregiverId,
+    String? patientId,
+    String? day,
+    int? peopleMet,
+    int? remindersDone,
+    int? remindersTotal,
+    int? snoozed,
+    DateTime? refreshedAt,
+  }) => DashboardDay(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    day: day ?? this.day,
+    peopleMet: peopleMet ?? this.peopleMet,
+    remindersDone: remindersDone ?? this.remindersDone,
+    remindersTotal: remindersTotal ?? this.remindersTotal,
+    snoozed: snoozed ?? this.snoozed,
+    refreshedAt: refreshedAt ?? this.refreshedAt,
+  );
+  DashboardDay copyWithCompanion(DashboardDaysCompanion data) {
+    return DashboardDay(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      day: data.day.present ? data.day.value : this.day,
+      peopleMet: data.peopleMet.present ? data.peopleMet.value : this.peopleMet,
+      remindersDone: data.remindersDone.present
+          ? data.remindersDone.value
+          : this.remindersDone,
+      remindersTotal: data.remindersTotal.present
+          ? data.remindersTotal.value
+          : this.remindersTotal,
+      snoozed: data.snoozed.present ? data.snoozed.value : this.snoozed,
+      refreshedAt: data.refreshedAt.present
+          ? data.refreshedAt.value
+          : this.refreshedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DashboardDay(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('day: $day, ')
+          ..write('peopleMet: $peopleMet, ')
+          ..write('remindersDone: $remindersDone, ')
+          ..write('remindersTotal: $remindersTotal, ')
+          ..write('snoozed: $snoozed, ')
+          ..write('refreshedAt: $refreshedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    caregiverId,
+    patientId,
+    day,
+    peopleMet,
+    remindersDone,
+    remindersTotal,
+    snoozed,
+    refreshedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DashboardDay &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.day == this.day &&
+          other.peopleMet == this.peopleMet &&
+          other.remindersDone == this.remindersDone &&
+          other.remindersTotal == this.remindersTotal &&
+          other.snoozed == this.snoozed &&
+          other.refreshedAt == this.refreshedAt);
+}
+
+class DashboardDaysCompanion extends UpdateCompanion<DashboardDay> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<String> day;
+  final Value<int> peopleMet;
+  final Value<int> remindersDone;
+  final Value<int> remindersTotal;
+  final Value<int> snoozed;
+  final Value<DateTime> refreshedAt;
+  final Value<int> rowid;
+  const DashboardDaysCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.day = const Value.absent(),
+    this.peopleMet = const Value.absent(),
+    this.remindersDone = const Value.absent(),
+    this.remindersTotal = const Value.absent(),
+    this.snoozed = const Value.absent(),
+    this.refreshedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DashboardDaysCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required String day,
+    required int peopleMet,
+    required int remindersDone,
+    required int remindersTotal,
+    required int snoozed,
+    required DateTime refreshedAt,
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       day = Value(day),
+       peopleMet = Value(peopleMet),
+       remindersDone = Value(remindersDone),
+       remindersTotal = Value(remindersTotal),
+       snoozed = Value(snoozed),
+       refreshedAt = Value(refreshedAt);
+  static Insertable<DashboardDay> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<String>? day,
+    Expression<int>? peopleMet,
+    Expression<int>? remindersDone,
+    Expression<int>? remindersTotal,
+    Expression<int>? snoozed,
+    Expression<int>? refreshedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (day != null) 'day': day,
+      if (peopleMet != null) 'people_met': peopleMet,
+      if (remindersDone != null) 'reminders_done': remindersDone,
+      if (remindersTotal != null) 'reminders_total': remindersTotal,
+      if (snoozed != null) 'snoozed': snoozed,
+      if (refreshedAt != null) 'refreshed_at': refreshedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DashboardDaysCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<String>? day,
+    Value<int>? peopleMet,
+    Value<int>? remindersDone,
+    Value<int>? remindersTotal,
+    Value<int>? snoozed,
+    Value<DateTime>? refreshedAt,
+    Value<int>? rowid,
+  }) {
+    return DashboardDaysCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      day: day ?? this.day,
+      peopleMet: peopleMet ?? this.peopleMet,
+      remindersDone: remindersDone ?? this.remindersDone,
+      remindersTotal: remindersTotal ?? this.remindersTotal,
+      snoozed: snoozed ?? this.snoozed,
+      refreshedAt: refreshedAt ?? this.refreshedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (day.present) {
+      map['day'] = Variable<String>(day.value);
+    }
+    if (peopleMet.present) {
+      map['people_met'] = Variable<int>(peopleMet.value);
+    }
+    if (remindersDone.present) {
+      map['reminders_done'] = Variable<int>(remindersDone.value);
+    }
+    if (remindersTotal.present) {
+      map['reminders_total'] = Variable<int>(remindersTotal.value);
+    }
+    if (snoozed.present) {
+      map['snoozed'] = Variable<int>(snoozed.value);
+    }
+    if (refreshedAt.present) {
+      map['refreshed_at'] = Variable<int>(
+        $DashboardDaysTable.$converterrefreshedAt.toSql(refreshedAt.value),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DashboardDaysCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('day: $day, ')
+          ..write('peopleMet: $peopleMet, ')
+          ..write('remindersDone: $remindersDone, ')
+          ..write('remindersTotal: $remindersTotal, ')
+          ..write('snoozed: $snoozed, ')
+          ..write('refreshedAt: $refreshedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$RemoriDatabase extends GeneratedDatabase {
   _$RemoriDatabase(QueryExecutor e) : super(e);
   $RemoriDatabaseManager get managers => $RemoriDatabaseManager(this);
   late final $ReminderLogsTable reminderLogs = $ReminderLogsTable(this);
   late final $OutboxEntriesTable outboxEntries = $OutboxEntriesTable(this);
+  late final $DashboardPatientsTable dashboardPatients =
+      $DashboardPatientsTable(this);
+  late final $DashboardDevicesTable dashboardDevices = $DashboardDevicesTable(
+    this,
+  );
+  late final $DashboardAlertsTable dashboardAlerts = $DashboardAlertsTable(
+    this,
+  );
+  late final $DashboardDaysTable dashboardDays = $DashboardDaysTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1004,6 +3130,10 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     reminderLogs,
     outboxEntries,
+    dashboardPatients,
+    dashboardDevices,
+    dashboardAlerts,
+    dashboardDays,
   ];
 }
 
@@ -1539,6 +3669,1133 @@ typedef $$OutboxEntriesTableProcessedTableManager =
       PendingWrite,
       PrefetchHooks Function()
     >;
+typedef $$DashboardPatientsTableCreateCompanionBuilder =
+    DashboardPatientsCompanion Function({
+      required String caregiverId,
+      required String id,
+      required String fullName,
+      required String preferredLanguage,
+      required String timezone,
+      required bool memoryCaptureEnabled,
+      required String permission,
+      required int position,
+      Value<int> rowid,
+    });
+typedef $$DashboardPatientsTableUpdateCompanionBuilder =
+    DashboardPatientsCompanion Function({
+      Value<String> caregiverId,
+      Value<String> id,
+      Value<String> fullName,
+      Value<String> preferredLanguage,
+      Value<String> timezone,
+      Value<bool> memoryCaptureEnabled,
+      Value<String> permission,
+      Value<int> position,
+      Value<int> rowid,
+    });
+
+class $$DashboardPatientsTableFilterComposer
+    extends Composer<_$RemoriDatabase, $DashboardPatientsTable> {
+  $$DashboardPatientsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fullName => $composableBuilder(
+    column: $table.fullName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get preferredLanguage => $composableBuilder(
+    column: $table.preferredLanguage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get timezone => $composableBuilder(
+    column: $table.timezone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get memoryCaptureEnabled => $composableBuilder(
+    column: $table.memoryCaptureEnabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get permission => $composableBuilder(
+    column: $table.permission,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DashboardPatientsTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $DashboardPatientsTable> {
+  $$DashboardPatientsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fullName => $composableBuilder(
+    column: $table.fullName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get preferredLanguage => $composableBuilder(
+    column: $table.preferredLanguage,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get timezone => $composableBuilder(
+    column: $table.timezone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get memoryCaptureEnabled => $composableBuilder(
+    column: $table.memoryCaptureEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get permission => $composableBuilder(
+    column: $table.permission,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DashboardPatientsTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $DashboardPatientsTable> {
+  $$DashboardPatientsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get fullName =>
+      $composableBuilder(column: $table.fullName, builder: (column) => column);
+
+  GeneratedColumn<String> get preferredLanguage => $composableBuilder(
+    column: $table.preferredLanguage,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get timezone =>
+      $composableBuilder(column: $table.timezone, builder: (column) => column);
+
+  GeneratedColumn<bool> get memoryCaptureEnabled => $composableBuilder(
+    column: $table.memoryCaptureEnabled,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get permission => $composableBuilder(
+    column: $table.permission,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+}
+
+class $$DashboardPatientsTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $DashboardPatientsTable,
+          DashboardPatient,
+          $$DashboardPatientsTableFilterComposer,
+          $$DashboardPatientsTableOrderingComposer,
+          $$DashboardPatientsTableAnnotationComposer,
+          $$DashboardPatientsTableCreateCompanionBuilder,
+          $$DashboardPatientsTableUpdateCompanionBuilder,
+          (
+            DashboardPatient,
+            BaseReferences<
+              _$RemoriDatabase,
+              $DashboardPatientsTable,
+              DashboardPatient
+            >,
+          ),
+          DashboardPatient,
+          PrefetchHooks Function()
+        > {
+  $$DashboardPatientsTableTableManager(
+    _$RemoriDatabase db,
+    $DashboardPatientsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DashboardPatientsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DashboardPatientsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DashboardPatientsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> fullName = const Value.absent(),
+                Value<String> preferredLanguage = const Value.absent(),
+                Value<String> timezone = const Value.absent(),
+                Value<bool> memoryCaptureEnabled = const Value.absent(),
+                Value<String> permission = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DashboardPatientsCompanion(
+                caregiverId: caregiverId,
+                id: id,
+                fullName: fullName,
+                preferredLanguage: preferredLanguage,
+                timezone: timezone,
+                memoryCaptureEnabled: memoryCaptureEnabled,
+                permission: permission,
+                position: position,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String id,
+                required String fullName,
+                required String preferredLanguage,
+                required String timezone,
+                required bool memoryCaptureEnabled,
+                required String permission,
+                required int position,
+                Value<int> rowid = const Value.absent(),
+              }) => DashboardPatientsCompanion.insert(
+                caregiverId: caregiverId,
+                id: id,
+                fullName: fullName,
+                preferredLanguage: preferredLanguage,
+                timezone: timezone,
+                memoryCaptureEnabled: memoryCaptureEnabled,
+                permission: permission,
+                position: position,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$DashboardPatientsTable, DashboardPatient>(table),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $DashboardPatientsTable,
+                    DashboardPatient
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DashboardPatientsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $DashboardPatientsTable,
+      DashboardPatient,
+      $$DashboardPatientsTableFilterComposer,
+      $$DashboardPatientsTableOrderingComposer,
+      $$DashboardPatientsTableAnnotationComposer,
+      $$DashboardPatientsTableCreateCompanionBuilder,
+      $$DashboardPatientsTableUpdateCompanionBuilder,
+      (
+        DashboardPatient,
+        BaseReferences<
+          _$RemoriDatabase,
+          $DashboardPatientsTable,
+          DashboardPatient
+        >,
+      ),
+      DashboardPatient,
+      PrefetchHooks Function()
+    >;
+typedef $$DashboardDevicesTableCreateCompanionBuilder =
+    DashboardDevicesCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required String id,
+      required String serial,
+      required bool online,
+      Value<int?> batteryPct,
+      Value<DateTime?> lastSeenAt,
+      Value<int> rowid,
+    });
+typedef $$DashboardDevicesTableUpdateCompanionBuilder =
+    DashboardDevicesCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<String> id,
+      Value<String> serial,
+      Value<bool> online,
+      Value<int?> batteryPct,
+      Value<DateTime?> lastSeenAt,
+      Value<int> rowid,
+    });
+
+class $$DashboardDevicesTableFilterComposer
+    extends Composer<_$RemoriDatabase, $DashboardDevicesTable> {
+  $$DashboardDevicesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get serial => $composableBuilder(
+    column: $table.serial,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get online => $composableBuilder(
+    column: $table.online,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get batteryPct => $composableBuilder(
+    column: $table.batteryPct,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime?, DateTime, int> get lastSeenAt =>
+      $composableBuilder(
+        column: $table.lastSeenAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+}
+
+class $$DashboardDevicesTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $DashboardDevicesTable> {
+  $$DashboardDevicesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get serial => $composableBuilder(
+    column: $table.serial,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get online => $composableBuilder(
+    column: $table.online,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get batteryPct => $composableBuilder(
+    column: $table.batteryPct,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lastSeenAt => $composableBuilder(
+    column: $table.lastSeenAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DashboardDevicesTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $DashboardDevicesTable> {
+  $$DashboardDevicesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get serial =>
+      $composableBuilder(column: $table.serial, builder: (column) => column);
+
+  GeneratedColumn<bool> get online =>
+      $composableBuilder(column: $table.online, builder: (column) => column);
+
+  GeneratedColumn<int> get batteryPct => $composableBuilder(
+    column: $table.batteryPct,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<DateTime?, int> get lastSeenAt =>
+      $composableBuilder(
+        column: $table.lastSeenAt,
+        builder: (column) => column,
+      );
+}
+
+class $$DashboardDevicesTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $DashboardDevicesTable,
+          DashboardDevice,
+          $$DashboardDevicesTableFilterComposer,
+          $$DashboardDevicesTableOrderingComposer,
+          $$DashboardDevicesTableAnnotationComposer,
+          $$DashboardDevicesTableCreateCompanionBuilder,
+          $$DashboardDevicesTableUpdateCompanionBuilder,
+          (
+            DashboardDevice,
+            BaseReferences<
+              _$RemoriDatabase,
+              $DashboardDevicesTable,
+              DashboardDevice
+            >,
+          ),
+          DashboardDevice,
+          PrefetchHooks Function()
+        > {
+  $$DashboardDevicesTableTableManager(
+    _$RemoriDatabase db,
+    $DashboardDevicesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DashboardDevicesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DashboardDevicesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DashboardDevicesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> serial = const Value.absent(),
+                Value<bool> online = const Value.absent(),
+                Value<int?> batteryPct = const Value.absent(),
+                Value<DateTime?> lastSeenAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DashboardDevicesCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                id: id,
+                serial: serial,
+                online: online,
+                batteryPct: batteryPct,
+                lastSeenAt: lastSeenAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required String id,
+                required String serial,
+                required bool online,
+                Value<int?> batteryPct = const Value.absent(),
+                Value<DateTime?> lastSeenAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DashboardDevicesCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                id: id,
+                serial: serial,
+                online: online,
+                batteryPct: batteryPct,
+                lastSeenAt: lastSeenAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$DashboardDevicesTable, DashboardDevice>(table),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $DashboardDevicesTable,
+                    DashboardDevice
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DashboardDevicesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $DashboardDevicesTable,
+      DashboardDevice,
+      $$DashboardDevicesTableFilterComposer,
+      $$DashboardDevicesTableOrderingComposer,
+      $$DashboardDevicesTableAnnotationComposer,
+      $$DashboardDevicesTableCreateCompanionBuilder,
+      $$DashboardDevicesTableUpdateCompanionBuilder,
+      (
+        DashboardDevice,
+        BaseReferences<
+          _$RemoriDatabase,
+          $DashboardDevicesTable,
+          DashboardDevice
+        >,
+      ),
+      DashboardDevice,
+      PrefetchHooks Function()
+    >;
+typedef $$DashboardAlertsTableCreateCompanionBuilder =
+    DashboardAlertsCompanion Function({
+      required String caregiverId,
+      required String id,
+      required String patientId,
+      required String alertType,
+      required String message,
+      required DateTime createdAt,
+      Value<DateTime?> readAt,
+      Value<String?> entityType,
+      Value<String?> entityId,
+      Value<int> rowid,
+    });
+typedef $$DashboardAlertsTableUpdateCompanionBuilder =
+    DashboardAlertsCompanion Function({
+      Value<String> caregiverId,
+      Value<String> id,
+      Value<String> patientId,
+      Value<String> alertType,
+      Value<String> message,
+      Value<DateTime> createdAt,
+      Value<DateTime?> readAt,
+      Value<String?> entityType,
+      Value<String?> entityId,
+      Value<int> rowid,
+    });
+
+class $$DashboardAlertsTableFilterComposer
+    extends Composer<_$RemoriDatabase, $DashboardAlertsTable> {
+  $$DashboardAlertsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get alertType => $composableBuilder(
+    column: $table.alertType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get message => $composableBuilder(
+    column: $table.message,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get createdAt =>
+      $composableBuilder(
+        column: $table.createdAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnWithTypeConverterFilters<DateTime?, DateTime, int> get readAt =>
+      $composableBuilder(
+        column: $table.readAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get entityType => $composableBuilder(
+    column: $table.entityType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get entityId => $composableBuilder(
+    column: $table.entityId,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DashboardAlertsTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $DashboardAlertsTable> {
+  $$DashboardAlertsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get alertType => $composableBuilder(
+    column: $table.alertType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get message => $composableBuilder(
+    column: $table.message,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get readAt => $composableBuilder(
+    column: $table.readAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get entityType => $composableBuilder(
+    column: $table.entityType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get entityId => $composableBuilder(
+    column: $table.entityId,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DashboardAlertsTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $DashboardAlertsTable> {
+  $$DashboardAlertsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get alertType =>
+      $composableBuilder(column: $table.alertType, builder: (column) => column);
+
+  GeneratedColumn<String> get message =>
+      $composableBuilder(column: $table.message, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime?, int> get readAt =>
+      $composableBuilder(column: $table.readAt, builder: (column) => column);
+
+  GeneratedColumn<String> get entityType => $composableBuilder(
+    column: $table.entityType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get entityId =>
+      $composableBuilder(column: $table.entityId, builder: (column) => column);
+}
+
+class $$DashboardAlertsTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $DashboardAlertsTable,
+          DashboardAlert,
+          $$DashboardAlertsTableFilterComposer,
+          $$DashboardAlertsTableOrderingComposer,
+          $$DashboardAlertsTableAnnotationComposer,
+          $$DashboardAlertsTableCreateCompanionBuilder,
+          $$DashboardAlertsTableUpdateCompanionBuilder,
+          (
+            DashboardAlert,
+            BaseReferences<
+              _$RemoriDatabase,
+              $DashboardAlertsTable,
+              DashboardAlert
+            >,
+          ),
+          DashboardAlert,
+          PrefetchHooks Function()
+        > {
+  $$DashboardAlertsTableTableManager(
+    _$RemoriDatabase db,
+    $DashboardAlertsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DashboardAlertsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DashboardAlertsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DashboardAlertsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<String> alertType = const Value.absent(),
+                Value<String> message = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> readAt = const Value.absent(),
+                Value<String?> entityType = const Value.absent(),
+                Value<String?> entityId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DashboardAlertsCompanion(
+                caregiverId: caregiverId,
+                id: id,
+                patientId: patientId,
+                alertType: alertType,
+                message: message,
+                createdAt: createdAt,
+                readAt: readAt,
+                entityType: entityType,
+                entityId: entityId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String id,
+                required String patientId,
+                required String alertType,
+                required String message,
+                required DateTime createdAt,
+                Value<DateTime?> readAt = const Value.absent(),
+                Value<String?> entityType = const Value.absent(),
+                Value<String?> entityId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DashboardAlertsCompanion.insert(
+                caregiverId: caregiverId,
+                id: id,
+                patientId: patientId,
+                alertType: alertType,
+                message: message,
+                createdAt: createdAt,
+                readAt: readAt,
+                entityType: entityType,
+                entityId: entityId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$DashboardAlertsTable, DashboardAlert>(table),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $DashboardAlertsTable,
+                    DashboardAlert
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DashboardAlertsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $DashboardAlertsTable,
+      DashboardAlert,
+      $$DashboardAlertsTableFilterComposer,
+      $$DashboardAlertsTableOrderingComposer,
+      $$DashboardAlertsTableAnnotationComposer,
+      $$DashboardAlertsTableCreateCompanionBuilder,
+      $$DashboardAlertsTableUpdateCompanionBuilder,
+      (
+        DashboardAlert,
+        BaseReferences<_$RemoriDatabase, $DashboardAlertsTable, DashboardAlert>,
+      ),
+      DashboardAlert,
+      PrefetchHooks Function()
+    >;
+typedef $$DashboardDaysTableCreateCompanionBuilder =
+    DashboardDaysCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required String day,
+      required int peopleMet,
+      required int remindersDone,
+      required int remindersTotal,
+      required int snoozed,
+      required DateTime refreshedAt,
+      Value<int> rowid,
+    });
+typedef $$DashboardDaysTableUpdateCompanionBuilder =
+    DashboardDaysCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<String> day,
+      Value<int> peopleMet,
+      Value<int> remindersDone,
+      Value<int> remindersTotal,
+      Value<int> snoozed,
+      Value<DateTime> refreshedAt,
+      Value<int> rowid,
+    });
+
+class $$DashboardDaysTableFilterComposer
+    extends Composer<_$RemoriDatabase, $DashboardDaysTable> {
+  $$DashboardDaysTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get peopleMet => $composableBuilder(
+    column: $table.peopleMet,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get remindersDone => $composableBuilder(
+    column: $table.remindersDone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get remindersTotal => $composableBuilder(
+    column: $table.remindersTotal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get snoozed => $composableBuilder(
+    column: $table.snoozed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+}
+
+class $$DashboardDaysTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $DashboardDaysTable> {
+  $$DashboardDaysTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get peopleMet => $composableBuilder(
+    column: $table.peopleMet,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get remindersDone => $composableBuilder(
+    column: $table.remindersDone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get remindersTotal => $composableBuilder(
+    column: $table.remindersTotal,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get snoozed => $composableBuilder(
+    column: $table.snoozed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get refreshedAt => $composableBuilder(
+    column: $table.refreshedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DashboardDaysTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $DashboardDaysTable> {
+  $$DashboardDaysTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get day =>
+      $composableBuilder(column: $table.day, builder: (column) => column);
+
+  GeneratedColumn<int> get peopleMet =>
+      $composableBuilder(column: $table.peopleMet, builder: (column) => column);
+
+  GeneratedColumn<int> get remindersDone => $composableBuilder(
+    column: $table.remindersDone,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get remindersTotal => $composableBuilder(
+    column: $table.remindersTotal,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get snoozed =>
+      $composableBuilder(column: $table.snoozed, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => column,
+      );
+}
+
+class $$DashboardDaysTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $DashboardDaysTable,
+          DashboardDay,
+          $$DashboardDaysTableFilterComposer,
+          $$DashboardDaysTableOrderingComposer,
+          $$DashboardDaysTableAnnotationComposer,
+          $$DashboardDaysTableCreateCompanionBuilder,
+          $$DashboardDaysTableUpdateCompanionBuilder,
+          (
+            DashboardDay,
+            BaseReferences<_$RemoriDatabase, $DashboardDaysTable, DashboardDay>,
+          ),
+          DashboardDay,
+          PrefetchHooks Function()
+        > {
+  $$DashboardDaysTableTableManager(
+    _$RemoriDatabase db,
+    $DashboardDaysTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DashboardDaysTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DashboardDaysTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DashboardDaysTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<String> day = const Value.absent(),
+                Value<int> peopleMet = const Value.absent(),
+                Value<int> remindersDone = const Value.absent(),
+                Value<int> remindersTotal = const Value.absent(),
+                Value<int> snoozed = const Value.absent(),
+                Value<DateTime> refreshedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DashboardDaysCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                day: day,
+                peopleMet: peopleMet,
+                remindersDone: remindersDone,
+                remindersTotal: remindersTotal,
+                snoozed: snoozed,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required String day,
+                required int peopleMet,
+                required int remindersDone,
+                required int remindersTotal,
+                required int snoozed,
+                required DateTime refreshedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => DashboardDaysCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                day: day,
+                peopleMet: peopleMet,
+                remindersDone: remindersDone,
+                remindersTotal: remindersTotal,
+                snoozed: snoozed,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$DashboardDaysTable, DashboardDay>(table),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $DashboardDaysTable,
+                    DashboardDay
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DashboardDaysTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $DashboardDaysTable,
+      DashboardDay,
+      $$DashboardDaysTableFilterComposer,
+      $$DashboardDaysTableOrderingComposer,
+      $$DashboardDaysTableAnnotationComposer,
+      $$DashboardDaysTableCreateCompanionBuilder,
+      $$DashboardDaysTableUpdateCompanionBuilder,
+      (
+        DashboardDay,
+        BaseReferences<_$RemoriDatabase, $DashboardDaysTable, DashboardDay>,
+      ),
+      DashboardDay,
+      PrefetchHooks Function()
+    >;
 
 class $RemoriDatabaseManager {
   final _$RemoriDatabase _db;
@@ -1547,4 +4804,12 @@ class $RemoriDatabaseManager {
       $$ReminderLogsTableTableManager(_db, _db.reminderLogs);
   $$OutboxEntriesTableTableManager get outboxEntries =>
       $$OutboxEntriesTableTableManager(_db, _db.outboxEntries);
+  $$DashboardPatientsTableTableManager get dashboardPatients =>
+      $$DashboardPatientsTableTableManager(_db, _db.dashboardPatients);
+  $$DashboardDevicesTableTableManager get dashboardDevices =>
+      $$DashboardDevicesTableTableManager(_db, _db.dashboardDevices);
+  $$DashboardAlertsTableTableManager get dashboardAlerts =>
+      $$DashboardAlertsTableTableManager(_db, _db.dashboardAlerts);
+  $$DashboardDaysTableTableManager get dashboardDays =>
+      $$DashboardDaysTableTableManager(_db, _db.dashboardDays);
 }

@@ -411,4 +411,129 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get permissionsHandoverFailed =>
       'Unable to enter Patient Mode. Check your connection and try again.';
+
+  @override
+  String get homeSwitchPatient => 'Switch patient';
+
+  @override
+  String get homeLoading => 'Loading Home…';
+
+  @override
+  String get homeLoadFailed =>
+      'Unable to load Home. Check your connection and try again.';
+
+  @override
+  String get homeOffline => 'Showing saved data. Unable to update Home.';
+
+  @override
+  String get homeRetry => 'Retry';
+
+  @override
+  String get homeNoPatients => 'No patients are linked to your account yet.';
+
+  @override
+  String get homeGlasses => 'Glasses';
+
+  @override
+  String get homeConnected => 'Connected';
+
+  @override
+  String get homeDisconnected => 'Disconnected';
+
+  @override
+  String get homeNotPaired => 'Not paired';
+
+  @override
+  String get homeUnknown => '—';
+
+  @override
+  String get homeMemoryOff => 'Memory: Off';
+
+  @override
+  String get homeMemoryPaused => 'Memory: Paused';
+
+  @override
+  String get homeMemoryCapturing => 'Memory: Capturing';
+
+  @override
+  String get homeMemoryEnabled => 'Memory: Enabled';
+
+  @override
+  String get homeJustNow => 'just now';
+
+  @override
+  String homeMinutesAgo(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes min ago',
+      one: '1 min ago',
+      zero: 'just now',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String homeDeviceDetail(String time, String battery) {
+    return 'Last seen $time · Battery $battery';
+  }
+
+  @override
+  String get homeOpenJournal => 'Open journal ›';
+
+  @override
+  String homeCachedDay(String date) {
+    return 'Saved statistics for $date';
+  }
+
+  @override
+  String get homePeopleMet => 'people met';
+
+  @override
+  String get homeRemindersDone => 'reminders done';
+
+  @override
+  String get homeSnoozed => 'snoozed';
+
+  @override
+  String homeReminderProgress(String done, String total) {
+    return '$done / $total';
+  }
+
+  @override
+  String get homeAlerts => 'Alerts';
+
+  @override
+  String get homeSeeAll => 'See all';
+
+  @override
+  String get homeNoAlerts => 'No recent alerts for this patient.';
+
+  @override
+  String get homeMissed => 'Missed';
+
+  @override
+  String get homeNewFace => 'New face';
+
+  @override
+  String get homeLowBattery => 'Battery';
+
+  @override
+  String get homeSummary => 'Summary';
+
+  @override
+  String get homeAlert => 'Alert';
+
+  @override
+  String get homeDailySummary => 'AI daily summary';
+
+  @override
+  String get homePhaseTwo => 'Phase 2';
+
+  @override
+  String get homeSummaryUnavailable =>
+      'Daily summaries will be available in Phase 2.';
+
+  @override
+  String get homeReadMore => 'Read more ›';
 }

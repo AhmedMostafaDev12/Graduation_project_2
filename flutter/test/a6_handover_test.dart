@@ -213,6 +213,8 @@ Future<ProviderContainer> mount(
       overrides: [
         appLocaleProvider.overrideWithValue(Locale(language)),
         credentialStoreProvider.overrideWithValue(credentials),
+        // These fixtures test A6 authentication, not Home's cache/bootstrap calls.
+        caregiverIdentityProvider.overrideWith((ref) async => null),
         patientSessionStoreProvider.overrideWithValue(sessionStore),
         glassesConnectionProvider.overrideWith((ref) {
           ref.onDispose(glasses.dispose);

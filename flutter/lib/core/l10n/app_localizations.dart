@@ -847,6 +847,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unable to enter Patient Mode. Check your connection and try again.'**
   String get permissionsHandoverFailed;
+
+  /// No description provided for @homeSwitchPatient.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch patient'**
+  String get homeSwitchPatient;
+
+  /// No description provided for @homeLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading Home…'**
+  String get homeLoading;
+
+  /// No description provided for @homeLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load Home. Check your connection and try again.'**
+  String get homeLoadFailed;
+
+  /// No description provided for @homeOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing saved data. Unable to update Home.'**
+  String get homeOffline;
+
+  /// No description provided for @homeRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get homeRetry;
+
+  /// No description provided for @homeNoPatients.
+  ///
+  /// In en, this message translates to:
+  /// **'No patients are linked to your account yet.'**
+  String get homeNoPatients;
+
+  /// No description provided for @homeGlasses.
+  ///
+  /// In en, this message translates to:
+  /// **'Glasses'**
+  String get homeGlasses;
+
+  /// No description provided for @homeConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get homeConnected;
+
+  /// No description provided for @homeDisconnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnected'**
+  String get homeDisconnected;
+
+  /// No description provided for @homeNotPaired.
+  ///
+  /// In en, this message translates to:
+  /// **'Not paired'**
+  String get homeNotPaired;
+
+  /// No description provided for @homeUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get homeUnknown;
+
+  /// No description provided for @homeMemoryOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory: Off'**
+  String get homeMemoryOff;
+
+  /// No description provided for @homeMemoryPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory: Paused'**
+  String get homeMemoryPaused;
+
+  /// No description provided for @homeMemoryCapturing.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory: Capturing'**
+  String get homeMemoryCapturing;
+
+  /// No description provided for @homeMemoryEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory: Enabled'**
+  String get homeMemoryEnabled;
+
+  /// No description provided for @homeJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'just now'**
+  String get homeJustNow;
+
+  /// No description provided for @homeMinutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes, plural, =0{just now} =1{1 min ago} other{{minutes} min ago}}'**
+  String homeMinutesAgo(int minutes);
+
+  /// No description provided for @homeDeviceDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Last seen {time} · Battery {battery}'**
+  String homeDeviceDetail(String time, String battery);
+
+  /// No description provided for @homeOpenJournal.
+  ///
+  /// In en, this message translates to:
+  /// **'Open journal ›'**
+  String get homeOpenJournal;
+
+  /// No description provided for @homeCachedDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved statistics for {date}'**
+  String homeCachedDay(String date);
+
+  /// No description provided for @homePeopleMet.
+  ///
+  /// In en, this message translates to:
+  /// **'people met'**
+  String get homePeopleMet;
+
+  /// No description provided for @homeRemindersDone.
+  ///
+  /// In en, this message translates to:
+  /// **'reminders done'**
+  String get homeRemindersDone;
+
+  /// No description provided for @homeSnoozed.
+  ///
+  /// In en, this message translates to:
+  /// **'snoozed'**
+  String get homeSnoozed;
+
+  /// No description provided for @homeReminderProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} / {total}'**
+  String homeReminderProgress(String done, String total);
+
+  /// No description provided for @homeAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts'**
+  String get homeAlerts;
+
+  /// No description provided for @homeSeeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get homeSeeAll;
+
+  /// No description provided for @homeNoAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'No recent alerts for this patient.'**
+  String get homeNoAlerts;
+
+  /// No description provided for @homeMissed.
+  ///
+  /// In en, this message translates to:
+  /// **'Missed'**
+  String get homeMissed;
+
+  /// No description provided for @homeNewFace.
+  ///
+  /// In en, this message translates to:
+  /// **'New face'**
+  String get homeNewFace;
+
+  /// No description provided for @homeLowBattery.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery'**
+  String get homeLowBattery;
+
+  /// No description provided for @homeSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Summary'**
+  String get homeSummary;
+
+  /// No description provided for @homeAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert'**
+  String get homeAlert;
+
+  /// No description provided for @homeDailySummary.
+  ///
+  /// In en, this message translates to:
+  /// **'AI daily summary'**
+  String get homeDailySummary;
+
+  /// No description provided for @homePhaseTwo.
+  ///
+  /// In en, this message translates to:
+  /// **'Phase 2'**
+  String get homePhaseTwo;
+
+  /// No description provided for @homeSummaryUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily summaries will be available in Phase 2.'**
+  String get homeSummaryUnavailable;
+
+  /// No description provided for @homeReadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Read more ›'**
+  String get homeReadMore;
 }
 
 class _AppLocalizationsDelegate

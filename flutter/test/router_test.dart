@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:remori/app.dart';
+import 'package:remori/features/caregiver_dashboard/presentation/home_providers.dart';
 import 'package:remori/core/router/remori_router.dart';
 import 'package:remori/core/router/remori_routes.dart';
 import 'package:remori/core/theme/remori_navigation_bar.dart';
@@ -22,6 +23,7 @@ Future<ProviderContainer> _mount(
 ) async {
   final container = ProviderContainer(
     overrides: [
+      caregiverCanManageProvider.overrideWithValue(true),
       routeAccessProvider.overrideWith((ref) => ref.watch(_testAccess)),
       screenBuildersProvider.overrideWithValue({
         for (final screen in RemoriScreen.values)
