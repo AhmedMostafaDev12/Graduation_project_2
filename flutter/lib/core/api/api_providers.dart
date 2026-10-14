@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'api_client.dart';
 import 'api_config.dart';
+import 'api_failure.dart';
 import 'credential_store.dart';
 import 'patient_session_provider.dart';
 
@@ -38,6 +39,33 @@ final caregiverSessionProvider = NotifierProvider<CaregiverSession, bool>(
   CaregiverSession.new,
 );
 
+final caregiverAccountIdProvider =
+    NotifierProvider<CaregiverAccountId, String?>(CaregiverAccountId.new);
+
+class CaregiverAccountId extends Notifier<String?> {
+  @override
+  String? build() => null;
+  void set(String? id) => state = id;
+}
+
+/// Cache ownership uses the authenticated /auth/me identity, never token decoding.
+final caregiverIdentityProvider = FutureProvider<String?>((ref) async {
+  if (!ref.watch(caregiverSessionProvider)) return null;
+  final restoredId = ref.watch(caregiverAccountIdProvider);
+  if (restoredId != null) return restoredId;
+  final response = await ref
+      .read(apiClientProvider)
+      .request<dynamic>('/auth/me', credential: ApiCredential.caregiver);
+  final data = response.data;
+  if (data is! Map ||
+      data['role'] != 'caregiver' ||
+      data['id'] is! String ||
+      (data['id'] as String).isEmpty) {
+    throw ApiFailure(ApiFailureKind.invalidResponse);
+  }
+  return data['id'] as String;
+});
+
 class CaregiverSession extends Notifier<bool> {
   int _generation = 0;
   late Future<void> restoration;
@@ -69,6 +97,7 @@ class CaregiverSession extends Notifier<bool> {
           (data['id'] as String).isNotEmpty &&
           ref.mounted &&
           generation == _generation) {
+        ref.read(caregiverAccountIdProvider.notifier).set(data['id'] as String);
         state = true;
       }
     } catch (_) {
@@ -79,11 +108,14 @@ class CaregiverSession extends Notifier<bool> {
 
   void signedIn() {
     _generation++;
+    ref.read(caregiverAccountIdProvider.notifier).set(null);
+    ref.invalidate(caregiverIdentityProvider);
     state = true;
   }
 
   void invalidate() {
     _generation++;
+    ref.read(caregiverAccountIdProvider.notifier).set(null);
     state = false;
   }
 }

@@ -132,7 +132,7 @@ and native Android/iOS build validation remain for their integration PRs.
 
 ## Drift and outbox foundation
 
-`databaseProvider` lazily opens schema version 1 in the private application-support
+`databaseProvider` lazily opens schema version 2 in the private application-support
 folder (`remori.sqlite`) using drift's background native executor. SQL logging is
 disabled. Tests override the executor with in-memory SQLite or a temporary file.
 Tokens remain exclusively in secure storage.
@@ -140,6 +140,9 @@ Tokens remain exclusively in secure storage.
 This skeleton includes local reminder logs and a patient-scoped transactional
 outbox. Other entity-cache tables arrive with their feature PRs. It does not create
 or change any backend table, field, or endpoint.
+
+C1 adds the approved caregiver-scoped patients, devices, alerts and latest daily
+statistics read caches. The v1→v2 migration retains reminder logs and outbox writes.
 
 - `saveReminderLog` generates a UUID v4 for a new occurrence, or retains a supplied
   occurrence UUID for changes. Local data and its API snapshot commit together.
@@ -491,3 +494,51 @@ Connected review captures:
 [Arabic](test/goldens/a6_connected_ar.png).
 Regenerate with flutter test test/a6_handover_test.dart --update-goldens.
 Runtime validation on a real Android device remains pending.
+
+## C1 caregiver Home
+
+C1 follows the exported layout with a patient switcher, glasses card, Today
+statistics, three recent alerts for the selected patient, and the Phase 2 card.
+Both languages, Arabic names in English mode, RTL count ordering, and 2x text
+on narrow screens are supported. The approved initials avatar uses the API name;
+there is no fabricated photo or name transliteration. Phase 2 summary text and
+Read more remain unavailable, as approved.
+
+Widgets observe Riverpod and SQLite only. HomeRepository refreshes GET /patients,
+GET /patients/{id}/devices, GET /patients/{id}/journal,
+GET /patients/{id}/reminder-logs?date= and GET /caregivers/me/alerts.
+The verified /auth/me caregiver ID scopes every cache read/write. Identity reload
+hides previous-account data and refresh disposal cancels pending requests.
+The journal supplies the backend's patient-local day; reminder logs use that
+exact date, even if refresh crosses midnight. People met counts distinct known
+person IDs in encounter entries, excluding unknown people and other event types.
+Only aggregate statistics are cached: no journal transcripts, embeddings,
+photos or signed URLs enter these Home tables.
+
+Schema v2 adds the approved four read-cache tables. Refresh commits atomically
+and failures retain cached data with an offline/date notice. Removed patient
+links remove that caregiver's related caches. The existing startup policy still
+verifies caregiver authentication online; this PR supports cached Home reads
+within an authenticated session, without changing that authentication policy.
+
+Android's selected serial uses glassesConnectionProvider for hello/time_sync
+(with the patient timezone) and telemetry. A live link overrides heartbeat status,
+including forced disconnects. Without a supported local link, API online status
+and the last-five-minutes heartbeat are used. Missing battery/last-seen values
+stay unknown. Memory: Capturing requires live telemetry, while the API master
+switch alone shows Memory: Enabled or Off. Real BLE remains unimplemented;
+the approved non-release REMORI_FAKE_GLASSES=true option exercises the dev link.
+No pairing tokens or fake events are uploaded by Home.
+
+The glasses and journal links open C16/C12; See all opens C2. Those screen slots
+will be implemented in their own PRs. Viewer accounts have no Add reminder
+action. The summary preview makes no Phase 2 request or invented AI output.
+Refresh runs on entry/resume and supports pull to refresh and error retry.
+
+Review captures: [English](test/goldens/c1_en.png), [Arabic](test/goldens/c1_ar.png).
+Regenerate with flutter test test/c1_home_test.dart --update-goldens.
+Checks: dart format ., flutter analyze (clean), flutter test (181 passed).
+C1 tests cover cache ownership, atomic rollback, removed links, alert pagination,
+v1 migration, revoked-link cache removal, patient switching, viewer access, offline/empty/error states,
+telemetry/disconnect, identity changes, RTL and large text.
+Live-account Android/iOS runtime validation remains pending.

@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
 part 'remori_database.g.dart';
+part 'dashboard_tables.dart';
 
 enum ReminderStatus { pending, completed, snoozed, missed }
 
@@ -47,11 +48,31 @@ class OutboxEntries extends Table {
   TextColumn get payload => text()();
 }
 
-@DriftDatabase(tables: [ReminderLogs, OutboxEntries])
+@DriftDatabase(
+  tables: [
+    ReminderLogs,
+    OutboxEntries,
+    DashboardPatients,
+    DashboardDevices,
+    DashboardAlerts,
+    DashboardDays,
+  ],
+)
 class RemoriDatabase extends _$RemoriDatabase {
   RemoriDatabase(super.executor);
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.createTable(dashboardPatients);
+        await m.createTable(dashboardDevices);
+        await m.createTable(dashboardAlerts);
+        await m.createTable(dashboardDays);
+      }
+    },
+  );
 
   static const _uuid = Uuid();
   static final _uuidPattern = RegExp(

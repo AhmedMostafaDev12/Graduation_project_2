@@ -405,4 +405,133 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get permissionsHandoverFailed =>
       'تعذّر الدخول إلى وضع المريض. تحقق من اتصالك وحاول مرة أخرى.';
+
+  @override
+  String get homeSwitchPatient => 'تغيير المريض';
+
+  @override
+  String get homeLoading => 'جارٍ تحميل الصفحة الرئيسية…';
+
+  @override
+  String get homeLoadFailed =>
+      'تعذّر تحميل الصفحة الرئيسية. تحقق من اتصالك وحاول مرة أخرى.';
+
+  @override
+  String get homeOffline =>
+      'نعرض البيانات المحفوظة. تعذّر تحديث الصفحة الرئيسية.';
+
+  @override
+  String get homeRetry => 'إعادة المحاولة';
+
+  @override
+  String get homeNoPatients => 'لا يوجد مرضى مرتبطون بحسابك حتى الآن.';
+
+  @override
+  String get homeGlasses => 'النظارة';
+
+  @override
+  String get homeConnected => 'متصلة';
+
+  @override
+  String get homeDisconnected => 'غير متصلة';
+
+  @override
+  String get homeNotPaired => 'غير مقترنة';
+
+  @override
+  String get homeUnknown => '—';
+
+  @override
+  String get homeMemoryOff => 'الذاكرة: متوقفة';
+
+  @override
+  String get homeMemoryPaused => 'الذاكرة: متوقفة مؤقتًا';
+
+  @override
+  String get homeMemoryCapturing => 'الذاكرة: تسجّل';
+
+  @override
+  String get homeMemoryEnabled => 'الذاكرة: مفعّلة';
+
+  @override
+  String get homeJustNow => 'الآن';
+
+  @override
+  String homeMinutesAgo(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'منذ $minutes دقيقة',
+      many: 'منذ $minutes دقيقة',
+      few: 'منذ $minutes دقائق',
+      two: 'منذ دقيقتين',
+      one: 'منذ دقيقة',
+      zero: 'الآن',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String homeDeviceDetail(String time, String battery) {
+    return 'آخر اتصال $time · البطارية $battery';
+  }
+
+  @override
+  String get homeOpenJournal => 'فتح سجل اليوم ‹';
+
+  @override
+  String homeCachedDay(String date) {
+    return 'إحصاءات محفوظة ليوم $date';
+  }
+
+  @override
+  String get homePeopleMet => 'أشخاص التقاهم';
+
+  @override
+  String get homeRemindersDone => 'تذكيرات مكتملة';
+
+  @override
+  String get homeSnoozed => 'مؤجلة';
+
+  @override
+  String homeReminderProgress(String done, String total) {
+    return '$done / $total';
+  }
+
+  @override
+  String get homeAlerts => 'التنبيهات';
+
+  @override
+  String get homeSeeAll => 'عرض الكل';
+
+  @override
+  String get homeNoAlerts => 'لا توجد تنبيهات حديثة لهذا المريض.';
+
+  @override
+  String get homeMissed => 'فائت';
+
+  @override
+  String get homeNewFace => 'وجه جديد';
+
+  @override
+  String get homeLowBattery => 'البطارية';
+
+  @override
+  String get homeSummary => 'الملخص';
+
+  @override
+  String get homeAlert => 'تنبيه';
+
+  @override
+  String get homeDailySummary => 'الملخص اليومي بالذكاء الاصطناعي';
+
+  @override
+  String get homePhaseTwo => 'المرحلة الثانية';
+
+  @override
+  String get homeSummaryUnavailable =>
+      'ستتوفر الملخصات اليومية في المرحلة الثانية.';
+
+  @override
+  String get homeReadMore => 'اقرأ المزيد ‹';
 }

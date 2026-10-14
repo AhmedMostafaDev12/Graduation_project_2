@@ -18,6 +18,7 @@ class RemoriNavigationBar extends StatelessWidget {
     required this.actionLabel,
     required this.actionIcon,
     required this.onAction,
+    this.showAction = true,
     this.mode = RemoriMode.caregiver,
   }) : assert(items.length == 4),
        assert(selectedIndex >= 0 && selectedIndex < 4);
@@ -28,6 +29,7 @@ class RemoriNavigationBar extends StatelessWidget {
   final String actionLabel;
   final Widget actionIcon;
   final VoidCallback onAction;
+  final bool showAction;
   final RemoriMode mode;
 
   @override
@@ -80,36 +82,38 @@ class RemoriNavigationBar extends StatelessWidget {
                 ],
               ),
             ),
-            Positioned(
-              top: 0,
-              left: (constraints.maxWidth - actionSize) / 2,
-              child: Semantics(
-                button: true,
-                label: actionLabel,
-                child: Tooltip(
-                  message: actionLabel,
-                  child: DecoratedBox(
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [RemoriTheme.actionShadow],
-                    ),
-                    child: Material(
-                      color: RemoriColors.surface,
-                      shape: const CircleBorder(),
-                      clipBehavior: Clip.antiAlias,
-                      child: InkWell(
-                        onTap: onAction,
-                        customBorder: const CircleBorder(),
-                        child: SizedBox(
-                          width: actionSize,
-                          height: actionSize,
-                          child: IconTheme(
-                            data: const IconThemeData(
-                              color: RemoriColors.purple,
-                              size: 28,
-                            ),
-                            child: Center(
-                              child: ExcludeSemantics(child: actionIcon),
+            if (showAction)
+              Positioned(
+                top: 0,
+                left: (constraints.maxWidth - actionSize) / 2,
+                child: Semantics(
+                  button: true,
+                  label: actionLabel,
+                  child: Tooltip(
+                    message: actionLabel,
+                    child: DecoratedBox(
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [RemoriTheme.actionShadow],
+                      ),
+                      child: Material(
+                        color: RemoriColors.surface,
+                        shape: const CircleBorder(),
+                        clipBehavior: Clip.antiAlias,
+                        child: InkWell(
+                          onTap: onAction,
+                          customBorder: const CircleBorder(),
+                          child: SizedBox(
+                            width: actionSize,
+                            height: actionSize,
+                            child: IconTheme(
+                              data: const IconThemeData(
+                                color: RemoriColors.purple,
+                                size: 28,
+                              ),
+                              child: Center(
+                                child: ExcludeSemantics(child: actionIcon),
+                              ),
                             ),
                           ),
                         ),
@@ -118,7 +122,6 @@ class RemoriNavigationBar extends StatelessWidget {
                   ),
                 ),
               ),
-            ),
           ],
         ),
       );
