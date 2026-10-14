@@ -2154,6 +2154,60 @@ abstract class AppLocalizations {
     String first,
     String last,
   );
+
+  /// No description provided for @placesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved places'**
+  String get placesTitle;
+
+  /// No description provided for @placesAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'+ Add'**
+  String get placesAdd;
+
+  /// No description provided for @placesIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Used when the patient asks the glasses \"Where am I?\". The phone matches its location to the nearest saved place.'**
+  String get placesIntro;
+
+  /// No description provided for @placesRadius.
+  ///
+  /// In en, this message translates to:
+  /// **'Radius {meters} m'**
+  String placesRadius(String meters);
+
+  /// No description provided for @placesEditingPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Adding and editing places will be available when the place editor is ready.'**
+  String get placesEditingPending;
+
+  /// No description provided for @placesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved places yet.'**
+  String get placesEmpty;
+
+  /// No description provided for @placesUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved places are unavailable. Select a patient and try again.'**
+  String get placesUnavailable;
+
+  /// No description provided for @placesLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to update saved places. Check your connection and try again.'**
+  String get placesLoadFailed;
+
+  /// No description provided for @placesOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing saved places. Retry to check the latest list.'**
+  String get placesOffline;
 }
 
 class _AppLocalizationsDelegate
