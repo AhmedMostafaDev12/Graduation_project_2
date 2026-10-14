@@ -212,6 +212,43 @@
         "type": "int"
       }
     }
+  },
+  "detailTitle": "تفاصيل الشخص",
+  "detailEdit": "تعديل",
+  "detailSave": "حفظ التغييرات",
+  "detailCancel": "إلغاء",
+  "detailAddPhotos": "+ إضافة صور",
+  "detailSavePhotos": "حفظ الصور",
+  "detailEnrolledBy": "{relationship} · أضافه {name}",
+  "detailPhotoCount": "الصور المسجلة ({count})",
+  "detailPhotoLabel": "صورة مسجلة",
+  "detailPhotoTip": "تساعد الصور الإضافية من زوايا مختلفة على تحسين التعرّف.",
+  "detailArchive": "أرشفة الشخص",
+  "detailArchiveHint": "لن يتم الإعلان عن الأشخاص المؤرشفين. سيُطلب منك التأكيد.",
+  "detailArchiveConfirm": "هل تريد أرشفة هذا الشخص؟ ستُحذف صوره وبيانات وجهه. تحتفظ اليوميات السابقة باسمه.",
+  "detailRemoveConfirm": "هل تريد حذف هذه الصورة المسجلة وبيانات وجهها؟",
+  "detailArchived": "هذا الشخص مؤرشف.",
+  "detailLastPhoto": "أضف صورة أخرى أولًا، أو أرشف الشخص.",
+  "detailTooManyPhotos": "يمكن تسجيل ٢٠ صورة للشخص. احذف صورة أولًا.",
+  "detailGone": "لم يعد هذا الشخص أو هذه الصورة متاحًا. حدّث القائمة.",
+  "detailSavedRefresh": "تم حفظ التغييرات. حدّث الصفحة لإكمال عرضها.",
+  "detailRetryMessage": "تعذّر تأكيد التغيير. حدّث الصفحة للتحقق من التفاصيل الحالية قبل المحاولة مجددًا.",
+  "@detailEnrolledBy": {
+    "placeholders": {
+      "relationship": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@detailPhotoCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
   }
 
 }

@@ -1291,6 +1291,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save person'**
   String get personSave;
+
+  /// No description provided for @detailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Person detail'**
+  String get detailTitle;
+
+  /// No description provided for @detailEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get detailEdit;
+
+  /// No description provided for @detailSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get detailSave;
+
+  /// No description provided for @detailCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get detailCancel;
+
+  /// No description provided for @detailAddPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'+ Add photos'**
+  String get detailAddPhotos;
+
+  /// No description provided for @detailSavePhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Save photos'**
+  String get detailSavePhotos;
+
+  /// No description provided for @detailEnrolledBy.
+  ///
+  /// In en, this message translates to:
+  /// **'{relationship} · enrolled by {name}'**
+  String detailEnrolledBy(String relationship, String name);
+
+  /// No description provided for @detailPhotoCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Enrolled photos ({count})'**
+  String detailPhotoCount(String count);
+
+  /// No description provided for @detailPhotoLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Enrolled photo'**
+  String get detailPhotoLabel;
+
+  /// No description provided for @detailPhotoTip.
+  ///
+  /// In en, this message translates to:
+  /// **'More photos from different angles improve recognition.'**
+  String get detailPhotoTip;
+
+  /// No description provided for @detailArchive.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive person'**
+  String get detailArchive;
+
+  /// No description provided for @detailArchiveHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived people are no longer announced. You\'ll be asked to confirm.'**
+  String get detailArchiveHint;
+
+  /// No description provided for @detailArchiveConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive this person? Their photos and face data will be deleted. Past journal entries keep their name.'**
+  String get detailArchiveConfirm;
+
+  /// No description provided for @detailRemoveConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this enrolled photo and its face data?'**
+  String get detailRemoveConfirm;
+
+  /// No description provided for @detailArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'This person is archived.'**
+  String get detailArchived;
+
+  /// No description provided for @detailLastPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Add another photo first, or archive the person.'**
+  String get detailLastPhoto;
+
+  /// No description provided for @detailTooManyPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'A person can have up to 20 photos. Remove a photo first.'**
+  String get detailTooManyPhotos;
+
+  /// No description provided for @detailGone.
+  ///
+  /// In en, this message translates to:
+  /// **'This person or photo is no longer available. Refresh the list.'**
+  String get detailGone;
+
+  /// No description provided for @detailSavedRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes saved. Refresh to finish updating this page.'**
+  String get detailSavedRefresh;
+
+  /// No description provided for @detailRetryMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to confirm the change. Refresh to check the current details before trying again.'**
+  String get detailRetryMessage;
 }
 
 class _AppLocalizationsDelegate

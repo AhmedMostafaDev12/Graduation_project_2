@@ -673,4 +673,77 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get personSave => 'Save person';
+
+  @override
+  String get detailTitle => 'Person detail';
+
+  @override
+  String get detailEdit => 'Edit';
+
+  @override
+  String get detailSave => 'Save changes';
+
+  @override
+  String get detailCancel => 'Cancel';
+
+  @override
+  String get detailAddPhotos => '+ Add photos';
+
+  @override
+  String get detailSavePhotos => 'Save photos';
+
+  @override
+  String detailEnrolledBy(String relationship, String name) {
+    return '$relationship · enrolled by $name';
+  }
+
+  @override
+  String detailPhotoCount(String count) {
+    return 'Enrolled photos ($count)';
+  }
+
+  @override
+  String get detailPhotoLabel => 'Enrolled photo';
+
+  @override
+  String get detailPhotoTip =>
+      'More photos from different angles improve recognition.';
+
+  @override
+  String get detailArchive => 'Archive person';
+
+  @override
+  String get detailArchiveHint =>
+      'Archived people are no longer announced. You\'ll be asked to confirm.';
+
+  @override
+  String get detailArchiveConfirm =>
+      'Archive this person? Their photos and face data will be deleted. Past journal entries keep their name.';
+
+  @override
+  String get detailRemoveConfirm =>
+      'Remove this enrolled photo and its face data?';
+
+  @override
+  String get detailArchived => 'This person is archived.';
+
+  @override
+  String get detailLastPhoto =>
+      'Add another photo first, or archive the person.';
+
+  @override
+  String get detailTooManyPhotos =>
+      'A person can have up to 20 photos. Remove a photo first.';
+
+  @override
+  String get detailGone =>
+      'This person or photo is no longer available. Refresh the list.';
+
+  @override
+  String get detailSavedRefresh =>
+      'Changes saved. Refresh to finish updating this page.';
+
+  @override
+  String get detailRetryMessage =>
+      'Unable to confirm the change. Refresh to check the current details before trying again.';
 }

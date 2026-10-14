@@ -75,6 +75,18 @@ class HomeRepository {
                     p.patientId.equals(patientId),
               ))
               .go();
+          await (db.delete(db.personDetailStates)..where(
+                (p) =>
+                    p.caregiverId.equals(caregiverId) &
+                    p.patientId.equals(patientId),
+              ))
+              .go();
+          await (db.delete(db.cachedPersonPhotos)..where(
+                (p) =>
+                    p.caregiverId.equals(caregiverId) &
+                    p.patientId.equals(patientId),
+              ))
+              .go();
         });
       }
       rethrow;
@@ -187,6 +199,18 @@ class HomeRepository {
           ))
           .go();
       await (db.delete(db.peopleCacheStates)..where(
+            (p) =>
+                p.caregiverId.equals(caregiverId) &
+                p.patientId.isNotIn(allowedIds),
+          ))
+          .go();
+      await (db.delete(db.personDetailStates)..where(
+            (p) =>
+                p.caregiverId.equals(caregiverId) &
+                p.patientId.isNotIn(allowedIds),
+          ))
+          .go();
+      await (db.delete(db.cachedPersonPhotos)..where(
             (p) =>
                 p.caregiverId.equals(caregiverId) &
                 p.patientId.isNotIn(allowedIds),

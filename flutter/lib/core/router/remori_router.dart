@@ -7,6 +7,7 @@ import '../../features/caregiver_dashboard/presentation/c1_home_screen.dart';
 import '../../features/caregiver_dashboard/presentation/home_providers.dart';
 import '../../features/people/presentation/c3_people_screen.dart';
 import '../../features/people/presentation/c4_add_person_screen.dart';
+import '../../features/people/presentation/c5_person_detail_screen.dart';
 import '../../features/auth/presentation/a1_mode_select_screen.dart';
 import '../../features/auth/presentation/a2_login_screen.dart';
 import '../../features/auth/presentation/a3_signup_screen.dart';
@@ -53,6 +54,14 @@ typedef RemoriScreenBuilder = Widget Function(BuildContext, GoRouterState);
 /// Feature PRs replace empty slots with the screen-ID presentation widgets.
 final screenBuildersProvider = Provider<Map<RemoriScreen, RemoriScreenBuilder>>(
   (ref) => {
+    RemoriScreen.c5: (context, state) => C5PersonDetailScreen(
+      patientId: state.extra is Map
+          ? (state.extra as Map)['patient_id'] as String?
+          : null,
+      personId: state.extra is Map
+          ? (state.extra as Map)['person_id'] as String?
+          : null,
+    ),
     RemoriScreen.c4: (context, state) => C4AddPersonScreen(
       patientId: state.extra is String ? state.extra as String : null,
     ),

@@ -6,6 +6,7 @@ import '../../../core/api/api_failure.dart';
 import '../../../core/db/remori_database.dart';
 import '../domain/people_data.dart';
 import 'people_photo_cache.dart';
+import 'person_detail_photo_cache.dart';
 
 class PeopleRepository {
   PeopleRepository(this.client, this.db, this.scope, this.photos);
@@ -129,6 +130,7 @@ class PeopleRepository {
             );
       });
       final current = await read();
+      final invalidDetails = <String>{};
       for (final old in previous.people.where((p) => p.photoUrl != null)) {
         final newer = current.people.where((p) => p.id == old.id).firstOrNull;
         if (newer == null ||
@@ -138,6 +140,15 @@ class PeopleRepository {
           await photos.evict(scope, old);
         }
       }
+      for (final old in previous.people) {
+        final newer = current.people.where((p) => p.id == old.id).firstOrNull;
+        if (newer == null ||
+            newer.status == PeopleFilter.archived ||
+            newer.updatedAt != old.updatedAt) {
+          invalidDetails.add(old.id);
+        }
+      }
+      await purgePersonDetails(db, scope, ids: invalidDetails);
     } on ApiFailure catch (failure) {
       if (failure.statusCode == 404 && failure.code == 'PATIENT_NOT_FOUND') {
         await purge();
@@ -179,6 +190,7 @@ class PeopleRepository {
     for (final person in old.people) {
       await photos.evict(scope, person);
     }
+    await purgePersonDetails(db, scope);
   }
 
   Stream<PeopleData> watch() => db
