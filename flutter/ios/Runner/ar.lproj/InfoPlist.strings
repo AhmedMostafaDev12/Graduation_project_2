@@ -1,1 +1,2 @@
-"NSCameraUsageDescription" = "امسح رمز QR على علبة النظارة لربطها بالمريض.";
+"NSCameraUsageDescription" = "امسح رمز النظارة أو التقط صورة لشخص وافق على التعرّف عليه.";
+"NSPhotoLibraryUsageDescription" = "اختر صورًا لشخص وافق على أن يتعرّف عليه ريموري.";

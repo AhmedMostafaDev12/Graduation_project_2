@@ -577,8 +577,9 @@ images, including Home's patient context. Home link removal also clears related
 C3 metadata. No embeddings or unknown-face images are cached by C3.
 
 Add person opens C4 with the patient ID, person cards open C5 with patient/person
-IDs, and the review banner opens C6 with patient context. These target screens
-remain slots for separate PRs. No create/archive/promote endpoint is called here.
+IDs, and the review banner opens C6 with patient context. C4 is implemented below;
+C5 and C6 remain slots for separate PRs. No create/archive/promote endpoint is
+called from C3.
 
 Review captures: [English](test/goldens/c3_en.png), [Arabic](test/goldens/c3_ar.png).
 The captures use exported design portraits as test fixtures only; runtime people
@@ -593,3 +594,48 @@ context, viewer permissions, account/patient changes, v2 migration, late image
 callbacks, RTL and 2x text at 320dp.
 Live-account image loading on a real Android/iOS device and iOS build validation
 remain pending.
+
+## C4 Add person
+
+C4 follows the exported design with five photo slots, name, relationship,
+explicit recognition consent, and Save person. Name hints use instructions
+rather than sample names. Both English and Arabic are supported, with scrolling
+for the keyboard and enlarged text. Only managers of the current patient can
+edit; the route's patient context must match the selected patient. Changing
+account/patient clears the form and ignores late picker/upload results.
+
+Ahmed approved image_picker (1.2.4) for camera/gallery and the online enrollment
+exception: POST /patients/{id}/people generates a server ID and has no queued
+creation/idempotency contract. C4 sends repeated photos multipart fields,
+trimmed name/relationship and consent_given=true, then inserts the response into
+the existing caregiver/patient-scoped Drift People cache. No table or outbox kind
+is added. C3 refresh obtains the thumbnail, which is absent from the 201 response.
+
+Consent starts unchecked. Require 1–5 JPEG/PNG photos, at most 4 MB each, a name
+of 1–80 characters and relationship of 1–40. The server remains authoritative for
+image validity; structured body.photos.<index> errors outline the relevant slots
+without displaying server text. Face inference is currently a backend stub, so
+C4 does not claim local face detection or fabricate the design's example error.
+
+Selected image bytes stay in the form, not Drift/outbox; previews are evicted
+when removed/replaced or the form closes. image_picker uses system temporary
+files; C4 makes no persistent copy. Android lost-picker results are recovered
+only into a currently authenticated manager's form, with consent still required.
+iOS camera/library purpose strings are localized; no microphone permission is
+added. Native picker permission failures leave the form intact.
+
+Duplicate taps are blocked. A known successful enrollment followed by a cache
+failure retains its result: retry only writes the cache, never creates another
+person. An uncertain network/response failure instructs the caregiver to check
+People before retrying; there is no automatic retry of enrollment.
+
+Review captures: [English](test/goldens/c4_en.png), [Arabic](test/goldens/c4_ar.png).
+Regenerate with flutter test test/c4_add_person_test.dart --update-goldens.
+Tests cover multipart fields/photo limits, consent, cache scope, server slot
+errors, cache retry, duplicate taps, late scope changes, viewer restrictions,
+camera cancellation, gallery selection/removal, navigation and enlarged RTL.
+Real-device camera/gallery, live-account enrollment and an iOS build require
+device validation; no account or face data was created for automated checks.
+
+Validation: dart format ., flutter analyze (clean), flutter test (215 passed,
+14 new C4 tests), Android debug APK build (successful).

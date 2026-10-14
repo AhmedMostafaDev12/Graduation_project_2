@@ -197,5 +197,44 @@
   "peopleSon": "Son",
   "peopleDaughter": "Daughter",
   "peopleDoctor": "Doctor",
-  "peopleNurse": "Nurse"
+  "peopleNurse": "Nurse",
+  "personUnavailable": "Select a patient you manage from Home, then try again.",
+  "personAddTitle": "Add person",
+  "personPhotos": "Photos (1–5)",
+  "personCamera": "Take photo",
+  "personGallery": "Choose from gallery",
+  "personRemovePhoto": "Remove photo",
+  "personPhotoSlot": "Photo {number}",
+  "personPhotoTooLarge": "Choose a photo no larger than 4 MB.",
+  "personPhotoUnsupported": "Choose a JPEG or PNG photo.",
+  "personPhotoPickFailed": "Unable to open the photo. Check permissions and try again.",
+  "personPhotosRequired": "Add at least one photo.",
+  "personPhotoInvalid": "Photo {number}: unable to use this photo. Please replace it.",
+  "personPhotoTip": "Tip: a clear face, good light, one person per photo. Different angles help.",
+  "personName": "Name",
+  "personNameHint": "Enter full name",
+  "personRelationship": "Relationship",
+  "personRelationshipHint": "Enter relationship",
+  "personConsent": "This person agreed to be recognized by Remori.",
+  "personConsentRequired": "Confirm this person’s consent before saving.",
+  "personCacheRetry": "Person saved. Tap Save person again to finish updating the list.",
+  "personSaveUncertain": "Unable to confirm the save. Check People before trying again to avoid adding this person twice.",
+  "personSaveRetry": "Unable to save this person. Check the fields and photos, then try again.",
+  "personSaving": "Saving…",
+  "personSave": "Save person",
+  "@personPhotoSlot": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "@personPhotoInvalid": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  }
+
 }

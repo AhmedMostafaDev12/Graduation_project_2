@@ -590,4 +590,87 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get peopleNurse => 'Nurse';
+
+  @override
+  String get personUnavailable =>
+      'Select a patient you manage from Home, then try again.';
+
+  @override
+  String get personAddTitle => 'Add person';
+
+  @override
+  String get personPhotos => 'Photos (1–5)';
+
+  @override
+  String get personCamera => 'Take photo';
+
+  @override
+  String get personGallery => 'Choose from gallery';
+
+  @override
+  String get personRemovePhoto => 'Remove photo';
+
+  @override
+  String personPhotoSlot(int number) {
+    return 'Photo $number';
+  }
+
+  @override
+  String get personPhotoTooLarge => 'Choose a photo no larger than 4 MB.';
+
+  @override
+  String get personPhotoUnsupported => 'Choose a JPEG or PNG photo.';
+
+  @override
+  String get personPhotoPickFailed =>
+      'Unable to open the photo. Check permissions and try again.';
+
+  @override
+  String get personPhotosRequired => 'Add at least one photo.';
+
+  @override
+  String personPhotoInvalid(int number) {
+    return 'Photo $number: unable to use this photo. Please replace it.';
+  }
+
+  @override
+  String get personPhotoTip =>
+      'Tip: a clear face, good light, one person per photo. Different angles help.';
+
+  @override
+  String get personName => 'Name';
+
+  @override
+  String get personNameHint => 'Enter full name';
+
+  @override
+  String get personRelationship => 'Relationship';
+
+  @override
+  String get personRelationshipHint => 'Enter relationship';
+
+  @override
+  String get personConsent => 'This person agreed to be recognized by Remori.';
+
+  @override
+  String get personConsentRequired =>
+      'Confirm this person’s consent before saving.';
+
+  @override
+  String get personCacheRetry =>
+      'Person saved. Tap Save person again to finish updating the list.';
+
+  @override
+  String get personSaveUncertain =>
+      'Unable to confirm the save. Check People before trying again to avoid adding this person twice.';
+
+  @override
+  String get personSaveRetry =>
+      'Unable to save this person. Check the fields and photos, then try again.';
+
+  @override
+  String get personSaving => 'Saving…';
+
+  @override
+  String get personSave => 'Save person';
 }
