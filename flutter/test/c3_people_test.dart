@@ -604,6 +604,9 @@ void main() {
     await db.customStatement('DROP TABLE people_cache_states');
     await db.customStatement('DROP TABLE person_detail_states');
     await db.customStatement('DROP TABLE cached_person_photos');
+    await db.customStatement('DROP TABLE cached_reminders');
+    await db.customStatement('DROP TABLE cached_reminder_occurrences');
+    await db.customStatement('DROP TABLE reminder_cache_states');
     await db.customStatement('PRAGMA user_version = 2');
     await db.close();
     db = RemoriDatabase(NativeDatabase(file, logStatements: false));

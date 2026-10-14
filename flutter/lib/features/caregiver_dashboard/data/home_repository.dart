@@ -87,6 +87,24 @@ class HomeRepository {
                     p.patientId.equals(patientId),
               ))
               .go();
+          await (db.delete(db.cachedReminders)..where(
+                (p) =>
+                    p.caregiverId.equals(caregiverId) &
+                    p.patientId.equals(patientId),
+              ))
+              .go();
+          await (db.delete(db.cachedReminderOccurrences)..where(
+                (p) =>
+                    p.caregiverId.equals(caregiverId) &
+                    p.patientId.equals(patientId),
+              ))
+              .go();
+          await (db.delete(db.reminderCacheStates)..where(
+                (p) =>
+                    p.caregiverId.equals(caregiverId) &
+                    p.patientId.equals(patientId),
+              ))
+              .go();
         });
       }
       rethrow;
@@ -211,6 +229,24 @@ class HomeRepository {
           ))
           .go();
       await (db.delete(db.cachedPersonPhotos)..where(
+            (p) =>
+                p.caregiverId.equals(caregiverId) &
+                p.patientId.isNotIn(allowedIds),
+          ))
+          .go();
+      await (db.delete(db.cachedReminders)..where(
+            (p) =>
+                p.caregiverId.equals(caregiverId) &
+                p.patientId.isNotIn(allowedIds),
+          ))
+          .go();
+      await (db.delete(db.cachedReminderOccurrences)..where(
+            (p) =>
+                p.caregiverId.equals(caregiverId) &
+                p.patientId.isNotIn(allowedIds),
+          ))
+          .go();
+      await (db.delete(db.reminderCacheStates)..where(
             (p) =>
                 p.caregiverId.equals(caregiverId) &
                 p.patientId.isNotIn(allowedIds),

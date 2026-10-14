@@ -746,4 +746,123 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get detailRetryMessage =>
       'Unable to confirm the change. Refresh to check the current details before trying again.';
+
+  @override
+  String get reminderAdd => '+ Add';
+
+  @override
+  String get reminderToday => 'TODAY';
+
+  @override
+  String reminderTodayDate(String date) {
+    return 'TODAY · $date';
+  }
+
+  @override
+  String get reminderAll => 'ALL REMINDERS';
+
+  @override
+  String get reminderMed => 'Med';
+
+  @override
+  String get reminderAppt => 'Appt';
+
+  @override
+  String get reminderTask => 'Task';
+
+  @override
+  String get reminderDone => 'Done';
+
+  @override
+  String reminderDoneVia(String via) {
+    return 'Done · $via';
+  }
+
+  @override
+  String get reminderVoice => 'voice';
+
+  @override
+  String get reminderApp => 'app';
+
+  @override
+  String get reminderCaregiver => 'caregiver';
+
+  @override
+  String get reminderPending => 'Pending';
+
+  @override
+  String get reminderMissed => 'Missed';
+
+  @override
+  String get reminderSnoozed => 'Snoozed';
+
+  @override
+  String reminderSnoozedUntil(String time) {
+    return 'Snoozed → $time';
+  }
+
+  @override
+  String get reminderNoLogs => 'No reminder activity recorded today.';
+
+  @override
+  String get reminderNoSavedToday => 'No saved reminder activity for today.';
+
+  @override
+  String get reminderNone => 'No reminders have been added yet.';
+
+  @override
+  String get reminderCustomSchedule => 'Scheduled reminder';
+
+  @override
+  String reminderDaily(String times) {
+    return 'Every day at $times';
+  }
+
+  @override
+  String reminderWeekly(String days, String times) {
+    return '$days at $times';
+  }
+
+  @override
+  String reminderJoin(String first, String last) {
+    return '$first and $last';
+  }
+
+  @override
+  String get reminderMonday => 'Mondays';
+
+  @override
+  String get reminderTuesday => 'Tuesdays';
+
+  @override
+  String get reminderWednesday => 'Wednesdays';
+
+  @override
+  String get reminderThursday => 'Thursdays';
+
+  @override
+  String get reminderFriday => 'Fridays';
+
+  @override
+  String get reminderSaturday => 'Saturdays';
+
+  @override
+  String get reminderSunday => 'Sundays';
+
+  @override
+  String reminderEnabledLabel(String title) {
+    return 'Enabled: $title';
+  }
+
+  @override
+  String get reminderSavedRetry =>
+      'Change saved. Retry to finish updating the list.';
+
+  @override
+  String get reminderOffline =>
+      'Showing saved reminders. Unable to update; retry to check the latest state.';
+
+  @override
+  String get reminderLoadFailed =>
+      'Unable to load reminders. Check your connection and try again.';
 }

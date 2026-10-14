@@ -272,6 +272,95 @@
         "type": "String"
       }
     }
+  },
+  "reminderAdd": "+ Add",
+  "reminderToday": "TODAY",
+  "reminderTodayDate": "TODAY · {date}",
+  "reminderAll": "ALL REMINDERS",
+  "reminderMed": "Med",
+  "reminderAppt": "Appt",
+  "reminderTask": "Task",
+  "reminderDone": "Done",
+  "reminderDoneVia": "Done · {via}",
+  "reminderVoice": "voice",
+  "reminderApp": "app",
+  "reminderCaregiver": "caregiver",
+  "reminderPending": "Pending",
+  "reminderMissed": "Missed",
+  "reminderSnoozed": "Snoozed",
+  "reminderSnoozedUntil": "Snoozed → {time}",
+  "reminderNoLogs": "No reminder activity recorded today.",
+  "reminderNoSavedToday": "No saved reminder activity for today.",
+  "reminderNone": "No reminders have been added yet.",
+  "reminderCustomSchedule": "Scheduled reminder",
+  "reminderDaily": "Every day at {times}",
+  "reminderWeekly": "{days} at {times}",
+  "reminderJoin": "{first} and {last}",
+  "reminderMonday": "Mondays",
+  "reminderTuesday": "Tuesdays",
+  "reminderWednesday": "Wednesdays",
+  "reminderThursday": "Thursdays",
+  "reminderFriday": "Fridays",
+  "reminderSaturday": "Saturdays",
+  "reminderSunday": "Sundays",
+  "reminderEnabledLabel": "Enabled: {title}",
+  "reminderSavedRetry": "Change saved. Retry to finish updating the list.",
+  "reminderOffline": "Showing saved reminders. Unable to update; retry to check the latest state.",
+  "reminderLoadFailed": "Unable to load reminders. Check your connection and try again.",
+  "@reminderTodayDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@reminderDoneVia": {
+    "placeholders": {
+      "via": {
+        "type": "String"
+      }
+    }
+  },
+  "@reminderSnoozedUntil": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "@reminderDaily": {
+    "placeholders": {
+      "times": {
+        "type": "String"
+      }
+    }
+  },
+  "@reminderWeekly": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      },
+      "times": {
+        "type": "String"
+      }
+    }
+  },
+  "@reminderJoin": {
+    "placeholders": {
+      "first": {
+        "type": "String"
+      },
+      "last": {
+        "type": "String"
+      }
+    }
+  },
+  "@reminderEnabledLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
   }
 
 }

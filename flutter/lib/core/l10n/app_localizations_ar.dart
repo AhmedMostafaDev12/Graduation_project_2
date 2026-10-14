@@ -743,4 +743,123 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get detailRetryMessage =>
       'تعذّر تأكيد التغيير. حدّث الصفحة للتحقق من التفاصيل الحالية قبل المحاولة مجددًا.';
+
+  @override
+  String get reminderAdd => '+ إضافة';
+
+  @override
+  String get reminderToday => 'اليوم';
+
+  @override
+  String reminderTodayDate(String date) {
+    return 'اليوم · $date';
+  }
+
+  @override
+  String get reminderAll => 'كل التذكيرات';
+
+  @override
+  String get reminderMed => 'دواء';
+
+  @override
+  String get reminderAppt => 'موعد';
+
+  @override
+  String get reminderTask => 'مهمة';
+
+  @override
+  String get reminderDone => 'تم';
+
+  @override
+  String reminderDoneVia(String via) {
+    return 'تم · $via';
+  }
+
+  @override
+  String get reminderVoice => 'بالصوت';
+
+  @override
+  String get reminderApp => 'بالتطبيق';
+
+  @override
+  String get reminderCaregiver => 'بمقدم الرعاية';
+
+  @override
+  String get reminderPending => 'قيد الانتظار';
+
+  @override
+  String get reminderMissed => 'فات الموعد';
+
+  @override
+  String get reminderSnoozed => 'مؤجّل';
+
+  @override
+  String reminderSnoozedUntil(String time) {
+    return 'مؤجّل ← $time';
+  }
+
+  @override
+  String get reminderNoLogs => 'لم يُسجَّل نشاط للتذكيرات اليوم.';
+
+  @override
+  String get reminderNoSavedToday => 'لا يوجد نشاط محفوظ للتذكيرات اليوم.';
+
+  @override
+  String get reminderNone => 'لم تتم إضافة تذكيرات بعد.';
+
+  @override
+  String get reminderCustomSchedule => 'تذكير مجدول';
+
+  @override
+  String reminderDaily(String times) {
+    return 'يوميًا الساعة $times';
+  }
+
+  @override
+  String reminderWeekly(String days, String times) {
+    return '$days الساعة $times';
+  }
+
+  @override
+  String reminderJoin(String first, String last) {
+    return '$first و$last';
+  }
+
+  @override
+  String get reminderMonday => 'كل يوم اثنين';
+
+  @override
+  String get reminderTuesday => 'كل يوم ثلاثاء';
+
+  @override
+  String get reminderWednesday => 'كل يوم أربعاء';
+
+  @override
+  String get reminderThursday => 'كل يوم خميس';
+
+  @override
+  String get reminderFriday => 'كل يوم جمعة';
+
+  @override
+  String get reminderSaturday => 'كل يوم سبت';
+
+  @override
+  String get reminderSunday => 'كل يوم أحد';
+
+  @override
+  String reminderEnabledLabel(String title) {
+    return 'مفعّل: $title';
+  }
+
+  @override
+  String get reminderSavedRetry =>
+      'تم حفظ التغيير. حاول مجددًا لإكمال تحديث القائمة.';
+
+  @override
+  String get reminderOffline =>
+      'نعرض التذكيرات المحفوظة. تعذّر تحديثها؛ حاول مجددًا للتحقق من الحالة الحالية.';
+
+  @override
+  String get reminderLoadFailed =>
+      'تعذّر تحميل التذكيرات. تحقق من اتصالك وحاول مرة أخرى.';
 }
