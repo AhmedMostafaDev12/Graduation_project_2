@@ -895,3 +895,38 @@ tests do not enroll or dismiss real faces.
 
 Validation: dart format --set-exit-if-changed ., flutter analyze (clean),
 flutter test (378 passed, including 26 new C7 tests), Android debug APK build.
+
+## C10 Saved places
+
+C10 reads its selected patient's saved places from the approved caregiver/patient-
+scoped CachedPlaces and PlacesCacheStates Drift caches. Schema v8 preserves older
+caches and pending writes. GET /patients/{id}/places refreshes definitions and
+freshness atomically; API names and order are retained, with localized radii.
+Coordinates are cached for the existing place contract, without requesting GPS,
+displaying a map, or implementing location matching in this screen.
+
+Invalid ownership, duplicate IDs, deleted rows, invalid names, coordinates, radii
+or timestamps reject the whole refresh and preserve previous cached data.
+Offline reads remain available. Empty refreshes, revoked/missing patient links
+and Home's removed-link cleanup purge only the affected scope. Stale refreshes
+cannot undo a purge, and changing accounts/patients hides the previous list.
+
+Approved staged scope: Add and place cards remain disabled until C11's separate
+PR, with a localized editing-pending notice for managers. Viewers can read places
+without editing controls. Only the API's single name is displayed: no translated
+name is invented. The existing caregiver navigation and C9 reminder action remain.
+C10's normal entry is through C18 More, which remains pending its own PR; no new
+entry point or partial C18 screen is added. The C10 route is implemented and
+covered by widget tests, including its Back destination.
+
+Review captures: [English](test/goldens/c10_en.png), [Arabic](test/goldens/c10_ar.png).
+Regenerate with flutter test test/c10_places_test.dart --update-goldens.
+Names in captures are test fixtures; runtime uses saved API places only.
+Tests cover contract validation, ownership, atomicity, offline reads, purging,
+removed links, migration, delayed responses, permissions, staged controls,
+navigation, localization and 2x text at 320dp. No packages, writes, backend changes,
+GPS permissions or relay behavior are added. An iOS build and live-account device
+validation remain pending on this Windows environment.
+
+Validation: dart format --set-exit-if-changed ., flutter analyze (clean),
+flutter test (409 passed, including 31 new C10 tests), Android debug APK built.

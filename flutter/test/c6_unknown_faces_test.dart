@@ -353,6 +353,8 @@ void main() {
           at: now,
           status: ReminderStatus.pending,
         );
+        await db.customStatement('DROP TABLE cached_places');
+        await db.customStatement('DROP TABLE places_cache_states');
         await db.customStatement('DROP TABLE cached_unknown_face_samples');
         await db.customStatement('DROP TABLE cached_unknown_faces');
         await db.customStatement('DROP TABLE unknown_faces_cache_states');

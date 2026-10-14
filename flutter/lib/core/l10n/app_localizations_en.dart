@@ -1183,4 +1183,38 @@ class AppLocalizationsEn extends AppLocalizations {
   ) {
     return 'Seen $times times on $days different days · first $first · last $last';
   }
+
+  @override
+  String get placesTitle => 'Saved places';
+
+  @override
+  String get placesAdd => '+ Add';
+
+  @override
+  String get placesIntro =>
+      'Used when the patient asks the glasses \"Where am I?\". The phone matches its location to the nearest saved place.';
+
+  @override
+  String placesRadius(String meters) {
+    return 'Radius $meters m';
+  }
+
+  @override
+  String get placesEditingPending =>
+      'Adding and editing places will be available when the place editor is ready.';
+
+  @override
+  String get placesEmpty => 'No saved places yet.';
+
+  @override
+  String get placesUnavailable =>
+      'Saved places are unavailable. Select a patient and try again.';
+
+  @override
+  String get placesLoadFailed =>
+      'Unable to update saved places. Check your connection and try again.';
+
+  @override
+  String get placesOffline =>
+      'Showing saved places. Retry to check the latest list.';
 }

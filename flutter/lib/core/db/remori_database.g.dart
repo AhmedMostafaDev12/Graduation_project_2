@@ -8219,6 +8219,894 @@ class CachedUnknownFaceSamplesCompanion
   }
 }
 
+class $CachedPlacesTable extends CachedPlaces
+    with TableInfo<$CachedPlacesTable, CachedPlace> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedPlacesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _latitudeMeta = const VerificationMeta(
+    'latitude',
+  );
+  @override
+  late final GeneratedColumn<double> latitude = GeneratedColumn<double>(
+    'latitude',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _longitudeMeta = const VerificationMeta(
+    'longitude',
+  );
+  @override
+  late final GeneratedColumn<double> longitude = GeneratedColumn<double>(
+    'longitude',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _radiusMMeta = const VerificationMeta(
+    'radiusM',
+  );
+  @override
+  late final GeneratedColumn<int> radiusM = GeneratedColumn<int>(
+    'radius_m',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdByMeta = const VerificationMeta(
+    'createdBy',
+  );
+  @override
+  late final GeneratedColumn<String> createdBy = GeneratedColumn<String>(
+    'created_by',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> updatedAt =
+      GeneratedColumn<int>(
+        'updated_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>($CachedPlacesTable.$converterupdatedAt);
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    caregiverId,
+    patientId,
+    id,
+    name,
+    latitude,
+    longitude,
+    radiusM,
+    createdBy,
+    updatedAt,
+    position,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_places';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedPlace> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('latitude')) {
+      context.handle(
+        _latitudeMeta,
+        latitude.isAcceptableOrUnknown(data['latitude']!, _latitudeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_latitudeMeta);
+    }
+    if (data.containsKey('longitude')) {
+      context.handle(
+        _longitudeMeta,
+        longitude.isAcceptableOrUnknown(data['longitude']!, _longitudeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_longitudeMeta);
+    }
+    if (data.containsKey('radius_m')) {
+      context.handle(
+        _radiusMMeta,
+        radiusM.isAcceptableOrUnknown(data['radius_m']!, _radiusMMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_radiusMMeta);
+    }
+    if (data.containsKey('created_by')) {
+      context.handle(
+        _createdByMeta,
+        createdBy.isAcceptableOrUnknown(data['created_by']!, _createdByMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdByMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, patientId, id};
+  @override
+  CachedPlace map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedPlace(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      latitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}latitude'],
+      )!,
+      longitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}longitude'],
+      )!,
+      radiusM: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}radius_m'],
+      )!,
+      createdBy: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_by'],
+      )!,
+      updatedAt: $CachedPlacesTable.$converterupdatedAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}updated_at'],
+        )!,
+      ),
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+    );
+  }
+
+  @override
+  $CachedPlacesTable createAlias(String alias) {
+    return $CachedPlacesTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converterupdatedAt = const UtcMicros();
+}
+
+class CachedPlace extends DataClass implements Insertable<CachedPlace> {
+  final String caregiverId;
+  final String patientId;
+  final String id;
+  final String name;
+  final double latitude;
+  final double longitude;
+  final int radiusM;
+  final String createdBy;
+  final DateTime updatedAt;
+  final int position;
+  const CachedPlace({
+    required this.caregiverId,
+    required this.patientId,
+    required this.id,
+    required this.name,
+    required this.latitude,
+    required this.longitude,
+    required this.radiusM,
+    required this.createdBy,
+    required this.updatedAt,
+    required this.position,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['latitude'] = Variable<double>(latitude);
+    map['longitude'] = Variable<double>(longitude);
+    map['radius_m'] = Variable<int>(radiusM);
+    map['created_by'] = Variable<String>(createdBy);
+    {
+      map['updated_at'] = Variable<int>(
+        $CachedPlacesTable.$converterupdatedAt.toSql(updatedAt),
+      );
+    }
+    map['position'] = Variable<int>(position);
+    return map;
+  }
+
+  CachedPlacesCompanion toCompanion(bool nullToAbsent) {
+    return CachedPlacesCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      id: Value(id),
+      name: Value(name),
+      latitude: Value(latitude),
+      longitude: Value(longitude),
+      radiusM: Value(radiusM),
+      createdBy: Value(createdBy),
+      updatedAt: Value(updatedAt),
+      position: Value(position),
+    );
+  }
+
+  factory CachedPlace.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedPlace(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      latitude: serializer.fromJson<double>(json['latitude']),
+      longitude: serializer.fromJson<double>(json['longitude']),
+      radiusM: serializer.fromJson<int>(json['radiusM']),
+      createdBy: serializer.fromJson<String>(json['createdBy']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      position: serializer.fromJson<int>(json['position']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'latitude': serializer.toJson<double>(latitude),
+      'longitude': serializer.toJson<double>(longitude),
+      'radiusM': serializer.toJson<int>(radiusM),
+      'createdBy': serializer.toJson<String>(createdBy),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'position': serializer.toJson<int>(position),
+    };
+  }
+
+  CachedPlace copyWith({
+    String? caregiverId,
+    String? patientId,
+    String? id,
+    String? name,
+    double? latitude,
+    double? longitude,
+    int? radiusM,
+    String? createdBy,
+    DateTime? updatedAt,
+    int? position,
+  }) => CachedPlace(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    id: id ?? this.id,
+    name: name ?? this.name,
+    latitude: latitude ?? this.latitude,
+    longitude: longitude ?? this.longitude,
+    radiusM: radiusM ?? this.radiusM,
+    createdBy: createdBy ?? this.createdBy,
+    updatedAt: updatedAt ?? this.updatedAt,
+    position: position ?? this.position,
+  );
+  CachedPlace copyWithCompanion(CachedPlacesCompanion data) {
+    return CachedPlace(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      latitude: data.latitude.present ? data.latitude.value : this.latitude,
+      longitude: data.longitude.present ? data.longitude.value : this.longitude,
+      radiusM: data.radiusM.present ? data.radiusM.value : this.radiusM,
+      createdBy: data.createdBy.present ? data.createdBy.value : this.createdBy,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      position: data.position.present ? data.position.value : this.position,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedPlace(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('latitude: $latitude, ')
+          ..write('longitude: $longitude, ')
+          ..write('radiusM: $radiusM, ')
+          ..write('createdBy: $createdBy, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('position: $position')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    caregiverId,
+    patientId,
+    id,
+    name,
+    latitude,
+    longitude,
+    radiusM,
+    createdBy,
+    updatedAt,
+    position,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedPlace &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.latitude == this.latitude &&
+          other.longitude == this.longitude &&
+          other.radiusM == this.radiusM &&
+          other.createdBy == this.createdBy &&
+          other.updatedAt == this.updatedAt &&
+          other.position == this.position);
+}
+
+class CachedPlacesCompanion extends UpdateCompanion<CachedPlace> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<String> id;
+  final Value<String> name;
+  final Value<double> latitude;
+  final Value<double> longitude;
+  final Value<int> radiusM;
+  final Value<String> createdBy;
+  final Value<DateTime> updatedAt;
+  final Value<int> position;
+  final Value<int> rowid;
+  const CachedPlacesCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.latitude = const Value.absent(),
+    this.longitude = const Value.absent(),
+    this.radiusM = const Value.absent(),
+    this.createdBy = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.position = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedPlacesCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required String id,
+    required String name,
+    required double latitude,
+    required double longitude,
+    required int radiusM,
+    required String createdBy,
+    required DateTime updatedAt,
+    required int position,
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       id = Value(id),
+       name = Value(name),
+       latitude = Value(latitude),
+       longitude = Value(longitude),
+       radiusM = Value(radiusM),
+       createdBy = Value(createdBy),
+       updatedAt = Value(updatedAt),
+       position = Value(position);
+  static Insertable<CachedPlace> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<double>? latitude,
+    Expression<double>? longitude,
+    Expression<int>? radiusM,
+    Expression<String>? createdBy,
+    Expression<int>? updatedAt,
+    Expression<int>? position,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (latitude != null) 'latitude': latitude,
+      if (longitude != null) 'longitude': longitude,
+      if (radiusM != null) 'radius_m': radiusM,
+      if (createdBy != null) 'created_by': createdBy,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (position != null) 'position': position,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedPlacesCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<String>? id,
+    Value<String>? name,
+    Value<double>? latitude,
+    Value<double>? longitude,
+    Value<int>? radiusM,
+    Value<String>? createdBy,
+    Value<DateTime>? updatedAt,
+    Value<int>? position,
+    Value<int>? rowid,
+  }) {
+    return CachedPlacesCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      id: id ?? this.id,
+      name: name ?? this.name,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      radiusM: radiusM ?? this.radiusM,
+      createdBy: createdBy ?? this.createdBy,
+      updatedAt: updatedAt ?? this.updatedAt,
+      position: position ?? this.position,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (latitude.present) {
+      map['latitude'] = Variable<double>(latitude.value);
+    }
+    if (longitude.present) {
+      map['longitude'] = Variable<double>(longitude.value);
+    }
+    if (radiusM.present) {
+      map['radius_m'] = Variable<int>(radiusM.value);
+    }
+    if (createdBy.present) {
+      map['created_by'] = Variable<String>(createdBy.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(
+        $CachedPlacesTable.$converterupdatedAt.toSql(updatedAt.value),
+      );
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedPlacesCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('latitude: $latitude, ')
+          ..write('longitude: $longitude, ')
+          ..write('radiusM: $radiusM, ')
+          ..write('createdBy: $createdBy, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('position: $position, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PlacesCacheStatesTable extends PlacesCacheStates
+    with TableInfo<$PlacesCacheStatesTable, PlacesCacheState> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PlacesCacheStatesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> refreshedAt =
+      GeneratedColumn<int>(
+        'refreshed_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>($PlacesCacheStatesTable.$converterrefreshedAt);
+  @override
+  List<GeneratedColumn> get $columns => [caregiverId, patientId, refreshedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'places_cache_states';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PlacesCacheState> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, patientId};
+  @override
+  PlacesCacheState map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PlacesCacheState(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      refreshedAt: $PlacesCacheStatesTable.$converterrefreshedAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}refreshed_at'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $PlacesCacheStatesTable createAlias(String alias) {
+    return $PlacesCacheStatesTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converterrefreshedAt = const UtcMicros();
+}
+
+class PlacesCacheState extends DataClass
+    implements Insertable<PlacesCacheState> {
+  final String caregiverId;
+  final String patientId;
+  final DateTime refreshedAt;
+  const PlacesCacheState({
+    required this.caregiverId,
+    required this.patientId,
+    required this.refreshedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    {
+      map['refreshed_at'] = Variable<int>(
+        $PlacesCacheStatesTable.$converterrefreshedAt.toSql(refreshedAt),
+      );
+    }
+    return map;
+  }
+
+  PlacesCacheStatesCompanion toCompanion(bool nullToAbsent) {
+    return PlacesCacheStatesCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      refreshedAt: Value(refreshedAt),
+    );
+  }
+
+  factory PlacesCacheState.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PlacesCacheState(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      refreshedAt: serializer.fromJson<DateTime>(json['refreshedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'refreshedAt': serializer.toJson<DateTime>(refreshedAt),
+    };
+  }
+
+  PlacesCacheState copyWith({
+    String? caregiverId,
+    String? patientId,
+    DateTime? refreshedAt,
+  }) => PlacesCacheState(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    refreshedAt: refreshedAt ?? this.refreshedAt,
+  );
+  PlacesCacheState copyWithCompanion(PlacesCacheStatesCompanion data) {
+    return PlacesCacheState(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      refreshedAt: data.refreshedAt.present
+          ? data.refreshedAt.value
+          : this.refreshedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlacesCacheState(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('refreshedAt: $refreshedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(caregiverId, patientId, refreshedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PlacesCacheState &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.refreshedAt == this.refreshedAt);
+}
+
+class PlacesCacheStatesCompanion extends UpdateCompanion<PlacesCacheState> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<DateTime> refreshedAt;
+  final Value<int> rowid;
+  const PlacesCacheStatesCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.refreshedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PlacesCacheStatesCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required DateTime refreshedAt,
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       refreshedAt = Value(refreshedAt);
+  static Insertable<PlacesCacheState> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<int>? refreshedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (refreshedAt != null) 'refreshed_at': refreshedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PlacesCacheStatesCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<DateTime>? refreshedAt,
+    Value<int>? rowid,
+  }) {
+    return PlacesCacheStatesCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      refreshedAt: refreshedAt ?? this.refreshedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (refreshedAt.present) {
+      map['refreshed_at'] = Variable<int>(
+        $PlacesCacheStatesTable.$converterrefreshedAt.toSql(refreshedAt.value),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlacesCacheStatesCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('refreshedAt: $refreshedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$RemoriDatabase extends GeneratedDatabase {
   _$RemoriDatabase(QueryExecutor e) : super(e);
   $RemoriDatabaseManager get managers => $RemoriDatabaseManager(this);
@@ -8253,6 +9141,9 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
       $UnknownFacesCacheStatesTable(this);
   late final $CachedUnknownFaceSamplesTable cachedUnknownFaceSamples =
       $CachedUnknownFaceSamplesTable(this);
+  late final $CachedPlacesTable cachedPlaces = $CachedPlacesTable(this);
+  late final $PlacesCacheStatesTable placesCacheStates =
+      $PlacesCacheStatesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -8274,6 +9165,8 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
     cachedUnknownFaces,
     unknownFacesCacheStates,
     cachedUnknownFaceSamples,
+    cachedPlaces,
+    placesCacheStates,
   ];
 }
 
@@ -12756,6 +13649,503 @@ typedef $$CachedUnknownFaceSamplesTableProcessedTableManager =
       CachedUnknownFaceSample,
       PrefetchHooks Function()
     >;
+typedef $$CachedPlacesTableCreateCompanionBuilder =
+    CachedPlacesCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required String id,
+      required String name,
+      required double latitude,
+      required double longitude,
+      required int radiusM,
+      required String createdBy,
+      required DateTime updatedAt,
+      required int position,
+      Value<int> rowid,
+    });
+typedef $$CachedPlacesTableUpdateCompanionBuilder =
+    CachedPlacesCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<String> id,
+      Value<String> name,
+      Value<double> latitude,
+      Value<double> longitude,
+      Value<int> radiusM,
+      Value<String> createdBy,
+      Value<DateTime> updatedAt,
+      Value<int> position,
+      Value<int> rowid,
+    });
+
+class $$CachedPlacesTableFilterComposer
+    extends Composer<_$RemoriDatabase, $CachedPlacesTable> {
+  $$CachedPlacesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get latitude => $composableBuilder(
+    column: $table.latitude,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get longitude => $composableBuilder(
+    column: $table.longitude,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get radiusM => $composableBuilder(
+    column: $table.radiusM,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get createdBy => $composableBuilder(
+    column: $table.createdBy,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get updatedAt =>
+      $composableBuilder(
+        column: $table.updatedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedPlacesTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $CachedPlacesTable> {
+  $$CachedPlacesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get latitude => $composableBuilder(
+    column: $table.latitude,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get longitude => $composableBuilder(
+    column: $table.longitude,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get radiusM => $composableBuilder(
+    column: $table.radiusM,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get createdBy => $composableBuilder(
+    column: $table.createdBy,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedPlacesTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $CachedPlacesTable> {
+  $$CachedPlacesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<double> get latitude =>
+      $composableBuilder(column: $table.latitude, builder: (column) => column);
+
+  GeneratedColumn<double> get longitude =>
+      $composableBuilder(column: $table.longitude, builder: (column) => column);
+
+  GeneratedColumn<int> get radiusM =>
+      $composableBuilder(column: $table.radiusM, builder: (column) => column);
+
+  GeneratedColumn<String> get createdBy =>
+      $composableBuilder(column: $table.createdBy, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+}
+
+class $$CachedPlacesTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $CachedPlacesTable,
+          CachedPlace,
+          $$CachedPlacesTableFilterComposer,
+          $$CachedPlacesTableOrderingComposer,
+          $$CachedPlacesTableAnnotationComposer,
+          $$CachedPlacesTableCreateCompanionBuilder,
+          $$CachedPlacesTableUpdateCompanionBuilder,
+          (
+            CachedPlace,
+            BaseReferences<_$RemoriDatabase, $CachedPlacesTable, CachedPlace>,
+          ),
+          CachedPlace,
+          PrefetchHooks Function()
+        > {
+  $$CachedPlacesTableTableManager(_$RemoriDatabase db, $CachedPlacesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedPlacesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedPlacesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CachedPlacesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<double> latitude = const Value.absent(),
+                Value<double> longitude = const Value.absent(),
+                Value<int> radiusM = const Value.absent(),
+                Value<String> createdBy = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedPlacesCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                id: id,
+                name: name,
+                latitude: latitude,
+                longitude: longitude,
+                radiusM: radiusM,
+                createdBy: createdBy,
+                updatedAt: updatedAt,
+                position: position,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required String id,
+                required String name,
+                required double latitude,
+                required double longitude,
+                required int radiusM,
+                required String createdBy,
+                required DateTime updatedAt,
+                required int position,
+                Value<int> rowid = const Value.absent(),
+              }) => CachedPlacesCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                id: id,
+                name: name,
+                latitude: latitude,
+                longitude: longitude,
+                radiusM: radiusM,
+                createdBy: createdBy,
+                updatedAt: updatedAt,
+                position: position,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CachedPlacesTable, CachedPlace>(table),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $CachedPlacesTable,
+                    CachedPlace
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedPlacesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $CachedPlacesTable,
+      CachedPlace,
+      $$CachedPlacesTableFilterComposer,
+      $$CachedPlacesTableOrderingComposer,
+      $$CachedPlacesTableAnnotationComposer,
+      $$CachedPlacesTableCreateCompanionBuilder,
+      $$CachedPlacesTableUpdateCompanionBuilder,
+      (
+        CachedPlace,
+        BaseReferences<_$RemoriDatabase, $CachedPlacesTable, CachedPlace>,
+      ),
+      CachedPlace,
+      PrefetchHooks Function()
+    >;
+typedef $$PlacesCacheStatesTableCreateCompanionBuilder =
+    PlacesCacheStatesCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required DateTime refreshedAt,
+      Value<int> rowid,
+    });
+typedef $$PlacesCacheStatesTableUpdateCompanionBuilder =
+    PlacesCacheStatesCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<DateTime> refreshedAt,
+      Value<int> rowid,
+    });
+
+class $$PlacesCacheStatesTableFilterComposer
+    extends Composer<_$RemoriDatabase, $PlacesCacheStatesTable> {
+  $$PlacesCacheStatesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+}
+
+class $$PlacesCacheStatesTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $PlacesCacheStatesTable> {
+  $$PlacesCacheStatesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get refreshedAt => $composableBuilder(
+    column: $table.refreshedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PlacesCacheStatesTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $PlacesCacheStatesTable> {
+  $$PlacesCacheStatesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => column,
+      );
+}
+
+class $$PlacesCacheStatesTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $PlacesCacheStatesTable,
+          PlacesCacheState,
+          $$PlacesCacheStatesTableFilterComposer,
+          $$PlacesCacheStatesTableOrderingComposer,
+          $$PlacesCacheStatesTableAnnotationComposer,
+          $$PlacesCacheStatesTableCreateCompanionBuilder,
+          $$PlacesCacheStatesTableUpdateCompanionBuilder,
+          (
+            PlacesCacheState,
+            BaseReferences<
+              _$RemoriDatabase,
+              $PlacesCacheStatesTable,
+              PlacesCacheState
+            >,
+          ),
+          PlacesCacheState,
+          PrefetchHooks Function()
+        > {
+  $$PlacesCacheStatesTableTableManager(
+    _$RemoriDatabase db,
+    $PlacesCacheStatesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PlacesCacheStatesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PlacesCacheStatesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PlacesCacheStatesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<DateTime> refreshedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PlacesCacheStatesCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required DateTime refreshedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => PlacesCacheStatesCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PlacesCacheStatesTable, PlacesCacheState>(table),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $PlacesCacheStatesTable,
+                    PlacesCacheState
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PlacesCacheStatesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $PlacesCacheStatesTable,
+      PlacesCacheState,
+      $$PlacesCacheStatesTableFilterComposer,
+      $$PlacesCacheStatesTableOrderingComposer,
+      $$PlacesCacheStatesTableAnnotationComposer,
+      $$PlacesCacheStatesTableCreateCompanionBuilder,
+      $$PlacesCacheStatesTableUpdateCompanionBuilder,
+      (
+        PlacesCacheState,
+        BaseReferences<
+          _$RemoriDatabase,
+          $PlacesCacheStatesTable,
+          PlacesCacheState
+        >,
+      ),
+      PlacesCacheState,
+      PrefetchHooks Function()
+    >;
 
 class $RemoriDatabaseManager {
   final _$RemoriDatabase _db;
@@ -12801,4 +14191,8 @@ class $RemoriDatabaseManager {
         _db,
         _db.cachedUnknownFaceSamples,
       );
+  $$CachedPlacesTableTableManager get cachedPlaces =>
+      $$CachedPlacesTableTableManager(_db, _db.cachedPlaces);
+  $$PlacesCacheStatesTableTableManager get placesCacheStates =>
+      $$PlacesCacheStatesTableTableManager(_db, _db.placesCacheStates);
 }

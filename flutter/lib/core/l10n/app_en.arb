@@ -476,5 +476,21 @@
         "type": "String"
       }
     }
+  },
+  "placesTitle": "Saved places",
+  "placesAdd": "+ Add",
+  "placesIntro": "Used when the patient asks the glasses \"Where am I?\". The phone matches its location to the nearest saved place.",
+  "placesRadius": "Radius {meters} m",
+  "placesEditingPending": "Adding and editing places will be available when the place editor is ready.",
+  "placesEmpty": "No saved places yet.",
+  "placesUnavailable": "Saved places are unavailable. Select a patient and try again.",
+  "placesLoadFailed": "Unable to update saved places. Check your connection and try again.",
+  "placesOffline": "Showing saved places. Retry to check the latest list.",
+  "@placesRadius": {
+    "placeholders": {
+      "meters": {
+        "type": "String"
+      }
+    }
   }
 }

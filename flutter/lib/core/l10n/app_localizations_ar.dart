@@ -1178,4 +1178,38 @@ class AppLocalizationsAr extends AppLocalizations {
   ) {
     return 'شوهد $times مرات في $days أيام مختلفة · أول مرة $first · آخر مرة $last';
   }
+
+  @override
+  String get placesTitle => 'الأماكن المحفوظة';
+
+  @override
+  String get placesAdd => '+ إضافة';
+
+  @override
+  String get placesIntro =>
+      'تُستخدم عندما يسأل المريض النظارة «أين أنا؟». يطابق الهاتف موقعه مع أقرب مكان محفوظ.';
+
+  @override
+  String placesRadius(String meters) {
+    return 'نطاق $meters م';
+  }
+
+  @override
+  String get placesEditingPending =>
+      'ستتوفر إضافة الأماكن وتعديلها عند اكتمال محرر الأماكن.';
+
+  @override
+  String get placesEmpty => 'لا توجد أماكن محفوظة بعد.';
+
+  @override
+  String get placesUnavailable =>
+      'الأماكن المحفوظة غير متاحة. اختر مريضًا وأعد المحاولة.';
+
+  @override
+  String get placesLoadFailed =>
+      'تعذّر تحديث الأماكن المحفوظة. تحقق من اتصالك وأعد المحاولة.';
+
+  @override
+  String get placesOffline =>
+      'نعرض الأماكن المحفوظة. أعد المحاولة للتحقق من أحدث قائمة.';
 }
