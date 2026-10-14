@@ -993,4 +993,86 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reminderWeekdaySaturday => 'S';
+
+  @override
+  String get alertsTitle => 'Alerts';
+
+  @override
+  String alertsUnread(String count) {
+    return '$count unread';
+  }
+
+  @override
+  String get alertsToday => 'TODAY';
+
+  @override
+  String get alertsYesterday => 'YESTERDAY';
+
+  @override
+  String get alertsSomeoneNew => 'Someone new';
+
+  @override
+  String get alertsLowBattery => 'Low battery';
+
+  @override
+  String get alertsMissedMedication => 'Missed medication';
+
+  @override
+  String get alertsDeviceOffline => 'Device offline';
+
+  @override
+  String get alertsSummaryReady => 'Daily summary ready';
+
+  @override
+  String alertsUnknownDescription(String patient) {
+    return 'Someone new has been flagged for $patient. Review when available.';
+  }
+
+  @override
+  String alertsBatteryDescription(String patient) {
+    return 'The glasses battery is low for $patient.';
+  }
+
+  @override
+  String alertsMissedDescription(String patient) {
+    return 'A medication reminder was not confirmed for $patient.';
+  }
+
+  @override
+  String alertsOfflineDescription(String patient) {
+    return 'The device has lost contact for $patient.';
+  }
+
+  @override
+  String alertsSummaryDescription(String patient) {
+    return 'A daily summary is ready for $patient.';
+  }
+
+  @override
+  String alertsOtherDescription(String patient) {
+    return 'There is an alert for $patient.';
+  }
+
+  @override
+  String get alertsNone => 'No alerts yet.';
+
+  @override
+  String get alertsLoadFailed =>
+      'Unable to update alerts. Check your connection and try again.';
+
+  @override
+  String get alertsCached =>
+      'Showing saved alerts. Retry to check the latest state.';
+
+  @override
+  String get alertsReadFailed =>
+      'Unable to mark the alert as read. Please try again.';
+
+  @override
+  String get alertsCacheRetry =>
+      'Alert marked as read. Retry to finish updating this phone.';
+
+  @override
+  String get alertsDestinationPending =>
+      'Alert read. This destination will be available when its screen is ready.';
 }

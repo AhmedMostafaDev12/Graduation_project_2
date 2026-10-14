@@ -772,3 +772,41 @@ tasks; automated checks do not modify live reminders.
 
 Validation: dart format ., flutter analyze (clean), flutter test (305 passed,
 35 new C9 tests), Android debug APK build (successful).
+
+## C2 Alerts
+
+Home's See all opens C2. It reads all cached alerts for the authenticated
+caregiver's currently linked patients, with unread dots/count, patient-local
+times and Today/Yesterday/date groups. Refresh fetches every page of
+GET /caregivers/me/alerts (unread_only=false, limit=50, offset), then updates
+the existing DashboardAlerts cache atomically. Arabic and English descriptions
+come from alert_type plus the patient's cached name. The API's English fallback
+message is never displayed; absent battery percentages, visit counts and
+medication details are not invented or extracted from fallback prose.
+
+Ahmed approved online POST /alerts/{id}/read followed by cache updates. Both
+managers and viewers can read their own alerts. Acknowledged reads whose cache
+update fails retain a receipt; Retry updates the cache without another POST.
+Offline refresh keeps cached cards. Failed unread marking keeps its unread dot;
+already-read alerts can open without a write. Duplicate taps are blocked, late
+account responses are ignored, and revoked links cannot regain cached alerts
+through a late receipt. Full refresh cannot clear confirmed read markers; Home's
+partial preview refresh retains C2 history and purges removed patient links.
+
+Approved staged navigation: medication alerts with reminder_log metadata select
+their patient and open C8. Other cards mark read and show a localized destination
+pending message; C6/C16/C17 remain separate screen PRs. No empty destination route
+is opened. The existing caregiver navigation is retained. No packages, tables,
+schema migration, outbox behavior or backend contracts are added.
+
+Review captures: [English](test/goldens/c2_en.png), [Arabic](test/goldens/c2_ar.png).
+Regenerate with flutter test test/c2_alerts_test.dart --update-goldens.
+Tests cover pagination and atomic failures, cache ownership, stale reads, Home
+preview history, missing alerts, revoked links, cache-only retry, viewer access,
+navigation, localization, account switches, midnight and cross-timezone grouping,
+empty state and 2x text at 320dp. Capture alerts are test fixtures only.
+Live-account read marking on Android/iOS and an iOS build remain device-validation
+tasks; automated tests do not change live alerts.
+
+Validation: dart format ., flutter analyze (clean), flutter test (331 passed,
+26 new C2 tests), Android debug APK build (successful).
