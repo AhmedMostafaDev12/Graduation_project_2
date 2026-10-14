@@ -41,6 +41,18 @@ class HomeRepository {
           segments[1] == 'patients') {
         final patientId = segments[2];
         await db.transaction(() async {
+          await (db.delete(db.cachedUnknownFaces)..where(
+                (p) =>
+                    p.caregiverId.equals(caregiverId) &
+                    p.patientId.equals(patientId),
+              ))
+              .go();
+          await (db.delete(db.unknownFacesCacheStates)..where(
+                (p) =>
+                    p.caregiverId.equals(caregiverId) &
+                    p.patientId.equals(patientId),
+              ))
+              .go();
           await (db.delete(db.dashboardPatients)..where(
                 (p) =>
                     p.caregiverId.equals(caregiverId) & p.id.equals(patientId),
@@ -212,6 +224,18 @@ class HomeRepository {
             );
       }
       final allowedIds = patients.map((p) => p['id'] as String).toList();
+      await (db.delete(db.cachedUnknownFaces)..where(
+            (p) =>
+                p.caregiverId.equals(caregiverId) &
+                p.patientId.isNotIn(allowedIds),
+          ))
+          .go();
+      await (db.delete(db.unknownFacesCacheStates)..where(
+            (p) =>
+                p.caregiverId.equals(caregiverId) &
+                p.patientId.isNotIn(allowedIds),
+          ))
+          .go();
       await (db.delete(db.cachedPeople)..where(
             (p) =>
                 p.caregiverId.equals(caregiverId) &

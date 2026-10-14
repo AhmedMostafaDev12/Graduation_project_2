@@ -107,7 +107,11 @@ class PeopleRepository {
           throw ApiFailure(ApiFailureKind.invalidResponse);
         }
         if (face['status'] == 'awaiting_caregiver') {
-          unknownIds.add(_string(face, 'id'));
+          final days = face['distinct_days'];
+          if (days is! int || days < 1) {
+            throw ApiFailure(ApiFailureKind.invalidResponse);
+          }
+          if (days >= 3) unknownIds.add(_string(face, 'id'));
         }
       }
       if (_disposed) return;
@@ -158,6 +162,18 @@ class PeopleRepository {
   }
 
   Future<void> purge() async {
+    await (db.delete(db.cachedUnknownFaces)..where(
+          (r) =>
+              r.caregiverId.equals(scope.caregiverId) &
+              r.patientId.equals(scope.patientId),
+        ))
+        .go();
+    await (db.delete(db.unknownFacesCacheStates)..where(
+          (r) =>
+              r.caregiverId.equals(scope.caregiverId) &
+              r.patientId.equals(scope.patientId),
+        ))
+        .go();
     final old = await read();
     await db.transaction(() async {
       await (db.delete(db.cachedPeople)..where(_rows)).go();

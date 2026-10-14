@@ -578,7 +578,7 @@ C3 metadata. No embeddings or unknown-face images are cached by C3.
 
 Add person opens C4 with the patient ID, person cards open C5 with patient/person
 IDs, and the review banner opens C6 with patient context. C4 is implemented below;
-C5 is implemented below; C6 remains a slot for a separate PR. No create/archive/promote endpoint is
+C5 and C6 are implemented below. No create/archive/promote endpoint is
 called from C3.
 
 Review captures: [English](test/goldens/c3_en.png), [Arabic](test/goldens/c3_ar.png).
@@ -794,8 +794,9 @@ through a late receipt. Full refresh cannot clear confirmed read markers; Home's
 partial preview refresh retains C2 history and purges removed patient links.
 
 Approved staged navigation: medication alerts with reminder_log metadata select
-their patient and open C8. Other cards mark read and show a localized destination
-pending message; C6/C16/C17 remain separate screen PRs. No empty destination route
+their patient and open C8. Unknown-person alerts with unknown_face_cluster metadata
+select their patient and open C6. Other cards mark read and show a localized destination
+pending message; C16/C17 remain separate screen PRs. No empty destination route
 is opened. The existing caregiver navigation is retained. No packages, tables,
 schema migration, outbox behavior or backend contracts are added.
 
@@ -810,3 +811,46 @@ tasks; automated tests do not change live alerts.
 
 Validation: dart format ., flutter analyze (clean), flutter test (331 passed,
 26 new C2 tests), Android debug APK build (successful).
+
+## C6 New faces to review
+
+Open C6 through the People review banner or an unknown-person alert in C2.
+GET /patients/{id}/unknown-faces refreshes a caregiver/patient-scoped Drift read
+cache; the screen reads locally. It displays sighting counts, distinct days,
+patient-local first/last seen dates, 72px previews and the design's retention
+explanation. D23's three-distinct-day threshold also applies to the C3 badge.
+There are no sample runtime faces, guessed names or face-management writes.
+
+Ahmed approved CachedUnknownFaces and UnknownFacesCacheStates metadata tables.
+Schema v6 adds these while preserving People, reminders, dashboard and outbox
+data. Only IDs, counts, dates and signed URLs are cached: no embeddings or photo
+bytes enter Drift. Refresh is atomic and clears removed clusters; mismatched
+patients, invalid URLs/counts/dates and inconsistent sample metadata are rejected.
+Known revoked/missing patient links purge these caches with the existing scopes.
+
+Approved previews are memory-only and require a successful refresh during this
+screen session. The thumbnail (or sample URL fallback) is fetched without
+caregiver credentials and without a disk cache. Session entries use account,
+patient, cluster and sample IDs. Refresh, route covering/leaving, backgrounding,
+scope changes and disposal clear byte references, decoded image-cache entries
+and pending image requests. Resume/return requires another successful refresh.
+Offline metadata remains visible with placeholders. HTTP 403 refreshes signed
+URLs once per sample until an explicit retry; errors never print signed URLs.
+
+Ahmed approved keeping review cards disabled with a localized pending notice
+until C7's separate PR. Viewers can read C6; they have no editing controls.
+Arabic/English layouts, enlarged text and scrolling follow the design and use
+the existing caregiver navigation. No packages or backend contracts are added.
+
+Review captures: [English](test/goldens/c6_en.png), [Arabic](test/goldens/c6_ar.png).
+Regenerate with flutter test test/c6_unknown_faces_test.dart --update-goldens.
+Design portraits are test fixtures only; runtime previews come from the API.
+Tests cover migration, ownership/atomicity, eligibility, offline metadata,
+native memory-only HTTP loading, safe errors, bounded 403 recovery, lifecycle
+and route cleanup, permissions, stale refreshes, account changes, empty state,
+Arabic/English at 2x text on 320dp, and C2-to-C6 patient navigation.
+Live-account signed-photo validation on Android/iOS and an iOS build remain
+device-validation tasks; automated checks do not modify live face data.
+
+Validation: dart format ., flutter analyze (clean), flutter test (352 passed:
+20 new C6 tests plus C2 navigation coverage), Android debug APK build (successful).

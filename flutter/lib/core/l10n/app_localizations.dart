@@ -1981,6 +1981,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Alert read. This destination will be available when its screen is ready.'**
   String get alertsDestinationPending;
+
+  /// No description provided for @unknownFacesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New faces to review'**
+  String get unknownFacesTitle;
+
+  /// No description provided for @unknownFacesIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'People the glasses saw on 3 or more different days. Only you can name them; the glasses never guess.'**
+  String get unknownFacesIntro;
+
+  /// No description provided for @unknownFacesSeen.
+  ///
+  /// In en, this message translates to:
+  /// **'Seen {times} times on {days} days'**
+  String unknownFacesSeen(String times, String days);
+
+  /// No description provided for @unknownFacesDates.
+  ///
+  /// In en, this message translates to:
+  /// **'First seen {first} · last seen {last}'**
+  String unknownFacesDates(String first, String last);
+
+  /// No description provided for @unknownFacesTodayTime.
+  ///
+  /// In en, this message translates to:
+  /// **'today {time}'**
+  String unknownFacesTodayTime(String time);
+
+  /// No description provided for @unknownFacesRetention.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos of unknown people are deleted after 30 days, or right away if you dismiss them.'**
+  String get unknownFacesRetention;
+
+  /// No description provided for @unknownFacesPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Face review will be available when the review screen is ready.'**
+  String get unknownFacesPending;
+
+  /// No description provided for @unknownFacesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No new faces to review yet.'**
+  String get unknownFacesEmpty;
+
+  /// No description provided for @unknownFacesLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to update new faces. Check your connection and try again.'**
+  String get unknownFacesLoadFailed;
+
+  /// No description provided for @unknownFacesOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing saved counts and dates. Photos require a successful refresh.'**
+  String get unknownFacesOffline;
+
+  /// No description provided for @unknownFacePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown person photo'**
+  String get unknownFacePhoto;
+
+  /// No description provided for @unknownFacePhotoUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo unavailable'**
+  String get unknownFacePhotoUnavailable;
+
+  /// No description provided for @unknownFacesUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This patient\'s new faces are unavailable.'**
+  String get unknownFacesUnavailable;
 }
 
 class _AppLocalizationsDelegate

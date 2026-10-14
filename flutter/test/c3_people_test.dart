@@ -108,16 +108,19 @@ class PeopleAdapter implements HttpClientAdapter {
                   'id': 'unknown-1',
                   'patient_id': p,
                   'status': 'awaiting_caregiver',
+                  'distinct_days': 3,
                 },
                 {
                   'id': 'unknown-2',
                   'patient_id': p,
                   'status': 'awaiting_caregiver',
+                  'distinct_days': 3,
                 },
                 {
                   'id': 'unknown-2',
                   'patient_id': p,
                   'status': 'awaiting_caregiver',
+                  'distinct_days': 3,
                 },
                 {'id': 'ignored', 'patient_id': p, 'status': 'dismissed'},
               ],
@@ -608,6 +611,8 @@ void main() {
     await db.customStatement('DROP TABLE cached_reminder_occurrences');
     await db.customStatement('DROP TABLE reminder_cache_states');
     await db.customStatement('PRAGMA user_version = 2');
+    await db.customStatement('DROP TABLE cached_unknown_faces');
+    await db.customStatement('DROP TABLE unknown_faces_cache_states');
     await db.close();
     db = RemoriDatabase(NativeDatabase(file, logStatements: false));
     expect((await db.select(db.dashboardPatients).get()).single.id, patient);

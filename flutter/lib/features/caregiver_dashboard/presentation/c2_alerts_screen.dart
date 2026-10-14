@@ -59,6 +59,11 @@ class _C2AlertsScreenState extends ConsumerState<C2AlertsScreen>
         alert.entityId != null) {
       ref.read(selectedHomePatientIdProvider.notifier).select(alert.patientId);
       context.goNamed(RemoriScreen.c8.name);
+    } else if (alert.type == 'unknown_person_flagged' &&
+        alert.entityType == 'unknown_face_cluster' &&
+        alert.entityId != null) {
+      ref.read(selectedHomePatientIdProvider.notifier).select(alert.patientId);
+      context.goNamed(RemoriScreen.c6.name, extra: alert.patientId);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
