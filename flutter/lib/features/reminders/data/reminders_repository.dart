@@ -147,9 +147,11 @@ class RemindersRepository {
       }
       if (_disposed || generation != _refreshGeneration) return;
       await db.transaction(() async {
+        if (_disposed || generation != _refreshGeneration) return;
         final previous = await (db.select(
           db.cachedReminders,
         )..where(_definitions)).get();
+        if (_disposed || generation != _refreshGeneration) return;
         final latest = {for (final row in previous) row.id: row};
         await (db.delete(db.cachedReminders)..where(_definitions)).go();
         await (db.delete(
@@ -232,6 +234,76 @@ class RemindersRepository {
           .insert(row, mode: InsertMode.insertOrReplace);
     },
   );
+
+  /// Separate the acknowledged write from caching it: a failed local save
+  /// must not cause a second non-idempotent POST on retry.
+  Future<CachedRemindersCompanion> save(
+    Map<String, Object?> payload, {
+    String? id,
+  }) async {
+    final existing = id == null
+        ? null
+        : await (db.select(
+            db.cachedReminders,
+          )..where((r) => _definitions(r) & r.id.equals(id))).getSingleOrNull();
+    if (id != null && existing == null) throw _invalid;
+    try {
+      final response = await client.request<dynamic>(
+        '$_path/reminders${id == null ? '' : '/$id'}',
+        method: id == null ? 'POST' : 'PATCH',
+        credential: ApiCredential.caregiver,
+        data: payload,
+        cancelToken: _cancel,
+      );
+      if (response.statusCode != (id == null ? 201 : 200) ||
+          response.data is! Map) {
+        throw _invalid;
+      }
+      final row = _definition(response.data as Map, existing?.position ?? -1);
+      if (id != null && row.id.value != id) throw _invalid;
+      ++_refreshGeneration;
+      return row;
+    } on ApiFailure catch (error) {
+      await _handleMissing(error, id);
+      rethrow;
+    }
+  }
+
+  Future<void> delete(String id) async {
+    try {
+      final response = await client.request<dynamic>(
+        '$_path/reminders/$id',
+        method: 'DELETE',
+        credential: ApiCredential.caregiver,
+        cancelToken: _cancel,
+      );
+      if (response.statusCode != 204) throw _invalid;
+      ++_refreshGeneration;
+    } on ApiFailure catch (error) {
+      await _handleMissing(error, id);
+      rethrow;
+    }
+  }
+
+  Future<void> _handleMissing(ApiFailure error, String? id) async {
+    if (error.statusCode == 404 && error.code == 'PATIENT_NOT_FOUND') {
+      ++_refreshGeneration;
+      await purge();
+    } else if (id != null &&
+        error.statusCode == 404 &&
+        error.code == 'REMINDER_NOT_FOUND') {
+      ++_refreshGeneration;
+      await cacheDelete(id);
+    }
+  }
+
+  // Recorded activity retains its title/type snapshot after soft deletion.
+  Future<void> cacheDelete(String id) async {
+    await (db.delete(
+      db.cachedReminders,
+    )..where((r) => _definitions(r) & r.id.equals(id))).go();
+  }
+
   Future<void> purge() => db.transaction(() async {
     await (db.delete(db.cachedReminders)..where(_definitions)).go();
     await (db.delete(db.cachedReminderOccurrences)..where(_occurrences)).go();
@@ -278,6 +350,7 @@ class RemindersRepository {
             dtstart: r.dtstart,
             timezone: r.timezone,
             active: r.active,
+            spokenText: r.spokenText,
           ),
       ],
       occurrences: [

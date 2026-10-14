@@ -865,4 +865,132 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get reminderLoadFailed =>
       'Unable to load reminders. Check your connection and try again.';
+
+  @override
+  String get reminderEditTitle => 'Edit reminder';
+
+  @override
+  String get reminderTitleLabel => 'Title';
+
+  @override
+  String get reminderTitleHint => 'Blood pressure pill';
+
+  @override
+  String get reminderSpeechLabel => 'What the glasses will say';
+
+  @override
+  String get reminderSpeechHint => 'ميعاد دواء الضغط';
+
+  @override
+  String get reminderTypeLabel => 'Type';
+
+  @override
+  String get reminderMedication => 'Medication';
+
+  @override
+  String get reminderAppointment => 'Appointment';
+
+  @override
+  String get reminderRepeatLabel => 'Repeat';
+
+  @override
+  String get reminderOnce => 'Once';
+
+  @override
+  String get reminderRepeatDaily => 'Daily';
+
+  @override
+  String get reminderRepeatWeekly => 'Weekly';
+
+  @override
+  String get reminderTimesLabel => 'Time(s)';
+
+  @override
+  String get reminderTimeHint => '09:00';
+
+  @override
+  String get reminderAddTime => '+ Add time';
+
+  @override
+  String get reminderRemoveTime => 'Remove time';
+
+  @override
+  String get reminderStartsLabel => 'Starts';
+
+  @override
+  String get reminderTimezoneLabel => 'Timezone';
+
+  @override
+  String get reminderSave => 'Save reminder';
+
+  @override
+  String get reminderSaving => 'Saving…';
+
+  @override
+  String get reminderDelete => 'Delete reminder';
+
+  @override
+  String get reminderDeleteConfirm =>
+      'Delete this reminder? Recorded activity will be kept.';
+
+  @override
+  String get reminderUnavailable =>
+      'This reminder is unavailable or you do not have permission to edit it.';
+
+  @override
+  String get reminderTitleRequired => 'Enter a title (up to 120 characters).';
+
+  @override
+  String get reminderSpeechTooLong =>
+      'Use up to 200 characters for the spoken text.';
+
+  @override
+  String get reminderTimesRequired => 'Select 1–4 different times.';
+
+  @override
+  String get reminderDaysRequired => 'Select at least one day.';
+
+  @override
+  String get reminderTimezoneInvalid =>
+      'Enter a valid timezone, such as Africa/Cairo.';
+
+  @override
+  String get reminderStartGap =>
+      'A selected time does not exist on the start day because the clocks change. Choose another time.';
+
+  @override
+  String get reminderSchedulePreserved =>
+      'This schedule is kept unchanged. You can edit the title, spoken text and type.';
+
+  @override
+  String get reminderWriteFailed =>
+      'Unable to save the change. Please try again.';
+
+  @override
+  String get reminderWriteUncertain =>
+      'Unable to confirm the change. Check the reminder list before trying again.';
+
+  @override
+  String get reminderFieldInvalid => 'Check the highlighted fields.';
+
+  @override
+  String get reminderWeekdaySunday => 'S';
+
+  @override
+  String get reminderWeekdayMonday => 'M';
+
+  @override
+  String get reminderWeekdayTuesday => 'T';
+
+  @override
+  String get reminderWeekdayWednesday => 'W';
+
+  @override
+  String get reminderWeekdayThursday => 'T';
+
+  @override
+  String get reminderWeekdayFriday => 'F';
+
+  @override
+  String get reminderWeekdaySaturday => 'S';
 }

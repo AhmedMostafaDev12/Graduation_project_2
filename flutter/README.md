@@ -721,7 +721,7 @@ day snapshots or newer confirmed definition timestamps. Account/patient changes
 clear pending state and stop displaying the previous scope's data.
 
 Header Add, reminder cards and the caregiver center action pass patient/reminder
-context to C9. C9 is still a route slot and its add/edit form is the next PR.
+context to C9's add/edit form.
 Both languages follow the C8 design and scroll/reflow for enlarged text at 320dp.
 Review captures: [English](test/goldens/c8_en.png), [Arabic](test/goldens/c8_ar.png).
 Regenerate with flutter test test/c8_reminders_test.dart --update-goldens.
@@ -732,3 +732,43 @@ Live-account toggle testing on Android/iOS and an iOS build remain pending.
 
 Validation: dart format ., flutter analyze (clean), flutter test (270 passed,
 27 new C8 tests), Android debug APK build (successful).
+
+## C9 Add / edit reminder
+
+Open Reminders and choose Add or a reminder card. C9 loads existing definitions,
+including spoken text, from the existing caregiver/patient-scoped Drift cache.
+Only managers can create, edit or delete. It includes title, optional spoken
+text (blank means say the title), type, repeat, weekdays, up to four selected
+times, Starts and timezone, with Arabic/English localization and native pickers.
+
+Ahmed approved online POST/PATCH/DELETE followed by updates to that cache and
+confirmation before deletion. Deletion removes the definition while retaining
+recorded activity. A confirmed write whose cache update fails locks the form;
+Retry only updates the cache, never resending the write. Uncertain responses
+ask the caregiver to check the list before trying again. Account/patient changes
+hide the previous form and ignore late responses. No new packages, database
+tables, outbox behavior or API contracts are introduced.
+
+Approved recurrence scope: Once, Daily and Weekly, with 1–4 exact times. Starts
+defaults to patient-local today and time selection is explicit. Weekly starts
+on the first selected weekday on or after Starts. Once runs every selected time
+on its start day. RFC 5545 BYSETPOS prevents mixed hour/minute selections from
+creating extra occurrences; COUNT bounds Once to that day's selected times.
+Nonexistent start times at a DST change are rejected; overlaps select the first
+occurrence. Existing schedules outside this scope remain unchanged, with only
+title, spoken text and type editable. Metadata-only edits omit all schedule and
+active fields, preserving existing schedules and paused reminders. C8 continues
+to use its generic description for rules outside its simple display formatter.
+
+Review captures: [English](test/goldens/c9_en.png), [Arabic](test/goldens/c9_ar.png).
+Regenerate with flutter test test/c9_edit_reminder_test.dart --update-goldens.
+Capture data is test-only. Tests cover contract writes, scoped cache updates,
+retained activity, stale refreshes, exact recurrence pairs, DST, native time
+selection, four-time limits, permissions, confirmation, cache-only retries,
+account changes and 2x text at 320dp. Daily/Weekly/Once occurrence fixtures were
+also independently verified with Python dateutil, used by the backend schema.
+Live-account changes on Android/iOS and an iOS build remain device-validation
+tasks; automated checks do not modify live reminders.
+
+Validation: dart format ., flutter analyze (clean), flutter test (305 passed,
+35 new C9 tests), Android debug APK build (successful).

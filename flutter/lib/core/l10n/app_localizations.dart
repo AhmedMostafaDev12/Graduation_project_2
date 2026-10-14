@@ -1615,6 +1615,246 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unable to load reminders. Check your connection and try again.'**
   String get reminderLoadFailed;
+
+  /// No description provided for @reminderEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit reminder'**
+  String get reminderEditTitle;
+
+  /// No description provided for @reminderTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get reminderTitleLabel;
+
+  /// No description provided for @reminderTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood pressure pill'**
+  String get reminderTitleHint;
+
+  /// No description provided for @reminderSpeechLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'What the glasses will say'**
+  String get reminderSpeechLabel;
+
+  /// No description provided for @reminderSpeechHint.
+  ///
+  /// In en, this message translates to:
+  /// **'ميعاد دواء الضغط'**
+  String get reminderSpeechHint;
+
+  /// No description provided for @reminderTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get reminderTypeLabel;
+
+  /// No description provided for @reminderMedication.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication'**
+  String get reminderMedication;
+
+  /// No description provided for @reminderAppointment.
+  ///
+  /// In en, this message translates to:
+  /// **'Appointment'**
+  String get reminderAppointment;
+
+  /// No description provided for @reminderRepeatLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat'**
+  String get reminderRepeatLabel;
+
+  /// No description provided for @reminderOnce.
+  ///
+  /// In en, this message translates to:
+  /// **'Once'**
+  String get reminderOnce;
+
+  /// No description provided for @reminderRepeatDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get reminderRepeatDaily;
+
+  /// No description provided for @reminderRepeatWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get reminderRepeatWeekly;
+
+  /// No description provided for @reminderTimesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Time(s)'**
+  String get reminderTimesLabel;
+
+  /// No description provided for @reminderTimeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'09:00'**
+  String get reminderTimeHint;
+
+  /// No description provided for @reminderAddTime.
+  ///
+  /// In en, this message translates to:
+  /// **'+ Add time'**
+  String get reminderAddTime;
+
+  /// No description provided for @reminderRemoveTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove time'**
+  String get reminderRemoveTime;
+
+  /// No description provided for @reminderStartsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts'**
+  String get reminderStartsLabel;
+
+  /// No description provided for @reminderTimezoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Timezone'**
+  String get reminderTimezoneLabel;
+
+  /// No description provided for @reminderSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save reminder'**
+  String get reminderSave;
+
+  /// No description provided for @reminderSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving…'**
+  String get reminderSaving;
+
+  /// No description provided for @reminderDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete reminder'**
+  String get reminderDelete;
+
+  /// No description provided for @reminderDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this reminder? Recorded activity will be kept.'**
+  String get reminderDeleteConfirm;
+
+  /// No description provided for @reminderUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This reminder is unavailable or you do not have permission to edit it.'**
+  String get reminderUnavailable;
+
+  /// No description provided for @reminderTitleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a title (up to 120 characters).'**
+  String get reminderTitleRequired;
+
+  /// No description provided for @reminderSpeechTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Use up to 200 characters for the spoken text.'**
+  String get reminderSpeechTooLong;
+
+  /// No description provided for @reminderTimesRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Select 1–4 different times.'**
+  String get reminderTimesRequired;
+
+  /// No description provided for @reminderDaysRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least one day.'**
+  String get reminderDaysRequired;
+
+  /// No description provided for @reminderTimezoneInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid timezone, such as Africa/Cairo.'**
+  String get reminderTimezoneInvalid;
+
+  /// No description provided for @reminderStartGap.
+  ///
+  /// In en, this message translates to:
+  /// **'A selected time does not exist on the start day because the clocks change. Choose another time.'**
+  String get reminderStartGap;
+
+  /// No description provided for @reminderSchedulePreserved.
+  ///
+  /// In en, this message translates to:
+  /// **'This schedule is kept unchanged. You can edit the title, spoken text and type.'**
+  String get reminderSchedulePreserved;
+
+  /// No description provided for @reminderWriteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to save the change. Please try again.'**
+  String get reminderWriteFailed;
+
+  /// No description provided for @reminderWriteUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to confirm the change. Check the reminder list before trying again.'**
+  String get reminderWriteUncertain;
+
+  /// No description provided for @reminderFieldInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the highlighted fields.'**
+  String get reminderFieldInvalid;
+
+  /// No description provided for @reminderWeekdaySunday.
+  ///
+  /// In en, this message translates to:
+  /// **'S'**
+  String get reminderWeekdaySunday;
+
+  /// No description provided for @reminderWeekdayMonday.
+  ///
+  /// In en, this message translates to:
+  /// **'M'**
+  String get reminderWeekdayMonday;
+
+  /// No description provided for @reminderWeekdayTuesday.
+  ///
+  /// In en, this message translates to:
+  /// **'T'**
+  String get reminderWeekdayTuesday;
+
+  /// No description provided for @reminderWeekdayWednesday.
+  ///
+  /// In en, this message translates to:
+  /// **'W'**
+  String get reminderWeekdayWednesday;
+
+  /// No description provided for @reminderWeekdayThursday.
+  ///
+  /// In en, this message translates to:
+  /// **'T'**
+  String get reminderWeekdayThursday;
+
+  /// No description provided for @reminderWeekdayFriday.
+  ///
+  /// In en, this message translates to:
+  /// **'F'**
+  String get reminderWeekdayFriday;
+
+  /// No description provided for @reminderWeekdaySaturday.
+  ///
+  /// In en, this message translates to:
+  /// **'S'**
+  String get reminderWeekdaySaturday;
 }
 
 class _AppLocalizationsDelegate

@@ -862,4 +862,131 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get reminderLoadFailed =>
       'تعذّر تحميل التذكيرات. تحقق من اتصالك وحاول مرة أخرى.';
+
+  @override
+  String get reminderEditTitle => 'تعديل التذكير';
+
+  @override
+  String get reminderTitleLabel => 'العنوان';
+
+  @override
+  String get reminderTitleHint => 'دواء ضغط الدم';
+
+  @override
+  String get reminderSpeechLabel => 'ما ستقوله النظارة';
+
+  @override
+  String get reminderSpeechHint => 'ميعاد دواء الضغط';
+
+  @override
+  String get reminderTypeLabel => 'النوع';
+
+  @override
+  String get reminderMedication => 'دواء';
+
+  @override
+  String get reminderAppointment => 'موعد';
+
+  @override
+  String get reminderRepeatLabel => 'التكرار';
+
+  @override
+  String get reminderOnce => 'مرة واحدة';
+
+  @override
+  String get reminderRepeatDaily => 'يوميًا';
+
+  @override
+  String get reminderRepeatWeekly => 'أسبوعيًا';
+
+  @override
+  String get reminderTimesLabel => 'الأوقات';
+
+  @override
+  String get reminderTimeHint => '٠٩:٠٠';
+
+  @override
+  String get reminderAddTime => '+ إضافة وقت';
+
+  @override
+  String get reminderRemoveTime => 'إزالة الوقت';
+
+  @override
+  String get reminderStartsLabel => 'يبدأ في';
+
+  @override
+  String get reminderTimezoneLabel => 'المنطقة الزمنية';
+
+  @override
+  String get reminderSave => 'حفظ التذكير';
+
+  @override
+  String get reminderSaving => 'جارٍ الحفظ…';
+
+  @override
+  String get reminderDelete => 'حذف التذكير';
+
+  @override
+  String get reminderDeleteConfirm =>
+      'هل تريد حذف هذا التذكير؟ سيُحتفظ بالنشاط المسجل.';
+
+  @override
+  String get reminderUnavailable =>
+      'هذا التذكير غير متاح أو ليس لديك صلاحية تعديله.';
+
+  @override
+  String get reminderTitleRequired => 'أدخل عنوانًا لا يتجاوز ١٢٠ حرفًا.';
+
+  @override
+  String get reminderSpeechTooLong => 'استخدم نصًا منطوقًا لا يتجاوز ٢٠٠ حرف.';
+
+  @override
+  String get reminderTimesRequired =>
+      'اختر من وقت واحد إلى أربعة أوقات مختلفة.';
+
+  @override
+  String get reminderDaysRequired => 'اختر يومًا واحدًا على الأقل.';
+
+  @override
+  String get reminderTimezoneInvalid =>
+      'أدخل منطقة زمنية صحيحة، مثل Africa/Cairo.';
+
+  @override
+  String get reminderStartGap =>
+      'أحد الأوقات المختارة غير موجود في يوم البداية بسبب تغيير الساعة. اختر وقتًا آخر.';
+
+  @override
+  String get reminderSchedulePreserved =>
+      'سيُحتفظ بهذا الجدول دون تغيير. يمكنك تعديل العنوان والنص المنطوق والنوع.';
+
+  @override
+  String get reminderWriteFailed => 'تعذر حفظ التغيير. حاول مرة أخرى.';
+
+  @override
+  String get reminderWriteUncertain =>
+      'تعذر تأكيد التغيير. راجع قائمة التذكيرات قبل المحاولة مرة أخرى.';
+
+  @override
+  String get reminderFieldInvalid => 'راجع الحقول المحددة.';
+
+  @override
+  String get reminderWeekdaySunday => 'ح';
+
+  @override
+  String get reminderWeekdayMonday => 'ن';
+
+  @override
+  String get reminderWeekdayTuesday => 'ث';
+
+  @override
+  String get reminderWeekdayWednesday => 'ر';
+
+  @override
+  String get reminderWeekdayThursday => 'خ';
+
+  @override
+  String get reminderWeekdayFriday => 'ج';
+
+  @override
+  String get reminderWeekdaySaturday => 'س';
 }
