@@ -1,1 +1,2 @@
-"NSCameraUsageDescription" = "Scan the QR code on the glasses case to link the glasses.";
+"NSCameraUsageDescription" = "Scan the glasses QR code or take a photo of someone who agreed to be recognized.";
+"NSPhotoLibraryUsageDescription" = "Select photos of someone who agreed to be recognized by Remori.";

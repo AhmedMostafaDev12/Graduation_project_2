@@ -1147,6 +1147,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Nurse'**
   String get peopleNurse;
+
+  /// No description provided for @personUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a patient you manage from Home, then try again.'**
+  String get personUnavailable;
+
+  /// No description provided for @personAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add person'**
+  String get personAddTitle;
+
+  /// No description provided for @personPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos (1–5)'**
+  String get personPhotos;
+
+  /// No description provided for @personCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get personCamera;
+
+  /// No description provided for @personGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from gallery'**
+  String get personGallery;
+
+  /// No description provided for @personRemovePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo'**
+  String get personRemovePhoto;
+
+  /// No description provided for @personPhotoSlot.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo {number}'**
+  String personPhotoSlot(int number);
+
+  /// No description provided for @personPhotoTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a photo no larger than 4 MB.'**
+  String get personPhotoTooLarge;
+
+  /// No description provided for @personPhotoUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a JPEG or PNG photo.'**
+  String get personPhotoUnsupported;
+
+  /// No description provided for @personPhotoPickFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open the photo. Check permissions and try again.'**
+  String get personPhotoPickFailed;
+
+  /// No description provided for @personPhotosRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Add at least one photo.'**
+  String get personPhotosRequired;
+
+  /// No description provided for @personPhotoInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo {number}: unable to use this photo. Please replace it.'**
+  String personPhotoInvalid(int number);
+
+  /// No description provided for @personPhotoTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: a clear face, good light, one person per photo. Different angles help.'**
+  String get personPhotoTip;
+
+  /// No description provided for @personName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get personName;
+
+  /// No description provided for @personNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter full name'**
+  String get personNameHint;
+
+  /// No description provided for @personRelationship.
+  ///
+  /// In en, this message translates to:
+  /// **'Relationship'**
+  String get personRelationship;
+
+  /// No description provided for @personRelationshipHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter relationship'**
+  String get personRelationshipHint;
+
+  /// No description provided for @personConsent.
+  ///
+  /// In en, this message translates to:
+  /// **'This person agreed to be recognized by Remori.'**
+  String get personConsent;
+
+  /// No description provided for @personConsentRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm this person’s consent before saving.'**
+  String get personConsentRequired;
+
+  /// No description provided for @personCacheRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Person saved. Tap Save person again to finish updating the list.'**
+  String get personCacheRetry;
+
+  /// No description provided for @personSaveUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to confirm the save. Check People before trying again to avoid adding this person twice.'**
+  String get personSaveUncertain;
+
+  /// No description provided for @personSaveRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to save this person. Check the fields and photos, then try again.'**
+  String get personSaveRetry;
+
+  /// No description provided for @personSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving…'**
+  String get personSaving;
+
+  /// No description provided for @personSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save person'**
+  String get personSave;
 }
 
 class _AppLocalizationsDelegate

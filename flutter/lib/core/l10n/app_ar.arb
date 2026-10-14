@@ -174,5 +174,44 @@
   "peopleSon": "ابن",
   "peopleDaughter": "ابنة",
   "peopleDoctor": "طبيب",
-  "peopleNurse": "ممرضة"
+  "peopleNurse": "ممرضة",
+  "personUnavailable": "اختر مريضًا تدير حسابه من الرئيسية، ثم حاول مرة أخرى.",
+  "personAddTitle": "إضافة شخص",
+  "personPhotos": "الصور (١–٥)",
+  "personCamera": "التقاط صورة",
+  "personGallery": "اختيار من المعرض",
+  "personRemovePhoto": "إزالة الصورة",
+  "personPhotoSlot": "الصورة {number}",
+  "personPhotoTooLarge": "اختر صورة لا يتجاوز حجمها ٤ ميجابايت.",
+  "personPhotoUnsupported": "اختر صورة بصيغة JPEG أو PNG.",
+  "personPhotoPickFailed": "تعذّر فتح الصورة. تحقق من الأذونات وحاول مرة أخرى.",
+  "personPhotosRequired": "أضف صورة واحدة على الأقل.",
+  "personPhotoInvalid": "الصورة {number}: لا يمكن استخدام هذه الصورة. يرجى استبدالها.",
+  "personPhotoTip": "نصيحة: وجه واضح وإضاءة جيدة وشخص واحد في كل صورة. تساعد الزوايا المختلفة.",
+  "personName": "الاسم",
+  "personNameHint": "أدخل الاسم الكامل",
+  "personRelationship": "صلة القرابة",
+  "personRelationshipHint": "أدخل صلة القرابة",
+  "personConsent": "وافق هذا الشخص على أن يتعرّف عليه ريموري.",
+  "personConsentRequired": "أكد موافقة هذا الشخص قبل الحفظ.",
+  "personCacheRetry": "تم حفظ الشخص. اضغط حفظ الشخص مجددًا لإكمال تحديث القائمة.",
+  "personSaveUncertain": "تعذّر تأكيد الحفظ. تحقق من قائمة الأشخاص قبل المحاولة مجددًا لتجنب إضافة الشخص مرتين.",
+  "personSaveRetry": "تعذّر حفظ الشخص. تحقق من الحقول والصور ثم حاول مجددًا.",
+  "personSaving": "جارٍ الحفظ…",
+  "personSave": "حفظ الشخص",
+  "@personPhotoSlot": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "@personPhotoInvalid": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  }
+
 }

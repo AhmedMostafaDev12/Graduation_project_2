@@ -589,4 +589,86 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get peopleNurse => 'ممرضة';
+
+  @override
+  String get personUnavailable =>
+      'اختر مريضًا تدير حسابه من الرئيسية، ثم حاول مرة أخرى.';
+
+  @override
+  String get personAddTitle => 'إضافة شخص';
+
+  @override
+  String get personPhotos => 'الصور (١–٥)';
+
+  @override
+  String get personCamera => 'التقاط صورة';
+
+  @override
+  String get personGallery => 'اختيار من المعرض';
+
+  @override
+  String get personRemovePhoto => 'إزالة الصورة';
+
+  @override
+  String personPhotoSlot(int number) {
+    return 'الصورة $number';
+  }
+
+  @override
+  String get personPhotoTooLarge => 'اختر صورة لا يتجاوز حجمها ٤ ميجابايت.';
+
+  @override
+  String get personPhotoUnsupported => 'اختر صورة بصيغة JPEG أو PNG.';
+
+  @override
+  String get personPhotoPickFailed =>
+      'تعذّر فتح الصورة. تحقق من الأذونات وحاول مرة أخرى.';
+
+  @override
+  String get personPhotosRequired => 'أضف صورة واحدة على الأقل.';
+
+  @override
+  String personPhotoInvalid(int number) {
+    return 'الصورة $number: لا يمكن استخدام هذه الصورة. يرجى استبدالها.';
+  }
+
+  @override
+  String get personPhotoTip =>
+      'نصيحة: وجه واضح وإضاءة جيدة وشخص واحد في كل صورة. تساعد الزوايا المختلفة.';
+
+  @override
+  String get personName => 'الاسم';
+
+  @override
+  String get personNameHint => 'أدخل الاسم الكامل';
+
+  @override
+  String get personRelationship => 'صلة القرابة';
+
+  @override
+  String get personRelationshipHint => 'أدخل صلة القرابة';
+
+  @override
+  String get personConsent => 'وافق هذا الشخص على أن يتعرّف عليه ريموري.';
+
+  @override
+  String get personConsentRequired => 'أكد موافقة هذا الشخص قبل الحفظ.';
+
+  @override
+  String get personCacheRetry =>
+      'تم حفظ الشخص. اضغط حفظ الشخص مجددًا لإكمال تحديث القائمة.';
+
+  @override
+  String get personSaveUncertain =>
+      'تعذّر تأكيد الحفظ. تحقق من قائمة الأشخاص قبل المحاولة مجددًا لتجنب إضافة الشخص مرتين.';
+
+  @override
+  String get personSaveRetry =>
+      'تعذّر حفظ الشخص. تحقق من الحقول والصور ثم حاول مجددًا.';
+
+  @override
+  String get personSaving => 'جارٍ الحفظ…';
+
+  @override
+  String get personSave => 'حفظ الشخص';
 }
