@@ -43,11 +43,13 @@ class CaregiverReminder {
     required this.dtstart,
     required this.timezone,
     required this.active,
+    this.spokenText,
   });
   final String id, title, rrule, timezone;
   final ReminderKind kind;
   final DateTime dtstart;
   final bool active;
+  final String? spokenText;
 }
 
 class ReminderOccurrence {
