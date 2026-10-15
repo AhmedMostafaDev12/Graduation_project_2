@@ -16,6 +16,7 @@ part 'document_detail_tables.dart';
 part 'more_tables.dart';
 part 'caregiver_tables.dart';
 part 'patient_today_tables.dart';
+part 'patient_journal_tables.dart';
 
 enum ReminderStatus { pending, completed, snoozed, missed }
 
@@ -93,12 +94,15 @@ class OutboxEntries extends Table {
     PatientTodaySettings,
     PatientReminderCards,
     PatientKnownEncounters,
+    PatientJournalEntries,
+    PatientJournalMedia,
+    PatientJournalDays,
   ],
 )
 class RemoriDatabase extends _$RemoriDatabase {
   RemoriDatabase(super.executor);
   @override
-  int get schemaVersion => 17;
+  int get schemaVersion => 18;
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onUpgrade: (m, from, to) async {
@@ -169,6 +173,11 @@ class RemoriDatabase extends _$RemoriDatabase {
           patientReminderCards,
           patientReminderCards.reminderType,
         );
+      }
+      if (from < 18) {
+        await m.createTable(patientJournalEntries);
+        await m.createTable(patientJournalMedia);
+        await m.createTable(patientJournalDays);
       }
     },
   );

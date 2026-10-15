@@ -2048,4 +2048,81 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get patientAlertBack => 'Back to reminders';
+
+  @override
+  String get patientDayToday => 'Today';
+
+  @override
+  String get patientDayYesterday => 'Yesterday';
+
+  @override
+  String get patientDayOffline =>
+      'Your saved day is here. Updates will arrive when connected.';
+
+  @override
+  String get patientDayEmpty => 'Moments from your day will appear here';
+
+  @override
+  String get patientDayDetailPending =>
+      'Memory details will be available soon.';
+
+  @override
+  String patientDayMet(String name, String time) {
+    return 'You met $name at $time';
+  }
+
+  @override
+  String patientDayEncounter(String time) {
+    return 'You met someone at $time';
+  }
+
+  @override
+  String patientDayTalk(String time) {
+    return 'A conversation at $time';
+  }
+
+  @override
+  String patientDayReminder(String time) {
+    return 'A reminder at $time';
+  }
+
+  @override
+  String patientDayRecording(String time) {
+    return 'A recording at $time';
+  }
+
+  @override
+  String patientDayMoment(String time) {
+    return 'A moment at $time';
+  }
+
+  @override
+  String patientDayDocument(String time) {
+    return 'A document at $time';
+  }
+
+  @override
+  String patientDayQuestion(String time) {
+    return 'You asked a question at $time';
+  }
+
+  @override
+  String patientDayGame(String time) {
+    return 'A game at $time';
+  }
+
+  @override
+  String patientDayPaused(String time) {
+    return 'Memory paused at $time';
+  }
+
+  @override
+  String patientDayResumed(String time) {
+    return 'Memory resumed at $time';
+  }
+
+  @override
+  String patientDayEvent(String time) {
+    return 'A moment from your day at $time';
+  }
 }

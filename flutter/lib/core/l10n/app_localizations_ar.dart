@@ -2049,4 +2049,80 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get patientAlertBack => 'ارجع للتذكيرات';
+
+  @override
+  String get patientDayToday => 'النهارده';
+
+  @override
+  String get patientDayYesterday => 'امبارح';
+
+  @override
+  String get patientDayOffline =>
+      'يومك المحفوظ موجود هنا. التحديثات هتوصل لما الاتصال يرجع.';
+
+  @override
+  String get patientDayEmpty => 'لحظات من يومك هتظهر هنا';
+
+  @override
+  String get patientDayDetailPending => 'تفاصيل الذكريات هتكون متاحة قريب.';
+
+  @override
+  String patientDayMet(String name, String time) {
+    return 'قابلت $name الساعة $time';
+  }
+
+  @override
+  String patientDayEncounter(String time) {
+    return 'قابلت حد الساعة $time';
+  }
+
+  @override
+  String patientDayTalk(String time) {
+    return 'محادثة الساعة $time';
+  }
+
+  @override
+  String patientDayReminder(String time) {
+    return 'تذكير الساعة $time';
+  }
+
+  @override
+  String patientDayRecording(String time) {
+    return 'تسجيل الساعة $time';
+  }
+
+  @override
+  String patientDayMoment(String time) {
+    return 'لحظة الساعة $time';
+  }
+
+  @override
+  String patientDayDocument(String time) {
+    return 'مستند الساعة $time';
+  }
+
+  @override
+  String patientDayQuestion(String time) {
+    return 'سألت سؤال الساعة $time';
+  }
+
+  @override
+  String patientDayGame(String time) {
+    return 'لعبة الساعة $time';
+  }
+
+  @override
+  String patientDayPaused(String time) {
+    return 'الذاكرة اتوقفت الساعة $time';
+  }
+
+  @override
+  String patientDayResumed(String time) {
+    return 'الذاكرة رجعت تشتغل الساعة $time';
+  }
+
+  @override
+  String patientDayEvent(String time) {
+    return 'لحظة من يومك الساعة $time';
+  }
 }

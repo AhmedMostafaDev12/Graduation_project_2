@@ -3624,6 +3624,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back to reminders'**
   String get patientAlertBack;
+
+  /// No description provided for @patientDayToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get patientDayToday;
+
+  /// No description provided for @patientDayYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get patientDayYesterday;
+
+  /// No description provided for @patientDayOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Your saved day is here. Updates will arrive when connected.'**
+  String get patientDayOffline;
+
+  /// No description provided for @patientDayEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Moments from your day will appear here'**
+  String get patientDayEmpty;
+
+  /// No description provided for @patientDayDetailPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory details will be available soon.'**
+  String get patientDayDetailPending;
+
+  /// No description provided for @patientDayMet.
+  ///
+  /// In en, this message translates to:
+  /// **'You met {name} at {time}'**
+  String patientDayMet(String name, String time);
+
+  /// No description provided for @patientDayEncounter.
+  ///
+  /// In en, this message translates to:
+  /// **'You met someone at {time}'**
+  String patientDayEncounter(String time);
+
+  /// No description provided for @patientDayTalk.
+  ///
+  /// In en, this message translates to:
+  /// **'A conversation at {time}'**
+  String patientDayTalk(String time);
+
+  /// No description provided for @patientDayReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'A reminder at {time}'**
+  String patientDayReminder(String time);
+
+  /// No description provided for @patientDayRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'A recording at {time}'**
+  String patientDayRecording(String time);
+
+  /// No description provided for @patientDayMoment.
+  ///
+  /// In en, this message translates to:
+  /// **'A moment at {time}'**
+  String patientDayMoment(String time);
+
+  /// No description provided for @patientDayDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'A document at {time}'**
+  String patientDayDocument(String time);
+
+  /// No description provided for @patientDayQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'You asked a question at {time}'**
+  String patientDayQuestion(String time);
+
+  /// No description provided for @patientDayGame.
+  ///
+  /// In en, this message translates to:
+  /// **'A game at {time}'**
+  String patientDayGame(String time);
+
+  /// No description provided for @patientDayPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory paused at {time}'**
+  String patientDayPaused(String time);
+
+  /// No description provided for @patientDayResumed.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory resumed at {time}'**
+  String patientDayResumed(String time);
+
+  /// No description provided for @patientDayEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'A moment from your day at {time}'**
+  String patientDayEvent(String time);
 }
 
 class _AppLocalizationsDelegate

@@ -799,5 +799,110 @@
   "@patientAlertTitle": {"placeholders": {"title": {"type": "String"}}},
   "patientAlertUnavailable": "Your reminders are in Reminders",
   "patientAlertSaveFailed": "That wasn't saved yet. Please try again.",
-  "patientAlertBack": "Back to reminders"
+  "patientAlertBack": "Back to reminders",
+
+    "patientDayToday":  "Today",
+    "patientDayYesterday":  "Yesterday",
+    "patientDayOffline":  "Your saved day is here. Updates will arrive when connected.",
+    "patientDayEmpty":  "Moments from your day will appear here",
+    "patientDayDetailPending":  "Memory details will be available soon.",
+    "patientDayMet":  "You met {name} at {time}",
+    "@patientDayMet":  {
+                           "placeholders":  {
+                                                "name":  {
+                                                             "type":  "String"
+                                                         },
+                                                "time":  {
+                                                             "type":  "String"
+                                                         }
+                                            }
+                       },
+    "patientDayEncounter":  "You met someone at {time}",
+    "@patientDayEncounter":  {
+                                 "placeholders":  {
+                                                      "time":  {
+                                                                   "type":  "String"
+                                                               }
+                                                  }
+                             },
+    "patientDayTalk":  "A conversation at {time}",
+    "@patientDayTalk":  {
+                            "placeholders":  {
+                                                 "time":  {
+                                                              "type":  "String"
+                                                          }
+                                             }
+                        },
+    "patientDayReminder":  "A reminder at {time}",
+    "@patientDayReminder":  {
+                                "placeholders":  {
+                                                     "time":  {
+                                                                  "type":  "String"
+                                                              }
+                                                 }
+                            },
+    "patientDayRecording":  "A recording at {time}",
+    "@patientDayRecording":  {
+                                 "placeholders":  {
+                                                      "time":  {
+                                                                   "type":  "String"
+                                                               }
+                                                  }
+                             },
+    "patientDayMoment":  "A moment at {time}",
+    "@patientDayMoment":  {
+                              "placeholders":  {
+                                                   "time":  {
+                                                                "type":  "String"
+                                                            }
+                                               }
+                          },
+    "patientDayDocument":  "A document at {time}",
+    "@patientDayDocument":  {
+                                "placeholders":  {
+                                                     "time":  {
+                                                                  "type":  "String"
+                                                              }
+                                                 }
+                            },
+    "patientDayQuestion":  "You asked a question at {time}",
+    "@patientDayQuestion":  {
+                                "placeholders":  {
+                                                     "time":  {
+                                                                  "type":  "String"
+                                                              }
+                                                 }
+                            },
+    "patientDayGame":  "A game at {time}",
+    "@patientDayGame":  {
+                            "placeholders":  {
+                                                 "time":  {
+                                                              "type":  "String"
+                                                          }
+                                             }
+                        },
+    "patientDayPaused":  "Memory paused at {time}",
+    "@patientDayPaused":  {
+                              "placeholders":  {
+                                                   "time":  {
+                                                                "type":  "String"
+                                                            }
+                                               }
+                          },
+    "patientDayResumed":  "Memory resumed at {time}",
+    "@patientDayResumed":  {
+                               "placeholders":  {
+                                                    "time":  {
+                                                                 "type":  "String"
+                                                             }
+                                                }
+                           },
+    "patientDayEvent":  "A moment from your day at {time}",
+    "@patientDayEvent":  {
+                             "placeholders":  {
+                                                  "time":  {
+                                                               "type":  "String"
+                                                           }
+                                              }
+                         }
 }
