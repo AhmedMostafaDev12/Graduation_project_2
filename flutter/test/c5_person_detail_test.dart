@@ -465,6 +465,8 @@ void main() {
     await db.customStatement(
       'ALTER TABLE dashboard_devices DROP COLUMN paired_at',
     );
+    await db.customStatement('DROP TABLE cached_caregiver_accounts');
+    await db.customStatement('DROP TABLE cached_consents');
     await db.customStatement('PRAGMA user_version = 3');
     await db.customStatement('DROP TABLE cached_document_details');
     await db.customStatement('DROP TABLE cached_documents');

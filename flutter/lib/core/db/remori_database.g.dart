@@ -12530,6 +12530,694 @@ class CachedDocumentDetailsCompanion
   }
 }
 
+class $CachedCaregiverAccountsTable extends CachedCaregiverAccounts
+    with TableInfo<$CachedCaregiverAccountsTable, CachedCaregiverAccount> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedCaregiverAccountsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fullNameMeta = const VerificationMeta(
+    'fullName',
+  );
+  @override
+  late final GeneratedColumn<String> fullName = GeneratedColumn<String>(
+    'full_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _emailMeta = const VerificationMeta('email');
+  @override
+  late final GeneratedColumn<String> email = GeneratedColumn<String>(
+    'email',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> refreshedAt =
+      GeneratedColumn<int>(
+        'refreshed_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>(
+        $CachedCaregiverAccountsTable.$converterrefreshedAt,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [id, fullName, email, refreshedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_caregiver_accounts';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedCaregiverAccount> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('full_name')) {
+      context.handle(
+        _fullNameMeta,
+        fullName.isAcceptableOrUnknown(data['full_name']!, _fullNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fullNameMeta);
+    }
+    if (data.containsKey('email')) {
+      context.handle(
+        _emailMeta,
+        email.isAcceptableOrUnknown(data['email']!, _emailMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_emailMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CachedCaregiverAccount map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedCaregiverAccount(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      fullName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}full_name'],
+      )!,
+      email: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}email'],
+      )!,
+      refreshedAt: $CachedCaregiverAccountsTable.$converterrefreshedAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}refreshed_at'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $CachedCaregiverAccountsTable createAlias(String alias) {
+    return $CachedCaregiverAccountsTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converterrefreshedAt = const UtcMicros();
+}
+
+class CachedCaregiverAccount extends DataClass
+    implements Insertable<CachedCaregiverAccount> {
+  final String id;
+  final String fullName;
+  final String email;
+  final DateTime refreshedAt;
+  const CachedCaregiverAccount({
+    required this.id,
+    required this.fullName,
+    required this.email,
+    required this.refreshedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['full_name'] = Variable<String>(fullName);
+    map['email'] = Variable<String>(email);
+    {
+      map['refreshed_at'] = Variable<int>(
+        $CachedCaregiverAccountsTable.$converterrefreshedAt.toSql(refreshedAt),
+      );
+    }
+    return map;
+  }
+
+  CachedCaregiverAccountsCompanion toCompanion(bool nullToAbsent) {
+    return CachedCaregiverAccountsCompanion(
+      id: Value(id),
+      fullName: Value(fullName),
+      email: Value(email),
+      refreshedAt: Value(refreshedAt),
+    );
+  }
+
+  factory CachedCaregiverAccount.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedCaregiverAccount(
+      id: serializer.fromJson<String>(json['id']),
+      fullName: serializer.fromJson<String>(json['fullName']),
+      email: serializer.fromJson<String>(json['email']),
+      refreshedAt: serializer.fromJson<DateTime>(json['refreshedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'fullName': serializer.toJson<String>(fullName),
+      'email': serializer.toJson<String>(email),
+      'refreshedAt': serializer.toJson<DateTime>(refreshedAt),
+    };
+  }
+
+  CachedCaregiverAccount copyWith({
+    String? id,
+    String? fullName,
+    String? email,
+    DateTime? refreshedAt,
+  }) => CachedCaregiverAccount(
+    id: id ?? this.id,
+    fullName: fullName ?? this.fullName,
+    email: email ?? this.email,
+    refreshedAt: refreshedAt ?? this.refreshedAt,
+  );
+  CachedCaregiverAccount copyWithCompanion(
+    CachedCaregiverAccountsCompanion data,
+  ) {
+    return CachedCaregiverAccount(
+      id: data.id.present ? data.id.value : this.id,
+      fullName: data.fullName.present ? data.fullName.value : this.fullName,
+      email: data.email.present ? data.email.value : this.email,
+      refreshedAt: data.refreshedAt.present
+          ? data.refreshedAt.value
+          : this.refreshedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedCaregiverAccount(')
+          ..write('id: $id, ')
+          ..write('fullName: $fullName, ')
+          ..write('email: $email, ')
+          ..write('refreshedAt: $refreshedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, fullName, email, refreshedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedCaregiverAccount &&
+          other.id == this.id &&
+          other.fullName == this.fullName &&
+          other.email == this.email &&
+          other.refreshedAt == this.refreshedAt);
+}
+
+class CachedCaregiverAccountsCompanion
+    extends UpdateCompanion<CachedCaregiverAccount> {
+  final Value<String> id;
+  final Value<String> fullName;
+  final Value<String> email;
+  final Value<DateTime> refreshedAt;
+  final Value<int> rowid;
+  const CachedCaregiverAccountsCompanion({
+    this.id = const Value.absent(),
+    this.fullName = const Value.absent(),
+    this.email = const Value.absent(),
+    this.refreshedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedCaregiverAccountsCompanion.insert({
+    required String id,
+    required String fullName,
+    required String email,
+    required DateTime refreshedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       fullName = Value(fullName),
+       email = Value(email),
+       refreshedAt = Value(refreshedAt);
+  static Insertable<CachedCaregiverAccount> custom({
+    Expression<String>? id,
+    Expression<String>? fullName,
+    Expression<String>? email,
+    Expression<int>? refreshedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (fullName != null) 'full_name': fullName,
+      if (email != null) 'email': email,
+      if (refreshedAt != null) 'refreshed_at': refreshedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedCaregiverAccountsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? fullName,
+    Value<String>? email,
+    Value<DateTime>? refreshedAt,
+    Value<int>? rowid,
+  }) {
+    return CachedCaregiverAccountsCompanion(
+      id: id ?? this.id,
+      fullName: fullName ?? this.fullName,
+      email: email ?? this.email,
+      refreshedAt: refreshedAt ?? this.refreshedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (fullName.present) {
+      map['full_name'] = Variable<String>(fullName.value);
+    }
+    if (email.present) {
+      map['email'] = Variable<String>(email.value);
+    }
+    if (refreshedAt.present) {
+      map['refreshed_at'] = Variable<int>(
+        $CachedCaregiverAccountsTable.$converterrefreshedAt.toSql(
+          refreshedAt.value,
+        ),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedCaregiverAccountsCompanion(')
+          ..write('id: $id, ')
+          ..write('fullName: $fullName, ')
+          ..write('email: $email, ')
+          ..write('refreshedAt: $refreshedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CachedConsentsTable extends CachedConsents
+    with TableInfo<$CachedConsentsTable, CachedConsent> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedConsentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> refreshedAt =
+      GeneratedColumn<int>(
+        'refreshed_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>($CachedConsentsTable.$converterrefreshedAt);
+  @override
+  List<GeneratedColumn> get $columns => [
+    caregiverId,
+    patientId,
+    id,
+    payload,
+    refreshedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_consents';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedConsent> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, patientId, id};
+  @override
+  CachedConsent map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedConsent(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      )!,
+      refreshedAt: $CachedConsentsTable.$converterrefreshedAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}refreshed_at'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $CachedConsentsTable createAlias(String alias) {
+    return $CachedConsentsTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converterrefreshedAt = const UtcMicros();
+}
+
+class CachedConsent extends DataClass implements Insertable<CachedConsent> {
+  final String caregiverId;
+  final String patientId;
+  final String id;
+  final String payload;
+  final DateTime refreshedAt;
+  const CachedConsent({
+    required this.caregiverId,
+    required this.patientId,
+    required this.id,
+    required this.payload,
+    required this.refreshedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    map['id'] = Variable<String>(id);
+    map['payload'] = Variable<String>(payload);
+    {
+      map['refreshed_at'] = Variable<int>(
+        $CachedConsentsTable.$converterrefreshedAt.toSql(refreshedAt),
+      );
+    }
+    return map;
+  }
+
+  CachedConsentsCompanion toCompanion(bool nullToAbsent) {
+    return CachedConsentsCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      id: Value(id),
+      payload: Value(payload),
+      refreshedAt: Value(refreshedAt),
+    );
+  }
+
+  factory CachedConsent.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedConsent(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      id: serializer.fromJson<String>(json['id']),
+      payload: serializer.fromJson<String>(json['payload']),
+      refreshedAt: serializer.fromJson<DateTime>(json['refreshedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'id': serializer.toJson<String>(id),
+      'payload': serializer.toJson<String>(payload),
+      'refreshedAt': serializer.toJson<DateTime>(refreshedAt),
+    };
+  }
+
+  CachedConsent copyWith({
+    String? caregiverId,
+    String? patientId,
+    String? id,
+    String? payload,
+    DateTime? refreshedAt,
+  }) => CachedConsent(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    id: id ?? this.id,
+    payload: payload ?? this.payload,
+    refreshedAt: refreshedAt ?? this.refreshedAt,
+  );
+  CachedConsent copyWithCompanion(CachedConsentsCompanion data) {
+    return CachedConsent(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      id: data.id.present ? data.id.value : this.id,
+      payload: data.payload.present ? data.payload.value : this.payload,
+      refreshedAt: data.refreshedAt.present
+          ? data.refreshedAt.value
+          : this.refreshedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedConsent(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('id: $id, ')
+          ..write('payload: $payload, ')
+          ..write('refreshedAt: $refreshedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(caregiverId, patientId, id, payload, refreshedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedConsent &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.id == this.id &&
+          other.payload == this.payload &&
+          other.refreshedAt == this.refreshedAt);
+}
+
+class CachedConsentsCompanion extends UpdateCompanion<CachedConsent> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<String> id;
+  final Value<String> payload;
+  final Value<DateTime> refreshedAt;
+  final Value<int> rowid;
+  const CachedConsentsCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.refreshedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedConsentsCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required String id,
+    required String payload,
+    required DateTime refreshedAt,
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       id = Value(id),
+       payload = Value(payload),
+       refreshedAt = Value(refreshedAt);
+  static Insertable<CachedConsent> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<String>? id,
+    Expression<String>? payload,
+    Expression<int>? refreshedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (id != null) 'id': id,
+      if (payload != null) 'payload': payload,
+      if (refreshedAt != null) 'refreshed_at': refreshedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedConsentsCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<String>? id,
+    Value<String>? payload,
+    Value<DateTime>? refreshedAt,
+    Value<int>? rowid,
+  }) {
+    return CachedConsentsCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      id: id ?? this.id,
+      payload: payload ?? this.payload,
+      refreshedAt: refreshedAt ?? this.refreshedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (refreshedAt.present) {
+      map['refreshed_at'] = Variable<int>(
+        $CachedConsentsTable.$converterrefreshedAt.toSql(refreshedAt.value),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedConsentsCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('id: $id, ')
+          ..write('payload: $payload, ')
+          ..write('refreshedAt: $refreshedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$RemoriDatabase extends GeneratedDatabase {
   _$RemoriDatabase(QueryExecutor e) : super(e);
   $RemoriDatabaseManager get managers => $RemoriDatabaseManager(this);
@@ -12582,6 +13270,9 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
       $DocumentsCacheStatesTable(this);
   late final $CachedDocumentDetailsTable cachedDocumentDetails =
       $CachedDocumentDetailsTable(this);
+  late final $CachedCaregiverAccountsTable cachedCaregiverAccounts =
+      $CachedCaregiverAccountsTable(this);
+  late final $CachedConsentsTable cachedConsents = $CachedConsentsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -12612,6 +13303,8 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
     cachedDocuments,
     documentsCacheStates,
     cachedDocumentDetails,
+    cachedCaregiverAccounts,
+    cachedConsents,
   ];
 }
 
@@ -19522,6 +20215,443 @@ typedef $$CachedDocumentDetailsTableProcessedTableManager =
       CachedDocumentDetail,
       PrefetchHooks Function()
     >;
+typedef $$CachedCaregiverAccountsTableCreateCompanionBuilder =
+    CachedCaregiverAccountsCompanion Function({
+      required String id,
+      required String fullName,
+      required String email,
+      required DateTime refreshedAt,
+      Value<int> rowid,
+    });
+typedef $$CachedCaregiverAccountsTableUpdateCompanionBuilder =
+    CachedCaregiverAccountsCompanion Function({
+      Value<String> id,
+      Value<String> fullName,
+      Value<String> email,
+      Value<DateTime> refreshedAt,
+      Value<int> rowid,
+    });
+
+class $$CachedCaregiverAccountsTableFilterComposer
+    extends Composer<_$RemoriDatabase, $CachedCaregiverAccountsTable> {
+  $$CachedCaregiverAccountsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fullName => $composableBuilder(
+    column: $table.fullName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+}
+
+class $$CachedCaregiverAccountsTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $CachedCaregiverAccountsTable> {
+  $$CachedCaregiverAccountsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fullName => $composableBuilder(
+    column: $table.fullName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get refreshedAt => $composableBuilder(
+    column: $table.refreshedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedCaregiverAccountsTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $CachedCaregiverAccountsTable> {
+  $$CachedCaregiverAccountsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get fullName =>
+      $composableBuilder(column: $table.fullName, builder: (column) => column);
+
+  GeneratedColumn<String> get email =>
+      $composableBuilder(column: $table.email, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => column,
+      );
+}
+
+class $$CachedCaregiverAccountsTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $CachedCaregiverAccountsTable,
+          CachedCaregiverAccount,
+          $$CachedCaregiverAccountsTableFilterComposer,
+          $$CachedCaregiverAccountsTableOrderingComposer,
+          $$CachedCaregiverAccountsTableAnnotationComposer,
+          $$CachedCaregiverAccountsTableCreateCompanionBuilder,
+          $$CachedCaregiverAccountsTableUpdateCompanionBuilder,
+          (
+            CachedCaregiverAccount,
+            BaseReferences<
+              _$RemoriDatabase,
+              $CachedCaregiverAccountsTable,
+              CachedCaregiverAccount
+            >,
+          ),
+          CachedCaregiverAccount,
+          PrefetchHooks Function()
+        > {
+  $$CachedCaregiverAccountsTableTableManager(
+    _$RemoriDatabase db,
+    $CachedCaregiverAccountsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedCaregiverAccountsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$CachedCaregiverAccountsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$CachedCaregiverAccountsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> fullName = const Value.absent(),
+                Value<String> email = const Value.absent(),
+                Value<DateTime> refreshedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedCaregiverAccountsCompanion(
+                id: id,
+                fullName: fullName,
+                email: email,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String fullName,
+                required String email,
+                required DateTime refreshedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CachedCaregiverAccountsCompanion.insert(
+                id: id,
+                fullName: fullName,
+                email: email,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    $CachedCaregiverAccountsTable,
+                    CachedCaregiverAccount
+                  >(table),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $CachedCaregiverAccountsTable,
+                    CachedCaregiverAccount
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedCaregiverAccountsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $CachedCaregiverAccountsTable,
+      CachedCaregiverAccount,
+      $$CachedCaregiverAccountsTableFilterComposer,
+      $$CachedCaregiverAccountsTableOrderingComposer,
+      $$CachedCaregiverAccountsTableAnnotationComposer,
+      $$CachedCaregiverAccountsTableCreateCompanionBuilder,
+      $$CachedCaregiverAccountsTableUpdateCompanionBuilder,
+      (
+        CachedCaregiverAccount,
+        BaseReferences<
+          _$RemoriDatabase,
+          $CachedCaregiverAccountsTable,
+          CachedCaregiverAccount
+        >,
+      ),
+      CachedCaregiverAccount,
+      PrefetchHooks Function()
+    >;
+typedef $$CachedConsentsTableCreateCompanionBuilder =
+    CachedConsentsCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required String id,
+      required String payload,
+      required DateTime refreshedAt,
+      Value<int> rowid,
+    });
+typedef $$CachedConsentsTableUpdateCompanionBuilder =
+    CachedConsentsCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<String> id,
+      Value<String> payload,
+      Value<DateTime> refreshedAt,
+      Value<int> rowid,
+    });
+
+class $$CachedConsentsTableFilterComposer
+    extends Composer<_$RemoriDatabase, $CachedConsentsTable> {
+  $$CachedConsentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+}
+
+class $$CachedConsentsTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $CachedConsentsTable> {
+  $$CachedConsentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get refreshedAt => $composableBuilder(
+    column: $table.refreshedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedConsentsTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $CachedConsentsTable> {
+  $$CachedConsentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => column,
+      );
+}
+
+class $$CachedConsentsTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $CachedConsentsTable,
+          CachedConsent,
+          $$CachedConsentsTableFilterComposer,
+          $$CachedConsentsTableOrderingComposer,
+          $$CachedConsentsTableAnnotationComposer,
+          $$CachedConsentsTableCreateCompanionBuilder,
+          $$CachedConsentsTableUpdateCompanionBuilder,
+          (
+            CachedConsent,
+            BaseReferences<
+              _$RemoriDatabase,
+              $CachedConsentsTable,
+              CachedConsent
+            >,
+          ),
+          CachedConsent,
+          PrefetchHooks Function()
+        > {
+  $$CachedConsentsTableTableManager(
+    _$RemoriDatabase db,
+    $CachedConsentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedConsentsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedConsentsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CachedConsentsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> payload = const Value.absent(),
+                Value<DateTime> refreshedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedConsentsCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                id: id,
+                payload: payload,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required String id,
+                required String payload,
+                required DateTime refreshedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CachedConsentsCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                id: id,
+                payload: payload,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CachedConsentsTable, CachedConsent>(table),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $CachedConsentsTable,
+                    CachedConsent
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedConsentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $CachedConsentsTable,
+      CachedConsent,
+      $$CachedConsentsTableFilterComposer,
+      $$CachedConsentsTableOrderingComposer,
+      $$CachedConsentsTableAnnotationComposer,
+      $$CachedConsentsTableCreateCompanionBuilder,
+      $$CachedConsentsTableUpdateCompanionBuilder,
+      (
+        CachedConsent,
+        BaseReferences<_$RemoriDatabase, $CachedConsentsTable, CachedConsent>,
+      ),
+      CachedConsent,
+      PrefetchHooks Function()
+    >;
 
 class $RemoriDatabaseManager {
   final _$RemoriDatabase _db;
@@ -19585,4 +20715,11 @@ class $RemoriDatabaseManager {
       $$DocumentsCacheStatesTableTableManager(_db, _db.documentsCacheStates);
   $$CachedDocumentDetailsTableTableManager get cachedDocumentDetails =>
       $$CachedDocumentDetailsTableTableManager(_db, _db.cachedDocumentDetails);
+  $$CachedCaregiverAccountsTableTableManager get cachedCaregiverAccounts =>
+      $$CachedCaregiverAccountsTableTableManager(
+        _db,
+        _db.cachedCaregiverAccounts,
+      );
+  $$CachedConsentsTableTableManager get cachedConsents =>
+      $$CachedConsentsTableTableManager(_db, _db.cachedConsents);
 }
