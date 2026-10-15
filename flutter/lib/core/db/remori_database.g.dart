@@ -9107,6 +9107,1261 @@ class PlacesCacheStatesCompanion extends UpdateCompanion<PlacesCacheState> {
   }
 }
 
+class $CachedJournalEntriesTable extends CachedJournalEntries
+    with TableInfo<$CachedJournalEntriesTable, CachedJournalEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedJournalEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dayMeta = const VerificationMeta('day');
+  @override
+  late final GeneratedColumn<String> day = GeneratedColumn<String>(
+    'day',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> occurredAt =
+      GeneratedColumn<int>(
+        'occurred_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>(
+        $CachedJournalEntriesTable.$converteroccurredAt,
+      );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    caregiverId,
+    patientId,
+    day,
+    id,
+    occurredAt,
+    payload,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_journal_entries';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedJournalEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('day')) {
+      context.handle(
+        _dayMeta,
+        day.isAcceptableOrUnknown(data['day']!, _dayMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dayMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, patientId, day, id};
+  @override
+  CachedJournalEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedJournalEntry(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      day: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}day'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      occurredAt: $CachedJournalEntriesTable.$converteroccurredAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}occurred_at'],
+        )!,
+      ),
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      )!,
+    );
+  }
+
+  @override
+  $CachedJournalEntriesTable createAlias(String alias) {
+    return $CachedJournalEntriesTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converteroccurredAt = const UtcMicros();
+}
+
+class CachedJournalEntry extends DataClass
+    implements Insertable<CachedJournalEntry> {
+  final String caregiverId;
+  final String patientId;
+  final String day;
+  final String id;
+  final DateTime occurredAt;
+  final String payload;
+  const CachedJournalEntry({
+    required this.caregiverId,
+    required this.patientId,
+    required this.day,
+    required this.id,
+    required this.occurredAt,
+    required this.payload,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    map['day'] = Variable<String>(day);
+    map['id'] = Variable<String>(id);
+    {
+      map['occurred_at'] = Variable<int>(
+        $CachedJournalEntriesTable.$converteroccurredAt.toSql(occurredAt),
+      );
+    }
+    map['payload'] = Variable<String>(payload);
+    return map;
+  }
+
+  CachedJournalEntriesCompanion toCompanion(bool nullToAbsent) {
+    return CachedJournalEntriesCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      day: Value(day),
+      id: Value(id),
+      occurredAt: Value(occurredAt),
+      payload: Value(payload),
+    );
+  }
+
+  factory CachedJournalEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedJournalEntry(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      day: serializer.fromJson<String>(json['day']),
+      id: serializer.fromJson<String>(json['id']),
+      occurredAt: serializer.fromJson<DateTime>(json['occurredAt']),
+      payload: serializer.fromJson<String>(json['payload']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'day': serializer.toJson<String>(day),
+      'id': serializer.toJson<String>(id),
+      'occurredAt': serializer.toJson<DateTime>(occurredAt),
+      'payload': serializer.toJson<String>(payload),
+    };
+  }
+
+  CachedJournalEntry copyWith({
+    String? caregiverId,
+    String? patientId,
+    String? day,
+    String? id,
+    DateTime? occurredAt,
+    String? payload,
+  }) => CachedJournalEntry(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    day: day ?? this.day,
+    id: id ?? this.id,
+    occurredAt: occurredAt ?? this.occurredAt,
+    payload: payload ?? this.payload,
+  );
+  CachedJournalEntry copyWithCompanion(CachedJournalEntriesCompanion data) {
+    return CachedJournalEntry(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      day: data.day.present ? data.day.value : this.day,
+      id: data.id.present ? data.id.value : this.id,
+      occurredAt: data.occurredAt.present
+          ? data.occurredAt.value
+          : this.occurredAt,
+      payload: data.payload.present ? data.payload.value : this.payload,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedJournalEntry(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('day: $day, ')
+          ..write('id: $id, ')
+          ..write('occurredAt: $occurredAt, ')
+          ..write('payload: $payload')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(caregiverId, patientId, day, id, occurredAt, payload);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedJournalEntry &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.day == this.day &&
+          other.id == this.id &&
+          other.occurredAt == this.occurredAt &&
+          other.payload == this.payload);
+}
+
+class CachedJournalEntriesCompanion
+    extends UpdateCompanion<CachedJournalEntry> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<String> day;
+  final Value<String> id;
+  final Value<DateTime> occurredAt;
+  final Value<String> payload;
+  final Value<int> rowid;
+  const CachedJournalEntriesCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.day = const Value.absent(),
+    this.id = const Value.absent(),
+    this.occurredAt = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedJournalEntriesCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required String day,
+    required String id,
+    required DateTime occurredAt,
+    required String payload,
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       day = Value(day),
+       id = Value(id),
+       occurredAt = Value(occurredAt),
+       payload = Value(payload);
+  static Insertable<CachedJournalEntry> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<String>? day,
+    Expression<String>? id,
+    Expression<int>? occurredAt,
+    Expression<String>? payload,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (day != null) 'day': day,
+      if (id != null) 'id': id,
+      if (occurredAt != null) 'occurred_at': occurredAt,
+      if (payload != null) 'payload': payload,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedJournalEntriesCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<String>? day,
+    Value<String>? id,
+    Value<DateTime>? occurredAt,
+    Value<String>? payload,
+    Value<int>? rowid,
+  }) {
+    return CachedJournalEntriesCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      day: day ?? this.day,
+      id: id ?? this.id,
+      occurredAt: occurredAt ?? this.occurredAt,
+      payload: payload ?? this.payload,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (day.present) {
+      map['day'] = Variable<String>(day.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (occurredAt.present) {
+      map['occurred_at'] = Variable<int>(
+        $CachedJournalEntriesTable.$converteroccurredAt.toSql(occurredAt.value),
+      );
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedJournalEntriesCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('day: $day, ')
+          ..write('id: $id, ')
+          ..write('occurredAt: $occurredAt, ')
+          ..write('payload: $payload, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CachedJournalMediaTable extends CachedJournalMedia
+    with TableInfo<$CachedJournalMediaTable, CachedJournalMediaData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedJournalMediaTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dayMeta = const VerificationMeta('day');
+  @override
+  late final GeneratedColumn<String> day = GeneratedColumn<String>(
+    'day',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _eventIdMeta = const VerificationMeta(
+    'eventId',
+  );
+  @override
+  late final GeneratedColumn<String> eventId = GeneratedColumn<String>(
+    'event_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    caregiverId,
+    patientId,
+    day,
+    id,
+    eventId,
+    payload,
+    position,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_journal_media';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedJournalMediaData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('day')) {
+      context.handle(
+        _dayMeta,
+        day.isAcceptableOrUnknown(data['day']!, _dayMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dayMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('event_id')) {
+      context.handle(
+        _eventIdMeta,
+        eventId.isAcceptableOrUnknown(data['event_id']!, _eventIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_eventIdMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, patientId, day, id};
+  @override
+  CachedJournalMediaData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedJournalMediaData(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      day: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}day'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      eventId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_id'],
+      )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+    );
+  }
+
+  @override
+  $CachedJournalMediaTable createAlias(String alias) {
+    return $CachedJournalMediaTable(attachedDatabase, alias);
+  }
+}
+
+class CachedJournalMediaData extends DataClass
+    implements Insertable<CachedJournalMediaData> {
+  final String caregiverId;
+  final String patientId;
+  final String day;
+  final String id;
+  final String eventId;
+  final String payload;
+  final int position;
+  const CachedJournalMediaData({
+    required this.caregiverId,
+    required this.patientId,
+    required this.day,
+    required this.id,
+    required this.eventId,
+    required this.payload,
+    required this.position,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    map['day'] = Variable<String>(day);
+    map['id'] = Variable<String>(id);
+    map['event_id'] = Variable<String>(eventId);
+    map['payload'] = Variable<String>(payload);
+    map['position'] = Variable<int>(position);
+    return map;
+  }
+
+  CachedJournalMediaCompanion toCompanion(bool nullToAbsent) {
+    return CachedJournalMediaCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      day: Value(day),
+      id: Value(id),
+      eventId: Value(eventId),
+      payload: Value(payload),
+      position: Value(position),
+    );
+  }
+
+  factory CachedJournalMediaData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedJournalMediaData(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      day: serializer.fromJson<String>(json['day']),
+      id: serializer.fromJson<String>(json['id']),
+      eventId: serializer.fromJson<String>(json['eventId']),
+      payload: serializer.fromJson<String>(json['payload']),
+      position: serializer.fromJson<int>(json['position']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'day': serializer.toJson<String>(day),
+      'id': serializer.toJson<String>(id),
+      'eventId': serializer.toJson<String>(eventId),
+      'payload': serializer.toJson<String>(payload),
+      'position': serializer.toJson<int>(position),
+    };
+  }
+
+  CachedJournalMediaData copyWith({
+    String? caregiverId,
+    String? patientId,
+    String? day,
+    String? id,
+    String? eventId,
+    String? payload,
+    int? position,
+  }) => CachedJournalMediaData(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    day: day ?? this.day,
+    id: id ?? this.id,
+    eventId: eventId ?? this.eventId,
+    payload: payload ?? this.payload,
+    position: position ?? this.position,
+  );
+  CachedJournalMediaData copyWithCompanion(CachedJournalMediaCompanion data) {
+    return CachedJournalMediaData(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      day: data.day.present ? data.day.value : this.day,
+      id: data.id.present ? data.id.value : this.id,
+      eventId: data.eventId.present ? data.eventId.value : this.eventId,
+      payload: data.payload.present ? data.payload.value : this.payload,
+      position: data.position.present ? data.position.value : this.position,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedJournalMediaData(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('day: $day, ')
+          ..write('id: $id, ')
+          ..write('eventId: $eventId, ')
+          ..write('payload: $payload, ')
+          ..write('position: $position')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(caregiverId, patientId, day, id, eventId, payload, position);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedJournalMediaData &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.day == this.day &&
+          other.id == this.id &&
+          other.eventId == this.eventId &&
+          other.payload == this.payload &&
+          other.position == this.position);
+}
+
+class CachedJournalMediaCompanion
+    extends UpdateCompanion<CachedJournalMediaData> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<String> day;
+  final Value<String> id;
+  final Value<String> eventId;
+  final Value<String> payload;
+  final Value<int> position;
+  final Value<int> rowid;
+  const CachedJournalMediaCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.day = const Value.absent(),
+    this.id = const Value.absent(),
+    this.eventId = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.position = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedJournalMediaCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required String day,
+    required String id,
+    required String eventId,
+    required String payload,
+    required int position,
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       day = Value(day),
+       id = Value(id),
+       eventId = Value(eventId),
+       payload = Value(payload),
+       position = Value(position);
+  static Insertable<CachedJournalMediaData> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<String>? day,
+    Expression<String>? id,
+    Expression<String>? eventId,
+    Expression<String>? payload,
+    Expression<int>? position,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (day != null) 'day': day,
+      if (id != null) 'id': id,
+      if (eventId != null) 'event_id': eventId,
+      if (payload != null) 'payload': payload,
+      if (position != null) 'position': position,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedJournalMediaCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<String>? day,
+    Value<String>? id,
+    Value<String>? eventId,
+    Value<String>? payload,
+    Value<int>? position,
+    Value<int>? rowid,
+  }) {
+    return CachedJournalMediaCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      day: day ?? this.day,
+      id: id ?? this.id,
+      eventId: eventId ?? this.eventId,
+      payload: payload ?? this.payload,
+      position: position ?? this.position,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (day.present) {
+      map['day'] = Variable<String>(day.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (eventId.present) {
+      map['event_id'] = Variable<String>(eventId.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedJournalMediaCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('day: $day, ')
+          ..write('id: $id, ')
+          ..write('eventId: $eventId, ')
+          ..write('payload: $payload, ')
+          ..write('position: $position, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $JournalCacheStatesTable extends JournalCacheStates
+    with TableInfo<$JournalCacheStatesTable, JournalCacheState> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $JournalCacheStatesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dayMeta = const VerificationMeta('day');
+  @override
+  late final GeneratedColumn<String> day = GeneratedColumn<String>(
+    'day',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _timezoneMeta = const VerificationMeta(
+    'timezone',
+  );
+  @override
+  late final GeneratedColumn<String> timezone = GeneratedColumn<String>(
+    'timezone',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> refreshedAt =
+      GeneratedColumn<int>(
+        'refreshed_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>($JournalCacheStatesTable.$converterrefreshedAt);
+  @override
+  List<GeneratedColumn> get $columns => [
+    caregiverId,
+    patientId,
+    day,
+    timezone,
+    refreshedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'journal_cache_states';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<JournalCacheState> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('day')) {
+      context.handle(
+        _dayMeta,
+        day.isAcceptableOrUnknown(data['day']!, _dayMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dayMeta);
+    }
+    if (data.containsKey('timezone')) {
+      context.handle(
+        _timezoneMeta,
+        timezone.isAcceptableOrUnknown(data['timezone']!, _timezoneMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_timezoneMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, patientId, day};
+  @override
+  JournalCacheState map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return JournalCacheState(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      day: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}day'],
+      )!,
+      timezone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}timezone'],
+      )!,
+      refreshedAt: $JournalCacheStatesTable.$converterrefreshedAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}refreshed_at'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $JournalCacheStatesTable createAlias(String alias) {
+    return $JournalCacheStatesTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converterrefreshedAt = const UtcMicros();
+}
+
+class JournalCacheState extends DataClass
+    implements Insertable<JournalCacheState> {
+  final String caregiverId;
+  final String patientId;
+  final String day;
+  final String timezone;
+  final DateTime refreshedAt;
+  const JournalCacheState({
+    required this.caregiverId,
+    required this.patientId,
+    required this.day,
+    required this.timezone,
+    required this.refreshedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    map['day'] = Variable<String>(day);
+    map['timezone'] = Variable<String>(timezone);
+    {
+      map['refreshed_at'] = Variable<int>(
+        $JournalCacheStatesTable.$converterrefreshedAt.toSql(refreshedAt),
+      );
+    }
+    return map;
+  }
+
+  JournalCacheStatesCompanion toCompanion(bool nullToAbsent) {
+    return JournalCacheStatesCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      day: Value(day),
+      timezone: Value(timezone),
+      refreshedAt: Value(refreshedAt),
+    );
+  }
+
+  factory JournalCacheState.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return JournalCacheState(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      day: serializer.fromJson<String>(json['day']),
+      timezone: serializer.fromJson<String>(json['timezone']),
+      refreshedAt: serializer.fromJson<DateTime>(json['refreshedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'day': serializer.toJson<String>(day),
+      'timezone': serializer.toJson<String>(timezone),
+      'refreshedAt': serializer.toJson<DateTime>(refreshedAt),
+    };
+  }
+
+  JournalCacheState copyWith({
+    String? caregiverId,
+    String? patientId,
+    String? day,
+    String? timezone,
+    DateTime? refreshedAt,
+  }) => JournalCacheState(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    day: day ?? this.day,
+    timezone: timezone ?? this.timezone,
+    refreshedAt: refreshedAt ?? this.refreshedAt,
+  );
+  JournalCacheState copyWithCompanion(JournalCacheStatesCompanion data) {
+    return JournalCacheState(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      day: data.day.present ? data.day.value : this.day,
+      timezone: data.timezone.present ? data.timezone.value : this.timezone,
+      refreshedAt: data.refreshedAt.present
+          ? data.refreshedAt.value
+          : this.refreshedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('JournalCacheState(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('day: $day, ')
+          ..write('timezone: $timezone, ')
+          ..write('refreshedAt: $refreshedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(caregiverId, patientId, day, timezone, refreshedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is JournalCacheState &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.day == this.day &&
+          other.timezone == this.timezone &&
+          other.refreshedAt == this.refreshedAt);
+}
+
+class JournalCacheStatesCompanion extends UpdateCompanion<JournalCacheState> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<String> day;
+  final Value<String> timezone;
+  final Value<DateTime> refreshedAt;
+  final Value<int> rowid;
+  const JournalCacheStatesCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.day = const Value.absent(),
+    this.timezone = const Value.absent(),
+    this.refreshedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  JournalCacheStatesCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required String day,
+    required String timezone,
+    required DateTime refreshedAt,
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       day = Value(day),
+       timezone = Value(timezone),
+       refreshedAt = Value(refreshedAt);
+  static Insertable<JournalCacheState> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<String>? day,
+    Expression<String>? timezone,
+    Expression<int>? refreshedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (day != null) 'day': day,
+      if (timezone != null) 'timezone': timezone,
+      if (refreshedAt != null) 'refreshed_at': refreshedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  JournalCacheStatesCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<String>? day,
+    Value<String>? timezone,
+    Value<DateTime>? refreshedAt,
+    Value<int>? rowid,
+  }) {
+    return JournalCacheStatesCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      day: day ?? this.day,
+      timezone: timezone ?? this.timezone,
+      refreshedAt: refreshedAt ?? this.refreshedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (day.present) {
+      map['day'] = Variable<String>(day.value);
+    }
+    if (timezone.present) {
+      map['timezone'] = Variable<String>(timezone.value);
+    }
+    if (refreshedAt.present) {
+      map['refreshed_at'] = Variable<int>(
+        $JournalCacheStatesTable.$converterrefreshedAt.toSql(refreshedAt.value),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('JournalCacheStatesCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('day: $day, ')
+          ..write('timezone: $timezone, ')
+          ..write('refreshedAt: $refreshedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$RemoriDatabase extends GeneratedDatabase {
   _$RemoriDatabase(QueryExecutor e) : super(e);
   $RemoriDatabaseManager get managers => $RemoriDatabaseManager(this);
@@ -9144,6 +10399,12 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
   late final $CachedPlacesTable cachedPlaces = $CachedPlacesTable(this);
   late final $PlacesCacheStatesTable placesCacheStates =
       $PlacesCacheStatesTable(this);
+  late final $CachedJournalEntriesTable cachedJournalEntries =
+      $CachedJournalEntriesTable(this);
+  late final $CachedJournalMediaTable cachedJournalMedia =
+      $CachedJournalMediaTable(this);
+  late final $JournalCacheStatesTable journalCacheStates =
+      $JournalCacheStatesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -9167,6 +10428,9 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
     cachedUnknownFaceSamples,
     cachedPlaces,
     placesCacheStates,
+    cachedJournalEntries,
+    cachedJournalMedia,
+    journalCacheStates,
   ];
 }
 
@@ -14146,6 +15410,752 @@ typedef $$PlacesCacheStatesTableProcessedTableManager =
       PlacesCacheState,
       PrefetchHooks Function()
     >;
+typedef $$CachedJournalEntriesTableCreateCompanionBuilder =
+    CachedJournalEntriesCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required String day,
+      required String id,
+      required DateTime occurredAt,
+      required String payload,
+      Value<int> rowid,
+    });
+typedef $$CachedJournalEntriesTableUpdateCompanionBuilder =
+    CachedJournalEntriesCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<String> day,
+      Value<String> id,
+      Value<DateTime> occurredAt,
+      Value<String> payload,
+      Value<int> rowid,
+    });
+
+class $$CachedJournalEntriesTableFilterComposer
+    extends Composer<_$RemoriDatabase, $CachedJournalEntriesTable> {
+  $$CachedJournalEntriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get occurredAt =>
+      $composableBuilder(
+        column: $table.occurredAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedJournalEntriesTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $CachedJournalEntriesTable> {
+  $$CachedJournalEntriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedJournalEntriesTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $CachedJournalEntriesTable> {
+  $$CachedJournalEntriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get day =>
+      $composableBuilder(column: $table.day, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get occurredAt =>
+      $composableBuilder(
+        column: $table.occurredAt,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+}
+
+class $$CachedJournalEntriesTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $CachedJournalEntriesTable,
+          CachedJournalEntry,
+          $$CachedJournalEntriesTableFilterComposer,
+          $$CachedJournalEntriesTableOrderingComposer,
+          $$CachedJournalEntriesTableAnnotationComposer,
+          $$CachedJournalEntriesTableCreateCompanionBuilder,
+          $$CachedJournalEntriesTableUpdateCompanionBuilder,
+          (
+            CachedJournalEntry,
+            BaseReferences<
+              _$RemoriDatabase,
+              $CachedJournalEntriesTable,
+              CachedJournalEntry
+            >,
+          ),
+          CachedJournalEntry,
+          PrefetchHooks Function()
+        > {
+  $$CachedJournalEntriesTableTableManager(
+    _$RemoriDatabase db,
+    $CachedJournalEntriesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedJournalEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedJournalEntriesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$CachedJournalEntriesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<String> day = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<DateTime> occurredAt = const Value.absent(),
+                Value<String> payload = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedJournalEntriesCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                day: day,
+                id: id,
+                occurredAt: occurredAt,
+                payload: payload,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required String day,
+                required String id,
+                required DateTime occurredAt,
+                required String payload,
+                Value<int> rowid = const Value.absent(),
+              }) => CachedJournalEntriesCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                day: day,
+                id: id,
+                occurredAt: occurredAt,
+                payload: payload,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CachedJournalEntriesTable, CachedJournalEntry>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $CachedJournalEntriesTable,
+                    CachedJournalEntry
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedJournalEntriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $CachedJournalEntriesTable,
+      CachedJournalEntry,
+      $$CachedJournalEntriesTableFilterComposer,
+      $$CachedJournalEntriesTableOrderingComposer,
+      $$CachedJournalEntriesTableAnnotationComposer,
+      $$CachedJournalEntriesTableCreateCompanionBuilder,
+      $$CachedJournalEntriesTableUpdateCompanionBuilder,
+      (
+        CachedJournalEntry,
+        BaseReferences<
+          _$RemoriDatabase,
+          $CachedJournalEntriesTable,
+          CachedJournalEntry
+        >,
+      ),
+      CachedJournalEntry,
+      PrefetchHooks Function()
+    >;
+typedef $$CachedJournalMediaTableCreateCompanionBuilder =
+    CachedJournalMediaCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required String day,
+      required String id,
+      required String eventId,
+      required String payload,
+      required int position,
+      Value<int> rowid,
+    });
+typedef $$CachedJournalMediaTableUpdateCompanionBuilder =
+    CachedJournalMediaCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<String> day,
+      Value<String> id,
+      Value<String> eventId,
+      Value<String> payload,
+      Value<int> position,
+      Value<int> rowid,
+    });
+
+class $$CachedJournalMediaTableFilterComposer
+    extends Composer<_$RemoriDatabase, $CachedJournalMediaTable> {
+  $$CachedJournalMediaTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get eventId => $composableBuilder(
+    column: $table.eventId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedJournalMediaTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $CachedJournalMediaTable> {
+  $$CachedJournalMediaTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get eventId => $composableBuilder(
+    column: $table.eventId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedJournalMediaTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $CachedJournalMediaTable> {
+  $$CachedJournalMediaTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get day =>
+      $composableBuilder(column: $table.day, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get eventId =>
+      $composableBuilder(column: $table.eventId, builder: (column) => column);
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+}
+
+class $$CachedJournalMediaTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $CachedJournalMediaTable,
+          CachedJournalMediaData,
+          $$CachedJournalMediaTableFilterComposer,
+          $$CachedJournalMediaTableOrderingComposer,
+          $$CachedJournalMediaTableAnnotationComposer,
+          $$CachedJournalMediaTableCreateCompanionBuilder,
+          $$CachedJournalMediaTableUpdateCompanionBuilder,
+          (
+            CachedJournalMediaData,
+            BaseReferences<
+              _$RemoriDatabase,
+              $CachedJournalMediaTable,
+              CachedJournalMediaData
+            >,
+          ),
+          CachedJournalMediaData,
+          PrefetchHooks Function()
+        > {
+  $$CachedJournalMediaTableTableManager(
+    _$RemoriDatabase db,
+    $CachedJournalMediaTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedJournalMediaTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedJournalMediaTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CachedJournalMediaTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<String> day = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> eventId = const Value.absent(),
+                Value<String> payload = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedJournalMediaCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                day: day,
+                id: id,
+                eventId: eventId,
+                payload: payload,
+                position: position,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required String day,
+                required String id,
+                required String eventId,
+                required String payload,
+                required int position,
+                Value<int> rowid = const Value.absent(),
+              }) => CachedJournalMediaCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                day: day,
+                id: id,
+                eventId: eventId,
+                payload: payload,
+                position: position,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CachedJournalMediaTable, CachedJournalMediaData>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $CachedJournalMediaTable,
+                    CachedJournalMediaData
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedJournalMediaTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $CachedJournalMediaTable,
+      CachedJournalMediaData,
+      $$CachedJournalMediaTableFilterComposer,
+      $$CachedJournalMediaTableOrderingComposer,
+      $$CachedJournalMediaTableAnnotationComposer,
+      $$CachedJournalMediaTableCreateCompanionBuilder,
+      $$CachedJournalMediaTableUpdateCompanionBuilder,
+      (
+        CachedJournalMediaData,
+        BaseReferences<
+          _$RemoriDatabase,
+          $CachedJournalMediaTable,
+          CachedJournalMediaData
+        >,
+      ),
+      CachedJournalMediaData,
+      PrefetchHooks Function()
+    >;
+typedef $$JournalCacheStatesTableCreateCompanionBuilder =
+    JournalCacheStatesCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required String day,
+      required String timezone,
+      required DateTime refreshedAt,
+      Value<int> rowid,
+    });
+typedef $$JournalCacheStatesTableUpdateCompanionBuilder =
+    JournalCacheStatesCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<String> day,
+      Value<String> timezone,
+      Value<DateTime> refreshedAt,
+      Value<int> rowid,
+    });
+
+class $$JournalCacheStatesTableFilterComposer
+    extends Composer<_$RemoriDatabase, $JournalCacheStatesTable> {
+  $$JournalCacheStatesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get timezone => $composableBuilder(
+    column: $table.timezone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+}
+
+class $$JournalCacheStatesTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $JournalCacheStatesTable> {
+  $$JournalCacheStatesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get timezone => $composableBuilder(
+    column: $table.timezone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get refreshedAt => $composableBuilder(
+    column: $table.refreshedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$JournalCacheStatesTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $JournalCacheStatesTable> {
+  $$JournalCacheStatesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get day =>
+      $composableBuilder(column: $table.day, builder: (column) => column);
+
+  GeneratedColumn<String> get timezone =>
+      $composableBuilder(column: $table.timezone, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => column,
+      );
+}
+
+class $$JournalCacheStatesTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $JournalCacheStatesTable,
+          JournalCacheState,
+          $$JournalCacheStatesTableFilterComposer,
+          $$JournalCacheStatesTableOrderingComposer,
+          $$JournalCacheStatesTableAnnotationComposer,
+          $$JournalCacheStatesTableCreateCompanionBuilder,
+          $$JournalCacheStatesTableUpdateCompanionBuilder,
+          (
+            JournalCacheState,
+            BaseReferences<
+              _$RemoriDatabase,
+              $JournalCacheStatesTable,
+              JournalCacheState
+            >,
+          ),
+          JournalCacheState,
+          PrefetchHooks Function()
+        > {
+  $$JournalCacheStatesTableTableManager(
+    _$RemoriDatabase db,
+    $JournalCacheStatesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$JournalCacheStatesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$JournalCacheStatesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$JournalCacheStatesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<String> day = const Value.absent(),
+                Value<String> timezone = const Value.absent(),
+                Value<DateTime> refreshedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => JournalCacheStatesCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                day: day,
+                timezone: timezone,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required String day,
+                required String timezone,
+                required DateTime refreshedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => JournalCacheStatesCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                day: day,
+                timezone: timezone,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$JournalCacheStatesTable, JournalCacheState>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $JournalCacheStatesTable,
+                    JournalCacheState
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$JournalCacheStatesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $JournalCacheStatesTable,
+      JournalCacheState,
+      $$JournalCacheStatesTableFilterComposer,
+      $$JournalCacheStatesTableOrderingComposer,
+      $$JournalCacheStatesTableAnnotationComposer,
+      $$JournalCacheStatesTableCreateCompanionBuilder,
+      $$JournalCacheStatesTableUpdateCompanionBuilder,
+      (
+        JournalCacheState,
+        BaseReferences<
+          _$RemoriDatabase,
+          $JournalCacheStatesTable,
+          JournalCacheState
+        >,
+      ),
+      JournalCacheState,
+      PrefetchHooks Function()
+    >;
 
 class $RemoriDatabaseManager {
   final _$RemoriDatabase _db;
@@ -14195,4 +16205,10 @@ class $RemoriDatabaseManager {
       $$CachedPlacesTableTableManager(_db, _db.cachedPlaces);
   $$PlacesCacheStatesTableTableManager get placesCacheStates =>
       $$PlacesCacheStatesTableTableManager(_db, _db.placesCacheStates);
+  $$CachedJournalEntriesTableTableManager get cachedJournalEntries =>
+      $$CachedJournalEntriesTableTableManager(_db, _db.cachedJournalEntries);
+  $$CachedJournalMediaTableTableManager get cachedJournalMedia =>
+      $$CachedJournalMediaTableTableManager(_db, _db.cachedJournalMedia);
+  $$JournalCacheStatesTableTableManager get journalCacheStates =>
+      $$JournalCacheStatesTableTableManager(_db, _db.journalCacheStates);
 }

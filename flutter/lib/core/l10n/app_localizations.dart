@@ -2334,6 +2334,210 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unable to save the change. Check the details and try again.'**
   String get placeWriteFailed;
+
+  /// No description provided for @journalAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get journalAll;
+
+  /// No description provided for @journalPeople.
+  ///
+  /// In en, this message translates to:
+  /// **'People'**
+  String get journalPeople;
+
+  /// No description provided for @journalTalk.
+  ///
+  /// In en, this message translates to:
+  /// **'Talk'**
+  String get journalTalk;
+
+  /// No description provided for @journalQuestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Questions'**
+  String get journalQuestions;
+
+  /// No description provided for @journalMedia.
+  ///
+  /// In en, this message translates to:
+  /// **'Media'**
+  String get journalMedia;
+
+  /// No description provided for @journalDocs.
+  ///
+  /// In en, this message translates to:
+  /// **'Docs'**
+  String get journalDocs;
+
+  /// No description provided for @journalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Journal'**
+  String get journalTitle;
+
+  /// No description provided for @journalPreviousDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous day'**
+  String get journalPreviousDay;
+
+  /// No description provided for @journalNextDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Next day'**
+  String get journalNextDay;
+
+  /// No description provided for @journalLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not refresh the journal. Please try again.'**
+  String get journalLoadFailed;
+
+  /// No description provided for @journalOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing saved journal text. Photos require a successful refresh.'**
+  String get journalOffline;
+
+  /// No description provided for @journalUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a patient to view their journal.'**
+  String get journalUnavailable;
+
+  /// No description provided for @journalEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No journal entries for this day and filter.'**
+  String get journalEmpty;
+
+  /// No description provided for @journalDetailsPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Media and document details will be available when their screens are ready.'**
+  String get journalDetailsPending;
+
+  /// No description provided for @journalEncounter.
+  ///
+  /// In en, this message translates to:
+  /// **'Encounter'**
+  String get journalEncounter;
+
+  /// No description provided for @journalConversation.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation'**
+  String get journalConversation;
+
+  /// No description provided for @journalQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Question asked'**
+  String get journalQuestion;
+
+  /// No description provided for @journalReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder'**
+  String get journalReminder;
+
+  /// No description provided for @journalRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording'**
+  String get journalRecording;
+
+  /// No description provided for @journalDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Document'**
+  String get journalDocument;
+
+  /// No description provided for @journalNotable.
+  ///
+  /// In en, this message translates to:
+  /// **'Notable moment'**
+  String get journalNotable;
+
+  /// No description provided for @journalGame.
+  ///
+  /// In en, this message translates to:
+  /// **'Game'**
+  String get journalGame;
+
+  /// No description provided for @journalNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get journalNote;
+
+  /// No description provided for @journalActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity'**
+  String get journalActivity;
+
+  /// No description provided for @journalUnknownPerson.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown person'**
+  String get journalUnknownPerson;
+
+  /// No description provided for @journalRecorded.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording captured'**
+  String get journalRecorded;
+
+  /// No description provided for @journalReminderActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder activity recorded.'**
+  String get journalReminderActivity;
+
+  /// No description provided for @journalPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory paused'**
+  String get journalPaused;
+
+  /// No description provided for @journalResumed.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory resumed'**
+  String get journalResumed;
+
+  /// No description provided for @journalPreviewUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo preview unavailable'**
+  String get journalPreviewUnavailable;
+
+  /// No description provided for @journalPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Journal photo preview'**
+  String get journalPreview;
+
+  /// No description provided for @journalRecordingDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded · {duration}'**
+  String journalRecordingDuration(String duration);
+
+  /// No description provided for @journalWithPerson.
+  ///
+  /// In en, this message translates to:
+  /// **'with {name}'**
+  String journalWithPerson(String name);
+
+  /// No description provided for @journalConversationDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'with {name} · {minutes} min'**
+  String journalConversationDuration(String name, String minutes);
 }
 
 class _AppLocalizationsDelegate

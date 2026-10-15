@@ -9,6 +9,7 @@ part 'people_tables.dart';
 part 'reminder_cache_tables.dart';
 part 'unknown_faces_tables.dart';
 part 'places_tables.dart';
+part 'journal_tables.dart';
 
 enum ReminderStatus { pending, completed, snoozed, missed }
 
@@ -72,12 +73,15 @@ class OutboxEntries extends Table {
     CachedUnknownFaceSamples,
     CachedPlaces,
     PlacesCacheStates,
+    CachedJournalEntries,
+    CachedJournalMedia,
+    JournalCacheStates,
   ],
 )
 class RemoriDatabase extends _$RemoriDatabase {
   RemoriDatabase(super.executor);
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onUpgrade: (m, from, to) async {
@@ -110,6 +114,11 @@ class RemoriDatabase extends _$RemoriDatabase {
       if (from < 8) {
         await m.createTable(cachedPlaces);
         await m.createTable(placesCacheStates);
+      }
+      if (from < 9) {
+        await m.createTable(cachedJournalEntries);
+        await m.createTable(cachedJournalMedia);
+        await m.createTable(journalCacheStates);
       }
     },
   );

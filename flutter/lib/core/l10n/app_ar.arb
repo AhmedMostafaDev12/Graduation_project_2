@@ -487,5 +487,63 @@
         "type": "String"
       }
     }
+  },
+  "journalAll": "الكل",
+  "journalPeople": "الأشخاص",
+  "journalTalk": "المحادثات",
+  "journalQuestions": "الأسئلة",
+  "journalMedia": "الوسائط",
+  "journalDocs": "المستندات",
+  "journalTitle": "اليوميات",
+  "journalPreviousDay": "اليوم السابق",
+  "journalNextDay": "اليوم التالي",
+  "journalLoadFailed": "تعذر تحديث اليوميات. حاول مرة أخرى.",
+  "journalOffline": "نعرض النص المحفوظ من اليوميات. تتطلب الصور تحديثًا ناجحًا.",
+  "journalUnavailable": "اختر مريضًا لعرض يومياته.",
+  "journalEmpty": "لا توجد أحداث لهذا اليوم ضمن هذا التصنيف.",
+  "journalDetailsPending": "ستتاح تفاصيل الوسائط والمستندات عند اكتمال شاشاتها.",
+  "journalEncounter": "لقاء",
+  "journalConversation": "محادثة",
+  "journalQuestion": "سؤال",
+  "journalReminder": "تذكير",
+  "journalRecording": "تسجيل",
+  "journalDocument": "مستند",
+  "journalNotable": "لحظة مميزة",
+  "journalGame": "لعبة",
+  "journalNote": "ملاحظة",
+  "journalActivity": "حدث",
+  "journalUnknownPerson": "شخص غير معروف",
+  "journalRecorded": "تم التقاط تسجيل",
+  "journalReminderActivity": "تم تسجيل حدث تذكير.",
+  "journalPaused": "تم إيقاف الذاكرة مؤقتًا",
+  "journalResumed": "تم استئناف الذاكرة",
+  "journalPreviewUnavailable": "معاينة الصورة غير متاحة",
+  "journalPreview": "معاينة صورة من اليوميات",
+  "journalRecordingDuration": "تسجيل · {duration}",
+  "journalWithPerson": "مع {name}",
+  "journalConversationDuration": "مع {name} · {minutes} دقيقة",
+  "@journalRecordingDuration": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "@journalWithPerson": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@journalConversationDuration": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
   }
 }
