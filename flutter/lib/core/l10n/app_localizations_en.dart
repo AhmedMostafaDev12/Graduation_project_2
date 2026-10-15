@@ -1972,4 +1972,50 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get todayGettingReady => 'Getting your day ready';
+
+  @override
+  String get todayMemoryOff => 'Memory is off';
+
+  @override
+  String get todayMemoryUnknown => 'Memory status unavailable';
+
+  @override
+  String get todayMemoryPaused => 'Memory is paused';
+
+  @override
+  String get todayMemoryOn => 'Memory is working';
+
+  @override
+  String get todayGlassesConnected => 'Glasses connected';
+
+  @override
+  String get todayGlassesAway => 'Glasses not connected';
+
+  @override
+  String get todayOffline =>
+      'You can keep using your saved day. Updates will arrive when connected.';
+
+  @override
+  String get todayNextReminder => 'Next reminder';
+
+  @override
+  String get todayNoReminder => 'No reminders for now';
+
+  @override
+  String get todayDone => 'Done';
+
+  @override
+  String get todayLater => 'Later';
+
+  @override
+  String get todayPeopleMet => 'People you met today';
+
+  @override
+  String get todayNoPeople => 'People you meet will appear here';
+
+  @override
+  String get todayAskLater => 'Ask (Phase 2)';
 }

@@ -398,6 +398,9 @@ void main() {
       await db.customStatement('DROP TABLE cached_consents');
       await db.customStatement('DROP TABLE cached_caregiver_links');
       await db.customStatement('DROP TABLE caregivers_cache_states');
+      await db.customStatement('DROP TABLE patient_today_settings');
+      await db.customStatement('DROP TABLE patient_reminder_cards');
+      await db.customStatement('DROP TABLE patient_known_encounters');
       await db.customStatement('PRAGMA user_version = 11');
       await db.close();
       db = RemoriDatabase(NativeDatabase(file));

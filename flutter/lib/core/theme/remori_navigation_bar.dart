@@ -28,7 +28,7 @@ class RemoriNavigationBar extends StatelessWidget {
   final ValueChanged<int> onSelected;
   final String actionLabel;
   final Widget actionIcon;
-  final VoidCallback onAction;
+  final VoidCallback? onAction;
   final bool showAction;
   final RemoriMode mode;
 
@@ -88,6 +88,7 @@ class RemoriNavigationBar extends StatelessWidget {
                 left: (constraints.maxWidth - actionSize) / 2,
                 child: Semantics(
                   button: true,
+                  enabled: onAction != null,
                   label: actionLabel,
                   child: Tooltip(
                     message: actionLabel,

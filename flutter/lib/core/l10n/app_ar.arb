@@ -729,5 +729,21 @@
 "caregiversEmpty":"لا توجد بيانات محفوظة لمقدمي رعاية مرتبطين.",
 "caregiversListUnavailable":"قائمة مقدمي الرعاية غير متاحة. أعد المحاولة للتحقق منها.",
 "caregiversMoreHelp":"مقدمو الرعاية المرتبطون والصلاحيات",
-"caregiversLinkedCount":"{count, plural, =0{لا يوجد مقدمو رعاية مرتبطون} =1{مقدم رعاية واحد مرتبط} =2{مقدما رعاية مرتبطان} few{{count} مقدمي رعاية مرتبطين} many{{count} مقدم رعاية مرتبطًا} other{{count} مقدم رعاية مرتبط}}"
+"caregiversLinkedCount":"{count, plural, =0{لا يوجد مقدمو رعاية مرتبطون} =1{مقدم رعاية واحد مرتبط} =2{مقدما رعاية مرتبطان} few{{count} مقدمي رعاية مرتبطين} many{{count} مقدم رعاية مرتبطًا} other{{count} مقدم رعاية مرتبط}}",
+
+    "todayGettingReady":  "بنجهّز يومك",
+    "todayMemoryOff":  "الذاكرة مقفولة",
+    "todayMemoryUnknown":  "حالة الذاكرة مش متاحة دلوقتي",
+    "todayMemoryPaused":  "الذاكرة متوقفة مؤقتًا",
+    "todayMemoryOn":  "الذاكرة شغالة",
+    "todayGlassesConnected":  "النظارة متوصلة",
+    "todayGlassesAway":  "النظارة مش متوصلة",
+    "todayOffline":  "تقدر تكمّل باليوم المحفوظ. التحديثات هتوصل لما الاتصال يرجع.",
+    "todayNextReminder":  "التذكير الجاي",
+    "todayNoReminder":  "مفيش تذكيرات دلوقتي",
+    "todayDone":  "خدته",
+    "todayLater":  "بعدين",
+    "todayPeopleMet":  "قابلت النهارده",
+    "todayNoPeople":  "الناس اللي تقابلهم هيظهروا هنا",
+    "todayAskLater":  "اسأل (المرحلة ٢)"
 }
