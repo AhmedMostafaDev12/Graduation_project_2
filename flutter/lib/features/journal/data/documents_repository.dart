@@ -161,6 +161,18 @@ class DocumentsRepository {
   Future<void> purge() {
     ++_generation;
     return db.transaction(() async {
+      await (db.delete(db.cachedCaregiverLinks)..where(
+            (r) =>
+                r.caregiverId.equals(key.$1.caregiverId) &
+                r.patientId.equals(key.$1.patientId),
+          ))
+          .go();
+      await (db.delete(db.caregiversCacheStates)..where(
+            (r) =>
+                r.caregiverId.equals(key.$1.caregiverId) &
+                r.patientId.equals(key.$1.patientId),
+          ))
+          .go();
       await (db.delete(db.cachedConsents)..where(
             (r) =>
                 r.caregiverId.equals(key.$1.caregiverId) &

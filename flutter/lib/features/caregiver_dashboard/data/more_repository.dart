@@ -337,6 +337,8 @@ class MoreRepository {
           db.dashboardPatients,
           db.cachedPlaces,
           db.placesCacheStates,
+          db.cachedCaregiverLinks,
+          db.caregiversCacheStates,
         },
       )
       .watch()
@@ -369,12 +371,30 @@ class MoreRepository {
                   ))
                   .get())
               .length;
+    final caregivers = exists
+        ? await (db.select(db.caregiversCacheStates)..where(
+                (c) =>
+                    c.caregiverId.equals(scope.$1) &
+                    c.patientId.equals(scope.$2!),
+              ))
+              .getSingleOrNull()
+        : null;
+    final caregiverCount = caregivers == null
+        ? null
+        : (await (db.select(db.cachedCaregiverLinks)..where(
+                    (c) =>
+                        c.caregiverId.equals(scope.$1) &
+                        c.patientId.equals(scope.$2!),
+                  ))
+                  .get())
+              .length;
     return MoreData(
       account: account == null
           ? null
           : CaregiverAccount(account.id, account.fullName, account.email),
       consents: consents,
       placeCount: count,
+      caregiverCount: caregiverCount,
     );
   });
 }

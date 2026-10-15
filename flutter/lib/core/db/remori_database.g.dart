@@ -13218,6 +13218,605 @@ class CachedConsentsCompanion extends UpdateCompanion<CachedConsent> {
   }
 }
 
+class $CachedCaregiverLinksTable extends CachedCaregiverLinks
+    with TableInfo<$CachedCaregiverLinksTable, CachedCaregiverLink> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedCaregiverLinksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [caregiverId, patientId, id, payload];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_caregiver_links';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedCaregiverLink> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, patientId, id};
+  @override
+  CachedCaregiverLink map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedCaregiverLink(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      )!,
+    );
+  }
+
+  @override
+  $CachedCaregiverLinksTable createAlias(String alias) {
+    return $CachedCaregiverLinksTable(attachedDatabase, alias);
+  }
+}
+
+class CachedCaregiverLink extends DataClass
+    implements Insertable<CachedCaregiverLink> {
+  final String caregiverId;
+  final String patientId;
+  final String id;
+  final String payload;
+  const CachedCaregiverLink({
+    required this.caregiverId,
+    required this.patientId,
+    required this.id,
+    required this.payload,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    map['id'] = Variable<String>(id);
+    map['payload'] = Variable<String>(payload);
+    return map;
+  }
+
+  CachedCaregiverLinksCompanion toCompanion(bool nullToAbsent) {
+    return CachedCaregiverLinksCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      id: Value(id),
+      payload: Value(payload),
+    );
+  }
+
+  factory CachedCaregiverLink.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedCaregiverLink(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      id: serializer.fromJson<String>(json['id']),
+      payload: serializer.fromJson<String>(json['payload']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'id': serializer.toJson<String>(id),
+      'payload': serializer.toJson<String>(payload),
+    };
+  }
+
+  CachedCaregiverLink copyWith({
+    String? caregiverId,
+    String? patientId,
+    String? id,
+    String? payload,
+  }) => CachedCaregiverLink(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    id: id ?? this.id,
+    payload: payload ?? this.payload,
+  );
+  CachedCaregiverLink copyWithCompanion(CachedCaregiverLinksCompanion data) {
+    return CachedCaregiverLink(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      id: data.id.present ? data.id.value : this.id,
+      payload: data.payload.present ? data.payload.value : this.payload,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedCaregiverLink(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('id: $id, ')
+          ..write('payload: $payload')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(caregiverId, patientId, id, payload);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedCaregiverLink &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.id == this.id &&
+          other.payload == this.payload);
+}
+
+class CachedCaregiverLinksCompanion
+    extends UpdateCompanion<CachedCaregiverLink> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<String> id;
+  final Value<String> payload;
+  final Value<int> rowid;
+  const CachedCaregiverLinksCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedCaregiverLinksCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required String id,
+    required String payload,
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       id = Value(id),
+       payload = Value(payload);
+  static Insertable<CachedCaregiverLink> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<String>? id,
+    Expression<String>? payload,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (id != null) 'id': id,
+      if (payload != null) 'payload': payload,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedCaregiverLinksCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<String>? id,
+    Value<String>? payload,
+    Value<int>? rowid,
+  }) {
+    return CachedCaregiverLinksCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      id: id ?? this.id,
+      payload: payload ?? this.payload,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedCaregiverLinksCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('id: $id, ')
+          ..write('payload: $payload, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CaregiversCacheStatesTable extends CaregiversCacheStates
+    with TableInfo<$CaregiversCacheStatesTable, CaregiversCacheState> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CaregiversCacheStatesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> refreshedAt =
+      GeneratedColumn<int>(
+        'refreshed_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>(
+        $CaregiversCacheStatesTable.$converterrefreshedAt,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [caregiverId, patientId, refreshedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'caregivers_cache_states';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CaregiversCacheState> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, patientId};
+  @override
+  CaregiversCacheState map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CaregiversCacheState(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      refreshedAt: $CaregiversCacheStatesTable.$converterrefreshedAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}refreshed_at'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $CaregiversCacheStatesTable createAlias(String alias) {
+    return $CaregiversCacheStatesTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converterrefreshedAt = const UtcMicros();
+}
+
+class CaregiversCacheState extends DataClass
+    implements Insertable<CaregiversCacheState> {
+  final String caregiverId;
+  final String patientId;
+  final DateTime refreshedAt;
+  const CaregiversCacheState({
+    required this.caregiverId,
+    required this.patientId,
+    required this.refreshedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    {
+      map['refreshed_at'] = Variable<int>(
+        $CaregiversCacheStatesTable.$converterrefreshedAt.toSql(refreshedAt),
+      );
+    }
+    return map;
+  }
+
+  CaregiversCacheStatesCompanion toCompanion(bool nullToAbsent) {
+    return CaregiversCacheStatesCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      refreshedAt: Value(refreshedAt),
+    );
+  }
+
+  factory CaregiversCacheState.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CaregiversCacheState(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      refreshedAt: serializer.fromJson<DateTime>(json['refreshedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'refreshedAt': serializer.toJson<DateTime>(refreshedAt),
+    };
+  }
+
+  CaregiversCacheState copyWith({
+    String? caregiverId,
+    String? patientId,
+    DateTime? refreshedAt,
+  }) => CaregiversCacheState(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    refreshedAt: refreshedAt ?? this.refreshedAt,
+  );
+  CaregiversCacheState copyWithCompanion(CaregiversCacheStatesCompanion data) {
+    return CaregiversCacheState(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      refreshedAt: data.refreshedAt.present
+          ? data.refreshedAt.value
+          : this.refreshedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CaregiversCacheState(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('refreshedAt: $refreshedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(caregiverId, patientId, refreshedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CaregiversCacheState &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.refreshedAt == this.refreshedAt);
+}
+
+class CaregiversCacheStatesCompanion
+    extends UpdateCompanion<CaregiversCacheState> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<DateTime> refreshedAt;
+  final Value<int> rowid;
+  const CaregiversCacheStatesCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.refreshedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CaregiversCacheStatesCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required DateTime refreshedAt,
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       refreshedAt = Value(refreshedAt);
+  static Insertable<CaregiversCacheState> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<int>? refreshedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (refreshedAt != null) 'refreshed_at': refreshedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CaregiversCacheStatesCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<DateTime>? refreshedAt,
+    Value<int>? rowid,
+  }) {
+    return CaregiversCacheStatesCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      refreshedAt: refreshedAt ?? this.refreshedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (refreshedAt.present) {
+      map['refreshed_at'] = Variable<int>(
+        $CaregiversCacheStatesTable.$converterrefreshedAt.toSql(
+          refreshedAt.value,
+        ),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CaregiversCacheStatesCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('refreshedAt: $refreshedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$RemoriDatabase extends GeneratedDatabase {
   _$RemoriDatabase(QueryExecutor e) : super(e);
   $RemoriDatabaseManager get managers => $RemoriDatabaseManager(this);
@@ -13273,6 +13872,10 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
   late final $CachedCaregiverAccountsTable cachedCaregiverAccounts =
       $CachedCaregiverAccountsTable(this);
   late final $CachedConsentsTable cachedConsents = $CachedConsentsTable(this);
+  late final $CachedCaregiverLinksTable cachedCaregiverLinks =
+      $CachedCaregiverLinksTable(this);
+  late final $CaregiversCacheStatesTable caregiversCacheStates =
+      $CaregiversCacheStatesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -13305,6 +13908,8 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
     cachedDocumentDetails,
     cachedCaregiverAccounts,
     cachedConsents,
+    cachedCaregiverLinks,
+    caregiversCacheStates,
   ];
 }
 
@@ -20652,6 +21257,415 @@ typedef $$CachedConsentsTableProcessedTableManager =
       CachedConsent,
       PrefetchHooks Function()
     >;
+typedef $$CachedCaregiverLinksTableCreateCompanionBuilder =
+    CachedCaregiverLinksCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required String id,
+      required String payload,
+      Value<int> rowid,
+    });
+typedef $$CachedCaregiverLinksTableUpdateCompanionBuilder =
+    CachedCaregiverLinksCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<String> id,
+      Value<String> payload,
+      Value<int> rowid,
+    });
+
+class $$CachedCaregiverLinksTableFilterComposer
+    extends Composer<_$RemoriDatabase, $CachedCaregiverLinksTable> {
+  $$CachedCaregiverLinksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedCaregiverLinksTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $CachedCaregiverLinksTable> {
+  $$CachedCaregiverLinksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedCaregiverLinksTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $CachedCaregiverLinksTable> {
+  $$CachedCaregiverLinksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+}
+
+class $$CachedCaregiverLinksTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $CachedCaregiverLinksTable,
+          CachedCaregiverLink,
+          $$CachedCaregiverLinksTableFilterComposer,
+          $$CachedCaregiverLinksTableOrderingComposer,
+          $$CachedCaregiverLinksTableAnnotationComposer,
+          $$CachedCaregiverLinksTableCreateCompanionBuilder,
+          $$CachedCaregiverLinksTableUpdateCompanionBuilder,
+          (
+            CachedCaregiverLink,
+            BaseReferences<
+              _$RemoriDatabase,
+              $CachedCaregiverLinksTable,
+              CachedCaregiverLink
+            >,
+          ),
+          CachedCaregiverLink,
+          PrefetchHooks Function()
+        > {
+  $$CachedCaregiverLinksTableTableManager(
+    _$RemoriDatabase db,
+    $CachedCaregiverLinksTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedCaregiverLinksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedCaregiverLinksTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$CachedCaregiverLinksTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> payload = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedCaregiverLinksCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                id: id,
+                payload: payload,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required String id,
+                required String payload,
+                Value<int> rowid = const Value.absent(),
+              }) => CachedCaregiverLinksCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                id: id,
+                payload: payload,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CachedCaregiverLinksTable, CachedCaregiverLink>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $CachedCaregiverLinksTable,
+                    CachedCaregiverLink
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedCaregiverLinksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $CachedCaregiverLinksTable,
+      CachedCaregiverLink,
+      $$CachedCaregiverLinksTableFilterComposer,
+      $$CachedCaregiverLinksTableOrderingComposer,
+      $$CachedCaregiverLinksTableAnnotationComposer,
+      $$CachedCaregiverLinksTableCreateCompanionBuilder,
+      $$CachedCaregiverLinksTableUpdateCompanionBuilder,
+      (
+        CachedCaregiverLink,
+        BaseReferences<
+          _$RemoriDatabase,
+          $CachedCaregiverLinksTable,
+          CachedCaregiverLink
+        >,
+      ),
+      CachedCaregiverLink,
+      PrefetchHooks Function()
+    >;
+typedef $$CaregiversCacheStatesTableCreateCompanionBuilder =
+    CaregiversCacheStatesCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required DateTime refreshedAt,
+      Value<int> rowid,
+    });
+typedef $$CaregiversCacheStatesTableUpdateCompanionBuilder =
+    CaregiversCacheStatesCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<DateTime> refreshedAt,
+      Value<int> rowid,
+    });
+
+class $$CaregiversCacheStatesTableFilterComposer
+    extends Composer<_$RemoriDatabase, $CaregiversCacheStatesTable> {
+  $$CaregiversCacheStatesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+}
+
+class $$CaregiversCacheStatesTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $CaregiversCacheStatesTable> {
+  $$CaregiversCacheStatesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get refreshedAt => $composableBuilder(
+    column: $table.refreshedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CaregiversCacheStatesTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $CaregiversCacheStatesTable> {
+  $$CaregiversCacheStatesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => column,
+      );
+}
+
+class $$CaregiversCacheStatesTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $CaregiversCacheStatesTable,
+          CaregiversCacheState,
+          $$CaregiversCacheStatesTableFilterComposer,
+          $$CaregiversCacheStatesTableOrderingComposer,
+          $$CaregiversCacheStatesTableAnnotationComposer,
+          $$CaregiversCacheStatesTableCreateCompanionBuilder,
+          $$CaregiversCacheStatesTableUpdateCompanionBuilder,
+          (
+            CaregiversCacheState,
+            BaseReferences<
+              _$RemoriDatabase,
+              $CaregiversCacheStatesTable,
+              CaregiversCacheState
+            >,
+          ),
+          CaregiversCacheState,
+          PrefetchHooks Function()
+        > {
+  $$CaregiversCacheStatesTableTableManager(
+    _$RemoriDatabase db,
+    $CaregiversCacheStatesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CaregiversCacheStatesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$CaregiversCacheStatesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$CaregiversCacheStatesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<DateTime> refreshedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CaregiversCacheStatesCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required DateTime refreshedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CaregiversCacheStatesCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    $CaregiversCacheStatesTable,
+                    CaregiversCacheState
+                  >(table),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $CaregiversCacheStatesTable,
+                    CaregiversCacheState
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CaregiversCacheStatesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $CaregiversCacheStatesTable,
+      CaregiversCacheState,
+      $$CaregiversCacheStatesTableFilterComposer,
+      $$CaregiversCacheStatesTableOrderingComposer,
+      $$CaregiversCacheStatesTableAnnotationComposer,
+      $$CaregiversCacheStatesTableCreateCompanionBuilder,
+      $$CaregiversCacheStatesTableUpdateCompanionBuilder,
+      (
+        CaregiversCacheState,
+        BaseReferences<
+          _$RemoriDatabase,
+          $CaregiversCacheStatesTable,
+          CaregiversCacheState
+        >,
+      ),
+      CaregiversCacheState,
+      PrefetchHooks Function()
+    >;
 
 class $RemoriDatabaseManager {
   final _$RemoriDatabase _db;
@@ -20722,4 +21736,8 @@ class $RemoriDatabaseManager {
       );
   $$CachedConsentsTableTableManager get cachedConsents =>
       $$CachedConsentsTableTableManager(_db, _db.cachedConsents);
+  $$CachedCaregiverLinksTableTableManager get cachedCaregiverLinks =>
+      $$CachedCaregiverLinksTableTableManager(_db, _db.cachedCaregiverLinks);
+  $$CaregiversCacheStatesTableTableManager get caregiversCacheStates =>
+      $$CaregiversCacheStatesTableTableManager(_db, _db.caregiversCacheStates);
 }

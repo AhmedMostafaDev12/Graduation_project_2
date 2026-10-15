@@ -249,9 +249,12 @@ class _C18MoreScreenState extends ConsumerState<C18MoreScreen>
                   ),
                   entry(
                     s.moreCaregivers,
-                    s.moreCaregiversPending,
+                    data.caregiverCount == null
+                        ? s.caregiversMoreHelp
+                        : s.caregiversLinkedCount(data.caregiverCount!),
                     arrow: true,
-                    enabled: false,
+                    enabled: patient != null,
+                    onTap: () => open(RemoriScreen.c19),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(vertical: 12),

@@ -54,6 +54,18 @@ class HomeRepository {
           segments[1] == 'patients') {
         final patientId = segments[2];
         await db.transaction(() async {
+          await (db.delete(db.cachedCaregiverLinks)..where(
+                (p) =>
+                    p.caregiverId.equals(caregiverId) &
+                    p.patientId.equals(patientId),
+              ))
+              .go();
+          await (db.delete(db.caregiversCacheStates)..where(
+                (p) =>
+                    p.caregiverId.equals(caregiverId) &
+                    p.patientId.equals(patientId),
+              ))
+              .go();
           await (db.delete(db.cachedConsents)..where(
                 (p) =>
                     p.caregiverId.equals(caregiverId) &
@@ -305,6 +317,18 @@ class HomeRepository {
             );
       }
       final allowedIds = patients.map((p) => p['id'] as String).toList();
+      await (db.delete(db.cachedCaregiverLinks)..where(
+            (p) =>
+                p.caregiverId.equals(caregiverId) &
+                p.patientId.isNotIn(allowedIds),
+          ))
+          .go();
+      await (db.delete(db.caregiversCacheStates)..where(
+            (p) =>
+                p.caregiverId.equals(caregiverId) &
+                p.patientId.isNotIn(allowedIds),
+          ))
+          .go();
       await (db.delete(db.cachedConsents)..where(
             (p) =>
                 p.caregiverId.equals(caregiverId) &
@@ -883,6 +907,17 @@ class HomeRepository {
 
   Future<dynamic> getConsents(String patientId) =>
       _get('/patients/$patientId/consents');
+  Future<dynamic> getCaregivers(String patientId) =>
+      _get('/patients/$patientId/caregivers');
+  Future<dynamic> addCaregiver(
+    String patientId,
+    Map<String, Object?> data,
+  ) async => (await _request(
+    '/patients/$patientId/caregivers',
+    method: 'POST',
+    data: data,
+    status: 201,
+  )).data;
 
   Future<HomePatient> changeProfile(
     String patientId,

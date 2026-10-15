@@ -42,8 +42,14 @@ class ConsentRecord {
 }
 
 class MoreData {
-  const MoreData({this.account, this.consents = const [], this.placeCount});
+  const MoreData({
+    this.account,
+    this.consents = const [],
+    this.placeCount,
+    this.caregiverCount,
+  });
   final CaregiverAccount? account;
   final List<ConsentRecord> consents;
   final int? placeCount;
+  final int? caregiverCount;
 }

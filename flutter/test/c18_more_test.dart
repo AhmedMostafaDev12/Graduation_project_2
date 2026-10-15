@@ -578,6 +578,8 @@ void main() {
       );
       await db.customStatement('DROP TABLE cached_caregiver_accounts');
       await db.customStatement('DROP TABLE cached_consents');
+      await db.customStatement('DROP TABLE cached_caregiver_links');
+      await db.customStatement('DROP TABLE caregivers_cache_states');
       await db.customStatement('PRAGMA user_version = 13');
       await db.close();
       db = RemoriDatabase(NativeDatabase(file));
@@ -646,6 +648,7 @@ void main() {
           ])
             screen: (_, _) => Text('${screen.name} destination'),
           RemoriScreen.a1: (_, _) => const Text('Mode destination'),
+          RemoriScreen.c19: (_, _) => const Text('Caregivers destination'),
         }),
       ],
     );
@@ -677,7 +680,7 @@ void main() {
       expect(find.text('2 linked · invite another'), findsNothing);
       await tester.tap(find.text('Caregivers'));
       await tester.pumpAndSettle();
-      expect(find.text('Consent records'), findsOneWidget);
+      expect(find.text('Caregivers destination'), findsOneWidget);
     },
   );
   for (final destination in {

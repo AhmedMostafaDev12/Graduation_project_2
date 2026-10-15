@@ -1869,4 +1869,107 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get moreSave => 'Save';
+
+  @override
+  String get caregiversUnavailable =>
+      'Select an available patient to view their caregivers.';
+
+  @override
+  String get caregiversManager => 'Manager';
+
+  @override
+  String get caregiversViewer => 'Viewer';
+
+  @override
+  String get caregiversPrimary => 'Primary';
+
+  @override
+  String caregiversYou(String name) {
+    return '$name (you)';
+  }
+
+  @override
+  String get caregiversPermissionHelp =>
+      'Managers can edit people, reminders and places. Viewers can only look.';
+
+  @override
+  String get caregiversAddTitle => 'Add a caregiver';
+
+  @override
+  String get caregiversExistingAccountHelp =>
+      'Use an existing caregiver account\'s email. No invitation email is sent.';
+
+  @override
+  String get caregiversEmail => 'Email';
+
+  @override
+  String get caregiversEmailHint => 'Enter caregiver\'s email';
+
+  @override
+  String get caregiversEmailInvalid => 'Enter a valid email address.';
+
+  @override
+  String get caregiversRelationship => 'Relationship';
+
+  @override
+  String get caregiversRelationshipHint => 'Relationship to the patient';
+
+  @override
+  String get caregiversRelationshipInvalid =>
+      'Enter their relationship to the patient.';
+
+  @override
+  String get caregiversPermission => 'Permission';
+
+  @override
+  String get caregiversAdd => 'Add caregiver';
+
+  @override
+  String get caregiversAdded => 'Caregiver added.';
+
+  @override
+  String get caregiversPending =>
+      'Caregiver added. Retry to finish updating this phone.';
+
+  @override
+  String get caregiversUncertain =>
+      'The result could not be confirmed. Refresh the caregiver list before trying again.';
+
+  @override
+  String get caregiversNotFound =>
+      'No caregiver account was found with that email. They need to create an account first.';
+
+  @override
+  String get caregiversAlreadyLinked =>
+      'This caregiver is already linked. Refresh to see the latest list.';
+
+  @override
+  String get caregiversManagerOnly =>
+      'Only a managing caregiver can add another caregiver. Refresh to check your access.';
+
+  @override
+  String get caregiversOffline =>
+      'Could not complete the request. Showing saved caregivers. Check your connection and try again.';
+
+  @override
+  String get caregiversEmpty => 'No linked caregivers are saved.';
+
+  @override
+  String get caregiversListUnavailable =>
+      'The caregiver list is unavailable. Retry to check it.';
+
+  @override
+  String get caregiversMoreHelp => 'Linked caregivers and permissions';
+
+  @override
+  String caregiversLinkedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count linked caregivers',
+      one: '1 linked caregiver',
+      zero: 'No linked caregivers',
+    );
+    return '$_temp0';
+  }
 }
