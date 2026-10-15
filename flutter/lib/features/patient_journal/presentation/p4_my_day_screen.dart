@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/app_localizations.dart';
+import '../../../core/router/remori_routes.dart';
 import '../../../core/theme/remori_theme.dart';
 import '../../../core/theme/remori_widgets.dart';
 import '../../patient_today/presentation/patient_today_providers.dart';
@@ -144,36 +146,42 @@ class _P4MyDayScreenState extends ConsumerState<P4MyDayScreen>
                       border: Border.all(color: RemoriColors.border),
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        _EntryPreview(
-                          entry: entry,
-                          journalKey: key!,
-                          visible: _foreground && _visible,
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Text(
-                            _description(context, entry, key.$3),
-                            style: const TextStyle(fontSize: 22, height: 1.45),
+                    child: InkWell(
+                      onTap: entry.media.isEmpty
+                          ? null
+                          : () => context.pushNamed(
+                              RemoriScreen.p5.name,
+                              extra: (
+                                journal: key!,
+                                eventId: entry.id,
+                                mediaId: entry.media.first.id,
+                              ),
+                            ),
+                      borderRadius: BorderRadius.circular(16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          _EntryPreview(
+                            entry: entry,
+                            journalKey: key!,
+                            visible: _foreground && _visible,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Text(
+                              _description(context, entry, key.$3),
+                              style: const TextStyle(
+                                fontSize: 22,
+                                height: 1.45,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 14),
                 ],
-                if (data.entries.any(
-                  (e) => e.media.isNotEmpty || e.type == 'encounter',
-                ))
-                  Text(
-                    s.patientDayDetailPending,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      color: RemoriColors.muted,
-                    ),
-                  ),
               ],
             ),
           ),

@@ -485,6 +485,7 @@ void main() {
         await db.customStatement('DROP TABLE patient_journal_entries');
         await db.customStatement('DROP TABLE patient_journal_media');
         await db.customStatement('DROP TABLE patient_journal_days');
+        await db.customStatement('DROP TABLE patient_memory_details');
         await db.customStatement('PRAGMA user_version = 10');
         await db.close();
         db = RemoriDatabase(NativeDatabase(file));

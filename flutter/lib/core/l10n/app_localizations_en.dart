@@ -10,6 +10,53 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get patientMemoryBack => 'Back';
+
+  @override
+  String get patientMemoryTitle => 'Your memory';
+
+  @override
+  String patientMemoryMet(String name) {
+    return 'You met $name';
+  }
+
+  @override
+  String get patientMemoryUnavailable =>
+      'This memory is not available right now.';
+
+  @override
+  String get patientMemoryPhotoUnavailable =>
+      'Your photo is not available right now.';
+
+  @override
+  String get patientMemoryVideoPending =>
+      'This is a video memory. Watching videos will be available later.';
+
+  @override
+  String get patientMemoryDelete => 'Delete';
+
+  @override
+  String get patientMemoryDeleteHelp => 'We’ll ask before deleting';
+
+  @override
+  String get patientMemoryDeleteTitle => 'Delete this memory?';
+
+  @override
+  String get patientMemoryDeleteConfirm =>
+      'The photo or video will be permanently deleted. You can keep it instead.';
+
+  @override
+  String get patientMemoryKeep => 'Keep memory';
+
+  @override
+  String get patientMemoryRemovedPending =>
+      'The memory was deleted. Tap Retry to finish.';
+
+  @override
+  String get patientMemoryUncertain =>
+      'Let’s check your memory before trying again.';
+
+  @override
   String get caregiverHome => 'Home';
 
   @override

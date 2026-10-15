@@ -1332,8 +1332,8 @@ bytes are excluded from these tables.
 Cards use actual API rendered text when supplied, otherwise localized neutral
 descriptions with actual times and names. A reminder event does not imply that
 medicine was taken. Missing person photos use initials; other missing previews
-use icons. P5 links remain disabled with a gentle notice, and Phase 2 Ask is
-disabled. No patient editing or deletion controls are added in P4.
+use icons. Cards with an actual media ID open P5; text-only cards remain read-only.
+Phase 2 Ask is disabled. No patient editing or deletion controls are added in P4.
 
 Previews load into memory only after a successful refresh, and only if the exact
 media reference belongs to that fresh result. They clear on leaving, background,
@@ -1348,5 +1348,34 @@ Review captures: [English](test/goldens/p4_en.png),
 `flutter test test/p4_my_day_test.dart --update-goldens`.
 
 Validation: formatting and analysis clean; all 764 tests passed, including 29 P4
+tests. Android debug APK built. iOS compilation and physical-device lifecycle
+validation remain pending on macOS/iOS.
+
+## P5 Memory Detail
+
+My Day media cards open a photo viewer with actual event/person details and the
+patient-local date and time. Schema v19 adds one patient/device/media-scoped
+metadata cache. Links must already belong to the selected device's P4 cache;
+the audited device-authenticated detail GET verifies patient, media and event
+IDs before storing only allowlisted display fields. Caregiver caches are separate.
+
+Full photos use the existing unauthenticated, memory-only image transport after
+a successful audited refresh. Leaving, backgrounding, scope changes and signed
+URL/retention expiry clear photo bytes. Offline mode shows saved metadata and a
+placeholder. A 403 permits one automatic detail refresh per cycle. Videos show
+actual metadata and a localized playback-pending placeholder; no player was added.
+
+Delete requires an explicit, large localized confirmation. A successful online
+DELETE removes P5 metadata and the current device's P4 media references, then
+returns to My Day. If local cleanup fails after confirmation from the server,
+Retry performs only cleanup. An uncertain server result requires a successful
+refresh before another deletion attempt. There is no pin, sharing or editing.
+
+Review captures: [English](test/goldens/p5_en_1.0x.png),
+[Arabic](test/goldens/p5_ar_1.0x.png). Both languages are also tested at 2x text
+on a 320dp screen. Regenerate with
+`flutter test test/p5_memory_detail_test.dart --update-goldens`.
+
+Validation: formatting and analysis clean; all 793 tests passed, including 29 P5
 tests. Android debug APK built. iOS compilation and physical-device lifecycle
 validation remain pending on macOS/iOS.

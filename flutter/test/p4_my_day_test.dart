@@ -416,6 +416,7 @@ void main() {
         ]) {
           await db.customStatement('DROP TABLE $name');
         }
+        await db.customStatement('DROP TABLE patient_memory_details');
         await db.customStatement('PRAGMA user_version = 17');
         await db.close();
         db = RemoriDatabase(NativeDatabase(file));
@@ -650,10 +651,7 @@ void main() {
       expect(find.textContaining('A reminder at'), findsOneWidget);
       expect(find.textContaining('took'), findsNothing);
       expect(find.byType(TextField), findsNothing);
-      expect(
-        find.text('Memory details will be available soon.'),
-        findsOneWidget,
-      );
+      expect(find.text('Memory details will be available soon.'), findsNothing);
       expect(
         tester
             .widget<RemoriNavigationBar>(find.byType(RemoriNavigationBar))

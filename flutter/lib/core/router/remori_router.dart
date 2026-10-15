@@ -12,6 +12,8 @@ import '../../features/patient_today/presentation/p1_today_screen.dart';
 import '../../features/patient_today/presentation/p2_reminders_screen.dart';
 import '../../features/patient_today/presentation/p3_reminder_alert_screen.dart';
 import '../../features/patient_journal/presentation/p4_my_day_screen.dart';
+import '../../features/patient_journal/presentation/p5_memory_detail_screen.dart';
+import '../../features/patient_journal/domain/patient_memory_detail.dart';
 import '../../features/patient_today/presentation/patient_reminder_alert_host.dart';
 import '../../features/patient_today/domain/patient_today_data.dart';
 import '../../features/caregiver_dashboard/presentation/home_providers.dart';
@@ -77,6 +79,11 @@ final screenBuildersProvider = Provider<Map<RemoriScreen, RemoriScreenBuilder>>(
     RemoriScreen.p1: (_, _) => const P1TodayScreen(),
     RemoriScreen.p2: (_, _) => const P2RemindersScreen(),
     RemoriScreen.p4: (_, _) => const P4MyDayScreen(),
+    RemoriScreen.p5: (_, state) => P5MemoryDetailScreen(
+      target: state.extra is PatientMemoryTarget
+          ? state.extra as PatientMemoryTarget
+          : null,
+    ),
     RemoriScreen.p3: (_, state) => P3ReminderAlertScreen(
       target: state.extra is PatientReminderAlertTarget
           ? state.extra as PatientReminderAlertTarget
