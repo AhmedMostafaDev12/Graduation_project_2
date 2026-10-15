@@ -513,6 +513,7 @@ void main() {
                 position: 0,
               ),
             );
+        await db.customStatement('DROP TABLE cached_media_details');
         await db.customStatement('DROP TABLE cached_journal_entries');
         await db.customStatement('DROP TABLE cached_journal_media');
         await db.customStatement('DROP TABLE journal_cache_states');
@@ -805,7 +806,7 @@ void main() {
             .path,
         RemoriScreen.c12.path,
       );
-      expect(find.textContaining('Media and document details'), findsOneWidget);
+      expect(find.textContaining('Document details'), findsOneWidget);
     },
   );
 

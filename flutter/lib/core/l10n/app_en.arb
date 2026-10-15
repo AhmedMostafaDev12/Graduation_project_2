@@ -534,7 +534,7 @@
   "journalOffline": "Showing saved journal text. Photos require a successful refresh.",
   "journalUnavailable": "Choose a patient to view their journal.",
   "journalEmpty": "No journal entries for this day and filter.",
-  "journalDetailsPending": "Media and document details will be available when their screens are ready.",
+  "journalDetailsPending": "Document details will be available when their screen is ready.",
   "journalEncounter": "Encounter",
   "journalConversation": "Conversation",
   "journalQuestion": "Question asked",
@@ -575,6 +575,47 @@
         "type": "String"
       },
       "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "mediaPhoto": "Photo",
+  "mediaVideo": "Video",
+  "mediaUnavailable": "This media is no longer available.",
+  "mediaDeletePhoto": "Delete photo",
+  "mediaDeleteVideo": "Delete video",
+  "mediaDeleteConfirm": "Delete this item permanently? The file will be removed and the deletion recorded in the audit log.",
+  "mediaPhotoUnavailable": "Photo unavailable. Refresh while online to view it.",
+  "mediaVideoPending": "Video playback will be available when the video viewer is ready.",
+  "mediaEncounter": "Encounter with {name} ({relationship})",
+  "mediaKeyframe": "keyframe from the glasses",
+  "mediaDocumentCapture": "document captured by the glasses",
+  "mediaNotableCapture": "moment captured by the glasses",
+  "mediaRequested": "recorded at the patient’s request",
+  "mediaCaptured": "captured by the glasses",
+  "mediaAiTags": "AI tags:",
+  "mediaKept": "Kept",
+  "mediaPin": "Pin to keep",
+  "mediaExpired": "Expired",
+  "mediaAutoDeletes": "Auto-deletes in {days} days",
+  "mediaRetentionNote": "Photos of other people expire after 30 days unless pinned",
+  "mediaCacheFailed": "The change was saved. Retry to update the saved information on this phone.",
+  "mediaUncertain": "The change could not be confirmed. Refresh before trying again.",
+  "mediaOffline": "Could not refresh. Saved information is available; photos need an online refresh.",
+  "mediaAuditNote": "You’ll be asked to confirm deletion. Deletions are recorded in the audit log.",
+  "@mediaEncounter": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "relationship": {
+        "type": "String"
+      }
+    }
+  },
+  "@mediaAutoDeletes": {
+    "placeholders": {
+      "days": {
         "type": "String"
       }
     }

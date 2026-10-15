@@ -1326,7 +1326,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get journalDetailsPending =>
-      'ستتاح تفاصيل الوسائط والمستندات عند اكتمال شاشاتها.';
+      'ستتاح تفاصيل المستندات عند اكتمال شاشتها.';
 
   @override
   String get journalEncounter => 'لقاء';
@@ -1393,4 +1393,88 @@ class AppLocalizationsAr extends AppLocalizations {
   String journalConversationDuration(String name, String minutes) {
     return 'مع $name · $minutes دقيقة';
   }
+
+  @override
+  String get mediaPhoto => 'صورة';
+
+  @override
+  String get mediaVideo => 'فيديو';
+
+  @override
+  String get mediaUnavailable => 'لم تعد هذه الوسائط متاحة.';
+
+  @override
+  String get mediaDeletePhoto => 'حذف الصورة';
+
+  @override
+  String get mediaDeleteVideo => 'حذف الفيديو';
+
+  @override
+  String get mediaDeleteConfirm =>
+      'هل تريد حذف هذا العنصر نهائيًا؟ سيُحذف الملف ويُسجّل الحذف في سجل التدقيق.';
+
+  @override
+  String get mediaPhotoUnavailable =>
+      'الصورة غير متاحة. حدّث الصفحة أثناء الاتصال لعرضها.';
+
+  @override
+  String get mediaVideoPending =>
+      'ستتاح مشاهدة الفيديو عند اكتمال شاشة الفيديو.';
+
+  @override
+  String mediaEncounter(String name, String relationship) {
+    return 'لقاء مع $name ($relationship)';
+  }
+
+  @override
+  String get mediaKeyframe => 'صورة من النظارة أثناء اللقاء';
+
+  @override
+  String get mediaDocumentCapture => 'مستند التقطته النظارة';
+
+  @override
+  String get mediaNotableCapture => 'لحظة التقطتها النظارة';
+
+  @override
+  String get mediaRequested => 'تسجيل بطلب المريض';
+
+  @override
+  String get mediaCaptured => 'التقطته النظارة';
+
+  @override
+  String get mediaAiTags => 'وسوم الذكاء الاصطناعي:';
+
+  @override
+  String get mediaKept => 'محفوظة';
+
+  @override
+  String get mediaPin => 'تثبيت للاحتفاظ';
+
+  @override
+  String get mediaExpired => 'انتهت الصلاحية';
+
+  @override
+  String mediaAutoDeletes(String days) {
+    return 'تُحذف تلقائيًا خلال $days يومًا';
+  }
+
+  @override
+  String get mediaRetentionNote =>
+      'تنتهي صلاحية صور الآخرين بعد ٣٠ يومًا ما لم تُثبّت';
+
+  @override
+  String get mediaCacheFailed =>
+      'تم حفظ التغيير. أعد المحاولة لتحديث المعلومات المحفوظة على هذا الهاتف.';
+
+  @override
+  String get mediaUncertain =>
+      'تعذر تأكيد التغيير. حدّث الصفحة قبل المحاولة مجددًا.';
+
+  @override
+  String get mediaOffline =>
+      'تعذر التحديث. المعلومات المحفوظة متاحة؛ عرض الصور يتطلب تحديثًا عبر الإنترنت.';
+
+  @override
+  String get mediaAuditNote =>
+      'سيُطلب منك تأكيد الحذف. تُسجّل عمليات الحذف في سجل التدقيق.';
 }

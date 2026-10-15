@@ -501,7 +501,7 @@
   "journalOffline": "نعرض النص المحفوظ من اليوميات. تتطلب الصور تحديثًا ناجحًا.",
   "journalUnavailable": "اختر مريضًا لعرض يومياته.",
   "journalEmpty": "لا توجد أحداث لهذا اليوم ضمن هذا التصنيف.",
-  "journalDetailsPending": "ستتاح تفاصيل الوسائط والمستندات عند اكتمال شاشاتها.",
+  "journalDetailsPending": "ستتاح تفاصيل المستندات عند اكتمال شاشتها.",
   "journalEncounter": "لقاء",
   "journalConversation": "محادثة",
   "journalQuestion": "سؤال",
@@ -542,6 +542,47 @@
         "type": "String"
       },
       "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "mediaPhoto": "صورة",
+  "mediaVideo": "فيديو",
+  "mediaUnavailable": "لم تعد هذه الوسائط متاحة.",
+  "mediaDeletePhoto": "حذف الصورة",
+  "mediaDeleteVideo": "حذف الفيديو",
+  "mediaDeleteConfirm": "هل تريد حذف هذا العنصر نهائيًا؟ سيُحذف الملف ويُسجّل الحذف في سجل التدقيق.",
+  "mediaPhotoUnavailable": "الصورة غير متاحة. حدّث الصفحة أثناء الاتصال لعرضها.",
+  "mediaVideoPending": "ستتاح مشاهدة الفيديو عند اكتمال شاشة الفيديو.",
+  "mediaEncounter": "لقاء مع {name} ({relationship})",
+  "mediaKeyframe": "صورة من النظارة أثناء اللقاء",
+  "mediaDocumentCapture": "مستند التقطته النظارة",
+  "mediaNotableCapture": "لحظة التقطتها النظارة",
+  "mediaRequested": "تسجيل بطلب المريض",
+  "mediaCaptured": "التقطته النظارة",
+  "mediaAiTags": "وسوم الذكاء الاصطناعي:",
+  "mediaKept": "محفوظة",
+  "mediaPin": "تثبيت للاحتفاظ",
+  "mediaExpired": "انتهت الصلاحية",
+  "mediaAutoDeletes": "تُحذف تلقائيًا خلال {days} يومًا",
+  "mediaRetentionNote": "تنتهي صلاحية صور الآخرين بعد ٣٠ يومًا ما لم تُثبّت",
+  "mediaCacheFailed": "تم حفظ التغيير. أعد المحاولة لتحديث المعلومات المحفوظة على هذا الهاتف.",
+  "mediaUncertain": "تعذر تأكيد التغيير. حدّث الصفحة قبل المحاولة مجددًا.",
+  "mediaOffline": "تعذر التحديث. المعلومات المحفوظة متاحة؛ عرض الصور يتطلب تحديثًا عبر الإنترنت.",
+  "mediaAuditNote": "سيُطلب منك تأكيد الحذف. تُسجّل عمليات الحذف في سجل التدقيق.",
+  "@mediaEncounter": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "relationship": {
+        "type": "String"
+      }
+    }
+  },
+  "@mediaAutoDeletes": {
+    "placeholders": {
+      "days": {
         "type": "String"
       }
     }

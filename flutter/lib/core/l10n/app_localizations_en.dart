@@ -1333,7 +1333,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get journalDetailsPending =>
-      'Media and document details will be available when their screens are ready.';
+      'Document details will be available when their screen is ready.';
 
   @override
   String get journalEncounter => 'Encounter';
@@ -1400,4 +1400,88 @@ class AppLocalizationsEn extends AppLocalizations {
   String journalConversationDuration(String name, String minutes) {
     return 'with $name · $minutes min';
   }
+
+  @override
+  String get mediaPhoto => 'Photo';
+
+  @override
+  String get mediaVideo => 'Video';
+
+  @override
+  String get mediaUnavailable => 'This media is no longer available.';
+
+  @override
+  String get mediaDeletePhoto => 'Delete photo';
+
+  @override
+  String get mediaDeleteVideo => 'Delete video';
+
+  @override
+  String get mediaDeleteConfirm =>
+      'Delete this item permanently? The file will be removed and the deletion recorded in the audit log.';
+
+  @override
+  String get mediaPhotoUnavailable =>
+      'Photo unavailable. Refresh while online to view it.';
+
+  @override
+  String get mediaVideoPending =>
+      'Video playback will be available when the video viewer is ready.';
+
+  @override
+  String mediaEncounter(String name, String relationship) {
+    return 'Encounter with $name ($relationship)';
+  }
+
+  @override
+  String get mediaKeyframe => 'keyframe from the glasses';
+
+  @override
+  String get mediaDocumentCapture => 'document captured by the glasses';
+
+  @override
+  String get mediaNotableCapture => 'moment captured by the glasses';
+
+  @override
+  String get mediaRequested => 'recorded at the patient’s request';
+
+  @override
+  String get mediaCaptured => 'captured by the glasses';
+
+  @override
+  String get mediaAiTags => 'AI tags:';
+
+  @override
+  String get mediaKept => 'Kept';
+
+  @override
+  String get mediaPin => 'Pin to keep';
+
+  @override
+  String get mediaExpired => 'Expired';
+
+  @override
+  String mediaAutoDeletes(String days) {
+    return 'Auto-deletes in $days days';
+  }
+
+  @override
+  String get mediaRetentionNote =>
+      'Photos of other people expire after 30 days unless pinned';
+
+  @override
+  String get mediaCacheFailed =>
+      'The change was saved. Retry to update the saved information on this phone.';
+
+  @override
+  String get mediaUncertain =>
+      'The change could not be confirmed. Refresh before trying again.';
+
+  @override
+  String get mediaOffline =>
+      'Could not refresh. Saved information is available; photos need an online refresh.';
+
+  @override
+  String get mediaAuditNote =>
+      'You’ll be asked to confirm deletion. Deletions are recorded in the audit log.';
 }
