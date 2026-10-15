@@ -1,4 +1,13 @@
 {
+  "patientGameCards": "لعبة الكروت",
+  "patientGamePicture": "سمّي الصورة",
+  "patientGameWords": "افتكر الكلمات",
+  "patientGameLastScore": "آخر نتيجة: {score}",
+  "@patientGameLastScore": {"placeholders": {"score": {"type": "String"}}},
+  "patientGameNone": "لسه مفيش ألعاب",
+  "patientGameUnavailable": "آخر نتيجة مش متاحة لسه",
+  "patientGamesPending": "اللعب هيكون متاح قريب.",
+  "patientGamesOffline": "مش قادرين نطمن على آخر النتائج دلوقتي. تقدر تحاول تاني.",
   "patientMemoryBack": "رجوع",
   "patientMemoryTitle": "ذكراك",
   "patientMemoryMet": "قابلت {name}",

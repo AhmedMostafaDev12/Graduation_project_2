@@ -13,6 +13,7 @@ import '../../features/patient_today/presentation/p2_reminders_screen.dart';
 import '../../features/patient_today/presentation/p3_reminder_alert_screen.dart';
 import '../../features/patient_journal/presentation/p4_my_day_screen.dart';
 import '../../features/patient_journal/presentation/p5_memory_detail_screen.dart';
+import '../../features/mind_games/presentation/p7_games_screen.dart';
 import '../../features/patient_journal/domain/patient_memory_detail.dart';
 import '../../features/patient_today/presentation/patient_reminder_alert_host.dart';
 import '../../features/patient_today/domain/patient_today_data.dart';
@@ -79,6 +80,7 @@ final screenBuildersProvider = Provider<Map<RemoriScreen, RemoriScreenBuilder>>(
     RemoriScreen.p1: (_, _) => const P1TodayScreen(),
     RemoriScreen.p2: (_, _) => const P2RemindersScreen(),
     RemoriScreen.p4: (_, _) => const P4MyDayScreen(),
+    RemoriScreen.p7: (_, _) => const P7GamesScreen(),
     RemoriScreen.p5: (_, state) => P5MemoryDetailScreen(
       target: state.extra is PatientMemoryTarget
           ? state.extra as PatientMemoryTarget
@@ -403,7 +405,8 @@ class _ModeShell extends ConsumerWidget {
                               patient &&
                                   (screen == RemoriScreen.p1 ||
                                       screen == RemoriScreen.p2 ||
-                                      screen == RemoriScreen.p4)
+                                      screen == RemoriScreen.p4 ||
+                                      screen == RemoriScreen.p7)
                               ? null
                               : () => context.pushNamed(
                                   patient

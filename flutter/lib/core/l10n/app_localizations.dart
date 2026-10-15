@@ -98,6 +98,54 @@ abstract class AppLocalizations {
     Locale('ar'),
   ];
 
+  /// No description provided for @patientGameCards.
+  ///
+  /// In en, this message translates to:
+  /// **'Card game'**
+  String get patientGameCards;
+
+  /// No description provided for @patientGamePicture.
+  ///
+  /// In en, this message translates to:
+  /// **'Name the picture'**
+  String get patientGamePicture;
+
+  /// No description provided for @patientGameWords.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember the words'**
+  String get patientGameWords;
+
+  /// No description provided for @patientGameLastScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Last score: {score}'**
+  String patientGameLastScore(String score);
+
+  /// No description provided for @patientGameNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No games yet'**
+  String get patientGameNone;
+
+  /// No description provided for @patientGameUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Last score is not available yet'**
+  String get patientGameUnavailable;
+
+  /// No description provided for @patientGamesPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Playing games will be available soon.'**
+  String get patientGamesPending;
+
+  /// No description provided for @patientGamesOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn’t check your latest scores. You can try again.'**
+  String get patientGamesOffline;
+
   /// No description provided for @patientMemoryBack.
   ///
   /// In en, this message translates to:

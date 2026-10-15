@@ -10,6 +10,33 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get patientGameCards => 'Card game';
+
+  @override
+  String get patientGamePicture => 'Name the picture';
+
+  @override
+  String get patientGameWords => 'Remember the words';
+
+  @override
+  String patientGameLastScore(String score) {
+    return 'Last score: $score';
+  }
+
+  @override
+  String get patientGameNone => 'No games yet';
+
+  @override
+  String get patientGameUnavailable => 'Last score is not available yet';
+
+  @override
+  String get patientGamesPending => 'Playing games will be available soon.';
+
+  @override
+  String get patientGamesOffline =>
+      'We couldn’t check your latest scores. You can try again.';
+
+  @override
   String get patientMemoryBack => 'Back';
 
   @override

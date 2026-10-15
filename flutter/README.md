@@ -1161,6 +1161,7 @@ Validation: formatting and analysis clean; all 597 tests passed, including 31
 C16 tests. Android debug APK built. iOS compilation and physical-device lifecycle
 validation remain pending on macOS/iOS.
 
+
 ## C18 More and settings
 
 The More tab connects Journal, Saved places, Documents and Device. It shows the
@@ -1379,3 +1380,28 @@ on a 320dp screen. Regenerate with
 Validation: formatting and analysis clean; all 793 tests passed, including 29 P5
 tests. Android debug APK built. iOS compilation and physical-device lifecycle
 validation remain pending on macOS/iOS.
+
+## P7 Games
+
+The Patient Mode Games tab shows Card game (`face_match`), Name the picture
+(`picture_naming`) and Remember the words (`word_recall`). Each card displays
+the actual latest score without a fabricated maximum. A successfully checked
+empty history shows “No games yet”; unchecked history shows an unavailable
+message. Cards remain disabled with a localized notice until P8 gameplay, and
+Ask remains disabled for Phase 2.
+
+Schema v20 adds two patient/device/game-scoped caches: latest session display
+fields and refresh metadata. Three device-authenticated filtered GETs request
+`limit=1&offset=0`; validated results replace the local snapshot atomically.
+Failed or malformed responses preserve previous scores. Cached scores remain
+readable offline, with Retry and foreground-resume refresh. Caregiver data,
+arbitrary response metadata and outbox writes are not used by this read-only
+screen. No package or backend changes were added.
+
+Review captures: [English](test/goldens/p7_en_1.0x.png),
+[Arabic](test/goldens/p7_ar_1.0x.png), plus both languages at 2x text on 320dp.
+Regenerate with `flutter test test/p7_games_test.dart --update-goldens`.
+
+Validation: formatting and analysis clean; all 817 tests passed, including 24 P7
+tests. Android debug APK built. iOS compilation and physical-device validation
+remain pending on macOS/iOS.

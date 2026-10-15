@@ -366,6 +366,8 @@ void main() {
         status: ReminderStatus.pending,
       );
       await db.customStatement('DROP TABLE patient_memory_details');
+      await db.customStatement('DROP TABLE patient_game_scores');
+      await db.customStatement('DROP TABLE patient_game_refreshes');
       await db.customStatement('PRAGMA user_version = 18');
       await db.close();
       db = RemoriDatabase(NativeDatabase(file));
