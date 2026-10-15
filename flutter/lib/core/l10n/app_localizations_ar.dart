@@ -1212,4 +1212,75 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get placesOffline =>
       'نعرض الأماكن المحفوظة. أعد المحاولة للتحقق من أحدث قائمة.';
+
+  @override
+  String get placeEditTitle => 'تعديل المكان';
+
+  @override
+  String get placeName => 'اسم المكان';
+
+  @override
+  String get placeNameHint => 'البيت · Home';
+
+  @override
+  String get placeSave => 'حفظ المكان';
+
+  @override
+  String get placeDelete => 'حذف المكان';
+
+  @override
+  String get placeDeleteConfirm =>
+      'هل تريد حذف هذا المكان المحفوظ؟ لن يُستخدم بعد ذلك للإجابة عن «أين أنا؟».';
+
+  @override
+  String get placeUnavailable => 'هذا المكان غير متاح أو ليس لديك إذن بتعديله.';
+
+  @override
+  String get placeNameRequired => 'أدخل اسمًا للمكان (حتى ٨٠ حرفًا).';
+
+  @override
+  String get placeSelectPoint => 'اختر المكان على الخريطة قبل الحفظ.';
+
+  @override
+  String get placeLocating => 'جارٍ تحديد موقع هذا الهاتف…';
+
+  @override
+  String get placeDragPin => 'اسحب العلامة إلى المكان';
+
+  @override
+  String get placePin => 'علامة المكان المختار؛ اسحبها لتغيير الموقع';
+
+  @override
+  String get placeAttribution => '© مساهمو OpenStreetMap';
+
+  @override
+  String get placeMapUnavailable =>
+      'الخريطة غير متاحة. تحقق من اتصالك وأعد المحاولة.';
+
+  @override
+  String placeRadiusLabel(String meters) {
+    return 'النطاق: $meters م';
+  }
+
+  @override
+  String get placeRadiusMinimum => '٥٠ م';
+
+  @override
+  String get placeRadiusMaximum => '٥٠٠ م';
+
+  @override
+  String get placeRadiusPreserved =>
+      'يبقى النطاق المحفوظ كما هو حتى تحرّك شريط النطاق.';
+
+  @override
+  String get placeCacheRetry =>
+      'تم حفظ التغيير. أعد المحاولة لإكمال تحديث هذا الهاتف.';
+
+  @override
+  String get placeWriteUncertain =>
+      'تعذّر تأكيد التغيير. ارجع إلى الأماكن المحفوظة وحدّث القائمة قبل المحاولة مجددًا.';
+
+  @override
+  String get placeWriteFailed =>
+      'تعذّر حفظ التغيير. تحقق من التفاصيل وأعد المحاولة.';
 }

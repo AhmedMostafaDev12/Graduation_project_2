@@ -5,6 +5,15 @@ import '../../../core/api/api_client.dart';
 import '../../../core/api/api_failure.dart';
 import '../../../core/db/remori_database.dart';
 import '../domain/places_data.dart';
+import '../domain/place_draft.dart';
+
+/// Acknowledged online write; retrying this receipt never sends another request.
+class PlaceReceipt {
+  const PlaceReceipt(this.scope, this.id, this.row);
+  final PlacesScope scope;
+  final String id;
+  final CachedPlacesCompanion? row;
+}
 
 class PlacesRepository {
   PlacesRepository(this.client, this.db, this.scope);
@@ -119,6 +128,127 @@ class PlacesRepository {
       await (db.delete(db.placesCacheStates)..where(_states)).go();
     });
   }
+
+  Future<PlaceReceipt> save(PlaceDraft draft, {String? id}) async {
+    if (!draft.valid || (id != null && id.isEmpty)) {
+      throw ApiFailure(ApiFailureKind.server, code: 'VALIDATION_ERROR');
+    }
+    final response = await _writeRequest(
+      '/patients/${scope.patientId}/places${id == null ? '' : '/$id'}',
+      method: id == null ? 'POST' : 'PATCH',
+      id: id,
+      data: {
+        'name': draft.name.trim(),
+        'latitude': draft.point!.latitude,
+        'longitude': draft.point!.longitude,
+        'radius_m': draft.radiusM,
+      },
+    );
+    final p = response.data;
+    if (response.statusCode != (id == null ? 201 : 200) || p is! Map) {
+      throw _invalid;
+    }
+    final returnedId = _text(p, 'id'),
+        name = _text(p, 'name'),
+        radius = p['radius_m'];
+    final updated = DateTime.tryParse(_text(p, 'updated_at'));
+    if ((id != null && id != returnedId) ||
+        p['patient_id'] != scope.patientId ||
+        p['deleted_at'] != null ||
+        name.runes.length > 80 ||
+        radius is! int ||
+        radius < 20 ||
+        radius > 2000 ||
+        updated == null ||
+        !updated.isUtc) {
+      throw _invalid;
+    }
+    return PlaceReceipt(
+      scope,
+      returnedId,
+      CachedPlacesCompanion.insert(
+        caregiverId: scope.caregiverId,
+        patientId: scope.patientId,
+        id: returnedId,
+        name: name,
+        latitude: _coordinate(p, 'latitude', 90),
+        longitude: _coordinate(p, 'longitude', 180),
+        radiusM: radius,
+        createdBy: _text(p, 'created_by'),
+        updatedAt: updated,
+        position: -1,
+      ),
+    );
+  }
+
+  Future<PlaceReceipt> remove(String id) async {
+    if (id.isEmpty) throw _invalid;
+    final response = await _writeRequest(
+      '/patients/${scope.patientId}/places/$id',
+      method: 'DELETE',
+      id: id,
+    );
+    if (response.statusCode != 204) throw _invalid;
+    return PlaceReceipt(scope, id, null);
+  }
+
+  Future<Response<dynamic>> _writeRequest(
+    String path, {
+    required String method,
+    String? id,
+    Object? data,
+  }) async {
+    ++_generation;
+    try {
+      return await client.request<dynamic>(
+        path,
+        method: method,
+        data: data,
+        credential: ApiCredential.caregiver,
+        cancelToken: _cancel,
+      );
+    } on ApiFailure catch (failure) {
+      if (failure.statusCode == 404 && failure.code == 'PATIENT_NOT_FOUND') {
+        await purge();
+      } else if (failure.statusCode == 404 &&
+          failure.code == 'PLACE_NOT_FOUND' &&
+          id != null) {
+        await cacheReceipt(PlaceReceipt(scope, id, null));
+      }
+      rethrow;
+    } finally {
+      ++_generation;
+    }
+  }
+
+  Future<void> cacheReceipt(PlaceReceipt receipt) => db.transaction(() async {
+    if (_disposed) throw ApiFailure(ApiFailureKind.cancelled);
+    if (receipt.scope != scope ||
+        (receipt.row != null &&
+            (receipt.row!.caregiverId.value != scope.caregiverId ||
+                receipt.row!.patientId.value != scope.patientId ||
+                receipt.row!.id.value != receipt.id))) {
+      throw _invalid;
+    }
+    ++_generation;
+    final condition = db.cachedPlaces.id.equals(receipt.id);
+    if (receipt.row == null) {
+      await (db.delete(
+        db.cachedPlaces,
+      )..where((p) => _rows(p) & p.id.equals(receipt.id))).go();
+    } else {
+      final old = await (db.select(
+        db.cachedPlaces,
+      )..where((p) => _rows(p) & condition)).getSingleOrNull();
+      await db
+          .into(db.cachedPlaces)
+          .insert(
+            receipt.row!.copyWith(position: Value(old?.position ?? -1)),
+            mode: InsertMode.insertOrReplace,
+          );
+    }
+    // A single write does not claim that the complete list was refreshed.
+  });
 
   Stream<PlacesData> watch() => db
       .customSelect(

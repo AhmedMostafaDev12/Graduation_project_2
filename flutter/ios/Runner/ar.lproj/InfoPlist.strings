@@ -1,2 +1,3 @@
 "NSCameraUsageDescription" = "امسح رمز النظارة أو التقط صورة لشخص وافق على التعرّف عليه.";
 "NSPhotoLibraryUsageDescription" = "اختر صورًا لشخص وافق على أن يتعرّف عليه ريموري.";
+"NSLocationWhenInUseUsageDescription" = "استخدم موقع هذا الهاتف مرة واحدة لاختيار مكان محفوظ جديد.";

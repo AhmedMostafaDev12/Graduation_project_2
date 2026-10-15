@@ -411,6 +411,8 @@ void main() {
           ...builders,
           RemoriScreen.c18: (_, _) => const Text('More destination'),
           RemoriScreen.c9: (_, _) => const Text('Reminder destination'),
+          RemoriScreen.c11: (_, state) =>
+              Text('Place editor destination', key: ValueKey(state.extra)),
         }),
       ],
     );
@@ -429,27 +431,31 @@ void main() {
     return container;
   }
 
-  testWidgets(
-    'C10 shows saved names and radii with disabled Add/edit controls',
-    (tester) async {
-      final fake = FakeRepository(client, db, scope);
-      await mount(tester, fake);
-      expect(find.text('Saved places'), findsOneWidget);
-      expect(find.text(names.first), findsOneWidget);
-      expect(find.text('Radius 100 m'), findsOneWidget);
-      expect(
-        tester
-            .widget<FilledButton>(find.widgetWithText(FilledButton, '+ Add'))
-            .onPressed,
-        isNull,
-      );
-      await tester.tap(find.byKey(const ValueKey('place-place-0')));
-      await tester.pumpAndSettle();
-      expect(find.text('Saved places'), findsOneWidget);
-      expect(find.textContaining('place editor is ready'), findsOneWidget);
-      expect(fake.refreshes, 1);
-    },
-  );
+  testWidgets('C10 shows saved names and radii and opens scoped C11 editors', (
+    tester,
+  ) async {
+    final fake = FakeRepository(client, db, scope);
+    await mount(tester, fake);
+    expect(find.text('Saved places'), findsOneWidget);
+    expect(find.text(names.first), findsOneWidget);
+    expect(find.text('Radius 100 m'), findsOneWidget);
+    expect(
+      tester
+          .widget<FilledButton>(find.widgetWithText(FilledButton, '+ Add'))
+          .onPressed,
+      isNotNull,
+    );
+    await tester.tap(find.byKey(const ValueKey('place-place-0')));
+    await tester.pumpAndSettle();
+    expect(find.text('Place editor destination'), findsOneWidget);
+    expect(
+      (tester.widget<Text>(find.text('Place editor destination')).key
+              as ValueKey)
+          .value,
+      {'patient_id': scope.patientId, 'place_id': 'place-0'},
+    );
+    expect(fake.refreshes, 1);
+  });
   testWidgets('viewer reads places without add or edit prompts', (
     tester,
   ) async {
