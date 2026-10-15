@@ -178,6 +178,18 @@ class MediaRepository {
     } else if (e.code == 'PATIENT_NOT_FOUND') {
       ++_generation;
       await db.transaction(() async {
+        await (db.delete(db.cachedDocuments)..where(
+              (r) =>
+                  r.caregiverId.equals(key.$1.caregiverId) &
+                  r.patientId.equals(key.$1.patientId),
+            ))
+            .go();
+        await (db.delete(db.documentsCacheStates)..where(
+              (r) =>
+                  r.caregiverId.equals(key.$1.caregiverId) &
+                  r.patientId.equals(key.$1.patientId),
+            ))
+            .go();
         await (db.delete(db.cachedMediaDetails)..where(
               (r) =>
                   r.caregiverId.equals(key.$1.caregiverId) &
@@ -236,6 +248,25 @@ class MediaRepository {
     return db.transaction(() async {
       if (receipt.deleted) {
         await (db.delete(db.cachedMediaDetails)..where(_row)).go();
+        await (db.delete(db.cachedDocuments)..where(
+              (r) =>
+                  r.caregiverId.equals(key.$1.caregiverId) &
+                  r.patientId.equals(key.$1.patientId) &
+                  r.mediaAssetId.equals(key.$2),
+            ))
+            .go();
+        // A deletion shifts offset pages. Refresh before paging this cache again.
+        await (db.update(db.documentsCacheStates)..where(
+              (r) =>
+                  r.caregiverId.equals(key.$1.caregiverId) &
+                  r.patientId.equals(key.$1.patientId),
+            ))
+            .write(
+              const DocumentsCacheStatesCompanion(
+                nextOffset: Value(0),
+                hasMore: Value(false),
+              ),
+            );
       } else {
         final row = await (db.select(
           db.cachedMediaDetails,

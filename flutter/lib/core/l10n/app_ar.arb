@@ -586,5 +586,22 @@
         "type": "String"
       }
     }
-  }
+  },
+  "documentsTitle": "المستندات",
+  "documentsAll": "الكل",
+  "documentsReceipts": "الإيصالات",
+  "documentsBills": "الفواتير",
+  "documentsMedicationLabels": "ملصقات الأدوية",
+  "documentsReceipt": "إيصال",
+  "documentsBill": "فاتورة",
+  "documentsMedicationLabel": "ملصق دواء",
+  "documentsOther": "مستند آخر",
+  "documentsIntro": "تلتقطها النظارة وتُقرأ تلقائيًا.",
+  "documentsLoadFailed": "تعذر تحديث المستندات. حاول مرة أخرى.",
+  "documentsOffline": "نعرض المستندات المحفوظة. تتطلب الصور تحديثًا عبر الإنترنت.",
+  "documentsUnavailable": "اختر مريضًا لعرض مستنداته.",
+  "documentsEmpty": "لا توجد مستندات في هذا التصنيف حتى الآن.",
+  "documentsDetailPending": "ستتاح تفاصيل المستندات عند اكتمال شاشتها.",
+  "documentsPreviewUnavailable": "معاينة المستند غير متاحة",
+  "documentsPreview": "معاينة مستند"
 }

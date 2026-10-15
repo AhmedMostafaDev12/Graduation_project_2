@@ -1058,3 +1058,41 @@ responses and bundled design assets; they never pin or delete live media.
 Validation: formatting and analysis clean; 504 tests passed, including 35 C13
 tests. Android debug APK built with the configured live API. iOS compilation
 and physical-device lifecycle validation remain pending on macOS/iOS.
+
+## C14 Documents
+
+C14 reads two caregiver/patient/filter-scoped caches (schema v11) for document
+cards and pagination/refresh state. It refreshes through
+`GET /patients/{id}/documents?limit=50&offset=0`, adding the documented `type`
+for Receipts, Bills or Medication labels. Scrolling near the end requests the
+next 50-item page. Refresh replaces the selected filter's pages; failed pages
+retain their cards and offset for Retry. Repeated IDs across offset pages are
+deduplicated, and cards are ordered by newest capture.
+
+Cards use actual API titles, headlines and patient-local capture times. A null
+title falls back to the localized document type. Only card metadata is saved:
+OCR text, extracted fields and image bytes never enter these tables. Removed
+patient links clear the scoped caches. A confirmed C13 media deletion removes
+matching document cards and invalidates their offset pagination.
+
+Thumbnails prefer the list's `thumbnail_url`, falling back to `url` for a photo;
+no media-detail request is made per thumbnail. The existing bare HTTPS loader
+keeps bytes only in memory after a successful list refresh. Leaving, covering,
+backgrounding, account/patient/filter changes and expiry clear or hide previews.
+Offline cards use placeholders; signed-URL 403 recovery is bounded by item ID.
+
+The approved staged navigation keeps document cards disabled with a localized
+notice until C15. The normal More-menu entry remains pending C18; no temporary
+menu entry was added. The existing C14 route, test captures and screen-builder
+override can be used to review the screen meanwhile. Managers and linked viewers
+can read documents; the existing center reminder action remains manager-only.
+
+Review captures: [English](test/goldens/c14_en.png),
+[Arabic](test/goldens/c14_ar.png). Regenerate with
+`flutter test test/c14_documents_test.dart --update-goldens`. Tests use synthetic
+API responses and render the bundled SVG design assets as in-memory fixtures;
+they do not read real documents or mutate live patient data.
+
+Validation: formatting and analysis clean; 536 tests passed, including 32 C14
+tests. Android debug APK built with the configured live API. iOS compilation
+and physical-device lifecycle validation remain pending on macOS/iOS.

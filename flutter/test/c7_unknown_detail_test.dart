@@ -428,6 +428,8 @@ void main() {
         at: c6.now,
         status: ReminderStatus.pending,
       );
+      await db.customStatement('DROP TABLE cached_documents');
+      await db.customStatement('DROP TABLE documents_cache_states');
       await db.customStatement('DROP TABLE cached_media_details');
       await db.customStatement('DROP TABLE cached_journal_entries');
       await db.customStatement('DROP TABLE cached_journal_media');

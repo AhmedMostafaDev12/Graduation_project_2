@@ -1484,4 +1484,60 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get mediaAuditNote =>
       'You’ll be asked to confirm deletion. Deletions are recorded in the audit log.';
+
+  @override
+  String get documentsTitle => 'Documents';
+
+  @override
+  String get documentsAll => 'All';
+
+  @override
+  String get documentsReceipts => 'Receipts';
+
+  @override
+  String get documentsBills => 'Bills';
+
+  @override
+  String get documentsMedicationLabels => 'Medication labels';
+
+  @override
+  String get documentsReceipt => 'Receipt';
+
+  @override
+  String get documentsBill => 'Bill';
+
+  @override
+  String get documentsMedicationLabel => 'Medication label';
+
+  @override
+  String get documentsOther => 'Other document';
+
+  @override
+  String get documentsIntro =>
+      'Captured by the glasses and read automatically.';
+
+  @override
+  String get documentsLoadFailed =>
+      'Could not refresh documents. Please try again.';
+
+  @override
+  String get documentsOffline =>
+      'Showing saved documents. Photos require an online refresh.';
+
+  @override
+  String get documentsUnavailable =>
+      'Choose a patient to view their documents.';
+
+  @override
+  String get documentsEmpty => 'No documents in this category yet.';
+
+  @override
+  String get documentsDetailPending =>
+      'Document details will be available when their screen is ready.';
+
+  @override
+  String get documentsPreviewUnavailable => 'Document preview unavailable';
+
+  @override
+  String get documentsPreview => 'Document preview';
 }

@@ -10733,6 +10733,1263 @@ class CachedMediaDetailsCompanion extends UpdateCompanion<CachedMediaDetail> {
   }
 }
 
+class $CachedDocumentsTable extends CachedDocuments
+    with TableInfo<$CachedDocumentsTable, CachedDocument> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedDocumentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _filterMeta = const VerificationMeta('filter');
+  @override
+  late final GeneratedColumn<String> filter = GeneratedColumn<String>(
+    'filter',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _eventIdMeta = const VerificationMeta(
+    'eventId',
+  );
+  @override
+  late final GeneratedColumn<String> eventId = GeneratedColumn<String>(
+    'event_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _mediaAssetIdMeta = const VerificationMeta(
+    'mediaAssetId',
+  );
+  @override
+  late final GeneratedColumn<String> mediaAssetId = GeneratedColumn<String>(
+    'media_asset_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _documentTypeMeta = const VerificationMeta(
+    'documentType',
+  );
+  @override
+  late final GeneratedColumn<String> documentType = GeneratedColumn<String>(
+    'document_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _headlineMeta = const VerificationMeta(
+    'headline',
+  );
+  @override
+  late final GeneratedColumn<String> headline = GeneratedColumn<String>(
+    'headline',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> capturedAt =
+      GeneratedColumn<int>(
+        'captured_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>($CachedDocumentsTable.$convertercapturedAt);
+  static const VerificationMeta _urlMeta = const VerificationMeta('url');
+  @override
+  late final GeneratedColumn<String> url = GeneratedColumn<String>(
+    'url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _thumbnailUrlMeta = const VerificationMeta(
+    'thumbnailUrl',
+  );
+  @override
+  late final GeneratedColumn<String> thumbnailUrl = GeneratedColumn<String>(
+    'thumbnail_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> previewUntil =
+      GeneratedColumn<int>(
+        'preview_until',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>($CachedDocumentsTable.$converterpreviewUntil);
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    caregiverId,
+    patientId,
+    filter,
+    id,
+    eventId,
+    mediaAssetId,
+    documentType,
+    title,
+    headline,
+    capturedAt,
+    url,
+    thumbnailUrl,
+    previewUntil,
+    position,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_documents';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedDocument> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('filter')) {
+      context.handle(
+        _filterMeta,
+        filter.isAcceptableOrUnknown(data['filter']!, _filterMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_filterMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('event_id')) {
+      context.handle(
+        _eventIdMeta,
+        eventId.isAcceptableOrUnknown(data['event_id']!, _eventIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_eventIdMeta);
+    }
+    if (data.containsKey('media_asset_id')) {
+      context.handle(
+        _mediaAssetIdMeta,
+        mediaAssetId.isAcceptableOrUnknown(
+          data['media_asset_id']!,
+          _mediaAssetIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_mediaAssetIdMeta);
+    }
+    if (data.containsKey('document_type')) {
+      context.handle(
+        _documentTypeMeta,
+        documentType.isAcceptableOrUnknown(
+          data['document_type']!,
+          _documentTypeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_documentTypeMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    }
+    if (data.containsKey('headline')) {
+      context.handle(
+        _headlineMeta,
+        headline.isAcceptableOrUnknown(data['headline']!, _headlineMeta),
+      );
+    }
+    if (data.containsKey('url')) {
+      context.handle(
+        _urlMeta,
+        url.isAcceptableOrUnknown(data['url']!, _urlMeta),
+      );
+    }
+    if (data.containsKey('thumbnail_url')) {
+      context.handle(
+        _thumbnailUrlMeta,
+        thumbnailUrl.isAcceptableOrUnknown(
+          data['thumbnail_url']!,
+          _thumbnailUrlMeta,
+        ),
+      );
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, patientId, filter, id};
+  @override
+  CachedDocument map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedDocument(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      filter: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}filter'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      eventId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_id'],
+      )!,
+      mediaAssetId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}media_asset_id'],
+      )!,
+      documentType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}document_type'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      ),
+      headline: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}headline'],
+      ),
+      capturedAt: $CachedDocumentsTable.$convertercapturedAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}captured_at'],
+        )!,
+      ),
+      url: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}url'],
+      ),
+      thumbnailUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}thumbnail_url'],
+      ),
+      previewUntil: $CachedDocumentsTable.$converterpreviewUntil.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}preview_until'],
+        )!,
+      ),
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+    );
+  }
+
+  @override
+  $CachedDocumentsTable createAlias(String alias) {
+    return $CachedDocumentsTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $convertercapturedAt = const UtcMicros();
+  static TypeConverter<DateTime, int> $converterpreviewUntil =
+      const UtcMicros();
+}
+
+class CachedDocument extends DataClass implements Insertable<CachedDocument> {
+  final String caregiverId;
+  final String patientId;
+  final String filter;
+  final String id;
+  final String eventId;
+  final String mediaAssetId;
+  final String documentType;
+  final String? title;
+  final String? headline;
+  final DateTime capturedAt;
+  final String? url;
+  final String? thumbnailUrl;
+  final DateTime previewUntil;
+  final int position;
+  const CachedDocument({
+    required this.caregiverId,
+    required this.patientId,
+    required this.filter,
+    required this.id,
+    required this.eventId,
+    required this.mediaAssetId,
+    required this.documentType,
+    this.title,
+    this.headline,
+    required this.capturedAt,
+    this.url,
+    this.thumbnailUrl,
+    required this.previewUntil,
+    required this.position,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    map['filter'] = Variable<String>(filter);
+    map['id'] = Variable<String>(id);
+    map['event_id'] = Variable<String>(eventId);
+    map['media_asset_id'] = Variable<String>(mediaAssetId);
+    map['document_type'] = Variable<String>(documentType);
+    if (!nullToAbsent || title != null) {
+      map['title'] = Variable<String>(title);
+    }
+    if (!nullToAbsent || headline != null) {
+      map['headline'] = Variable<String>(headline);
+    }
+    {
+      map['captured_at'] = Variable<int>(
+        $CachedDocumentsTable.$convertercapturedAt.toSql(capturedAt),
+      );
+    }
+    if (!nullToAbsent || url != null) {
+      map['url'] = Variable<String>(url);
+    }
+    if (!nullToAbsent || thumbnailUrl != null) {
+      map['thumbnail_url'] = Variable<String>(thumbnailUrl);
+    }
+    {
+      map['preview_until'] = Variable<int>(
+        $CachedDocumentsTable.$converterpreviewUntil.toSql(previewUntil),
+      );
+    }
+    map['position'] = Variable<int>(position);
+    return map;
+  }
+
+  CachedDocumentsCompanion toCompanion(bool nullToAbsent) {
+    return CachedDocumentsCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      filter: Value(filter),
+      id: Value(id),
+      eventId: Value(eventId),
+      mediaAssetId: Value(mediaAssetId),
+      documentType: Value(documentType),
+      title: title == null && nullToAbsent
+          ? const Value.absent()
+          : Value(title),
+      headline: headline == null && nullToAbsent
+          ? const Value.absent()
+          : Value(headline),
+      capturedAt: Value(capturedAt),
+      url: url == null && nullToAbsent ? const Value.absent() : Value(url),
+      thumbnailUrl: thumbnailUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(thumbnailUrl),
+      previewUntil: Value(previewUntil),
+      position: Value(position),
+    );
+  }
+
+  factory CachedDocument.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedDocument(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      filter: serializer.fromJson<String>(json['filter']),
+      id: serializer.fromJson<String>(json['id']),
+      eventId: serializer.fromJson<String>(json['eventId']),
+      mediaAssetId: serializer.fromJson<String>(json['mediaAssetId']),
+      documentType: serializer.fromJson<String>(json['documentType']),
+      title: serializer.fromJson<String?>(json['title']),
+      headline: serializer.fromJson<String?>(json['headline']),
+      capturedAt: serializer.fromJson<DateTime>(json['capturedAt']),
+      url: serializer.fromJson<String?>(json['url']),
+      thumbnailUrl: serializer.fromJson<String?>(json['thumbnailUrl']),
+      previewUntil: serializer.fromJson<DateTime>(json['previewUntil']),
+      position: serializer.fromJson<int>(json['position']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'filter': serializer.toJson<String>(filter),
+      'id': serializer.toJson<String>(id),
+      'eventId': serializer.toJson<String>(eventId),
+      'mediaAssetId': serializer.toJson<String>(mediaAssetId),
+      'documentType': serializer.toJson<String>(documentType),
+      'title': serializer.toJson<String?>(title),
+      'headline': serializer.toJson<String?>(headline),
+      'capturedAt': serializer.toJson<DateTime>(capturedAt),
+      'url': serializer.toJson<String?>(url),
+      'thumbnailUrl': serializer.toJson<String?>(thumbnailUrl),
+      'previewUntil': serializer.toJson<DateTime>(previewUntil),
+      'position': serializer.toJson<int>(position),
+    };
+  }
+
+  CachedDocument copyWith({
+    String? caregiverId,
+    String? patientId,
+    String? filter,
+    String? id,
+    String? eventId,
+    String? mediaAssetId,
+    String? documentType,
+    Value<String?> title = const Value.absent(),
+    Value<String?> headline = const Value.absent(),
+    DateTime? capturedAt,
+    Value<String?> url = const Value.absent(),
+    Value<String?> thumbnailUrl = const Value.absent(),
+    DateTime? previewUntil,
+    int? position,
+  }) => CachedDocument(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    filter: filter ?? this.filter,
+    id: id ?? this.id,
+    eventId: eventId ?? this.eventId,
+    mediaAssetId: mediaAssetId ?? this.mediaAssetId,
+    documentType: documentType ?? this.documentType,
+    title: title.present ? title.value : this.title,
+    headline: headline.present ? headline.value : this.headline,
+    capturedAt: capturedAt ?? this.capturedAt,
+    url: url.present ? url.value : this.url,
+    thumbnailUrl: thumbnailUrl.present ? thumbnailUrl.value : this.thumbnailUrl,
+    previewUntil: previewUntil ?? this.previewUntil,
+    position: position ?? this.position,
+  );
+  CachedDocument copyWithCompanion(CachedDocumentsCompanion data) {
+    return CachedDocument(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      filter: data.filter.present ? data.filter.value : this.filter,
+      id: data.id.present ? data.id.value : this.id,
+      eventId: data.eventId.present ? data.eventId.value : this.eventId,
+      mediaAssetId: data.mediaAssetId.present
+          ? data.mediaAssetId.value
+          : this.mediaAssetId,
+      documentType: data.documentType.present
+          ? data.documentType.value
+          : this.documentType,
+      title: data.title.present ? data.title.value : this.title,
+      headline: data.headline.present ? data.headline.value : this.headline,
+      capturedAt: data.capturedAt.present
+          ? data.capturedAt.value
+          : this.capturedAt,
+      url: data.url.present ? data.url.value : this.url,
+      thumbnailUrl: data.thumbnailUrl.present
+          ? data.thumbnailUrl.value
+          : this.thumbnailUrl,
+      previewUntil: data.previewUntil.present
+          ? data.previewUntil.value
+          : this.previewUntil,
+      position: data.position.present ? data.position.value : this.position,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedDocument(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('filter: $filter, ')
+          ..write('id: $id, ')
+          ..write('eventId: $eventId, ')
+          ..write('mediaAssetId: $mediaAssetId, ')
+          ..write('documentType: $documentType, ')
+          ..write('title: $title, ')
+          ..write('headline: $headline, ')
+          ..write('capturedAt: $capturedAt, ')
+          ..write('url: $url, ')
+          ..write('thumbnailUrl: $thumbnailUrl, ')
+          ..write('previewUntil: $previewUntil, ')
+          ..write('position: $position')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    caregiverId,
+    patientId,
+    filter,
+    id,
+    eventId,
+    mediaAssetId,
+    documentType,
+    title,
+    headline,
+    capturedAt,
+    url,
+    thumbnailUrl,
+    previewUntil,
+    position,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedDocument &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.filter == this.filter &&
+          other.id == this.id &&
+          other.eventId == this.eventId &&
+          other.mediaAssetId == this.mediaAssetId &&
+          other.documentType == this.documentType &&
+          other.title == this.title &&
+          other.headline == this.headline &&
+          other.capturedAt == this.capturedAt &&
+          other.url == this.url &&
+          other.thumbnailUrl == this.thumbnailUrl &&
+          other.previewUntil == this.previewUntil &&
+          other.position == this.position);
+}
+
+class CachedDocumentsCompanion extends UpdateCompanion<CachedDocument> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<String> filter;
+  final Value<String> id;
+  final Value<String> eventId;
+  final Value<String> mediaAssetId;
+  final Value<String> documentType;
+  final Value<String?> title;
+  final Value<String?> headline;
+  final Value<DateTime> capturedAt;
+  final Value<String?> url;
+  final Value<String?> thumbnailUrl;
+  final Value<DateTime> previewUntil;
+  final Value<int> position;
+  final Value<int> rowid;
+  const CachedDocumentsCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.filter = const Value.absent(),
+    this.id = const Value.absent(),
+    this.eventId = const Value.absent(),
+    this.mediaAssetId = const Value.absent(),
+    this.documentType = const Value.absent(),
+    this.title = const Value.absent(),
+    this.headline = const Value.absent(),
+    this.capturedAt = const Value.absent(),
+    this.url = const Value.absent(),
+    this.thumbnailUrl = const Value.absent(),
+    this.previewUntil = const Value.absent(),
+    this.position = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedDocumentsCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required String filter,
+    required String id,
+    required String eventId,
+    required String mediaAssetId,
+    required String documentType,
+    this.title = const Value.absent(),
+    this.headline = const Value.absent(),
+    required DateTime capturedAt,
+    this.url = const Value.absent(),
+    this.thumbnailUrl = const Value.absent(),
+    required DateTime previewUntil,
+    required int position,
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       filter = Value(filter),
+       id = Value(id),
+       eventId = Value(eventId),
+       mediaAssetId = Value(mediaAssetId),
+       documentType = Value(documentType),
+       capturedAt = Value(capturedAt),
+       previewUntil = Value(previewUntil),
+       position = Value(position);
+  static Insertable<CachedDocument> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<String>? filter,
+    Expression<String>? id,
+    Expression<String>? eventId,
+    Expression<String>? mediaAssetId,
+    Expression<String>? documentType,
+    Expression<String>? title,
+    Expression<String>? headline,
+    Expression<int>? capturedAt,
+    Expression<String>? url,
+    Expression<String>? thumbnailUrl,
+    Expression<int>? previewUntil,
+    Expression<int>? position,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (filter != null) 'filter': filter,
+      if (id != null) 'id': id,
+      if (eventId != null) 'event_id': eventId,
+      if (mediaAssetId != null) 'media_asset_id': mediaAssetId,
+      if (documentType != null) 'document_type': documentType,
+      if (title != null) 'title': title,
+      if (headline != null) 'headline': headline,
+      if (capturedAt != null) 'captured_at': capturedAt,
+      if (url != null) 'url': url,
+      if (thumbnailUrl != null) 'thumbnail_url': thumbnailUrl,
+      if (previewUntil != null) 'preview_until': previewUntil,
+      if (position != null) 'position': position,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedDocumentsCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<String>? filter,
+    Value<String>? id,
+    Value<String>? eventId,
+    Value<String>? mediaAssetId,
+    Value<String>? documentType,
+    Value<String?>? title,
+    Value<String?>? headline,
+    Value<DateTime>? capturedAt,
+    Value<String?>? url,
+    Value<String?>? thumbnailUrl,
+    Value<DateTime>? previewUntil,
+    Value<int>? position,
+    Value<int>? rowid,
+  }) {
+    return CachedDocumentsCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      filter: filter ?? this.filter,
+      id: id ?? this.id,
+      eventId: eventId ?? this.eventId,
+      mediaAssetId: mediaAssetId ?? this.mediaAssetId,
+      documentType: documentType ?? this.documentType,
+      title: title ?? this.title,
+      headline: headline ?? this.headline,
+      capturedAt: capturedAt ?? this.capturedAt,
+      url: url ?? this.url,
+      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
+      previewUntil: previewUntil ?? this.previewUntil,
+      position: position ?? this.position,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (filter.present) {
+      map['filter'] = Variable<String>(filter.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (eventId.present) {
+      map['event_id'] = Variable<String>(eventId.value);
+    }
+    if (mediaAssetId.present) {
+      map['media_asset_id'] = Variable<String>(mediaAssetId.value);
+    }
+    if (documentType.present) {
+      map['document_type'] = Variable<String>(documentType.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (headline.present) {
+      map['headline'] = Variable<String>(headline.value);
+    }
+    if (capturedAt.present) {
+      map['captured_at'] = Variable<int>(
+        $CachedDocumentsTable.$convertercapturedAt.toSql(capturedAt.value),
+      );
+    }
+    if (url.present) {
+      map['url'] = Variable<String>(url.value);
+    }
+    if (thumbnailUrl.present) {
+      map['thumbnail_url'] = Variable<String>(thumbnailUrl.value);
+    }
+    if (previewUntil.present) {
+      map['preview_until'] = Variable<int>(
+        $CachedDocumentsTable.$converterpreviewUntil.toSql(previewUntil.value),
+      );
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedDocumentsCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('filter: $filter, ')
+          ..write('id: $id, ')
+          ..write('eventId: $eventId, ')
+          ..write('mediaAssetId: $mediaAssetId, ')
+          ..write('documentType: $documentType, ')
+          ..write('title: $title, ')
+          ..write('headline: $headline, ')
+          ..write('capturedAt: $capturedAt, ')
+          ..write('url: $url, ')
+          ..write('thumbnailUrl: $thumbnailUrl, ')
+          ..write('previewUntil: $previewUntil, ')
+          ..write('position: $position, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $DocumentsCacheStatesTable extends DocumentsCacheStates
+    with TableInfo<$DocumentsCacheStatesTable, DocumentsCacheState> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DocumentsCacheStatesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _filterMeta = const VerificationMeta('filter');
+  @override
+  late final GeneratedColumn<String> filter = GeneratedColumn<String>(
+    'filter',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nextOffsetMeta = const VerificationMeta(
+    'nextOffset',
+  );
+  @override
+  late final GeneratedColumn<int> nextOffset = GeneratedColumn<int>(
+    'next_offset',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _hasMoreMeta = const VerificationMeta(
+    'hasMore',
+  );
+  @override
+  late final GeneratedColumn<bool> hasMore = GeneratedColumn<bool>(
+    'has_more',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("has_more" IN (0, 1))',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> refreshedAt =
+      GeneratedColumn<int>(
+        'refreshed_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>(
+        $DocumentsCacheStatesTable.$converterrefreshedAt,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    caregiverId,
+    patientId,
+    filter,
+    nextOffset,
+    hasMore,
+    refreshedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'documents_cache_states';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DocumentsCacheState> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('filter')) {
+      context.handle(
+        _filterMeta,
+        filter.isAcceptableOrUnknown(data['filter']!, _filterMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_filterMeta);
+    }
+    if (data.containsKey('next_offset')) {
+      context.handle(
+        _nextOffsetMeta,
+        nextOffset.isAcceptableOrUnknown(data['next_offset']!, _nextOffsetMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nextOffsetMeta);
+    }
+    if (data.containsKey('has_more')) {
+      context.handle(
+        _hasMoreMeta,
+        hasMore.isAcceptableOrUnknown(data['has_more']!, _hasMoreMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_hasMoreMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, patientId, filter};
+  @override
+  DocumentsCacheState map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DocumentsCacheState(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      filter: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}filter'],
+      )!,
+      nextOffset: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}next_offset'],
+      )!,
+      hasMore: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}has_more'],
+      )!,
+      refreshedAt: $DocumentsCacheStatesTable.$converterrefreshedAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}refreshed_at'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $DocumentsCacheStatesTable createAlias(String alias) {
+    return $DocumentsCacheStatesTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converterrefreshedAt = const UtcMicros();
+}
+
+class DocumentsCacheState extends DataClass
+    implements Insertable<DocumentsCacheState> {
+  final String caregiverId;
+  final String patientId;
+  final String filter;
+  final int nextOffset;
+  final bool hasMore;
+  final DateTime refreshedAt;
+  const DocumentsCacheState({
+    required this.caregiverId,
+    required this.patientId,
+    required this.filter,
+    required this.nextOffset,
+    required this.hasMore,
+    required this.refreshedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    map['filter'] = Variable<String>(filter);
+    map['next_offset'] = Variable<int>(nextOffset);
+    map['has_more'] = Variable<bool>(hasMore);
+    {
+      map['refreshed_at'] = Variable<int>(
+        $DocumentsCacheStatesTable.$converterrefreshedAt.toSql(refreshedAt),
+      );
+    }
+    return map;
+  }
+
+  DocumentsCacheStatesCompanion toCompanion(bool nullToAbsent) {
+    return DocumentsCacheStatesCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      filter: Value(filter),
+      nextOffset: Value(nextOffset),
+      hasMore: Value(hasMore),
+      refreshedAt: Value(refreshedAt),
+    );
+  }
+
+  factory DocumentsCacheState.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DocumentsCacheState(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      filter: serializer.fromJson<String>(json['filter']),
+      nextOffset: serializer.fromJson<int>(json['nextOffset']),
+      hasMore: serializer.fromJson<bool>(json['hasMore']),
+      refreshedAt: serializer.fromJson<DateTime>(json['refreshedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'filter': serializer.toJson<String>(filter),
+      'nextOffset': serializer.toJson<int>(nextOffset),
+      'hasMore': serializer.toJson<bool>(hasMore),
+      'refreshedAt': serializer.toJson<DateTime>(refreshedAt),
+    };
+  }
+
+  DocumentsCacheState copyWith({
+    String? caregiverId,
+    String? patientId,
+    String? filter,
+    int? nextOffset,
+    bool? hasMore,
+    DateTime? refreshedAt,
+  }) => DocumentsCacheState(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    filter: filter ?? this.filter,
+    nextOffset: nextOffset ?? this.nextOffset,
+    hasMore: hasMore ?? this.hasMore,
+    refreshedAt: refreshedAt ?? this.refreshedAt,
+  );
+  DocumentsCacheState copyWithCompanion(DocumentsCacheStatesCompanion data) {
+    return DocumentsCacheState(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      filter: data.filter.present ? data.filter.value : this.filter,
+      nextOffset: data.nextOffset.present
+          ? data.nextOffset.value
+          : this.nextOffset,
+      hasMore: data.hasMore.present ? data.hasMore.value : this.hasMore,
+      refreshedAt: data.refreshedAt.present
+          ? data.refreshedAt.value
+          : this.refreshedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DocumentsCacheState(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('filter: $filter, ')
+          ..write('nextOffset: $nextOffset, ')
+          ..write('hasMore: $hasMore, ')
+          ..write('refreshedAt: $refreshedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    caregiverId,
+    patientId,
+    filter,
+    nextOffset,
+    hasMore,
+    refreshedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DocumentsCacheState &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.filter == this.filter &&
+          other.nextOffset == this.nextOffset &&
+          other.hasMore == this.hasMore &&
+          other.refreshedAt == this.refreshedAt);
+}
+
+class DocumentsCacheStatesCompanion
+    extends UpdateCompanion<DocumentsCacheState> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<String> filter;
+  final Value<int> nextOffset;
+  final Value<bool> hasMore;
+  final Value<DateTime> refreshedAt;
+  final Value<int> rowid;
+  const DocumentsCacheStatesCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.filter = const Value.absent(),
+    this.nextOffset = const Value.absent(),
+    this.hasMore = const Value.absent(),
+    this.refreshedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DocumentsCacheStatesCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required String filter,
+    required int nextOffset,
+    required bool hasMore,
+    required DateTime refreshedAt,
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       filter = Value(filter),
+       nextOffset = Value(nextOffset),
+       hasMore = Value(hasMore),
+       refreshedAt = Value(refreshedAt);
+  static Insertable<DocumentsCacheState> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<String>? filter,
+    Expression<int>? nextOffset,
+    Expression<bool>? hasMore,
+    Expression<int>? refreshedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (filter != null) 'filter': filter,
+      if (nextOffset != null) 'next_offset': nextOffset,
+      if (hasMore != null) 'has_more': hasMore,
+      if (refreshedAt != null) 'refreshed_at': refreshedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DocumentsCacheStatesCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<String>? filter,
+    Value<int>? nextOffset,
+    Value<bool>? hasMore,
+    Value<DateTime>? refreshedAt,
+    Value<int>? rowid,
+  }) {
+    return DocumentsCacheStatesCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      filter: filter ?? this.filter,
+      nextOffset: nextOffset ?? this.nextOffset,
+      hasMore: hasMore ?? this.hasMore,
+      refreshedAt: refreshedAt ?? this.refreshedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (filter.present) {
+      map['filter'] = Variable<String>(filter.value);
+    }
+    if (nextOffset.present) {
+      map['next_offset'] = Variable<int>(nextOffset.value);
+    }
+    if (hasMore.present) {
+      map['has_more'] = Variable<bool>(hasMore.value);
+    }
+    if (refreshedAt.present) {
+      map['refreshed_at'] = Variable<int>(
+        $DocumentsCacheStatesTable.$converterrefreshedAt.toSql(
+          refreshedAt.value,
+        ),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DocumentsCacheStatesCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('filter: $filter, ')
+          ..write('nextOffset: $nextOffset, ')
+          ..write('hasMore: $hasMore, ')
+          ..write('refreshedAt: $refreshedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$RemoriDatabase extends GeneratedDatabase {
   _$RemoriDatabase(QueryExecutor e) : super(e);
   $RemoriDatabaseManager get managers => $RemoriDatabaseManager(this);
@@ -10778,6 +12035,11 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
       $JournalCacheStatesTable(this);
   late final $CachedMediaDetailsTable cachedMediaDetails =
       $CachedMediaDetailsTable(this);
+  late final $CachedDocumentsTable cachedDocuments = $CachedDocumentsTable(
+    this,
+  );
+  late final $DocumentsCacheStatesTable documentsCacheStates =
+      $DocumentsCacheStatesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -10805,6 +12067,8 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
     cachedJournalMedia,
     journalCacheStates,
     cachedMediaDetails,
+    cachedDocuments,
+    documentsCacheStates,
   ];
 }
 
@@ -16760,6 +18024,662 @@ typedef $$CachedMediaDetailsTableProcessedTableManager =
       CachedMediaDetail,
       PrefetchHooks Function()
     >;
+typedef $$CachedDocumentsTableCreateCompanionBuilder =
+    CachedDocumentsCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required String filter,
+      required String id,
+      required String eventId,
+      required String mediaAssetId,
+      required String documentType,
+      Value<String?> title,
+      Value<String?> headline,
+      required DateTime capturedAt,
+      Value<String?> url,
+      Value<String?> thumbnailUrl,
+      required DateTime previewUntil,
+      required int position,
+      Value<int> rowid,
+    });
+typedef $$CachedDocumentsTableUpdateCompanionBuilder =
+    CachedDocumentsCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<String> filter,
+      Value<String> id,
+      Value<String> eventId,
+      Value<String> mediaAssetId,
+      Value<String> documentType,
+      Value<String?> title,
+      Value<String?> headline,
+      Value<DateTime> capturedAt,
+      Value<String?> url,
+      Value<String?> thumbnailUrl,
+      Value<DateTime> previewUntil,
+      Value<int> position,
+      Value<int> rowid,
+    });
+
+class $$CachedDocumentsTableFilterComposer
+    extends Composer<_$RemoriDatabase, $CachedDocumentsTable> {
+  $$CachedDocumentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get filter => $composableBuilder(
+    column: $table.filter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get eventId => $composableBuilder(
+    column: $table.eventId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mediaAssetId => $composableBuilder(
+    column: $table.mediaAssetId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get documentType => $composableBuilder(
+    column: $table.documentType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get headline => $composableBuilder(
+    column: $table.headline,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get capturedAt =>
+      $composableBuilder(
+        column: $table.capturedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get url => $composableBuilder(
+    column: $table.url,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get thumbnailUrl => $composableBuilder(
+    column: $table.thumbnailUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get previewUntil =>
+      $composableBuilder(
+        column: $table.previewUntil,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedDocumentsTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $CachedDocumentsTable> {
+  $$CachedDocumentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get filter => $composableBuilder(
+    column: $table.filter,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get eventId => $composableBuilder(
+    column: $table.eventId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mediaAssetId => $composableBuilder(
+    column: $table.mediaAssetId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get documentType => $composableBuilder(
+    column: $table.documentType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get headline => $composableBuilder(
+    column: $table.headline,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get capturedAt => $composableBuilder(
+    column: $table.capturedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get url => $composableBuilder(
+    column: $table.url,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get thumbnailUrl => $composableBuilder(
+    column: $table.thumbnailUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get previewUntil => $composableBuilder(
+    column: $table.previewUntil,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedDocumentsTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $CachedDocumentsTable> {
+  $$CachedDocumentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get filter =>
+      $composableBuilder(column: $table.filter, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get eventId =>
+      $composableBuilder(column: $table.eventId, builder: (column) => column);
+
+  GeneratedColumn<String> get mediaAssetId => $composableBuilder(
+    column: $table.mediaAssetId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get documentType => $composableBuilder(
+    column: $table.documentType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get headline =>
+      $composableBuilder(column: $table.headline, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get capturedAt =>
+      $composableBuilder(
+        column: $table.capturedAt,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<String> get url =>
+      $composableBuilder(column: $table.url, builder: (column) => column);
+
+  GeneratedColumn<String> get thumbnailUrl => $composableBuilder(
+    column: $table.thumbnailUrl,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get previewUntil =>
+      $composableBuilder(
+        column: $table.previewUntil,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+}
+
+class $$CachedDocumentsTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $CachedDocumentsTable,
+          CachedDocument,
+          $$CachedDocumentsTableFilterComposer,
+          $$CachedDocumentsTableOrderingComposer,
+          $$CachedDocumentsTableAnnotationComposer,
+          $$CachedDocumentsTableCreateCompanionBuilder,
+          $$CachedDocumentsTableUpdateCompanionBuilder,
+          (
+            CachedDocument,
+            BaseReferences<
+              _$RemoriDatabase,
+              $CachedDocumentsTable,
+              CachedDocument
+            >,
+          ),
+          CachedDocument,
+          PrefetchHooks Function()
+        > {
+  $$CachedDocumentsTableTableManager(
+    _$RemoriDatabase db,
+    $CachedDocumentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedDocumentsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedDocumentsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CachedDocumentsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<String> filter = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> eventId = const Value.absent(),
+                Value<String> mediaAssetId = const Value.absent(),
+                Value<String> documentType = const Value.absent(),
+                Value<String?> title = const Value.absent(),
+                Value<String?> headline = const Value.absent(),
+                Value<DateTime> capturedAt = const Value.absent(),
+                Value<String?> url = const Value.absent(),
+                Value<String?> thumbnailUrl = const Value.absent(),
+                Value<DateTime> previewUntil = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedDocumentsCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                filter: filter,
+                id: id,
+                eventId: eventId,
+                mediaAssetId: mediaAssetId,
+                documentType: documentType,
+                title: title,
+                headline: headline,
+                capturedAt: capturedAt,
+                url: url,
+                thumbnailUrl: thumbnailUrl,
+                previewUntil: previewUntil,
+                position: position,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required String filter,
+                required String id,
+                required String eventId,
+                required String mediaAssetId,
+                required String documentType,
+                Value<String?> title = const Value.absent(),
+                Value<String?> headline = const Value.absent(),
+                required DateTime capturedAt,
+                Value<String?> url = const Value.absent(),
+                Value<String?> thumbnailUrl = const Value.absent(),
+                required DateTime previewUntil,
+                required int position,
+                Value<int> rowid = const Value.absent(),
+              }) => CachedDocumentsCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                filter: filter,
+                id: id,
+                eventId: eventId,
+                mediaAssetId: mediaAssetId,
+                documentType: documentType,
+                title: title,
+                headline: headline,
+                capturedAt: capturedAt,
+                url: url,
+                thumbnailUrl: thumbnailUrl,
+                previewUntil: previewUntil,
+                position: position,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CachedDocumentsTable, CachedDocument>(table),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $CachedDocumentsTable,
+                    CachedDocument
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedDocumentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $CachedDocumentsTable,
+      CachedDocument,
+      $$CachedDocumentsTableFilterComposer,
+      $$CachedDocumentsTableOrderingComposer,
+      $$CachedDocumentsTableAnnotationComposer,
+      $$CachedDocumentsTableCreateCompanionBuilder,
+      $$CachedDocumentsTableUpdateCompanionBuilder,
+      (
+        CachedDocument,
+        BaseReferences<_$RemoriDatabase, $CachedDocumentsTable, CachedDocument>,
+      ),
+      CachedDocument,
+      PrefetchHooks Function()
+    >;
+typedef $$DocumentsCacheStatesTableCreateCompanionBuilder =
+    DocumentsCacheStatesCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required String filter,
+      required int nextOffset,
+      required bool hasMore,
+      required DateTime refreshedAt,
+      Value<int> rowid,
+    });
+typedef $$DocumentsCacheStatesTableUpdateCompanionBuilder =
+    DocumentsCacheStatesCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<String> filter,
+      Value<int> nextOffset,
+      Value<bool> hasMore,
+      Value<DateTime> refreshedAt,
+      Value<int> rowid,
+    });
+
+class $$DocumentsCacheStatesTableFilterComposer
+    extends Composer<_$RemoriDatabase, $DocumentsCacheStatesTable> {
+  $$DocumentsCacheStatesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get filter => $composableBuilder(
+    column: $table.filter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get nextOffset => $composableBuilder(
+    column: $table.nextOffset,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get hasMore => $composableBuilder(
+    column: $table.hasMore,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+}
+
+class $$DocumentsCacheStatesTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $DocumentsCacheStatesTable> {
+  $$DocumentsCacheStatesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get filter => $composableBuilder(
+    column: $table.filter,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get nextOffset => $composableBuilder(
+    column: $table.nextOffset,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get hasMore => $composableBuilder(
+    column: $table.hasMore,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get refreshedAt => $composableBuilder(
+    column: $table.refreshedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DocumentsCacheStatesTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $DocumentsCacheStatesTable> {
+  $$DocumentsCacheStatesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get filter =>
+      $composableBuilder(column: $table.filter, builder: (column) => column);
+
+  GeneratedColumn<int> get nextOffset => $composableBuilder(
+    column: $table.nextOffset,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get hasMore =>
+      $composableBuilder(column: $table.hasMore, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => column,
+      );
+}
+
+class $$DocumentsCacheStatesTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $DocumentsCacheStatesTable,
+          DocumentsCacheState,
+          $$DocumentsCacheStatesTableFilterComposer,
+          $$DocumentsCacheStatesTableOrderingComposer,
+          $$DocumentsCacheStatesTableAnnotationComposer,
+          $$DocumentsCacheStatesTableCreateCompanionBuilder,
+          $$DocumentsCacheStatesTableUpdateCompanionBuilder,
+          (
+            DocumentsCacheState,
+            BaseReferences<
+              _$RemoriDatabase,
+              $DocumentsCacheStatesTable,
+              DocumentsCacheState
+            >,
+          ),
+          DocumentsCacheState,
+          PrefetchHooks Function()
+        > {
+  $$DocumentsCacheStatesTableTableManager(
+    _$RemoriDatabase db,
+    $DocumentsCacheStatesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DocumentsCacheStatesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DocumentsCacheStatesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$DocumentsCacheStatesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<String> filter = const Value.absent(),
+                Value<int> nextOffset = const Value.absent(),
+                Value<bool> hasMore = const Value.absent(),
+                Value<DateTime> refreshedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DocumentsCacheStatesCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                filter: filter,
+                nextOffset: nextOffset,
+                hasMore: hasMore,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required String filter,
+                required int nextOffset,
+                required bool hasMore,
+                required DateTime refreshedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => DocumentsCacheStatesCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                filter: filter,
+                nextOffset: nextOffset,
+                hasMore: hasMore,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$DocumentsCacheStatesTable, DocumentsCacheState>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $DocumentsCacheStatesTable,
+                    DocumentsCacheState
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DocumentsCacheStatesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $DocumentsCacheStatesTable,
+      DocumentsCacheState,
+      $$DocumentsCacheStatesTableFilterComposer,
+      $$DocumentsCacheStatesTableOrderingComposer,
+      $$DocumentsCacheStatesTableAnnotationComposer,
+      $$DocumentsCacheStatesTableCreateCompanionBuilder,
+      $$DocumentsCacheStatesTableUpdateCompanionBuilder,
+      (
+        DocumentsCacheState,
+        BaseReferences<
+          _$RemoriDatabase,
+          $DocumentsCacheStatesTable,
+          DocumentsCacheState
+        >,
+      ),
+      DocumentsCacheState,
+      PrefetchHooks Function()
+    >;
 
 class $RemoriDatabaseManager {
   final _$RemoriDatabase _db;
@@ -16817,4 +18737,8 @@ class $RemoriDatabaseManager {
       $$JournalCacheStatesTableTableManager(_db, _db.journalCacheStates);
   $$CachedMediaDetailsTableTableManager get cachedMediaDetails =>
       $$CachedMediaDetailsTableTableManager(_db, _db.cachedMediaDetails);
+  $$CachedDocumentsTableTableManager get cachedDocuments =>
+      $$CachedDocumentsTableTableManager(_db, _db.cachedDocuments);
+  $$DocumentsCacheStatesTableTableManager get documentsCacheStates =>
+      $$DocumentsCacheStatesTableTableManager(_db, _db.documentsCacheStates);
 }
