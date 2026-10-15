@@ -10,6 +10,59 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
+  String get cardGameInstruction => 'لاقي الكارتين اللي شبه بعض';
+
+  @override
+  String get cardGameNeedPeople =>
+      'اطلب من اللي بيرعاك يضيف صور لشخصين تعرفهم قبل ما تلعب.';
+
+  @override
+  String get cardGameUnavailable =>
+      'مش قادرين نجهّز الصور دلوقتي. تقدر تحاول تاني.';
+
+  @override
+  String get cardGameEncouragement => 'شاطر! كمّل';
+
+  @override
+  String get cardGameDone => 'خلصت';
+
+  @override
+  String get cardGameSaveFailed =>
+      'مش قادرين نحفظ اللعبة لسه. حاول تاني من فضلك.';
+
+  @override
+  String get cardGameWellDone => 'أحسنت!';
+
+  @override
+  String cardGameScore(int score) {
+    return 'النتيجة: $score من ٢';
+  }
+
+  @override
+  String cardGameDuration(String time) {
+    return 'المدة: $time';
+  }
+
+  @override
+  String get cardGameAgain => 'العب تاني';
+
+  @override
+  String get cardGameBackGames => 'رجوع للألعاب';
+
+  @override
+  String get cardGameResultUnavailable => 'نتيجة اللعبة دي مش متاحة دلوقتي.';
+
+  @override
+  String cardGameHidden(int number) {
+    return 'الكارت $number، مقلوب';
+  }
+
+  @override
+  String cardGamePerson(String name) {
+    return 'صورة $name';
+  }
+
+  @override
   String get patientGameCards => 'لعبة الكروت';
 
   @override
@@ -30,7 +83,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get patientGameUnavailable => 'آخر نتيجة مش متاحة لسه';
 
   @override
-  String get patientGamesPending => 'اللعب هيكون متاح قريب.';
+  String get patientGamesPending => 'الألعاب التانية هتكون متاحة قريب.';
 
   @override
   String get patientGamesOffline =>

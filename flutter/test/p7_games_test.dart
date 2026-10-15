@@ -22,6 +22,7 @@ import 'package:remori/features/mind_games/data/patient_games_repository.dart';
 import 'package:remori/features/mind_games/domain/patient_games_data.dart';
 import 'package:remori/features/mind_games/presentation/p7_games_screen.dart';
 import 'package:remori/features/mind_games/presentation/patient_games_providers.dart';
+import 'package:remori/features/mind_games/presentation/card_game_providers.dart';
 import 'package:remori/features/patient_today/presentation/patient_today_providers.dart';
 import 'package:remori/features/patient_today/presentation/patient_reminder_alert_host.dart';
 
@@ -288,6 +289,8 @@ void main() {
       );
       await db.customStatement('DROP TABLE patient_game_scores');
       await db.customStatement('DROP TABLE patient_game_refreshes');
+      await db.customStatement('DROP TABLE patient_game_people');
+      await db.customStatement('DROP TABLE patient_game_sessions');
       await db.customStatement('PRAGMA user_version = 19');
       await db.close();
       db = RemoriDatabase(NativeDatabase(file));
@@ -336,6 +339,7 @@ void main() {
           (ref) => ref.watch(p2.selectedScope),
         ),
         patientAlertCandidateProvider.overrideWithValue(null),
+        cardGameUploadProvider.overrideWith((ref, key) => () async {}),
         patientGamesRepositoryProvider.overrideWith((ref, key) {
           final fake = FakeRepository(
             client,
@@ -358,6 +362,7 @@ void main() {
           (ref) => {
             RemoriScreen.p1: (_, _) => const Text('Today destination'),
             RemoriScreen.p7: (_, _) => const P7GamesScreen(),
+            RemoriScreen.p8: (_, _) => const Text('Card game destination'),
           },
         ),
       ],
@@ -383,28 +388,27 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets(
-    'P7 shows three actual scores, disabled game cards and disabled Ask',
-    (tester) async {
-      final c = await mount(tester);
-      for (final score in [8, 6, 5]) {
-        expect(find.text('Last score: $score'), findsOneWidget);
-      }
-      expect(find.textContaining('of 10'), findsNothing);
-      expect(find.text('Card game'), findsOneWidget);
-      expect(
-        tester
-            .widget<RemoriNavigationBar>(find.byType(RemoriNavigationBar))
-            .onAction,
-        isNull,
-      );
-      await tester.tap(find.text('Card game'));
-      await tester.pumpAndSettle();
-      expect(find.byType(P7GamesScreen), findsOneWidget);
-      expect(find.byType(TextField), findsNothing);
-      await unmount(tester, c);
-    },
-  );
+  testWidgets('P7 shows actual scores, enabled Card game and disabled Ask', (
+    tester,
+  ) async {
+    final c = await mount(tester);
+    for (final score in [8, 6, 5]) {
+      expect(find.text('Last score: $score'), findsOneWidget);
+    }
+    expect(find.textContaining('of 10'), findsNothing);
+    expect(find.text('Card game'), findsOneWidget);
+    expect(
+      tester
+          .widget<RemoriNavigationBar>(find.byType(RemoriNavigationBar))
+          .onAction,
+      isNull,
+    );
+    await tester.tap(find.text('Card game'));
+    await tester.pumpAndSettle();
+    expect(find.text('Card game destination'), findsOneWidget);
+    expect(find.byType(TextField), findsNothing);
+    await unmount(tester, c);
+  });
   testWidgets('verified empty results do not invent scores', (tester) async {
     final c = await mount(tester, empty: true);
     expect(find.text('No games yet'), findsNWidgets(3));

@@ -119,7 +119,11 @@ class PatientGamesRepository {
   Stream<PatientGamesData> watch() => db
       .customSelect(
         'SELECT 1',
-        readsFrom: {db.patientGameScores, db.patientGameRefreshes},
+        readsFrom: {
+          db.patientGameScores,
+          db.patientGameRefreshes,
+          db.patientGameSessions,
+        },
       )
       .watch()
       .asyncMap((_) => read());
@@ -134,6 +138,15 @@ class PatientGamesRepository {
               (r) => r.patientId.equals(key.$1) & r.deviceId.equals(key.$2),
             ))
             .get();
+    final local =
+        await (db.select(db.patientGameSessions)
+              ..where(
+                (r) => r.patientId.equals(key.$1) & r.deviceId.equals(key.$2),
+              )
+              ..orderBy([(r) => OrderingTerm.desc(r.completedAt)])
+              ..limit(1))
+            .getSingleOrNull();
+    final latest = scores.where((r) => r.gameType == 'face_match').firstOrNull;
     return PatientGamesData(
       scores: {
         for (final r in scores)
@@ -143,6 +156,15 @@ class PatientGamesRepository {
             r.score,
             r.durationSeconds,
             r.completedAt,
+          ),
+        if (local != null &&
+            (latest == null || !local.completedAt.isBefore(latest.completedAt)))
+          'face_match': PatientGameScore(
+            local.id,
+            'face_match',
+            local.score,
+            local.durationSeconds,
+            local.completedAt,
           ),
       },
       refreshed: states.map((r) => r.gameType).toSet(),

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../core/router/remori_routes.dart';
 
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/remori_theme.dart';
@@ -85,68 +88,74 @@ class _P7GamesScreenState extends ConsumerState<P7GamesScreen>
           for (var i = 0; i < patientGameTypes.length; i++) ...[
             Semantics(
               button: true,
-              enabled: false,
-              child: Container(
-                key: ValueKey('patient-game-${patientGameTypes[i]}'),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xffa48fcb),
-                    width: 1.5,
+              enabled: i == 0 && key != null,
+              child: InkWell(
+                onTap: i == 0 && key != null
+                    ? () => context.pushNamed(RemoriScreen.p8.name, extra: key)
+                    : null,
+                borderRadius: BorderRadius.circular(18),
+                child: Container(
+                  key: ValueKey('patient-game-${patientGameTypes[i]}'),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: const Color(0xffa48fcb),
+                      width: 1.5,
+                    ),
+                    borderRadius: BorderRadius.circular(18),
                   ),
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Row(
-                  children: [
-                    ExcludeSemantics(
-                      child: Container(
-                        width: 84,
-                        height: 84,
-                        decoration: BoxDecoration(
-                          color: const Color(0xffeee8f7),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Icon(
-                          icons[i],
-                          size: 40,
-                          color: RemoriColors.purple,
+                  child: Row(
+                    children: [
+                      ExcludeSemantics(
+                        child: Container(
+                          width: 84,
+                          height: 84,
+                          decoration: BoxDecoration(
+                            color: const Color(0xffeee8f7),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Icon(
+                            icons[i],
+                            size: 40,
+                            color: RemoriColors.purple,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            titles[i],
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w600,
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              titles[i],
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
-                          Text(
-                            data.scores[patientGameTypes[i]] != null
-                                ? s.patientGameLastScore(
-                                    NumberFormat.decimalPattern(
-                                      Localizations.localeOf(context)
-                                          .languageCode,
-                                    ).format(
-                                      data.scores[patientGameTypes[i]]!.score,
-                                    ),
-                                  )
-                                : data.refreshed.contains(patientGameTypes[i])
-                                ? s.patientGameNone
-                                : s.patientGameUnavailable,
-                            style: const TextStyle(
-                              fontSize: 22,
-                              color: RemoriColors.muted,
+                            Text(
+                              data.scores[patientGameTypes[i]] != null
+                                  ? s.patientGameLastScore(
+                                      NumberFormat.decimalPattern(
+                                        Localizations.localeOf(context)
+                                            .languageCode,
+                                      ).format(
+                                        data.scores[patientGameTypes[i]]!.score,
+                                      ),
+                                    )
+                                  : data.refreshed.contains(patientGameTypes[i])
+                                  ? s.patientGameNone
+                                  : s.patientGameUnavailable,
+                              style: const TextStyle(
+                                fontSize: 22,
+                                color: RemoriColors.muted,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
