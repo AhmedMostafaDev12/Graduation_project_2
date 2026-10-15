@@ -98,6 +98,84 @@ abstract class AppLocalizations {
     Locale('ar'),
   ];
 
+  /// No description provided for @patientMemoryBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get patientMemoryBack;
+
+  /// No description provided for @patientMemoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your memory'**
+  String get patientMemoryTitle;
+
+  /// No description provided for @patientMemoryMet.
+  ///
+  /// In en, this message translates to:
+  /// **'You met {name}'**
+  String patientMemoryMet(String name);
+
+  /// No description provided for @patientMemoryUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This memory is not available right now.'**
+  String get patientMemoryUnavailable;
+
+  /// No description provided for @patientMemoryPhotoUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Your photo is not available right now.'**
+  String get patientMemoryPhotoUnavailable;
+
+  /// No description provided for @patientMemoryVideoPending.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a video memory. Watching videos will be available later.'**
+  String get patientMemoryVideoPending;
+
+  /// No description provided for @patientMemoryDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get patientMemoryDelete;
+
+  /// No description provided for @patientMemoryDeleteHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'We’ll ask before deleting'**
+  String get patientMemoryDeleteHelp;
+
+  /// No description provided for @patientMemoryDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this memory?'**
+  String get patientMemoryDeleteTitle;
+
+  /// No description provided for @patientMemoryDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'The photo or video will be permanently deleted. You can keep it instead.'**
+  String get patientMemoryDeleteConfirm;
+
+  /// No description provided for @patientMemoryKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep memory'**
+  String get patientMemoryKeep;
+
+  /// No description provided for @patientMemoryRemovedPending.
+  ///
+  /// In en, this message translates to:
+  /// **'The memory was deleted. Tap Retry to finish.'**
+  String get patientMemoryRemovedPending;
+
+  /// No description provided for @patientMemoryUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'Let’s check your memory before trying again.'**
+  String get patientMemoryUncertain;
+
   /// Caregiver shell C1 destination
   ///
   /// In en, this message translates to:

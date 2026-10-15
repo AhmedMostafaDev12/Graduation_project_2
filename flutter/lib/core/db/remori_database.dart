@@ -97,12 +97,13 @@ class OutboxEntries extends Table {
     PatientJournalEntries,
     PatientJournalMedia,
     PatientJournalDays,
+    PatientMemoryDetails,
   ],
 )
 class RemoriDatabase extends _$RemoriDatabase {
   RemoriDatabase(super.executor);
   @override
-  int get schemaVersion => 18;
+  int get schemaVersion => 19;
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onUpgrade: (m, from, to) async {
@@ -178,6 +179,9 @@ class RemoriDatabase extends _$RemoriDatabase {
         await m.createTable(patientJournalEntries);
         await m.createTable(patientJournalMedia);
         await m.createTable(patientJournalDays);
+      }
+      if (from < 19) {
+        await m.createTable(patientMemoryDetails);
       }
     },
   );

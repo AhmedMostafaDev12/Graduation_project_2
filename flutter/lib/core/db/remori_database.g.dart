@@ -16378,6 +16378,377 @@ class PatientJournalDaysCompanion extends UpdateCompanion<PatientJournalDay> {
   }
 }
 
+class $PatientMemoryDetailsTable extends PatientMemoryDetails
+    with TableInfo<$PatientMemoryDetailsTable, PatientMemoryDetail> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PatientMemoryDetailsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> refreshedAt =
+      GeneratedColumn<int>(
+        'refreshed_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>(
+        $PatientMemoryDetailsTable.$converterrefreshedAt,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    patientId,
+    deviceId,
+    id,
+    payload,
+    refreshedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'patient_memory_details';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PatientMemoryDetail> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {patientId, deviceId, id};
+  @override
+  PatientMemoryDetail map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PatientMemoryDetail(
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      )!,
+      refreshedAt: $PatientMemoryDetailsTable.$converterrefreshedAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}refreshed_at'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $PatientMemoryDetailsTable createAlias(String alias) {
+    return $PatientMemoryDetailsTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converterrefreshedAt = const UtcMicros();
+}
+
+class PatientMemoryDetail extends DataClass
+    implements Insertable<PatientMemoryDetail> {
+  final String patientId;
+  final String deviceId;
+  final String id;
+  final String payload;
+  final DateTime refreshedAt;
+  const PatientMemoryDetail({
+    required this.patientId,
+    required this.deviceId,
+    required this.id,
+    required this.payload,
+    required this.refreshedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['patient_id'] = Variable<String>(patientId);
+    map['device_id'] = Variable<String>(deviceId);
+    map['id'] = Variable<String>(id);
+    map['payload'] = Variable<String>(payload);
+    {
+      map['refreshed_at'] = Variable<int>(
+        $PatientMemoryDetailsTable.$converterrefreshedAt.toSql(refreshedAt),
+      );
+    }
+    return map;
+  }
+
+  PatientMemoryDetailsCompanion toCompanion(bool nullToAbsent) {
+    return PatientMemoryDetailsCompanion(
+      patientId: Value(patientId),
+      deviceId: Value(deviceId),
+      id: Value(id),
+      payload: Value(payload),
+      refreshedAt: Value(refreshedAt),
+    );
+  }
+
+  factory PatientMemoryDetail.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PatientMemoryDetail(
+      patientId: serializer.fromJson<String>(json['patientId']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+      id: serializer.fromJson<String>(json['id']),
+      payload: serializer.fromJson<String>(json['payload']),
+      refreshedAt: serializer.fromJson<DateTime>(json['refreshedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'patientId': serializer.toJson<String>(patientId),
+      'deviceId': serializer.toJson<String>(deviceId),
+      'id': serializer.toJson<String>(id),
+      'payload': serializer.toJson<String>(payload),
+      'refreshedAt': serializer.toJson<DateTime>(refreshedAt),
+    };
+  }
+
+  PatientMemoryDetail copyWith({
+    String? patientId,
+    String? deviceId,
+    String? id,
+    String? payload,
+    DateTime? refreshedAt,
+  }) => PatientMemoryDetail(
+    patientId: patientId ?? this.patientId,
+    deviceId: deviceId ?? this.deviceId,
+    id: id ?? this.id,
+    payload: payload ?? this.payload,
+    refreshedAt: refreshedAt ?? this.refreshedAt,
+  );
+  PatientMemoryDetail copyWithCompanion(PatientMemoryDetailsCompanion data) {
+    return PatientMemoryDetail(
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      id: data.id.present ? data.id.value : this.id,
+      payload: data.payload.present ? data.payload.value : this.payload,
+      refreshedAt: data.refreshedAt.present
+          ? data.refreshedAt.value
+          : this.refreshedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PatientMemoryDetail(')
+          ..write('patientId: $patientId, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('id: $id, ')
+          ..write('payload: $payload, ')
+          ..write('refreshedAt: $refreshedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(patientId, deviceId, id, payload, refreshedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PatientMemoryDetail &&
+          other.patientId == this.patientId &&
+          other.deviceId == this.deviceId &&
+          other.id == this.id &&
+          other.payload == this.payload &&
+          other.refreshedAt == this.refreshedAt);
+}
+
+class PatientMemoryDetailsCompanion
+    extends UpdateCompanion<PatientMemoryDetail> {
+  final Value<String> patientId;
+  final Value<String> deviceId;
+  final Value<String> id;
+  final Value<String> payload;
+  final Value<DateTime> refreshedAt;
+  final Value<int> rowid;
+  const PatientMemoryDetailsCompanion({
+    this.patientId = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.refreshedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PatientMemoryDetailsCompanion.insert({
+    required String patientId,
+    required String deviceId,
+    required String id,
+    required String payload,
+    required DateTime refreshedAt,
+    this.rowid = const Value.absent(),
+  }) : patientId = Value(patientId),
+       deviceId = Value(deviceId),
+       id = Value(id),
+       payload = Value(payload),
+       refreshedAt = Value(refreshedAt);
+  static Insertable<PatientMemoryDetail> custom({
+    Expression<String>? patientId,
+    Expression<String>? deviceId,
+    Expression<String>? id,
+    Expression<String>? payload,
+    Expression<int>? refreshedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (patientId != null) 'patient_id': patientId,
+      if (deviceId != null) 'device_id': deviceId,
+      if (id != null) 'id': id,
+      if (payload != null) 'payload': payload,
+      if (refreshedAt != null) 'refreshed_at': refreshedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PatientMemoryDetailsCompanion copyWith({
+    Value<String>? patientId,
+    Value<String>? deviceId,
+    Value<String>? id,
+    Value<String>? payload,
+    Value<DateTime>? refreshedAt,
+    Value<int>? rowid,
+  }) {
+    return PatientMemoryDetailsCompanion(
+      patientId: patientId ?? this.patientId,
+      deviceId: deviceId ?? this.deviceId,
+      id: id ?? this.id,
+      payload: payload ?? this.payload,
+      refreshedAt: refreshedAt ?? this.refreshedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (refreshedAt.present) {
+      map['refreshed_at'] = Variable<int>(
+        $PatientMemoryDetailsTable.$converterrefreshedAt.toSql(
+          refreshedAt.value,
+        ),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PatientMemoryDetailsCompanion(')
+          ..write('patientId: $patientId, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('id: $id, ')
+          ..write('payload: $payload, ')
+          ..write('refreshedAt: $refreshedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$RemoriDatabase extends GeneratedDatabase {
   _$RemoriDatabase(QueryExecutor e) : super(e);
   $RemoriDatabaseManager get managers => $RemoriDatabaseManager(this);
@@ -16449,6 +16820,8 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
       $PatientJournalMediaTable(this);
   late final $PatientJournalDaysTable patientJournalDays =
       $PatientJournalDaysTable(this);
+  late final $PatientMemoryDetailsTable patientMemoryDetails =
+      $PatientMemoryDetailsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -16489,6 +16862,7 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
     patientJournalEntries,
     patientJournalMedia,
     patientJournalDays,
+    patientMemoryDetails,
   ];
 }
 
@@ -25762,6 +26136,237 @@ typedef $$PatientJournalDaysTableProcessedTableManager =
       PatientJournalDay,
       PrefetchHooks Function()
     >;
+typedef $$PatientMemoryDetailsTableCreateCompanionBuilder =
+    PatientMemoryDetailsCompanion Function({
+      required String patientId,
+      required String deviceId,
+      required String id,
+      required String payload,
+      required DateTime refreshedAt,
+      Value<int> rowid,
+    });
+typedef $$PatientMemoryDetailsTableUpdateCompanionBuilder =
+    PatientMemoryDetailsCompanion Function({
+      Value<String> patientId,
+      Value<String> deviceId,
+      Value<String> id,
+      Value<String> payload,
+      Value<DateTime> refreshedAt,
+      Value<int> rowid,
+    });
+
+class $$PatientMemoryDetailsTableFilterComposer
+    extends Composer<_$RemoriDatabase, $PatientMemoryDetailsTable> {
+  $$PatientMemoryDetailsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+}
+
+class $$PatientMemoryDetailsTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $PatientMemoryDetailsTable> {
+  $$PatientMemoryDetailsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get refreshedAt => $composableBuilder(
+    column: $table.refreshedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PatientMemoryDetailsTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $PatientMemoryDetailsTable> {
+  $$PatientMemoryDetailsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => column,
+      );
+}
+
+class $$PatientMemoryDetailsTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $PatientMemoryDetailsTable,
+          PatientMemoryDetail,
+          $$PatientMemoryDetailsTableFilterComposer,
+          $$PatientMemoryDetailsTableOrderingComposer,
+          $$PatientMemoryDetailsTableAnnotationComposer,
+          $$PatientMemoryDetailsTableCreateCompanionBuilder,
+          $$PatientMemoryDetailsTableUpdateCompanionBuilder,
+          (
+            PatientMemoryDetail,
+            BaseReferences<
+              _$RemoriDatabase,
+              $PatientMemoryDetailsTable,
+              PatientMemoryDetail
+            >,
+          ),
+          PatientMemoryDetail,
+          PrefetchHooks Function()
+        > {
+  $$PatientMemoryDetailsTableTableManager(
+    _$RemoriDatabase db,
+    $PatientMemoryDetailsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PatientMemoryDetailsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PatientMemoryDetailsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$PatientMemoryDetailsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> patientId = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> payload = const Value.absent(),
+                Value<DateTime> refreshedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PatientMemoryDetailsCompanion(
+                patientId: patientId,
+                deviceId: deviceId,
+                id: id,
+                payload: payload,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String patientId,
+                required String deviceId,
+                required String id,
+                required String payload,
+                required DateTime refreshedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => PatientMemoryDetailsCompanion.insert(
+                patientId: patientId,
+                deviceId: deviceId,
+                id: id,
+                payload: payload,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PatientMemoryDetailsTable, PatientMemoryDetail>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $PatientMemoryDetailsTable,
+                    PatientMemoryDetail
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PatientMemoryDetailsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $PatientMemoryDetailsTable,
+      PatientMemoryDetail,
+      $$PatientMemoryDetailsTableFilterComposer,
+      $$PatientMemoryDetailsTableOrderingComposer,
+      $$PatientMemoryDetailsTableAnnotationComposer,
+      $$PatientMemoryDetailsTableCreateCompanionBuilder,
+      $$PatientMemoryDetailsTableUpdateCompanionBuilder,
+      (
+        PatientMemoryDetail,
+        BaseReferences<
+          _$RemoriDatabase,
+          $PatientMemoryDetailsTable,
+          PatientMemoryDetail
+        >,
+      ),
+      PatientMemoryDetail,
+      PrefetchHooks Function()
+    >;
 
 class $RemoriDatabaseManager {
   final _$RemoriDatabase _db;
@@ -25851,4 +26456,6 @@ class $RemoriDatabaseManager {
       $$PatientJournalMediaTableTableManager(_db, _db.patientJournalMedia);
   $$PatientJournalDaysTableTableManager get patientJournalDays =>
       $$PatientJournalDaysTableTableManager(_db, _db.patientJournalDays);
+  $$PatientMemoryDetailsTableTableManager get patientMemoryDetails =>
+      $$PatientMemoryDetailsTableTableManager(_db, _db.patientMemoryDetails);
 }

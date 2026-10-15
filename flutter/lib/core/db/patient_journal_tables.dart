@@ -32,3 +32,13 @@ class PatientJournalDays extends Table {
   @override
   Set<Column> get primaryKey => {patientId, deviceId, day};
 }
+
+class PatientMemoryDetails extends Table {
+  TextColumn get patientId => text()();
+  TextColumn get deviceId => text()();
+  TextColumn get id => text()();
+  TextColumn get payload => text()();
+  IntColumn get refreshedAt => integer().map(const UtcMicros())();
+  @override
+  Set<Column> get primaryKey => {patientId, deviceId, id};
+}

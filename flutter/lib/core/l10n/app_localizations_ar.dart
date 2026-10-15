@@ -10,6 +10,51 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
+  String get patientMemoryBack => 'رجوع';
+
+  @override
+  String get patientMemoryTitle => 'ذكراك';
+
+  @override
+  String patientMemoryMet(String name) {
+    return 'قابلت $name';
+  }
+
+  @override
+  String get patientMemoryUnavailable => 'الذكرى دي مش متاحة دلوقتي.';
+
+  @override
+  String get patientMemoryPhotoUnavailable => 'صورتك مش متاحة دلوقتي.';
+
+  @override
+  String get patientMemoryVideoPending =>
+      'دي ذكرى فيديو. مشاهدة الفيديو هتكون متاحة بعدين.';
+
+  @override
+  String get patientMemoryDelete => 'امسح';
+
+  @override
+  String get patientMemoryDeleteHelp => 'هنسألك قبل ما نمسح';
+
+  @override
+  String get patientMemoryDeleteTitle => 'نمسح الذكرى دي؟';
+
+  @override
+  String get patientMemoryDeleteConfirm =>
+      'الصورة أو الفيديو هيتحذف نهائيًا. تقدر تحتفظ بيه بدل ما تمسحه.';
+
+  @override
+  String get patientMemoryKeep => 'احتفظ بالذكرى';
+
+  @override
+  String get patientMemoryRemovedPending =>
+      'الذكرى اتمسحت. اضغط حاول تاني عشان نكمّل.';
+
+  @override
+  String get patientMemoryUncertain =>
+      'خلينا نطمن على الذكرى قبل ما نحاول تاني.';
+
+  @override
   String get caregiverHome => 'الرئيسية';
 
   @override
