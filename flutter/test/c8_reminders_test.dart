@@ -465,6 +465,12 @@ void main() {
     await db.customStatement('DROP TABLE cached_reminders');
     await db.customStatement('DROP TABLE cached_reminder_occurrences');
     await db.customStatement('DROP TABLE reminder_cache_states');
+    await db.customStatement(
+      'ALTER TABLE dashboard_devices DROP COLUMN firmware_version',
+    );
+    await db.customStatement(
+      'ALTER TABLE dashboard_devices DROP COLUMN paired_at',
+    );
     await db.customStatement('PRAGMA user_version = 4');
     await db.customStatement('DROP TABLE cached_document_details');
     await db.customStatement('DROP TABLE cached_documents');

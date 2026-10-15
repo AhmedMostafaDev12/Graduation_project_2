@@ -627,5 +627,31 @@
         "type": "String"
       }
     }
-  }
+  },
+
+"deviceTitle":"الجهاز",
+"deviceGlasses":"نظارة ريموري",
+"deviceConnected":"متصلة",
+"deviceOffline":"غير متصلة",
+"deviceStatusUnavailable":"الحالة غير متاحة",
+"deviceSerial":"الرقم التسلسلي",
+"deviceFirmware":"إصدار البرنامج",
+"deviceBattery":"البطارية",
+"deviceLastSeen":"آخر اتصال",
+"deviceUnknown":"غير متاح",
+"deviceJustNow":"الآن",
+"deviceMinutesAgo":"{count, plural, =0{الآن} =1{منذ دقيقة} =2{منذ دقيقتين} few{منذ {count} دقائق} many{منذ {count} دقيقة} other{منذ {count} دقيقة}}",
+"deviceHoursAgo":"{count, plural, =1{منذ ساعة} =2{منذ ساعتين} few{منذ {count} ساعات} many{منذ {count} ساعة} other{منذ {count} ساعة}}",
+"deviceDaysAgo":"{count, plural, =1{منذ يوم} =2{منذ يومين} few{منذ {count} أيام} many{منذ {count} يومًا} other{منذ {count} يوم}}",
+"deviceMemory":"ذاكرة المحادثات",
+"deviceMemoryHelp":"عند إيقافها، تتوقف النظارة عن التقاط الكلام. يستمر التعرف على الوجوه والتذكيرات. يمكن للمريض أيضًا إيقافها مؤقتًا بضغطة مطوّلة على النظارة.",
+"deviceHeartbeatHelp":"متصلة تعني وصول إشارة من الجهاز خلال آخر ٥ دقائق، ولا تؤكد اتصال بلوتوث مباشرًا. عند انقطاع الشبكة، تظهر آخر قراءات محفوظة.",
+"deviceRepair":"إعادة إقران النظارة",
+"deviceUnpair":"إلغاء إقران النظارة",
+"deviceUnpairConfirm":"هل تريد إلغاء إقران {serial}؟ سيتوقف رمز هاتف المريض عن العمل. ستحتاج إلى إقران النظارة مجددًا لإعادة الاتصال.",
+"deviceUnavailable":"اختر مريضًا متاحًا لعرض نظارته.",
+"deviceNone":"لا توجد نظارة مقترنة بهذا المريض.",
+"deviceLoadFailed":"تعذر التحديث. تظهر قراءات الجهاز المحفوظة. تحقق من اتصالك وحاول مجددًا.",
+"deviceSavedLocallyPending":"حُفظ التغيير. أعد المحاولة لإكمال تحديث هذا الهاتف.",
+"deviceUncertain":"تعذر تأكيد التغيير. حدّث البيانات قبل إجراء تغيير آخر."
 }

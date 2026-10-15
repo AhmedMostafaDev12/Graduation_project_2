@@ -1576,6 +1576,26 @@ class $DashboardDevicesTable extends DashboardDevices
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _firmwareVersionMeta = const VerificationMeta(
+    'firmwareVersion',
+  );
+  @override
+  late final GeneratedColumn<String> firmwareVersion = GeneratedColumn<String>(
+    'firmware_version',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime?, int> pairedAt =
+      GeneratedColumn<int>(
+        'paired_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      ).withConverter<DateTime?>($DashboardDevicesTable.$converterpairedAtn);
   static const VerificationMeta _onlineMeta = const VerificationMeta('online');
   @override
   late final GeneratedColumn<bool> online = GeneratedColumn<bool>(
@@ -1614,6 +1634,8 @@ class $DashboardDevicesTable extends DashboardDevices
     patientId,
     id,
     serial,
+    firmwareVersion,
+    pairedAt,
     online,
     batteryPct,
     lastSeenAt,
@@ -1662,6 +1684,15 @@ class $DashboardDevicesTable extends DashboardDevices
     } else if (isInserting) {
       context.missing(_serialMeta);
     }
+    if (data.containsKey('firmware_version')) {
+      context.handle(
+        _firmwareVersionMeta,
+        firmwareVersion.isAcceptableOrUnknown(
+          data['firmware_version']!,
+          _firmwareVersionMeta,
+        ),
+      );
+    }
     if (data.containsKey('online')) {
       context.handle(
         _onlineMeta,
@@ -1701,6 +1732,16 @@ class $DashboardDevicesTable extends DashboardDevices
         DriftSqlType.string,
         data['${effectivePrefix}serial'],
       )!,
+      firmwareVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}firmware_version'],
+      ),
+      pairedAt: $DashboardDevicesTable.$converterpairedAtn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}paired_at'],
+        ),
+      ),
       online: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}online'],
@@ -1723,6 +1764,9 @@ class $DashboardDevicesTable extends DashboardDevices
     return $DashboardDevicesTable(attachedDatabase, alias);
   }
 
+  static TypeConverter<DateTime, int> $converterpairedAt = const UtcMicros();
+  static TypeConverter<DateTime?, int?> $converterpairedAtn =
+      NullAwareTypeConverter.wrap($converterpairedAt);
   static TypeConverter<DateTime, int> $converterlastSeenAt = const UtcMicros();
   static TypeConverter<DateTime?, int?> $converterlastSeenAtn =
       NullAwareTypeConverter.wrap($converterlastSeenAt);
@@ -1733,6 +1777,8 @@ class DashboardDevice extends DataClass implements Insertable<DashboardDevice> {
   final String patientId;
   final String id;
   final String serial;
+  final String? firmwareVersion;
+  final DateTime? pairedAt;
   final bool online;
   final int? batteryPct;
   final DateTime? lastSeenAt;
@@ -1741,6 +1787,8 @@ class DashboardDevice extends DataClass implements Insertable<DashboardDevice> {
     required this.patientId,
     required this.id,
     required this.serial,
+    this.firmwareVersion,
+    this.pairedAt,
     required this.online,
     this.batteryPct,
     this.lastSeenAt,
@@ -1752,6 +1800,14 @@ class DashboardDevice extends DataClass implements Insertable<DashboardDevice> {
     map['patient_id'] = Variable<String>(patientId);
     map['id'] = Variable<String>(id);
     map['serial'] = Variable<String>(serial);
+    if (!nullToAbsent || firmwareVersion != null) {
+      map['firmware_version'] = Variable<String>(firmwareVersion);
+    }
+    if (!nullToAbsent || pairedAt != null) {
+      map['paired_at'] = Variable<int>(
+        $DashboardDevicesTable.$converterpairedAtn.toSql(pairedAt),
+      );
+    }
     map['online'] = Variable<bool>(online);
     if (!nullToAbsent || batteryPct != null) {
       map['battery_pct'] = Variable<int>(batteryPct);
@@ -1770,6 +1826,12 @@ class DashboardDevice extends DataClass implements Insertable<DashboardDevice> {
       patientId: Value(patientId),
       id: Value(id),
       serial: Value(serial),
+      firmwareVersion: firmwareVersion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(firmwareVersion),
+      pairedAt: pairedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pairedAt),
       online: Value(online),
       batteryPct: batteryPct == null && nullToAbsent
           ? const Value.absent()
@@ -1790,6 +1852,8 @@ class DashboardDevice extends DataClass implements Insertable<DashboardDevice> {
       patientId: serializer.fromJson<String>(json['patientId']),
       id: serializer.fromJson<String>(json['id']),
       serial: serializer.fromJson<String>(json['serial']),
+      firmwareVersion: serializer.fromJson<String?>(json['firmwareVersion']),
+      pairedAt: serializer.fromJson<DateTime?>(json['pairedAt']),
       online: serializer.fromJson<bool>(json['online']),
       batteryPct: serializer.fromJson<int?>(json['batteryPct']),
       lastSeenAt: serializer.fromJson<DateTime?>(json['lastSeenAt']),
@@ -1803,6 +1867,8 @@ class DashboardDevice extends DataClass implements Insertable<DashboardDevice> {
       'patientId': serializer.toJson<String>(patientId),
       'id': serializer.toJson<String>(id),
       'serial': serializer.toJson<String>(serial),
+      'firmwareVersion': serializer.toJson<String?>(firmwareVersion),
+      'pairedAt': serializer.toJson<DateTime?>(pairedAt),
       'online': serializer.toJson<bool>(online),
       'batteryPct': serializer.toJson<int?>(batteryPct),
       'lastSeenAt': serializer.toJson<DateTime?>(lastSeenAt),
@@ -1814,6 +1880,8 @@ class DashboardDevice extends DataClass implements Insertable<DashboardDevice> {
     String? patientId,
     String? id,
     String? serial,
+    Value<String?> firmwareVersion = const Value.absent(),
+    Value<DateTime?> pairedAt = const Value.absent(),
     bool? online,
     Value<int?> batteryPct = const Value.absent(),
     Value<DateTime?> lastSeenAt = const Value.absent(),
@@ -1822,6 +1890,10 @@ class DashboardDevice extends DataClass implements Insertable<DashboardDevice> {
     patientId: patientId ?? this.patientId,
     id: id ?? this.id,
     serial: serial ?? this.serial,
+    firmwareVersion: firmwareVersion.present
+        ? firmwareVersion.value
+        : this.firmwareVersion,
+    pairedAt: pairedAt.present ? pairedAt.value : this.pairedAt,
     online: online ?? this.online,
     batteryPct: batteryPct.present ? batteryPct.value : this.batteryPct,
     lastSeenAt: lastSeenAt.present ? lastSeenAt.value : this.lastSeenAt,
@@ -1834,6 +1906,10 @@ class DashboardDevice extends DataClass implements Insertable<DashboardDevice> {
       patientId: data.patientId.present ? data.patientId.value : this.patientId,
       id: data.id.present ? data.id.value : this.id,
       serial: data.serial.present ? data.serial.value : this.serial,
+      firmwareVersion: data.firmwareVersion.present
+          ? data.firmwareVersion.value
+          : this.firmwareVersion,
+      pairedAt: data.pairedAt.present ? data.pairedAt.value : this.pairedAt,
       online: data.online.present ? data.online.value : this.online,
       batteryPct: data.batteryPct.present
           ? data.batteryPct.value
@@ -1851,6 +1927,8 @@ class DashboardDevice extends DataClass implements Insertable<DashboardDevice> {
           ..write('patientId: $patientId, ')
           ..write('id: $id, ')
           ..write('serial: $serial, ')
+          ..write('firmwareVersion: $firmwareVersion, ')
+          ..write('pairedAt: $pairedAt, ')
           ..write('online: $online, ')
           ..write('batteryPct: $batteryPct, ')
           ..write('lastSeenAt: $lastSeenAt')
@@ -1864,6 +1942,8 @@ class DashboardDevice extends DataClass implements Insertable<DashboardDevice> {
     patientId,
     id,
     serial,
+    firmwareVersion,
+    pairedAt,
     online,
     batteryPct,
     lastSeenAt,
@@ -1876,6 +1956,8 @@ class DashboardDevice extends DataClass implements Insertable<DashboardDevice> {
           other.patientId == this.patientId &&
           other.id == this.id &&
           other.serial == this.serial &&
+          other.firmwareVersion == this.firmwareVersion &&
+          other.pairedAt == this.pairedAt &&
           other.online == this.online &&
           other.batteryPct == this.batteryPct &&
           other.lastSeenAt == this.lastSeenAt);
@@ -1886,6 +1968,8 @@ class DashboardDevicesCompanion extends UpdateCompanion<DashboardDevice> {
   final Value<String> patientId;
   final Value<String> id;
   final Value<String> serial;
+  final Value<String?> firmwareVersion;
+  final Value<DateTime?> pairedAt;
   final Value<bool> online;
   final Value<int?> batteryPct;
   final Value<DateTime?> lastSeenAt;
@@ -1895,6 +1979,8 @@ class DashboardDevicesCompanion extends UpdateCompanion<DashboardDevice> {
     this.patientId = const Value.absent(),
     this.id = const Value.absent(),
     this.serial = const Value.absent(),
+    this.firmwareVersion = const Value.absent(),
+    this.pairedAt = const Value.absent(),
     this.online = const Value.absent(),
     this.batteryPct = const Value.absent(),
     this.lastSeenAt = const Value.absent(),
@@ -1905,6 +1991,8 @@ class DashboardDevicesCompanion extends UpdateCompanion<DashboardDevice> {
     required String patientId,
     required String id,
     required String serial,
+    this.firmwareVersion = const Value.absent(),
+    this.pairedAt = const Value.absent(),
     required bool online,
     this.batteryPct = const Value.absent(),
     this.lastSeenAt = const Value.absent(),
@@ -1919,6 +2007,8 @@ class DashboardDevicesCompanion extends UpdateCompanion<DashboardDevice> {
     Expression<String>? patientId,
     Expression<String>? id,
     Expression<String>? serial,
+    Expression<String>? firmwareVersion,
+    Expression<int>? pairedAt,
     Expression<bool>? online,
     Expression<int>? batteryPct,
     Expression<int>? lastSeenAt,
@@ -1929,6 +2019,8 @@ class DashboardDevicesCompanion extends UpdateCompanion<DashboardDevice> {
       if (patientId != null) 'patient_id': patientId,
       if (id != null) 'id': id,
       if (serial != null) 'serial': serial,
+      if (firmwareVersion != null) 'firmware_version': firmwareVersion,
+      if (pairedAt != null) 'paired_at': pairedAt,
       if (online != null) 'online': online,
       if (batteryPct != null) 'battery_pct': batteryPct,
       if (lastSeenAt != null) 'last_seen_at': lastSeenAt,
@@ -1941,6 +2033,8 @@ class DashboardDevicesCompanion extends UpdateCompanion<DashboardDevice> {
     Value<String>? patientId,
     Value<String>? id,
     Value<String>? serial,
+    Value<String?>? firmwareVersion,
+    Value<DateTime?>? pairedAt,
     Value<bool>? online,
     Value<int?>? batteryPct,
     Value<DateTime?>? lastSeenAt,
@@ -1951,6 +2045,8 @@ class DashboardDevicesCompanion extends UpdateCompanion<DashboardDevice> {
       patientId: patientId ?? this.patientId,
       id: id ?? this.id,
       serial: serial ?? this.serial,
+      firmwareVersion: firmwareVersion ?? this.firmwareVersion,
+      pairedAt: pairedAt ?? this.pairedAt,
       online: online ?? this.online,
       batteryPct: batteryPct ?? this.batteryPct,
       lastSeenAt: lastSeenAt ?? this.lastSeenAt,
@@ -1972,6 +2068,14 @@ class DashboardDevicesCompanion extends UpdateCompanion<DashboardDevice> {
     }
     if (serial.present) {
       map['serial'] = Variable<String>(serial.value);
+    }
+    if (firmwareVersion.present) {
+      map['firmware_version'] = Variable<String>(firmwareVersion.value);
+    }
+    if (pairedAt.present) {
+      map['paired_at'] = Variable<int>(
+        $DashboardDevicesTable.$converterpairedAtn.toSql(pairedAt.value),
+      );
     }
     if (online.present) {
       map['online'] = Variable<bool>(online.value);
@@ -1997,6 +2101,8 @@ class DashboardDevicesCompanion extends UpdateCompanion<DashboardDevice> {
           ..write('patientId: $patientId, ')
           ..write('id: $id, ')
           ..write('serial: $serial, ')
+          ..write('firmwareVersion: $firmwareVersion, ')
+          ..write('pairedAt: $pairedAt, ')
           ..write('online: $online, ')
           ..write('batteryPct: $batteryPct, ')
           ..write('lastSeenAt: $lastSeenAt, ')
@@ -13334,6 +13440,8 @@ typedef $$DashboardDevicesTableCreateCompanionBuilder =
       required String patientId,
       required String id,
       required String serial,
+      Value<String?> firmwareVersion,
+      Value<DateTime?> pairedAt,
       required bool online,
       Value<int?> batteryPct,
       Value<DateTime?> lastSeenAt,
@@ -13345,6 +13453,8 @@ typedef $$DashboardDevicesTableUpdateCompanionBuilder =
       Value<String> patientId,
       Value<String> id,
       Value<String> serial,
+      Value<String?> firmwareVersion,
+      Value<DateTime?> pairedAt,
       Value<bool> online,
       Value<int?> batteryPct,
       Value<DateTime?> lastSeenAt,
@@ -13379,6 +13489,17 @@ class $$DashboardDevicesTableFilterComposer
     column: $table.serial,
     builder: (column) => ColumnFilters(column),
   );
+
+  ColumnFilters<String> get firmwareVersion => $composableBuilder(
+    column: $table.firmwareVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime?, DateTime, int> get pairedAt =>
+      $composableBuilder(
+        column: $table.pairedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
 
   ColumnFilters<bool> get online => $composableBuilder(
     column: $table.online,
@@ -13426,6 +13547,16 @@ class $$DashboardDevicesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get firmwareVersion => $composableBuilder(
+    column: $table.firmwareVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get pairedAt => $composableBuilder(
+    column: $table.pairedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get online => $composableBuilder(
     column: $table.online,
     builder: (column) => ColumnOrderings(column),
@@ -13464,6 +13595,14 @@ class $$DashboardDevicesTableAnnotationComposer
 
   GeneratedColumn<String> get serial =>
       $composableBuilder(column: $table.serial, builder: (column) => column);
+
+  GeneratedColumn<String> get firmwareVersion => $composableBuilder(
+    column: $table.firmwareVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<DateTime?, int> get pairedAt =>
+      $composableBuilder(column: $table.pairedAt, builder: (column) => column);
 
   GeneratedColumn<bool> get online =>
       $composableBuilder(column: $table.online, builder: (column) => column);
@@ -13521,6 +13660,8 @@ class $$DashboardDevicesTableTableManager
                 Value<String> patientId = const Value.absent(),
                 Value<String> id = const Value.absent(),
                 Value<String> serial = const Value.absent(),
+                Value<String?> firmwareVersion = const Value.absent(),
+                Value<DateTime?> pairedAt = const Value.absent(),
                 Value<bool> online = const Value.absent(),
                 Value<int?> batteryPct = const Value.absent(),
                 Value<DateTime?> lastSeenAt = const Value.absent(),
@@ -13530,6 +13671,8 @@ class $$DashboardDevicesTableTableManager
                 patientId: patientId,
                 id: id,
                 serial: serial,
+                firmwareVersion: firmwareVersion,
+                pairedAt: pairedAt,
                 online: online,
                 batteryPct: batteryPct,
                 lastSeenAt: lastSeenAt,
@@ -13541,6 +13684,8 @@ class $$DashboardDevicesTableTableManager
                 required String patientId,
                 required String id,
                 required String serial,
+                Value<String?> firmwareVersion = const Value.absent(),
+                Value<DateTime?> pairedAt = const Value.absent(),
                 required bool online,
                 Value<int?> batteryPct = const Value.absent(),
                 Value<DateTime?> lastSeenAt = const Value.absent(),
@@ -13550,6 +13695,8 @@ class $$DashboardDevicesTableTableManager
                 patientId: patientId,
                 id: id,
                 serial: serial,
+                firmwareVersion: firmwareVersion,
+                pairedAt: pairedAt,
                 online: online,
                 batteryPct: batteryPct,
                 lastSeenAt: lastSeenAt,

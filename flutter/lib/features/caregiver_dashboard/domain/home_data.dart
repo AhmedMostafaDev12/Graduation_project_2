@@ -19,11 +19,28 @@ class HomeDevice {
     required this.online,
     this.battery,
     this.lastSeen,
+    this.firmware,
+    this.pairedAt,
   });
   final String id, patientId, serial;
   final bool online;
   final int? battery;
   final DateTime? lastSeen;
+  final String? firmware;
+  final DateTime? pairedAt;
+}
+
+/// Acknowledged online operation; retries apply only local effects.
+class DeviceChange {
+  const DeviceChange.memory(this.patientId, bool enabled)
+    : memoryEnabled = enabled,
+      deviceId = null;
+  const DeviceChange.unpaired(this.patientId, String id)
+    : deviceId = id,
+      memoryEnabled = null;
+  final String patientId;
+  final String? deviceId;
+  final bool? memoryEnabled;
 }
 
 class HomeDay {

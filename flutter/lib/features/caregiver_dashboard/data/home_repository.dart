@@ -15,29 +15,41 @@ class HomeRepository {
   final _cancel = CancelToken();
   bool _disposed = false;
   int _alertGeneration = 0;
+  int _deviceGeneration = 0;
   void dispose() {
     _disposed = true;
     _cancel.cancel();
   }
 
-  Future<dynamic> _get(String path, [Map<String, dynamic>? query]) async {
+  Future<dynamic> _get(String path, [Map<String, dynamic>? query]) async =>
+      (await _request(path, query: query)).data;
+
+  Future<Response<dynamic>> _request(
+    String path, {
+    Map<String, dynamic>? query,
+    String method = 'GET',
+    Object? data,
+    int status = 200,
+  }) async {
     try {
       final response = await client.request<dynamic>(
         path,
         credential: ApiCredential.caregiver,
+        method: method,
+        data: data,
         queryParameters: query,
         cancelToken: _cancel,
       );
-      if (response.statusCode != 200) {
+      if (response.statusCode != status) {
         throw ApiFailure(ApiFailureKind.invalidResponse);
       }
-      return response.data;
+      return response;
     } on ApiFailure catch (failure) {
       // A known revoked/missing link is not an offline-cache fallback.
       final segments = path.split('/');
       if (failure.statusCode == 404 &&
           failure.code == 'PATIENT_NOT_FOUND' &&
-          segments.length >= 4 &&
+          segments.length >= 3 &&
           segments[1] == 'patients') {
         final patientId = segments[2];
         await db.transaction(() async {
@@ -209,6 +221,7 @@ class HomeRepository {
 
   Future<void> refresh(String? selectedId) async {
     final alertGeneration = _alertGeneration;
+    final deviceGeneration = _deviceGeneration;
     final patients = _list(await _get('/patients'));
     for (final p in patients) {
       for (final key in [
@@ -261,8 +274,9 @@ class HomeRepository {
         offset += page.length;
       }
     }
-    if (_disposed) return;
+    if (_disposed || deviceGeneration != _deviceGeneration) return;
     await db.transaction(() async {
+      if (_disposed || deviceGeneration != _deviceGeneration) return;
       await (db.delete(
         db.dashboardPatients,
       )..where((p) => p.caregiverId.equals(caregiverId))).go();
@@ -447,6 +461,10 @@ class HomeRepository {
                 patientId: patientId,
                 id: _string(d, 'id'),
                 serial: _string(d, 'serial_number'),
+                firmwareVersion: Value(_firmware(d)),
+                pairedAt: Value(
+                  d['paired_at'] == null ? null : _time(d, 'paired_at'),
+                ),
                 online: d['online'],
                 batteryPct: Value(battery as int?),
                 lastSeenAt: Value(
@@ -556,6 +574,8 @@ class HomeRepository {
               online: d.online,
               battery: d.batteryPct,
               lastSeen: d.lastSeenAt,
+              firmware: d.firmwareVersion,
+              pairedAt: d.pairedAt,
             ),
           )
           .toList(),
@@ -705,6 +725,147 @@ class HomeRepository {
       }
       rethrow;
     }
+  }
+
+  String? _firmware(Map raw) {
+    final value = raw['firmware_version'];
+    if (value != null && value is! String) {
+      throw ApiFailure(ApiFailureKind.invalidResponse);
+    }
+    return value as String?;
+  }
+
+  Future<DashboardPatient?> _devicePatient(String patientId) =>
+      (db.select(db.dashboardPatients)..where(
+            (p) => p.caregiverId.equals(caregiverId) & p.id.equals(patientId),
+          ))
+          .getSingleOrNull();
+
+  Future<void> refreshDevices(String patientId) async {
+    final generation = ++_deviceGeneration;
+    if (await _devicePatient(patientId) == null) {
+      throw ApiFailure(ApiFailureKind.invalidResponse);
+    }
+    final raw = _list(await _get('/patients/$patientId/devices'));
+    final rows = <DashboardDevicesCompanion>[];
+    final ids = <String>{};
+    for (final d in raw) {
+      final id = _string(d, 'id'), battery = d['battery_level_pct'];
+      if (!ids.add(id) ||
+          d['patient_id'] != patientId ||
+          d['online'] is! bool ||
+          (battery != null &&
+              (battery is! int || battery < 0 || battery > 100))) {
+        throw ApiFailure(ApiFailureKind.invalidResponse);
+      }
+      rows.add(
+        DashboardDevicesCompanion.insert(
+          caregiverId: caregiverId,
+          patientId: patientId,
+          id: id,
+          serial: _string(d, 'serial_number'),
+          online: d['online'],
+          batteryPct: Value(battery as int?),
+          firmwareVersion: Value(_firmware(d)),
+          pairedAt: Value(
+            d['paired_at'] == null ? null : _time(d, 'paired_at'),
+          ),
+          lastSeenAt: Value(
+            d['last_seen_at'] == null ? null : _time(d, 'last_seen_at'),
+          ),
+        ),
+      );
+    }
+    if (_disposed || generation != _deviceGeneration) return;
+    await db.transaction(() async {
+      if (_disposed ||
+          generation != _deviceGeneration ||
+          await _devicePatient(patientId) == null) {
+        return;
+      }
+      await (db.delete(db.dashboardDevices)..where(
+            (d) =>
+                d.caregiverId.equals(caregiverId) &
+                d.patientId.equals(patientId),
+          ))
+          .go();
+      for (final row in rows) {
+        await db.into(db.dashboardDevices).insert(row);
+      }
+    });
+  }
+
+  Future<DeviceChange> changeDevice(
+    String patientId, {
+    bool? memoryEnabled,
+    String? unpairId,
+  }) async {
+    final patient = await _devicePatient(patientId);
+    if (patient?.permission != 'manager' ||
+        (memoryEnabled == null) == (unpairId == null)) {
+      throw ApiFailure(ApiFailureKind.invalidResponse);
+    }
+    if (unpairId != null) {
+      final device =
+          await (db.select(db.dashboardDevices)..where(
+                (d) =>
+                    d.caregiverId.equals(caregiverId) &
+                    d.patientId.equals(patientId) &
+                    d.id.equals(unpairId),
+              ))
+              .getSingleOrNull();
+      if (device == null) throw ApiFailure(ApiFailureKind.invalidResponse);
+    }
+    final response = await _request(
+      unpairId == null ? '/patients/$patientId' : '/devices/$unpairId',
+      method: unpairId == null ? 'PATCH' : 'DELETE',
+      status: unpairId == null ? 200 : 204,
+      data: unpairId == null ? {'memory_capture_enabled': memoryEnabled} : null,
+    );
+    if (unpairId != null) {
+      if (response.statusCode != 204) {
+        throw ApiFailure(ApiFailureKind.invalidResponse);
+      }
+    } else {
+      final data = response.data;
+      if (response.statusCode != 200 ||
+          data is! Map ||
+          data['id'] != patientId ||
+          data['memory_capture_enabled'] != memoryEnabled) {
+        throw ApiFailure(ApiFailureKind.invalidResponse);
+      }
+    }
+    ++_deviceGeneration;
+    return unpairId == null
+        ? DeviceChange.memory(patientId, memoryEnabled!)
+        : DeviceChange.unpaired(patientId, unpairId);
+  }
+
+  Future<void> cacheDeviceChange(DeviceChange change) {
+    ++_deviceGeneration;
+    return db.transaction(() async {
+      if (_disposed || await _devicePatient(change.patientId) == null) return;
+      if (change.deviceId != null) {
+        await (db.delete(db.dashboardDevices)..where(
+              (d) =>
+                  d.caregiverId.equals(caregiverId) &
+                  d.patientId.equals(change.patientId) &
+                  d.id.equals(change.deviceId!),
+            ))
+            .go();
+      } else {
+        await (db.update(db.dashboardPatients)..where(
+              (p) =>
+                  p.caregiverId.equals(caregiverId) &
+                  p.id.equals(change.patientId),
+            ))
+            .write(
+              DashboardPatientsCompanion(
+                memoryCaptureEnabled: Value(change.memoryEnabled!),
+              ),
+            );
+      }
+    });
   }
 
   Future<void> cacheAlertRead(

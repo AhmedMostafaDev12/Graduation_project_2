@@ -64,6 +64,9 @@ class _C2AlertsScreenState extends ConsumerState<C2AlertsScreen>
         alert.entityId != null) {
       ref.read(selectedHomePatientIdProvider.notifier).select(alert.patientId);
       context.goNamed(RemoriScreen.c6.name, extra: alert.patientId);
+    } else if (alert.type == 'device_offline' || alert.type == 'low_battery') {
+      ref.read(selectedHomePatientIdProvider.notifier).select(alert.patientId);
+      context.goNamed(RemoriScreen.c16.name);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

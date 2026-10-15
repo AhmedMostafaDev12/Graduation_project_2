@@ -1585,4 +1585,120 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get documentFieldExpires => 'تاريخ الانتهاء';
+
+  @override
+  String get deviceTitle => 'الجهاز';
+
+  @override
+  String get deviceGlasses => 'نظارة ريموري';
+
+  @override
+  String get deviceConnected => 'متصلة';
+
+  @override
+  String get deviceOffline => 'غير متصلة';
+
+  @override
+  String get deviceStatusUnavailable => 'الحالة غير متاحة';
+
+  @override
+  String get deviceSerial => 'الرقم التسلسلي';
+
+  @override
+  String get deviceFirmware => 'إصدار البرنامج';
+
+  @override
+  String get deviceBattery => 'البطارية';
+
+  @override
+  String get deviceLastSeen => 'آخر اتصال';
+
+  @override
+  String get deviceUnknown => 'غير متاح';
+
+  @override
+  String get deviceJustNow => 'الآن';
+
+  @override
+  String deviceMinutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'منذ $count دقيقة',
+      many: 'منذ $count دقيقة',
+      few: 'منذ $count دقائق',
+      two: 'منذ دقيقتين',
+      one: 'منذ دقيقة',
+      zero: 'الآن',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String deviceHoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'منذ $count ساعة',
+      many: 'منذ $count ساعة',
+      few: 'منذ $count ساعات',
+      two: 'منذ ساعتين',
+      one: 'منذ ساعة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String deviceDaysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'منذ $count يوم',
+      many: 'منذ $count يومًا',
+      few: 'منذ $count أيام',
+      two: 'منذ يومين',
+      one: 'منذ يوم',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deviceMemory => 'ذاكرة المحادثات';
+
+  @override
+  String get deviceMemoryHelp =>
+      'عند إيقافها، تتوقف النظارة عن التقاط الكلام. يستمر التعرف على الوجوه والتذكيرات. يمكن للمريض أيضًا إيقافها مؤقتًا بضغطة مطوّلة على النظارة.';
+
+  @override
+  String get deviceHeartbeatHelp =>
+      'متصلة تعني وصول إشارة من الجهاز خلال آخر ٥ دقائق، ولا تؤكد اتصال بلوتوث مباشرًا. عند انقطاع الشبكة، تظهر آخر قراءات محفوظة.';
+
+  @override
+  String get deviceRepair => 'إعادة إقران النظارة';
+
+  @override
+  String get deviceUnpair => 'إلغاء إقران النظارة';
+
+  @override
+  String deviceUnpairConfirm(String serial) {
+    return 'هل تريد إلغاء إقران $serial؟ سيتوقف رمز هاتف المريض عن العمل. ستحتاج إلى إقران النظارة مجددًا لإعادة الاتصال.';
+  }
+
+  @override
+  String get deviceUnavailable => 'اختر مريضًا متاحًا لعرض نظارته.';
+
+  @override
+  String get deviceNone => 'لا توجد نظارة مقترنة بهذا المريض.';
+
+  @override
+  String get deviceLoadFailed =>
+      'تعذر التحديث. تظهر قراءات الجهاز المحفوظة. تحقق من اتصالك وحاول مجددًا.';
+
+  @override
+  String get deviceSavedLocallyPending =>
+      'حُفظ التغيير. أعد المحاولة لإكمال تحديث هذا الهاتف.';
+
+  @override
+  String get deviceUncertain =>
+      'تعذر تأكيد التغيير. حدّث البيانات قبل إجراء تغيير آخر.';
 }

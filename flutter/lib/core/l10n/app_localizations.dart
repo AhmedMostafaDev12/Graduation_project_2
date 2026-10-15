@@ -2886,6 +2886,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Expires'**
   String get documentFieldExpires;
+
+  /// No description provided for @deviceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Device'**
+  String get deviceTitle;
+
+  /// No description provided for @deviceGlasses.
+  ///
+  /// In en, this message translates to:
+  /// **'Remori glasses'**
+  String get deviceGlasses;
+
+  /// No description provided for @deviceConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get deviceConnected;
+
+  /// No description provided for @deviceOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline'**
+  String get deviceOffline;
+
+  /// No description provided for @deviceStatusUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Status unavailable'**
+  String get deviceStatusUnavailable;
+
+  /// No description provided for @deviceSerial.
+  ///
+  /// In en, this message translates to:
+  /// **'Serial'**
+  String get deviceSerial;
+
+  /// No description provided for @deviceFirmware.
+  ///
+  /// In en, this message translates to:
+  /// **'Firmware'**
+  String get deviceFirmware;
+
+  /// No description provided for @deviceBattery.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery'**
+  String get deviceBattery;
+
+  /// No description provided for @deviceLastSeen.
+  ///
+  /// In en, this message translates to:
+  /// **'Last seen'**
+  String get deviceLastSeen;
+
+  /// No description provided for @deviceUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unavailable'**
+  String get deviceUnknown;
+
+  /// No description provided for @deviceJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get deviceJustNow;
+
+  /// No description provided for @deviceMinutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 min ago} other{{count} min ago}}'**
+  String deviceMinutesAgo(int count);
+
+  /// No description provided for @deviceHoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 hour ago} other{{count} hours ago}}'**
+  String deviceHoursAgo(int count);
+
+  /// No description provided for @deviceDaysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day ago} other{{count} days ago}}'**
+  String deviceDaysAgo(int count);
+
+  /// No description provided for @deviceMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation memory'**
+  String get deviceMemory;
+
+  /// No description provided for @deviceMemoryHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'When off, the glasses stop capturing speech. Face recognition and reminders keep working. The patient can also pause it with a long press on the glasses.'**
+  String get deviceMemoryHelp;
+
+  /// No description provided for @deviceHeartbeatHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected means a heartbeat was received in the last 5 minutes. It does not confirm a direct Bluetooth connection. Offline values are last saved readings.'**
+  String get deviceHeartbeatHelp;
+
+  /// No description provided for @deviceRepair.
+  ///
+  /// In en, this message translates to:
+  /// **'Re-pair glasses'**
+  String get deviceRepair;
+
+  /// No description provided for @deviceUnpair.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpair glasses'**
+  String get deviceUnpair;
+
+  /// No description provided for @deviceUnpairConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpair {serial}? Its patient phone token will stop working. You will need to pair the glasses again to reconnect.'**
+  String deviceUnpairConfirm(String serial);
+
+  /// No description provided for @deviceUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an available patient to view their glasses.'**
+  String get deviceUnavailable;
+
+  /// No description provided for @deviceNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No glasses are paired with this patient.'**
+  String get deviceNone;
+
+  /// No description provided for @deviceLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not refresh. Showing saved device readings. Check your connection and try again.'**
+  String get deviceLoadFailed;
+
+  /// No description provided for @deviceSavedLocallyPending.
+  ///
+  /// In en, this message translates to:
+  /// **'The change was saved. Retry to finish updating this phone.'**
+  String get deviceSavedLocallyPending;
+
+  /// No description provided for @deviceUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'The change could not be confirmed. Refresh before making another change.'**
+  String get deviceUncertain;
 }
 
 class _AppLocalizationsDelegate

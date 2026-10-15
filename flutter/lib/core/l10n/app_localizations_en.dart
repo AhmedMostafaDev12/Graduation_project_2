@@ -1596,4 +1596,111 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get documentFieldExpires => 'Expires';
+
+  @override
+  String get deviceTitle => 'Device';
+
+  @override
+  String get deviceGlasses => 'Remori glasses';
+
+  @override
+  String get deviceConnected => 'Connected';
+
+  @override
+  String get deviceOffline => 'Offline';
+
+  @override
+  String get deviceStatusUnavailable => 'Status unavailable';
+
+  @override
+  String get deviceSerial => 'Serial';
+
+  @override
+  String get deviceFirmware => 'Firmware';
+
+  @override
+  String get deviceBattery => 'Battery';
+
+  @override
+  String get deviceLastSeen => 'Last seen';
+
+  @override
+  String get deviceUnknown => 'Unavailable';
+
+  @override
+  String get deviceJustNow => 'Just now';
+
+  @override
+  String deviceMinutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count min ago',
+      one: '1 min ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String deviceHoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hours ago',
+      one: '1 hour ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String deviceDaysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days ago',
+      one: '1 day ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deviceMemory => 'Conversation memory';
+
+  @override
+  String get deviceMemoryHelp =>
+      'When off, the glasses stop capturing speech. Face recognition and reminders keep working. The patient can also pause it with a long press on the glasses.';
+
+  @override
+  String get deviceHeartbeatHelp =>
+      'Connected means a heartbeat was received in the last 5 minutes. It does not confirm a direct Bluetooth connection. Offline values are last saved readings.';
+
+  @override
+  String get deviceRepair => 'Re-pair glasses';
+
+  @override
+  String get deviceUnpair => 'Unpair glasses';
+
+  @override
+  String deviceUnpairConfirm(String serial) {
+    return 'Unpair $serial? Its patient phone token will stop working. You will need to pair the glasses again to reconnect.';
+  }
+
+  @override
+  String get deviceUnavailable =>
+      'Select an available patient to view their glasses.';
+
+  @override
+  String get deviceNone => 'No glasses are paired with this patient.';
+
+  @override
+  String get deviceLoadFailed =>
+      'Could not refresh. Showing saved device readings. Check your connection and try again.';
+
+  @override
+  String get deviceSavedLocallyPending =>
+      'The change was saved. Retry to finish updating this phone.';
+
+  @override
+  String get deviceUncertain =>
+      'The change could not be confirmed. Refresh before making another change.';
 }

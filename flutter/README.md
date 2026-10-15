@@ -530,8 +530,7 @@ switch alone shows Memory: Enabled or Off. Real BLE remains unimplemented;
 the approved non-release REMORI_FAKE_GLASSES=true option exercises the dev link.
 No pairing tokens or fake events are uploaded by Home.
 
-The glasses and journal links open C16/C12; See all opens C2. Those screen slots
-will be implemented in their own PRs. Viewer accounts have no Add reminder
+The glasses and journal links open C16/C12; See all opens C2. Viewer accounts have no Add reminder
 action. The summary preview makes no Phase 2 request or invented AI output.
 Refresh runs on entry/resume and supports pull to refresh and error retry.
 
@@ -795,8 +794,9 @@ partial preview refresh retains C2 history and purges removed patient links.
 
 Approved staged navigation: medication alerts with reminder_log metadata select
 their patient and open C8. Unknown-person alerts with unknown_face_cluster metadata
-select their patient and open C6. Other cards mark read and show a localized destination
-pending message; C16/C17 remain separate screen PRs. No empty destination route
+select their patient and open C6. Device alerts select their patient and open C16.
+Phase 2 summary cards mark read and show a localized destination
+pending message until C17. No empty destination route
 is opened. The existing caregiver navigation is retained. No packages, tables,
 schema migration, outbox behavior or backend contracts are added.
 
@@ -1127,3 +1127,37 @@ Tests use synthetic responses and bundled design assets, without live document a
 Validation: formatting and analysis clean; 566 tests passed, including 30 C15
 tests. Android debug APK built with the configured live API. iOS compilation
 and physical-device lifecycle validation remain pending on macOS/iOS.
+
+## C16 Device
+
+Open Device from Home's glasses card or a device-related alert. C16 reads the
+existing caregiver-scoped Home cache and refreshes the selected patient's devices
+through `GET /patients/{id}/devices`. Schema v13 adds nullable firmware and pairing
+timestamps to that cache. Every returned device has its own card; multiple devices
+have individual Unpair actions. Missing firmware, battery and last-seen readings
+display unavailable rather than example data.
+
+Connected means a successful refreshed heartbeat within five minutes, as defined
+by the API. It does not assert a direct Bluetooth connection. Offline mode keeps
+saved readings and marks the connection status unavailable. The status ages as
+time passes and refreshes when returning from the background.
+
+Managers can change conversation memory online through `PATCH /patients/{id}`
+and unpair through `DELETE /devices/{id}` after confirmation. Viewers are read-only.
+Confirmed operations update the shared Home cache. A failed local update retries
+only local effects, without repeating the API action. Uncertain writes disable
+further changes until Home's existing patient/settings refresh reconciles them.
+Older device/Home responses cannot restore values changed by a confirmed action.
+
+Unpairing clears a matching locally known pairing grant and disconnects its glasses;
+other local grants are preserved. The server immediately revokes the removed device's
+token. Re-pair opens the existing A5 → A6 flow. C18's More entry remains pending.
+
+Review captures: [English](test/goldens/c16_en.png),
+[Arabic](test/goldens/c16_ar.png). Regenerate with
+`flutter test test/c16_device_test.dart --update-goldens`.
+Tests use synthetic responses and do not change live patient settings or devices.
+
+Validation: formatting and analysis clean; all 597 tests passed, including 31
+C16 tests. Android debug APK built. iOS compilation and physical-device lifecycle
+validation remain pending on macOS/iOS.
