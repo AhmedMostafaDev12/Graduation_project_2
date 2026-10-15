@@ -2018,4 +2018,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get todayAskLater => 'Ask (Phase 2)';
+
+  @override
+  String get patientRemindersTitle => 'Today\'s reminders';
+
+  @override
+  String get patientRemindersEmpty => 'Your reminders will appear here';
+
+  @override
+  String get patientReminderPending => 'Still to do';
+
+  @override
+  String get patientReminderSnoozed => 'Later';
+
+  @override
+  String get patientReminderMissed => 'Time has passed';
 }

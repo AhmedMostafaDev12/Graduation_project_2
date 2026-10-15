@@ -789,5 +789,10 @@
     "todayLater":  "Later",
     "todayPeopleMet":  "People you met today",
     "todayNoPeople":  "People you meet will appear here",
-    "todayAskLater":  "Ask (Phase 2)"
+    "todayAskLater":  "Ask (Phase 2)",
+  "patientRemindersTitle": "Today's reminders",
+  "patientRemindersEmpty": "Your reminders will appear here",
+  "patientReminderPending": "Still to do",
+  "patientReminderSnoozed": "Later",
+  "patientReminderMissed": "Time has passed"
 }

@@ -745,5 +745,10 @@
     "todayLater":  "بعدين",
     "todayPeopleMet":  "قابلت النهارده",
     "todayNoPeople":  "الناس اللي تقابلهم هيظهروا هنا",
-    "todayAskLater":  "اسأل (المرحلة ٢)"
+    "todayAskLater":  "اسأل (المرحلة ٢)",
+  "patientRemindersTitle": "تذكيرات النهارده",
+  "patientRemindersEmpty": "تذكيراتك هتظهر هنا",
+  "patientReminderPending": "لسه",
+  "patientReminderSnoozed": "بعدين",
+  "patientReminderMissed": "وقتها فات"
 }
