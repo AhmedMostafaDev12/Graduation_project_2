@@ -13,6 +13,7 @@ import '../../features/people/presentation/c6_unknown_faces_screen.dart';
 import '../../features/people/presentation/c7_unknown_detail_screen.dart';
 import '../../features/places/presentation/c10_places_screen.dart';
 import '../../features/places/presentation/c11_edit_place_screen.dart';
+import '../../features/journal/presentation/c12_journal_screen.dart';
 import '../../features/reminders/presentation/c8_reminders_screen.dart';
 import '../../features/reminders/presentation/c9_edit_reminder_screen.dart';
 import '../../features/auth/presentation/a1_mode_select_screen.dart';
@@ -61,6 +62,8 @@ typedef RemoriScreenBuilder = Widget Function(BuildContext, GoRouterState);
 /// Feature PRs replace empty slots with the screen-ID presentation widgets.
 final screenBuildersProvider = Provider<Map<RemoriScreen, RemoriScreenBuilder>>(
   (ref) => {
+    RemoriScreen.c12: (context, state) =>
+        const C12JournalScreen(key: ValueKey(RemoriScreen.c12)),
     RemoriScreen.c11: (context, state) => C11EditPlaceScreen(
       patientId:
           state.extra is Map && (state.extra as Map)['patient_id'] is String

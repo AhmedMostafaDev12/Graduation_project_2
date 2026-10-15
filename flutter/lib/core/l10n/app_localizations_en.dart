@@ -1289,4 +1289,115 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get placeWriteFailed =>
       'Unable to save the change. Check the details and try again.';
+
+  @override
+  String get journalAll => 'All';
+
+  @override
+  String get journalPeople => 'People';
+
+  @override
+  String get journalTalk => 'Talk';
+
+  @override
+  String get journalQuestions => 'Questions';
+
+  @override
+  String get journalMedia => 'Media';
+
+  @override
+  String get journalDocs => 'Docs';
+
+  @override
+  String get journalTitle => 'Journal';
+
+  @override
+  String get journalPreviousDay => 'Previous day';
+
+  @override
+  String get journalNextDay => 'Next day';
+
+  @override
+  String get journalLoadFailed =>
+      'Could not refresh the journal. Please try again.';
+
+  @override
+  String get journalOffline =>
+      'Showing saved journal text. Photos require a successful refresh.';
+
+  @override
+  String get journalUnavailable => 'Choose a patient to view their journal.';
+
+  @override
+  String get journalEmpty => 'No journal entries for this day and filter.';
+
+  @override
+  String get journalDetailsPending =>
+      'Media and document details will be available when their screens are ready.';
+
+  @override
+  String get journalEncounter => 'Encounter';
+
+  @override
+  String get journalConversation => 'Conversation';
+
+  @override
+  String get journalQuestion => 'Question asked';
+
+  @override
+  String get journalReminder => 'Reminder';
+
+  @override
+  String get journalRecording => 'Recording';
+
+  @override
+  String get journalDocument => 'Document';
+
+  @override
+  String get journalNotable => 'Notable moment';
+
+  @override
+  String get journalGame => 'Game';
+
+  @override
+  String get journalNote => 'Note';
+
+  @override
+  String get journalActivity => 'Activity';
+
+  @override
+  String get journalUnknownPerson => 'Unknown person';
+
+  @override
+  String get journalRecorded => 'Recording captured';
+
+  @override
+  String get journalReminderActivity => 'Reminder activity recorded.';
+
+  @override
+  String get journalPaused => 'Memory paused';
+
+  @override
+  String get journalResumed => 'Memory resumed';
+
+  @override
+  String get journalPreviewUnavailable => 'Photo preview unavailable';
+
+  @override
+  String get journalPreview => 'Journal photo preview';
+
+  @override
+  String journalRecordingDuration(String duration) {
+    return 'Recorded · $duration';
+  }
+
+  @override
+  String journalWithPerson(String name) {
+    return 'with $name';
+  }
+
+  @override
+  String journalConversationDuration(String name, String minutes) {
+    return 'with $name · $minutes min';
+  }
 }

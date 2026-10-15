@@ -520,5 +520,63 @@
         "type": "String"
       }
     }
+  },
+  "journalAll": "All",
+  "journalPeople": "People",
+  "journalTalk": "Talk",
+  "journalQuestions": "Questions",
+  "journalMedia": "Media",
+  "journalDocs": "Docs",
+  "journalTitle": "Journal",
+  "journalPreviousDay": "Previous day",
+  "journalNextDay": "Next day",
+  "journalLoadFailed": "Could not refresh the journal. Please try again.",
+  "journalOffline": "Showing saved journal text. Photos require a successful refresh.",
+  "journalUnavailable": "Choose a patient to view their journal.",
+  "journalEmpty": "No journal entries for this day and filter.",
+  "journalDetailsPending": "Media and document details will be available when their screens are ready.",
+  "journalEncounter": "Encounter",
+  "journalConversation": "Conversation",
+  "journalQuestion": "Question asked",
+  "journalReminder": "Reminder",
+  "journalRecording": "Recording",
+  "journalDocument": "Document",
+  "journalNotable": "Notable moment",
+  "journalGame": "Game",
+  "journalNote": "Note",
+  "journalActivity": "Activity",
+  "journalUnknownPerson": "Unknown person",
+  "journalRecorded": "Recording captured",
+  "journalReminderActivity": "Reminder activity recorded.",
+  "journalPaused": "Memory paused",
+  "journalResumed": "Memory resumed",
+  "journalPreviewUnavailable": "Photo preview unavailable",
+  "journalPreview": "Journal photo preview",
+  "journalRecordingDuration": "Recorded · {duration}",
+  "journalWithPerson": "with {name}",
+  "journalConversationDuration": "with {name} · {minutes} min",
+  "@journalRecordingDuration": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "@journalWithPerson": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@journalConversationDuration": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
   }
 }

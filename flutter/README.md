@@ -986,3 +986,40 @@ Validation: dart format --set-exit-if-changed . (clean), flutter analyze (clean)
 flutter test (433 passed, including 24 new C11 tests), Android debug APK built
 with the configured live API and approved OpenStreetMap tiles. Automated tests
 never create, edit or delete live places and never query a real phone location.
+
+## C12 Journal
+
+Open Home → Open journal to view C12. The journal reads its caregiver/patient/day
+cache and refreshes it through GET /patients/{id}/journal?date=YYYY-MM-DD. Date
+navigation and times use the patient's IANA timezone; entries appear oldest
+first. All, People, Talk, Questions, Reminders, Media and Docs filter the saved
+events locally. Managers and linked viewers receive the same read-only screen.
+
+Schema v9 adds three scoped caches for allowlisted entry text, media metadata,
+and day/refresh metadata. Arbitrary event metadata and embeddings are discarded;
+audio and image bytes never enter Drift. Failed refreshes preserve saved text.
+Known missing/revoked patients purge all journal days for that caregiver/patient,
+including when Home refresh removes the link.
+
+Signed HTTPS previews use a separate client without authorization headers and
+are memory-only. They load after a successful journal refresh, prefer thumbnail
+URLs, and fall back to image URLs only for images. Videos without thumbnails use
+an icon. Leaving the screen, backgrounding, or changing day/account/patient clears
+the preview store and Flutter image cache. Retention expiry hides and evicts the
+preview without another request; a 403 refreshes the journal once per media ID
+until the next manual refresh. Offline entries show photo placeholders.
+
+The API's actual names, relationships, transcript/rendered text, document
+summaries and media tags are displayed. Person photos, medication names, reminder
+completion details and missing question answers are not invented. Conversations
+use initials when a person is provided. Media/document navigation remains
+disabled with a localized notice until C13/C15 are implemented.
+
+Review captures: [English](test/goldens/c12_en.png),
+[Arabic](test/goldens/c12_ar.png). Regenerate with
+`flutter test test/c12_journal_test.dart --update-goldens`. Tests use synthetic
+responses and bundled design assets; they do not read or modify live journals.
+
+Validation: formatting and analysis clean; 469 tests passed, including 36 C12
+tests. Android debug APK built with the configured live API. iOS compilation and
+device-level lifecycle checks remain validation tasks on macOS/iOS.

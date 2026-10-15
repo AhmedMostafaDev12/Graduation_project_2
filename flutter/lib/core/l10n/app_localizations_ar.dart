@@ -1283,4 +1283,114 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get placeWriteFailed =>
       'تعذّر حفظ التغيير. تحقق من التفاصيل وأعد المحاولة.';
+
+  @override
+  String get journalAll => 'الكل';
+
+  @override
+  String get journalPeople => 'الأشخاص';
+
+  @override
+  String get journalTalk => 'المحادثات';
+
+  @override
+  String get journalQuestions => 'الأسئلة';
+
+  @override
+  String get journalMedia => 'الوسائط';
+
+  @override
+  String get journalDocs => 'المستندات';
+
+  @override
+  String get journalTitle => 'اليوميات';
+
+  @override
+  String get journalPreviousDay => 'اليوم السابق';
+
+  @override
+  String get journalNextDay => 'اليوم التالي';
+
+  @override
+  String get journalLoadFailed => 'تعذر تحديث اليوميات. حاول مرة أخرى.';
+
+  @override
+  String get journalOffline =>
+      'نعرض النص المحفوظ من اليوميات. تتطلب الصور تحديثًا ناجحًا.';
+
+  @override
+  String get journalUnavailable => 'اختر مريضًا لعرض يومياته.';
+
+  @override
+  String get journalEmpty => 'لا توجد أحداث لهذا اليوم ضمن هذا التصنيف.';
+
+  @override
+  String get journalDetailsPending =>
+      'ستتاح تفاصيل الوسائط والمستندات عند اكتمال شاشاتها.';
+
+  @override
+  String get journalEncounter => 'لقاء';
+
+  @override
+  String get journalConversation => 'محادثة';
+
+  @override
+  String get journalQuestion => 'سؤال';
+
+  @override
+  String get journalReminder => 'تذكير';
+
+  @override
+  String get journalRecording => 'تسجيل';
+
+  @override
+  String get journalDocument => 'مستند';
+
+  @override
+  String get journalNotable => 'لحظة مميزة';
+
+  @override
+  String get journalGame => 'لعبة';
+
+  @override
+  String get journalNote => 'ملاحظة';
+
+  @override
+  String get journalActivity => 'حدث';
+
+  @override
+  String get journalUnknownPerson => 'شخص غير معروف';
+
+  @override
+  String get journalRecorded => 'تم التقاط تسجيل';
+
+  @override
+  String get journalReminderActivity => 'تم تسجيل حدث تذكير.';
+
+  @override
+  String get journalPaused => 'تم إيقاف الذاكرة مؤقتًا';
+
+  @override
+  String get journalResumed => 'تم استئناف الذاكرة';
+
+  @override
+  String get journalPreviewUnavailable => 'معاينة الصورة غير متاحة';
+
+  @override
+  String get journalPreview => 'معاينة صورة من اليوميات';
+
+  @override
+  String journalRecordingDuration(String duration) {
+    return 'تسجيل · $duration';
+  }
+
+  @override
+  String journalWithPerson(String name) {
+    return 'مع $name';
+  }
+
+  @override
+  String journalConversationDuration(String name, String minutes) {
+    return 'مع $name · $minutes دقيقة';
+  }
 }
