@@ -18,6 +18,7 @@ class PatientReminderCards extends Table {
   TextColumn get id => text()();
   TextColumn get day => text()();
   TextColumn get title => text()();
+  TextColumn get reminderType => text().nullable()();
   @override
   Set<Column> get primaryKey => {patientId, deviceId, id};
 }

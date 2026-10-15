@@ -103,6 +103,39 @@ class PatientTodayController extends Notifier<PatientTodayState> {
     }
     if (_current) state = PatientTodayState(offline: offline);
   }
+
+  /// P3 leaves only after local persistence, without waiting for connectivity.
+  Future<bool> confirmAlert(
+    PatientReminderAlertTarget target, {
+    required bool snooze,
+  }) async {
+    if (!_current || state.busy || target.scope != key) return false;
+    state = const PatientTodayState(busy: true);
+    try {
+      final repo = ref.read(patientTodayRepositoryProvider(key));
+      final saved = await repo.confirmAlert(target, snooze: snooze);
+      if (!_current) return false;
+      if (!saved) {
+        state = const PatientTodayState();
+        return false;
+      }
+      unawaited(_uploadAlert(repo));
+      return true;
+    } catch (_) {
+      if (_current) state = const PatientTodayState(offline: true);
+      return false;
+    }
+  }
+
+  Future<void> _uploadAlert(PatientTodayRepository repo) async {
+    var offline = false;
+    try {
+      await repo.upload();
+    } catch (_) {
+      offline = true;
+    }
+    if (_current) state = PatientTodayState(offline: offline);
+  }
 }
 
 class PatientLinkStatus {

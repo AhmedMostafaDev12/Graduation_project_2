@@ -94,6 +94,7 @@ class Adapter implements HttpClientAdapter {
           'id': logId,
           'reminder_id': reminder,
           'title': 'Medicine',
+          'type': 'medication',
           'status': status,
           'scheduled_at': now
               .subtract(const Duration(hours: 1))

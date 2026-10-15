@@ -2033,4 +2033,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get patientReminderMissed => 'Time has passed';
+
+  @override
+  String patientAlertTitle(String title) {
+    return 'Time for $title';
+  }
+
+  @override
+  String get patientAlertUnavailable => 'Your reminders are in Reminders';
+
+  @override
+  String get patientAlertSaveFailed =>
+      'That wasn\'t saved yet. Please try again.';
+
+  @override
+  String get patientAlertBack => 'Back to reminders';
 }

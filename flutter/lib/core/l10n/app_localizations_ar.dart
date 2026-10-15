@@ -2035,4 +2035,18 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get patientReminderMissed => 'وقتها فات';
+
+  @override
+  String patientAlertTitle(String title) {
+    return 'ميعاد $title';
+  }
+
+  @override
+  String get patientAlertUnavailable => 'تذكيراتك موجودة في التذكيرات';
+
+  @override
+  String get patientAlertSaveFailed => 'لسه ما اتحفظتش. جرّب تاني.';
+
+  @override
+  String get patientAlertBack => 'ارجع للتذكيرات';
 }

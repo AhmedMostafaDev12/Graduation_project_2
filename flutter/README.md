@@ -1285,3 +1285,37 @@ Review captures: [English](test/goldens/p2_en.png),
 Validation: formatting and analysis clean; all 709 tests passed, including 18 P2
 tests. Android debug APK built. iOS compilation and physical-device integration
 remain pending on macOS/iOS.
+
+## P3 Reminder Alert
+
+While Patient Today or Reminders is visible and the app is foregrounded, the next
+cached pending/snoozed occurrence opens P3 when due. The existing foreground clock
+checks once per minute and on screen/resume updates. An in-memory app-session
+receipt, scoped by patient, device, occurrence and effective due time, prevents
+reopening the same alert across navigation; a new snooze time can alert again.
+Other screens and background operation do not open P3.
+
+P3 displays the actual title and patient-local due time, with the design's pill
+icon for medication and a generic bell for other/unknown types. Schema v17 adds
+one nullable reminder-type column to the existing scoped card cache. Older rows
+remain readable with a bell until refreshed. No new table or package was added.
+
+Done and Later (15 minutes) reuse the local reminder/outbox transaction. P3
+returns to P2 only after local persistence is verified, without waiting for the
+upload; uncertain connectivity leaves the snapshot queued. A failed local save
+keeps P3 open with a gentle retry message. Stale due times, completed occurrences,
+wrong-device links and non-next occurrences cannot confirm through P3. A remote
+completion dismisses the displayed alert. Scope changes immediately hide its
+title and actions.
+
+This is the approved foreground stage. Recurrence expansion, OS/background
+notifications, foreground relay service and BLE schedule/confirmation delivery
+remain separate work. There is no temporary trigger button or invented reminder.
+
+Review captures: [English](test/goldens/p3_en.png),
+[Arabic](test/goldens/p3_ar.png). Regenerate with
+`flutter test test/p3_reminder_alert_test.dart --update-goldens`.
+
+Validation: formatting and analysis clean; all 735 tests passed, including 26 P3
+tests. Android debug APK built. iOS compilation and physical-device lifecycle
+validation remain pending on macOS/iOS.

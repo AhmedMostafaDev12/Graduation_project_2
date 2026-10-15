@@ -750,5 +750,10 @@
   "patientRemindersEmpty": "تذكيراتك هتظهر هنا",
   "patientReminderPending": "لسه",
   "patientReminderSnoozed": "بعدين",
-  "patientReminderMissed": "وقتها فات"
+  "patientReminderMissed": "وقتها فات",
+  "patientAlertTitle": "ميعاد {title}",
+  "@patientAlertTitle": {"placeholders": {"title": {"type": "String"}}},
+  "patientAlertUnavailable": "تذكيراتك موجودة في التذكيرات",
+  "patientAlertSaveFailed": "لسه ما اتحفظتش. جرّب تاني.",
+  "patientAlertBack": "ارجع للتذكيرات"
 }
