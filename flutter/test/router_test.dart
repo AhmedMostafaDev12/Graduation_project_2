@@ -156,14 +156,19 @@ void main() {
   });
 
   testWidgets(
-    'patient auto-entry uses RTL theme and routes Ask without navigation',
+    'patient auto-entry uses RTL and keeps Phase 2 Ask disabled on P1/P2',
     (tester) async {
-      final container = await _mount(
+      await _mount(
         tester,
         const RouteAccess(devicePaired: true, entryMode: RemoriMode.patient),
       );
-      final router = container.read(remoriRouterProvider);
       expect(find.text('p1'), findsOneWidget);
+      expect(
+        tester
+            .widget<RemoriNavigationBar>(find.byType(RemoriNavigationBar))
+            .onAction,
+        isNull,
+      );
       final context = tester.element(find.text('p1'));
       expect(Directionality.of(context), TextDirection.rtl);
       expect(
@@ -173,13 +178,16 @@ void main() {
       await tester.tap(find.text('التذكيرات'));
       await tester.pumpAndSettle();
       expect(find.text('p2'), findsOneWidget);
+      expect(
+        tester
+            .widget<RemoriNavigationBar>(find.byType(RemoriNavigationBar))
+            .onAction,
+        isNull,
+      );
       await tester.tap(find.byIcon(Icons.mic_none));
       await tester.pumpAndSettle();
-      expect(find.text('p6'), findsOneWidget);
-      expect(find.byType(RemoriNavigationBar), findsNothing);
-      router.pop();
-      await tester.pumpAndSettle();
       expect(find.text('p2'), findsOneWidget);
+      expect(find.text('p6'), findsNothing);
     },
   );
 

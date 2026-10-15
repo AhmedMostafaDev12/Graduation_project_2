@@ -328,6 +328,23 @@ class PatientTodayRepository {
                   r.id.isIn(cards.map((c) => c.id)),
             ))
             .get();
+    logs.sort((a, b) {
+      final byTime = a.scheduledAt.compareTo(b.scheduledAt);
+      return byTime != 0 ? byTime : a.id.compareTo(b.id);
+    });
+    final reminders = logs
+        .map(
+          (log) => PatientReminder(
+            log.id,
+            cards.firstWhere((c) => c.id == log.id).title,
+            log.status == ReminderStatus.snoozed
+                ? log.snoozedUntil ?? log.scheduledAt
+                : log.scheduledAt,
+            status: log.status.name,
+            scheduledAt: log.scheduledAt,
+          ),
+        )
+        .toList();
     final next =
         logs
             .where(
@@ -357,11 +374,8 @@ class PatientTodayRepository {
       ),
       next: first == null
           ? null
-          : PatientReminder(
-              first.id,
-              cards.firstWhere((c) => c.id == first.id).title,
-              first.snoozedUntil ?? first.scheduledAt,
-            ),
+          : reminders.firstWhere((r) => r.id == first.id),
+      reminders: reminders,
       people: people.map((p) => MetPerson(p.personId, p.name)).toList(),
     );
   });

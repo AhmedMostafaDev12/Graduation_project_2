@@ -1257,3 +1257,31 @@ Review captures: [English](test/goldens/p1_en.png),
 Validation: formatting and analysis clean; all 691 tests passed, including 17 P1
 tests. Android debug APK built. iOS compilation and physical-device integration
 remain pending on macOS/iOS.
+
+## P2 Reminders
+
+The Patient Mode Reminders tab now shows today's actual occurrence logs from
+P1's existing patient/device-scoped cache, ordered by their original scheduled
+time in the patient's timezone. Completed, pending, snoozed and missed states
+have localized, calm descriptions. A snoozed card shows its effective later time.
+The next pending/snoozed occurrence has Done and Later (15 minutes) actions;
+other cards cannot enqueue actions. There are no patient editing controls.
+
+P1 and P2 share the repository, foreground refresh, completion-wins merge and
+atomic reminder/outbox writes. Actions remain on P2, work offline, and upload
+through the existing device-authenticated batch path. Retry checks connectivity,
+uploads pending snapshots, then refreshes. Leaving and returning to P1 shows the
+same local result. Ask remains disabled for Phase 2 on both screens.
+
+No new packages, database tables or API contracts were added. Recurrence
+expansion, background notifications, full BLE schedule delivery and P3 remain
+separate work. The list shows cached actual occurrences, without inventing
+reminders from caregiver-only data or generating a recurrence schedule.
+
+Review captures: [English](test/goldens/p2_en.png),
+[Arabic](test/goldens/p2_ar.png). Regenerate with
+`flutter test test/p2_reminders_test.dart --update-goldens`.
+
+Validation: formatting and analysis clean; all 709 tests passed, including 18 P2
+tests. Android debug APK built. iOS compilation and physical-device integration
+remain pending on macOS/iOS.

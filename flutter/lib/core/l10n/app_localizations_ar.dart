@@ -2020,4 +2020,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get todayAskLater => 'اسأل (المرحلة ٢)';
+
+  @override
+  String get patientRemindersTitle => 'تذكيرات النهارده';
+
+  @override
+  String get patientRemindersEmpty => 'تذكيراتك هتظهر هنا';
+
+  @override
+  String get patientReminderPending => 'لسه';
+
+  @override
+  String get patientReminderSnoozed => 'بعدين';
+
+  @override
+  String get patientReminderMissed => 'وقتها فات';
 }

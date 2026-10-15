@@ -3570,6 +3570,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Ask (Phase 2)'**
   String get todayAskLater;
+
+  /// No description provided for @patientRemindersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s reminders'**
+  String get patientRemindersTitle;
+
+  /// No description provided for @patientRemindersEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Your reminders will appear here'**
+  String get patientRemindersEmpty;
+
+  /// No description provided for @patientReminderPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Still to do'**
+  String get patientReminderPending;
+
+  /// No description provided for @patientReminderSnoozed.
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get patientReminderSnoozed;
+
+  /// No description provided for @patientReminderMissed.
+  ///
+  /// In en, this message translates to:
+  /// **'Time has passed'**
+  String get patientReminderMissed;
 }
 
 class _AppLocalizationsDelegate

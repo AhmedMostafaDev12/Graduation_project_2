@@ -12,9 +12,16 @@ class PatientSettings {
 }
 
 class PatientReminder {
-  const PatientReminder(this.id, this.title, this.dueAt);
-  final String id, title;
+  const PatientReminder(
+    this.id,
+    this.title,
+    this.dueAt, {
+    this.status = 'pending',
+    DateTime? scheduledAt,
+  }) : scheduledAt = scheduledAt ?? dueAt;
+  final String id, title, status;
   final DateTime dueAt;
+  final DateTime scheduledAt;
 }
 
 class MetPerson {
@@ -23,8 +30,14 @@ class MetPerson {
 }
 
 class PatientTodayData {
-  const PatientTodayData({this.settings, this.next, this.people = const []});
+  const PatientTodayData({
+    this.settings,
+    this.next,
+    this.people = const [],
+    this.reminders = const [],
+  });
   final PatientSettings? settings;
   final PatientReminder? next;
   final List<MetPerson> people;
+  final List<PatientReminder> reminders;
 }
