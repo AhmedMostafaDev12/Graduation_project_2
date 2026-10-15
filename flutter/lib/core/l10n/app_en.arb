@@ -1,4 +1,13 @@
 {
+  "patientGameCards": "Card game",
+  "patientGamePicture": "Name the picture",
+  "patientGameWords": "Remember the words",
+  "patientGameLastScore": "Last score: {score}",
+  "@patientGameLastScore": {"placeholders": {"score": {"type": "String"}}},
+  "patientGameNone": "No games yet",
+  "patientGameUnavailable": "Last score is not available yet",
+  "patientGamesPending": "Playing games will be available soon.",
+  "patientGamesOffline": "We couldn’t check your latest scores. You can try again.",
   "patientMemoryBack": "Back",
   "patientMemoryTitle": "Your memory",
   "patientMemoryMet": "You met {name}",

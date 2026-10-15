@@ -16749,6 +16749,809 @@ class PatientMemoryDetailsCompanion
   }
 }
 
+class $PatientGameScoresTable extends PatientGameScores
+    with TableInfo<$PatientGameScoresTable, PatientGameScore> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PatientGameScoresTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _gameTypeMeta = const VerificationMeta(
+    'gameType',
+  );
+  @override
+  late final GeneratedColumn<String> gameType = GeneratedColumn<String>(
+    'game_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sessionIdMeta = const VerificationMeta(
+    'sessionId',
+  );
+  @override
+  late final GeneratedColumn<String> sessionId = GeneratedColumn<String>(
+    'session_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _scoreMeta = const VerificationMeta('score');
+  @override
+  late final GeneratedColumn<int> score = GeneratedColumn<int>(
+    'score',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _durationSecondsMeta = const VerificationMeta(
+    'durationSeconds',
+  );
+  @override
+  late final GeneratedColumn<int> durationSeconds = GeneratedColumn<int>(
+    'duration_seconds',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> completedAt =
+      GeneratedColumn<int>(
+        'completed_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>($PatientGameScoresTable.$convertercompletedAt);
+  @override
+  List<GeneratedColumn> get $columns => [
+    patientId,
+    deviceId,
+    gameType,
+    sessionId,
+    score,
+    durationSeconds,
+    completedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'patient_game_scores';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PatientGameScore> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    if (data.containsKey('game_type')) {
+      context.handle(
+        _gameTypeMeta,
+        gameType.isAcceptableOrUnknown(data['game_type']!, _gameTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_gameTypeMeta);
+    }
+    if (data.containsKey('session_id')) {
+      context.handle(
+        _sessionIdMeta,
+        sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sessionIdMeta);
+    }
+    if (data.containsKey('score')) {
+      context.handle(
+        _scoreMeta,
+        score.isAcceptableOrUnknown(data['score']!, _scoreMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_scoreMeta);
+    }
+    if (data.containsKey('duration_seconds')) {
+      context.handle(
+        _durationSecondsMeta,
+        durationSeconds.isAcceptableOrUnknown(
+          data['duration_seconds']!,
+          _durationSecondsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_durationSecondsMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {patientId, deviceId, gameType};
+  @override
+  PatientGameScore map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PatientGameScore(
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+      gameType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}game_type'],
+      )!,
+      sessionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}session_id'],
+      )!,
+      score: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}score'],
+      )!,
+      durationSeconds: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}duration_seconds'],
+      )!,
+      completedAt: $PatientGameScoresTable.$convertercompletedAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}completed_at'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $PatientGameScoresTable createAlias(String alias) {
+    return $PatientGameScoresTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $convertercompletedAt = const UtcMicros();
+}
+
+class PatientGameScore extends DataClass
+    implements Insertable<PatientGameScore> {
+  final String patientId;
+  final String deviceId;
+  final String gameType;
+  final String sessionId;
+  final int score;
+  final int durationSeconds;
+  final DateTime completedAt;
+  const PatientGameScore({
+    required this.patientId,
+    required this.deviceId,
+    required this.gameType,
+    required this.sessionId,
+    required this.score,
+    required this.durationSeconds,
+    required this.completedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['patient_id'] = Variable<String>(patientId);
+    map['device_id'] = Variable<String>(deviceId);
+    map['game_type'] = Variable<String>(gameType);
+    map['session_id'] = Variable<String>(sessionId);
+    map['score'] = Variable<int>(score);
+    map['duration_seconds'] = Variable<int>(durationSeconds);
+    {
+      map['completed_at'] = Variable<int>(
+        $PatientGameScoresTable.$convertercompletedAt.toSql(completedAt),
+      );
+    }
+    return map;
+  }
+
+  PatientGameScoresCompanion toCompanion(bool nullToAbsent) {
+    return PatientGameScoresCompanion(
+      patientId: Value(patientId),
+      deviceId: Value(deviceId),
+      gameType: Value(gameType),
+      sessionId: Value(sessionId),
+      score: Value(score),
+      durationSeconds: Value(durationSeconds),
+      completedAt: Value(completedAt),
+    );
+  }
+
+  factory PatientGameScore.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PatientGameScore(
+      patientId: serializer.fromJson<String>(json['patientId']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+      gameType: serializer.fromJson<String>(json['gameType']),
+      sessionId: serializer.fromJson<String>(json['sessionId']),
+      score: serializer.fromJson<int>(json['score']),
+      durationSeconds: serializer.fromJson<int>(json['durationSeconds']),
+      completedAt: serializer.fromJson<DateTime>(json['completedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'patientId': serializer.toJson<String>(patientId),
+      'deviceId': serializer.toJson<String>(deviceId),
+      'gameType': serializer.toJson<String>(gameType),
+      'sessionId': serializer.toJson<String>(sessionId),
+      'score': serializer.toJson<int>(score),
+      'durationSeconds': serializer.toJson<int>(durationSeconds),
+      'completedAt': serializer.toJson<DateTime>(completedAt),
+    };
+  }
+
+  PatientGameScore copyWith({
+    String? patientId,
+    String? deviceId,
+    String? gameType,
+    String? sessionId,
+    int? score,
+    int? durationSeconds,
+    DateTime? completedAt,
+  }) => PatientGameScore(
+    patientId: patientId ?? this.patientId,
+    deviceId: deviceId ?? this.deviceId,
+    gameType: gameType ?? this.gameType,
+    sessionId: sessionId ?? this.sessionId,
+    score: score ?? this.score,
+    durationSeconds: durationSeconds ?? this.durationSeconds,
+    completedAt: completedAt ?? this.completedAt,
+  );
+  PatientGameScore copyWithCompanion(PatientGameScoresCompanion data) {
+    return PatientGameScore(
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      gameType: data.gameType.present ? data.gameType.value : this.gameType,
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      score: data.score.present ? data.score.value : this.score,
+      durationSeconds: data.durationSeconds.present
+          ? data.durationSeconds.value
+          : this.durationSeconds,
+      completedAt: data.completedAt.present
+          ? data.completedAt.value
+          : this.completedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PatientGameScore(')
+          ..write('patientId: $patientId, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('gameType: $gameType, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('score: $score, ')
+          ..write('durationSeconds: $durationSeconds, ')
+          ..write('completedAt: $completedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    patientId,
+    deviceId,
+    gameType,
+    sessionId,
+    score,
+    durationSeconds,
+    completedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PatientGameScore &&
+          other.patientId == this.patientId &&
+          other.deviceId == this.deviceId &&
+          other.gameType == this.gameType &&
+          other.sessionId == this.sessionId &&
+          other.score == this.score &&
+          other.durationSeconds == this.durationSeconds &&
+          other.completedAt == this.completedAt);
+}
+
+class PatientGameScoresCompanion extends UpdateCompanion<PatientGameScore> {
+  final Value<String> patientId;
+  final Value<String> deviceId;
+  final Value<String> gameType;
+  final Value<String> sessionId;
+  final Value<int> score;
+  final Value<int> durationSeconds;
+  final Value<DateTime> completedAt;
+  final Value<int> rowid;
+  const PatientGameScoresCompanion({
+    this.patientId = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.gameType = const Value.absent(),
+    this.sessionId = const Value.absent(),
+    this.score = const Value.absent(),
+    this.durationSeconds = const Value.absent(),
+    this.completedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PatientGameScoresCompanion.insert({
+    required String patientId,
+    required String deviceId,
+    required String gameType,
+    required String sessionId,
+    required int score,
+    required int durationSeconds,
+    required DateTime completedAt,
+    this.rowid = const Value.absent(),
+  }) : patientId = Value(patientId),
+       deviceId = Value(deviceId),
+       gameType = Value(gameType),
+       sessionId = Value(sessionId),
+       score = Value(score),
+       durationSeconds = Value(durationSeconds),
+       completedAt = Value(completedAt);
+  static Insertable<PatientGameScore> custom({
+    Expression<String>? patientId,
+    Expression<String>? deviceId,
+    Expression<String>? gameType,
+    Expression<String>? sessionId,
+    Expression<int>? score,
+    Expression<int>? durationSeconds,
+    Expression<int>? completedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (patientId != null) 'patient_id': patientId,
+      if (deviceId != null) 'device_id': deviceId,
+      if (gameType != null) 'game_type': gameType,
+      if (sessionId != null) 'session_id': sessionId,
+      if (score != null) 'score': score,
+      if (durationSeconds != null) 'duration_seconds': durationSeconds,
+      if (completedAt != null) 'completed_at': completedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PatientGameScoresCompanion copyWith({
+    Value<String>? patientId,
+    Value<String>? deviceId,
+    Value<String>? gameType,
+    Value<String>? sessionId,
+    Value<int>? score,
+    Value<int>? durationSeconds,
+    Value<DateTime>? completedAt,
+    Value<int>? rowid,
+  }) {
+    return PatientGameScoresCompanion(
+      patientId: patientId ?? this.patientId,
+      deviceId: deviceId ?? this.deviceId,
+      gameType: gameType ?? this.gameType,
+      sessionId: sessionId ?? this.sessionId,
+      score: score ?? this.score,
+      durationSeconds: durationSeconds ?? this.durationSeconds,
+      completedAt: completedAt ?? this.completedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (gameType.present) {
+      map['game_type'] = Variable<String>(gameType.value);
+    }
+    if (sessionId.present) {
+      map['session_id'] = Variable<String>(sessionId.value);
+    }
+    if (score.present) {
+      map['score'] = Variable<int>(score.value);
+    }
+    if (durationSeconds.present) {
+      map['duration_seconds'] = Variable<int>(durationSeconds.value);
+    }
+    if (completedAt.present) {
+      map['completed_at'] = Variable<int>(
+        $PatientGameScoresTable.$convertercompletedAt.toSql(completedAt.value),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PatientGameScoresCompanion(')
+          ..write('patientId: $patientId, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('gameType: $gameType, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('score: $score, ')
+          ..write('durationSeconds: $durationSeconds, ')
+          ..write('completedAt: $completedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PatientGameRefreshesTable extends PatientGameRefreshes
+    with TableInfo<$PatientGameRefreshesTable, PatientGameRefreshe> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PatientGameRefreshesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _gameTypeMeta = const VerificationMeta(
+    'gameType',
+  );
+  @override
+  late final GeneratedColumn<String> gameType = GeneratedColumn<String>(
+    'game_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> refreshedAt =
+      GeneratedColumn<int>(
+        'refreshed_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>(
+        $PatientGameRefreshesTable.$converterrefreshedAt,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    patientId,
+    deviceId,
+    gameType,
+    refreshedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'patient_game_refreshes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PatientGameRefreshe> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    if (data.containsKey('game_type')) {
+      context.handle(
+        _gameTypeMeta,
+        gameType.isAcceptableOrUnknown(data['game_type']!, _gameTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_gameTypeMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {patientId, deviceId, gameType};
+  @override
+  PatientGameRefreshe map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PatientGameRefreshe(
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+      gameType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}game_type'],
+      )!,
+      refreshedAt: $PatientGameRefreshesTable.$converterrefreshedAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}refreshed_at'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $PatientGameRefreshesTable createAlias(String alias) {
+    return $PatientGameRefreshesTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converterrefreshedAt = const UtcMicros();
+}
+
+class PatientGameRefreshe extends DataClass
+    implements Insertable<PatientGameRefreshe> {
+  final String patientId;
+  final String deviceId;
+  final String gameType;
+  final DateTime refreshedAt;
+  const PatientGameRefreshe({
+    required this.patientId,
+    required this.deviceId,
+    required this.gameType,
+    required this.refreshedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['patient_id'] = Variable<String>(patientId);
+    map['device_id'] = Variable<String>(deviceId);
+    map['game_type'] = Variable<String>(gameType);
+    {
+      map['refreshed_at'] = Variable<int>(
+        $PatientGameRefreshesTable.$converterrefreshedAt.toSql(refreshedAt),
+      );
+    }
+    return map;
+  }
+
+  PatientGameRefreshesCompanion toCompanion(bool nullToAbsent) {
+    return PatientGameRefreshesCompanion(
+      patientId: Value(patientId),
+      deviceId: Value(deviceId),
+      gameType: Value(gameType),
+      refreshedAt: Value(refreshedAt),
+    );
+  }
+
+  factory PatientGameRefreshe.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PatientGameRefreshe(
+      patientId: serializer.fromJson<String>(json['patientId']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+      gameType: serializer.fromJson<String>(json['gameType']),
+      refreshedAt: serializer.fromJson<DateTime>(json['refreshedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'patientId': serializer.toJson<String>(patientId),
+      'deviceId': serializer.toJson<String>(deviceId),
+      'gameType': serializer.toJson<String>(gameType),
+      'refreshedAt': serializer.toJson<DateTime>(refreshedAt),
+    };
+  }
+
+  PatientGameRefreshe copyWith({
+    String? patientId,
+    String? deviceId,
+    String? gameType,
+    DateTime? refreshedAt,
+  }) => PatientGameRefreshe(
+    patientId: patientId ?? this.patientId,
+    deviceId: deviceId ?? this.deviceId,
+    gameType: gameType ?? this.gameType,
+    refreshedAt: refreshedAt ?? this.refreshedAt,
+  );
+  PatientGameRefreshe copyWithCompanion(PatientGameRefreshesCompanion data) {
+    return PatientGameRefreshe(
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      gameType: data.gameType.present ? data.gameType.value : this.gameType,
+      refreshedAt: data.refreshedAt.present
+          ? data.refreshedAt.value
+          : this.refreshedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PatientGameRefreshe(')
+          ..write('patientId: $patientId, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('gameType: $gameType, ')
+          ..write('refreshedAt: $refreshedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(patientId, deviceId, gameType, refreshedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PatientGameRefreshe &&
+          other.patientId == this.patientId &&
+          other.deviceId == this.deviceId &&
+          other.gameType == this.gameType &&
+          other.refreshedAt == this.refreshedAt);
+}
+
+class PatientGameRefreshesCompanion
+    extends UpdateCompanion<PatientGameRefreshe> {
+  final Value<String> patientId;
+  final Value<String> deviceId;
+  final Value<String> gameType;
+  final Value<DateTime> refreshedAt;
+  final Value<int> rowid;
+  const PatientGameRefreshesCompanion({
+    this.patientId = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.gameType = const Value.absent(),
+    this.refreshedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PatientGameRefreshesCompanion.insert({
+    required String patientId,
+    required String deviceId,
+    required String gameType,
+    required DateTime refreshedAt,
+    this.rowid = const Value.absent(),
+  }) : patientId = Value(patientId),
+       deviceId = Value(deviceId),
+       gameType = Value(gameType),
+       refreshedAt = Value(refreshedAt);
+  static Insertable<PatientGameRefreshe> custom({
+    Expression<String>? patientId,
+    Expression<String>? deviceId,
+    Expression<String>? gameType,
+    Expression<int>? refreshedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (patientId != null) 'patient_id': patientId,
+      if (deviceId != null) 'device_id': deviceId,
+      if (gameType != null) 'game_type': gameType,
+      if (refreshedAt != null) 'refreshed_at': refreshedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PatientGameRefreshesCompanion copyWith({
+    Value<String>? patientId,
+    Value<String>? deviceId,
+    Value<String>? gameType,
+    Value<DateTime>? refreshedAt,
+    Value<int>? rowid,
+  }) {
+    return PatientGameRefreshesCompanion(
+      patientId: patientId ?? this.patientId,
+      deviceId: deviceId ?? this.deviceId,
+      gameType: gameType ?? this.gameType,
+      refreshedAt: refreshedAt ?? this.refreshedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (gameType.present) {
+      map['game_type'] = Variable<String>(gameType.value);
+    }
+    if (refreshedAt.present) {
+      map['refreshed_at'] = Variable<int>(
+        $PatientGameRefreshesTable.$converterrefreshedAt.toSql(
+          refreshedAt.value,
+        ),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PatientGameRefreshesCompanion(')
+          ..write('patientId: $patientId, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('gameType: $gameType, ')
+          ..write('refreshedAt: $refreshedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$RemoriDatabase extends GeneratedDatabase {
   _$RemoriDatabase(QueryExecutor e) : super(e);
   $RemoriDatabaseManager get managers => $RemoriDatabaseManager(this);
@@ -16822,6 +17625,10 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
       $PatientJournalDaysTable(this);
   late final $PatientMemoryDetailsTable patientMemoryDetails =
       $PatientMemoryDetailsTable(this);
+  late final $PatientGameScoresTable patientGameScores =
+      $PatientGameScoresTable(this);
+  late final $PatientGameRefreshesTable patientGameRefreshes =
+      $PatientGameRefreshesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -16863,6 +17670,8 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
     patientJournalMedia,
     patientJournalDays,
     patientMemoryDetails,
+    patientGameScores,
+    patientGameRefreshes,
   ];
 }
 
@@ -26367,6 +27176,484 @@ typedef $$PatientMemoryDetailsTableProcessedTableManager =
       PatientMemoryDetail,
       PrefetchHooks Function()
     >;
+typedef $$PatientGameScoresTableCreateCompanionBuilder =
+    PatientGameScoresCompanion Function({
+      required String patientId,
+      required String deviceId,
+      required String gameType,
+      required String sessionId,
+      required int score,
+      required int durationSeconds,
+      required DateTime completedAt,
+      Value<int> rowid,
+    });
+typedef $$PatientGameScoresTableUpdateCompanionBuilder =
+    PatientGameScoresCompanion Function({
+      Value<String> patientId,
+      Value<String> deviceId,
+      Value<String> gameType,
+      Value<String> sessionId,
+      Value<int> score,
+      Value<int> durationSeconds,
+      Value<DateTime> completedAt,
+      Value<int> rowid,
+    });
+
+class $$PatientGameScoresTableFilterComposer
+    extends Composer<_$RemoriDatabase, $PatientGameScoresTable> {
+  $$PatientGameScoresTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get gameType => $composableBuilder(
+    column: $table.gameType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sessionId => $composableBuilder(
+    column: $table.sessionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get score => $composableBuilder(
+    column: $table.score,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get durationSeconds => $composableBuilder(
+    column: $table.durationSeconds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get completedAt =>
+      $composableBuilder(
+        column: $table.completedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+}
+
+class $$PatientGameScoresTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $PatientGameScoresTable> {
+  $$PatientGameScoresTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get gameType => $composableBuilder(
+    column: $table.gameType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sessionId => $composableBuilder(
+    column: $table.sessionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get score => $composableBuilder(
+    column: $table.score,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get durationSeconds => $composableBuilder(
+    column: $table.durationSeconds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PatientGameScoresTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $PatientGameScoresTable> {
+  $$PatientGameScoresTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<String> get gameType =>
+      $composableBuilder(column: $table.gameType, builder: (column) => column);
+
+  GeneratedColumn<String> get sessionId =>
+      $composableBuilder(column: $table.sessionId, builder: (column) => column);
+
+  GeneratedColumn<int> get score =>
+      $composableBuilder(column: $table.score, builder: (column) => column);
+
+  GeneratedColumn<int> get durationSeconds => $composableBuilder(
+    column: $table.durationSeconds,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get completedAt =>
+      $composableBuilder(
+        column: $table.completedAt,
+        builder: (column) => column,
+      );
+}
+
+class $$PatientGameScoresTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $PatientGameScoresTable,
+          PatientGameScore,
+          $$PatientGameScoresTableFilterComposer,
+          $$PatientGameScoresTableOrderingComposer,
+          $$PatientGameScoresTableAnnotationComposer,
+          $$PatientGameScoresTableCreateCompanionBuilder,
+          $$PatientGameScoresTableUpdateCompanionBuilder,
+          (
+            PatientGameScore,
+            BaseReferences<
+              _$RemoriDatabase,
+              $PatientGameScoresTable,
+              PatientGameScore
+            >,
+          ),
+          PatientGameScore,
+          PrefetchHooks Function()
+        > {
+  $$PatientGameScoresTableTableManager(
+    _$RemoriDatabase db,
+    $PatientGameScoresTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PatientGameScoresTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PatientGameScoresTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PatientGameScoresTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> patientId = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<String> gameType = const Value.absent(),
+                Value<String> sessionId = const Value.absent(),
+                Value<int> score = const Value.absent(),
+                Value<int> durationSeconds = const Value.absent(),
+                Value<DateTime> completedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PatientGameScoresCompanion(
+                patientId: patientId,
+                deviceId: deviceId,
+                gameType: gameType,
+                sessionId: sessionId,
+                score: score,
+                durationSeconds: durationSeconds,
+                completedAt: completedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String patientId,
+                required String deviceId,
+                required String gameType,
+                required String sessionId,
+                required int score,
+                required int durationSeconds,
+                required DateTime completedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => PatientGameScoresCompanion.insert(
+                patientId: patientId,
+                deviceId: deviceId,
+                gameType: gameType,
+                sessionId: sessionId,
+                score: score,
+                durationSeconds: durationSeconds,
+                completedAt: completedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PatientGameScoresTable, PatientGameScore>(table),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $PatientGameScoresTable,
+                    PatientGameScore
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PatientGameScoresTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $PatientGameScoresTable,
+      PatientGameScore,
+      $$PatientGameScoresTableFilterComposer,
+      $$PatientGameScoresTableOrderingComposer,
+      $$PatientGameScoresTableAnnotationComposer,
+      $$PatientGameScoresTableCreateCompanionBuilder,
+      $$PatientGameScoresTableUpdateCompanionBuilder,
+      (
+        PatientGameScore,
+        BaseReferences<
+          _$RemoriDatabase,
+          $PatientGameScoresTable,
+          PatientGameScore
+        >,
+      ),
+      PatientGameScore,
+      PrefetchHooks Function()
+    >;
+typedef $$PatientGameRefreshesTableCreateCompanionBuilder =
+    PatientGameRefreshesCompanion Function({
+      required String patientId,
+      required String deviceId,
+      required String gameType,
+      required DateTime refreshedAt,
+      Value<int> rowid,
+    });
+typedef $$PatientGameRefreshesTableUpdateCompanionBuilder =
+    PatientGameRefreshesCompanion Function({
+      Value<String> patientId,
+      Value<String> deviceId,
+      Value<String> gameType,
+      Value<DateTime> refreshedAt,
+      Value<int> rowid,
+    });
+
+class $$PatientGameRefreshesTableFilterComposer
+    extends Composer<_$RemoriDatabase, $PatientGameRefreshesTable> {
+  $$PatientGameRefreshesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get gameType => $composableBuilder(
+    column: $table.gameType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+}
+
+class $$PatientGameRefreshesTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $PatientGameRefreshesTable> {
+  $$PatientGameRefreshesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get gameType => $composableBuilder(
+    column: $table.gameType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get refreshedAt => $composableBuilder(
+    column: $table.refreshedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PatientGameRefreshesTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $PatientGameRefreshesTable> {
+  $$PatientGameRefreshesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<String> get gameType =>
+      $composableBuilder(column: $table.gameType, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => column,
+      );
+}
+
+class $$PatientGameRefreshesTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $PatientGameRefreshesTable,
+          PatientGameRefreshe,
+          $$PatientGameRefreshesTableFilterComposer,
+          $$PatientGameRefreshesTableOrderingComposer,
+          $$PatientGameRefreshesTableAnnotationComposer,
+          $$PatientGameRefreshesTableCreateCompanionBuilder,
+          $$PatientGameRefreshesTableUpdateCompanionBuilder,
+          (
+            PatientGameRefreshe,
+            BaseReferences<
+              _$RemoriDatabase,
+              $PatientGameRefreshesTable,
+              PatientGameRefreshe
+            >,
+          ),
+          PatientGameRefreshe,
+          PrefetchHooks Function()
+        > {
+  $$PatientGameRefreshesTableTableManager(
+    _$RemoriDatabase db,
+    $PatientGameRefreshesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PatientGameRefreshesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PatientGameRefreshesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$PatientGameRefreshesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> patientId = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<String> gameType = const Value.absent(),
+                Value<DateTime> refreshedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PatientGameRefreshesCompanion(
+                patientId: patientId,
+                deviceId: deviceId,
+                gameType: gameType,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String patientId,
+                required String deviceId,
+                required String gameType,
+                required DateTime refreshedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => PatientGameRefreshesCompanion.insert(
+                patientId: patientId,
+                deviceId: deviceId,
+                gameType: gameType,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PatientGameRefreshesTable, PatientGameRefreshe>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $PatientGameRefreshesTable,
+                    PatientGameRefreshe
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PatientGameRefreshesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $PatientGameRefreshesTable,
+      PatientGameRefreshe,
+      $$PatientGameRefreshesTableFilterComposer,
+      $$PatientGameRefreshesTableOrderingComposer,
+      $$PatientGameRefreshesTableAnnotationComposer,
+      $$PatientGameRefreshesTableCreateCompanionBuilder,
+      $$PatientGameRefreshesTableUpdateCompanionBuilder,
+      (
+        PatientGameRefreshe,
+        BaseReferences<
+          _$RemoriDatabase,
+          $PatientGameRefreshesTable,
+          PatientGameRefreshe
+        >,
+      ),
+      PatientGameRefreshe,
+      PrefetchHooks Function()
+    >;
 
 class $RemoriDatabaseManager {
   final _$RemoriDatabase _db;
@@ -26458,4 +27745,8 @@ class $RemoriDatabaseManager {
       $$PatientJournalDaysTableTableManager(_db, _db.patientJournalDays);
   $$PatientMemoryDetailsTableTableManager get patientMemoryDetails =>
       $$PatientMemoryDetailsTableTableManager(_db, _db.patientMemoryDetails);
+  $$PatientGameScoresTableTableManager get patientGameScores =>
+      $$PatientGameScoresTableTableManager(_db, _db.patientGameScores);
+  $$PatientGameRefreshesTableTableManager get patientGameRefreshes =>
+      $$PatientGameRefreshesTableTableManager(_db, _db.patientGameRefreshes);
 }

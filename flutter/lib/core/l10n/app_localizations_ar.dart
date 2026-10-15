@@ -10,6 +10,33 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
+  String get patientGameCards => 'لعبة الكروت';
+
+  @override
+  String get patientGamePicture => 'سمّي الصورة';
+
+  @override
+  String get patientGameWords => 'افتكر الكلمات';
+
+  @override
+  String patientGameLastScore(String score) {
+    return 'آخر نتيجة: $score';
+  }
+
+  @override
+  String get patientGameNone => 'لسه مفيش ألعاب';
+
+  @override
+  String get patientGameUnavailable => 'آخر نتيجة مش متاحة لسه';
+
+  @override
+  String get patientGamesPending => 'اللعب هيكون متاح قريب.';
+
+  @override
+  String get patientGamesOffline =>
+      'مش قادرين نطمن على آخر النتائج دلوقتي. تقدر تحاول تاني.';
+
+  @override
   String get patientMemoryBack => 'رجوع';
 
   @override
