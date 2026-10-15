@@ -10,6 +10,60 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get cardGameInstruction => 'Find the two cards that match';
+
+  @override
+  String get cardGameNeedPeople =>
+      'Ask your caregiver to add photos of two people you know before playing.';
+
+  @override
+  String get cardGameUnavailable =>
+      'We couldn’t get the photos ready. You can try again.';
+
+  @override
+  String get cardGameEncouragement => 'Well done! Keep going';
+
+  @override
+  String get cardGameDone => 'Done';
+
+  @override
+  String get cardGameSaveFailed =>
+      'We couldn’t save your game yet. Please try again.';
+
+  @override
+  String get cardGameWellDone => 'Well done!';
+
+  @override
+  String cardGameScore(int score) {
+    return 'Score: $score out of 2';
+  }
+
+  @override
+  String cardGameDuration(String time) {
+    return 'Time: $time';
+  }
+
+  @override
+  String get cardGameAgain => 'Play again';
+
+  @override
+  String get cardGameBackGames => 'Back to games';
+
+  @override
+  String get cardGameResultUnavailable =>
+      'This game result is not available right now.';
+
+  @override
+  String cardGameHidden(int number) {
+    return 'Card $number, face down';
+  }
+
+  @override
+  String cardGamePerson(String name) {
+    return 'Photo of $name';
+  }
+
+  @override
   String get patientGameCards => 'Card game';
 
   @override
@@ -30,7 +84,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get patientGameUnavailable => 'Last score is not available yet';
 
   @override
-  String get patientGamesPending => 'Playing games will be available soon.';
+  String get patientGamesPending => 'The other games will be available soon.';
 
   @override
   String get patientGamesOffline =>

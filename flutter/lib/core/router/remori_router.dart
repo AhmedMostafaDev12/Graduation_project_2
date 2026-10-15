@@ -14,6 +14,9 @@ import '../../features/patient_today/presentation/p3_reminder_alert_screen.dart'
 import '../../features/patient_journal/presentation/p4_my_day_screen.dart';
 import '../../features/patient_journal/presentation/p5_memory_detail_screen.dart';
 import '../../features/mind_games/presentation/p7_games_screen.dart';
+import '../../features/mind_games/presentation/p8_gameplay_screen.dart';
+import '../../features/mind_games/presentation/p9_game_result_screen.dart';
+import '../../features/mind_games/domain/card_game.dart';
 import '../../features/patient_journal/domain/patient_memory_detail.dart';
 import '../../features/patient_today/presentation/patient_reminder_alert_host.dart';
 import '../../features/patient_today/domain/patient_today_data.dart';
@@ -81,6 +84,16 @@ final screenBuildersProvider = Provider<Map<RemoriScreen, RemoriScreenBuilder>>(
     RemoriScreen.p2: (_, _) => const P2RemindersScreen(),
     RemoriScreen.p4: (_, _) => const P4MyDayScreen(),
     RemoriScreen.p7: (_, _) => const P7GamesScreen(),
+    RemoriScreen.p8: (_, state) => P8GameplayScreen(
+      scope: state.extra is PatientTodayKey
+          ? state.extra as PatientTodayKey
+          : null,
+    ),
+    RemoriScreen.p9: (_, state) => P9GameResultScreen(
+      target: state.extra is GameResultTarget
+          ? state.extra as GameResultTarget
+          : null,
+    ),
     RemoriScreen.p5: (_, state) => P5MemoryDetailScreen(
       target: state.extra is PatientMemoryTarget
           ? state.extra as PatientMemoryTarget

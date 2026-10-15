@@ -98,6 +98,90 @@ abstract class AppLocalizations {
     Locale('ar'),
   ];
 
+  /// No description provided for @cardGameInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'Find the two cards that match'**
+  String get cardGameInstruction;
+
+  /// No description provided for @cardGameNeedPeople.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask your caregiver to add photos of two people you know before playing.'**
+  String get cardGameNeedPeople;
+
+  /// No description provided for @cardGameUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn’t get the photos ready. You can try again.'**
+  String get cardGameUnavailable;
+
+  /// No description provided for @cardGameEncouragement.
+  ///
+  /// In en, this message translates to:
+  /// **'Well done! Keep going'**
+  String get cardGameEncouragement;
+
+  /// No description provided for @cardGameDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get cardGameDone;
+
+  /// No description provided for @cardGameSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn’t save your game yet. Please try again.'**
+  String get cardGameSaveFailed;
+
+  /// No description provided for @cardGameWellDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Well done!'**
+  String get cardGameWellDone;
+
+  /// No description provided for @cardGameScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Score: {score} out of 2'**
+  String cardGameScore(int score);
+
+  /// No description provided for @cardGameDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Time: {time}'**
+  String cardGameDuration(String time);
+
+  /// No description provided for @cardGameAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Play again'**
+  String get cardGameAgain;
+
+  /// No description provided for @cardGameBackGames.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to games'**
+  String get cardGameBackGames;
+
+  /// No description provided for @cardGameResultUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This game result is not available right now.'**
+  String get cardGameResultUnavailable;
+
+  /// No description provided for @cardGameHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Card {number}, face down'**
+  String cardGameHidden(int number);
+
+  /// No description provided for @cardGamePerson.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo of {name}'**
+  String cardGamePerson(String name);
+
   /// No description provided for @patientGameCards.
   ///
   /// In en, this message translates to:
@@ -137,7 +221,7 @@ abstract class AppLocalizations {
   /// No description provided for @patientGamesPending.
   ///
   /// In en, this message translates to:
-  /// **'Playing games will be available soon.'**
+  /// **'The other games will be available soon.'**
   String get patientGamesPending;
 
   /// No description provided for @patientGamesOffline.

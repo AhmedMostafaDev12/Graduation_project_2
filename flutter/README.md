@@ -1387,8 +1387,8 @@ The Patient Mode Games tab shows Card game (`face_match`), Name the picture
 (`picture_naming`) and Remember the words (`word_recall`). Each card displays
 the actual latest score without a fabricated maximum. A successfully checked
 empty history shows “No games yet”; unchecked history shows an unavailable
-message. Cards remain disabled with a localized notice until P8 gameplay, and
-Ask remains disabled for Phase 2.
+message. Card game opens P8; the other two cards remain disabled until their
+gameplay designs are approved. Ask remains disabled for Phase 2.
 
 Schema v20 adds two patient/device/game-scoped caches: latest session display
 fields and refresh metadata. Three device-authenticated filtered GETs request
@@ -1405,3 +1405,41 @@ Regenerate with `flutter test test/p7_games_test.dart --update-goldens`.
 Validation: formatting and analysis clean; all 817 tests passed, including 24 P7
 tests. Android debug APK built. iOS compilation and physical-device validation
 remain pending on macOS/iOS.
+
+## P8–P9 Card Game and Result
+
+The approved first game uses four cards (two matching pairs), keeping Patient
+Mode's four-item limit. Card game opens from P7; picture naming and word recall
+remain disabled. Two real enrolled people with available photos are required.
+There are no sample faces or invented scores. Correct pairs earn one point,
+mistakes do not subtract points, and Done records the actual matched-pair score
+out of two. Back discards an unfinished round.
+
+Schema v21 adds patient/device-scoped card-person metadata and completed game
+sessions. A fresh device-authenticated active-People response authorizes image
+loading; widgets use metadata read back from Drift. Photos use the existing
+unauthenticated memory-only transport and are decoded before play starts. They
+clear on leaving, backgrounding, device changes and signed-reference expiry.
+Resume requires fresh people and photos; a changed pair resets the round. A
+photo 403 permits one automatic list refresh. Offline cold starts show calm
+unavailable text; offline completion works after photos have loaded.
+
+The stopwatch counts foreground play, excluding photo loading and background
+time. Done atomically saves a completed session and immutable outbox snapshot
+with a stable UUID, then opens P9 from the local result. Failed local saves keep
+P8 open and retry the same completion. Device-authenticated uploads use the
+idempotent game endpoint and acknowledge only a validated receipt. P7 and P9
+retry queued sessions during foreground refresh/resume; the background sync
+service remains separate work. P7 includes local completed scores immediately.
+
+P9 shows the actual score and duration, with Play again and Back to games.
+Both screens support Arabic/English, large text and 64dp actions. No new package,
+backend contract, permanent face-image cache or patient editing was added.
+
+Review captures: `test/goldens/p8_*.png` and `test/goldens/p9_*.png`, including
+both languages at 2x text on 320dp. Regenerate with
+`flutter test test/p8_gameplay_test.dart --update-goldens`.
+
+Validation: formatting and analysis clean; all 851 tests passed, including 34
+P8–P9 tests. Android debug APK built. iOS compilation and physical-device
+lifecycle validation remain pending on macOS/iOS.

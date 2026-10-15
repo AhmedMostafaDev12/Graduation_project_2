@@ -6,6 +6,7 @@ import '../../patient_today/domain/patient_today_data.dart';
 import '../../patient_today/presentation/patient_today_providers.dart';
 import '../data/patient_games_repository.dart';
 import '../domain/patient_games_data.dart';
+import 'card_game_providers.dart';
 
 final patientGamesRepositoryProvider = Provider.autoDispose
     .family<PatientGamesRepository, PatientTodayKey>((ref, key) {
@@ -40,6 +41,11 @@ class PatientGamesController extends Notifier<PatientGamesState> {
   bool get _current => ref.mounted && ref.read(patientTodayKeyProvider) == key;
   @override
   PatientGamesState build() {
+    try {
+      ref.watch(cardGameUploadProvider(key));
+    } catch (_) {
+      /* Refresh handles unavailable credentials/configuration. */
+    }
     Future.microtask(() {
       if (_current) refresh();
     });
@@ -49,9 +55,16 @@ class PatientGamesController extends Notifier<PatientGamesState> {
   Future<void> refresh() async {
     if (!_current || state.busy) return;
     state = const PatientGamesState(busy: true);
+    var failed = false;
+    try {
+      await ref.read(cardGameUploadProvider(key))();
+    } catch (_) {
+      failed = true;
+    }
+    if (!_current) return;
     try {
       await ref.read(patientGamesRepositoryProvider(key)).refresh();
-      if (_current) state = const PatientGamesState();
+      if (_current) state = PatientGamesState(failed: failed);
     } catch (_) {
       if (_current) state = const PatientGamesState(failed: true);
     }
