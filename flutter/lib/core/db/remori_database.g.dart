@@ -14357,8 +14357,26 @@ class $PatientReminderCardsTable extends PatientReminderCards
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _reminderTypeMeta = const VerificationMeta(
+    'reminderType',
+  );
   @override
-  List<GeneratedColumn> get $columns => [patientId, deviceId, id, day, title];
+  late final GeneratedColumn<String> reminderType = GeneratedColumn<String>(
+    'reminder_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    patientId,
+    deviceId,
+    id,
+    day,
+    title,
+    reminderType,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -14408,6 +14426,15 @@ class $PatientReminderCardsTable extends PatientReminderCards
     } else if (isInserting) {
       context.missing(_titleMeta);
     }
+    if (data.containsKey('reminder_type')) {
+      context.handle(
+        _reminderTypeMeta,
+        reminderType.isAcceptableOrUnknown(
+          data['reminder_type']!,
+          _reminderTypeMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -14437,6 +14464,10 @@ class $PatientReminderCardsTable extends PatientReminderCards
         DriftSqlType.string,
         data['${effectivePrefix}title'],
       )!,
+      reminderType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reminder_type'],
+      ),
     );
   }
 
@@ -14453,12 +14484,14 @@ class PatientReminderCard extends DataClass
   final String id;
   final String day;
   final String title;
+  final String? reminderType;
   const PatientReminderCard({
     required this.patientId,
     required this.deviceId,
     required this.id,
     required this.day,
     required this.title,
+    this.reminderType,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -14468,6 +14501,9 @@ class PatientReminderCard extends DataClass
     map['id'] = Variable<String>(id);
     map['day'] = Variable<String>(day);
     map['title'] = Variable<String>(title);
+    if (!nullToAbsent || reminderType != null) {
+      map['reminder_type'] = Variable<String>(reminderType);
+    }
     return map;
   }
 
@@ -14478,6 +14514,9 @@ class PatientReminderCard extends DataClass
       id: Value(id),
       day: Value(day),
       title: Value(title),
+      reminderType: reminderType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reminderType),
     );
   }
 
@@ -14492,6 +14531,7 @@ class PatientReminderCard extends DataClass
       id: serializer.fromJson<String>(json['id']),
       day: serializer.fromJson<String>(json['day']),
       title: serializer.fromJson<String>(json['title']),
+      reminderType: serializer.fromJson<String?>(json['reminderType']),
     );
   }
   @override
@@ -14503,6 +14543,7 @@ class PatientReminderCard extends DataClass
       'id': serializer.toJson<String>(id),
       'day': serializer.toJson<String>(day),
       'title': serializer.toJson<String>(title),
+      'reminderType': serializer.toJson<String?>(reminderType),
     };
   }
 
@@ -14512,12 +14553,14 @@ class PatientReminderCard extends DataClass
     String? id,
     String? day,
     String? title,
+    Value<String?> reminderType = const Value.absent(),
   }) => PatientReminderCard(
     patientId: patientId ?? this.patientId,
     deviceId: deviceId ?? this.deviceId,
     id: id ?? this.id,
     day: day ?? this.day,
     title: title ?? this.title,
+    reminderType: reminderType.present ? reminderType.value : this.reminderType,
   );
   PatientReminderCard copyWithCompanion(PatientReminderCardsCompanion data) {
     return PatientReminderCard(
@@ -14526,6 +14569,9 @@ class PatientReminderCard extends DataClass
       id: data.id.present ? data.id.value : this.id,
       day: data.day.present ? data.day.value : this.day,
       title: data.title.present ? data.title.value : this.title,
+      reminderType: data.reminderType.present
+          ? data.reminderType.value
+          : this.reminderType,
     );
   }
 
@@ -14536,13 +14582,15 @@ class PatientReminderCard extends DataClass
           ..write('deviceId: $deviceId, ')
           ..write('id: $id, ')
           ..write('day: $day, ')
-          ..write('title: $title')
+          ..write('title: $title, ')
+          ..write('reminderType: $reminderType')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(patientId, deviceId, id, day, title);
+  int get hashCode =>
+      Object.hash(patientId, deviceId, id, day, title, reminderType);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -14551,7 +14599,8 @@ class PatientReminderCard extends DataClass
           other.deviceId == this.deviceId &&
           other.id == this.id &&
           other.day == this.day &&
-          other.title == this.title);
+          other.title == this.title &&
+          other.reminderType == this.reminderType);
 }
 
 class PatientReminderCardsCompanion
@@ -14561,6 +14610,7 @@ class PatientReminderCardsCompanion
   final Value<String> id;
   final Value<String> day;
   final Value<String> title;
+  final Value<String?> reminderType;
   final Value<int> rowid;
   const PatientReminderCardsCompanion({
     this.patientId = const Value.absent(),
@@ -14568,6 +14618,7 @@ class PatientReminderCardsCompanion
     this.id = const Value.absent(),
     this.day = const Value.absent(),
     this.title = const Value.absent(),
+    this.reminderType = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   PatientReminderCardsCompanion.insert({
@@ -14576,6 +14627,7 @@ class PatientReminderCardsCompanion
     required String id,
     required String day,
     required String title,
+    this.reminderType = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : patientId = Value(patientId),
        deviceId = Value(deviceId),
@@ -14588,6 +14640,7 @@ class PatientReminderCardsCompanion
     Expression<String>? id,
     Expression<String>? day,
     Expression<String>? title,
+    Expression<String>? reminderType,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -14596,6 +14649,7 @@ class PatientReminderCardsCompanion
       if (id != null) 'id': id,
       if (day != null) 'day': day,
       if (title != null) 'title': title,
+      if (reminderType != null) 'reminder_type': reminderType,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -14606,6 +14660,7 @@ class PatientReminderCardsCompanion
     Value<String>? id,
     Value<String>? day,
     Value<String>? title,
+    Value<String?>? reminderType,
     Value<int>? rowid,
   }) {
     return PatientReminderCardsCompanion(
@@ -14614,6 +14669,7 @@ class PatientReminderCardsCompanion
       id: id ?? this.id,
       day: day ?? this.day,
       title: title ?? this.title,
+      reminderType: reminderType ?? this.reminderType,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -14636,6 +14692,9 @@ class PatientReminderCardsCompanion
     if (title.present) {
       map['title'] = Variable<String>(title.value);
     }
+    if (reminderType.present) {
+      map['reminder_type'] = Variable<String>(reminderType.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -14650,6 +14709,7 @@ class PatientReminderCardsCompanion
           ..write('id: $id, ')
           ..write('day: $day, ')
           ..write('title: $title, ')
+          ..write('reminderType: $reminderType, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -23209,6 +23269,7 @@ typedef $$PatientReminderCardsTableCreateCompanionBuilder =
       required String id,
       required String day,
       required String title,
+      Value<String?> reminderType,
       Value<int> rowid,
     });
 typedef $$PatientReminderCardsTableUpdateCompanionBuilder =
@@ -23218,6 +23279,7 @@ typedef $$PatientReminderCardsTableUpdateCompanionBuilder =
       Value<String> id,
       Value<String> day,
       Value<String> title,
+      Value<String?> reminderType,
       Value<int> rowid,
     });
 
@@ -23252,6 +23314,11 @@ class $$PatientReminderCardsTableFilterComposer
 
   ColumnFilters<String> get title => $composableBuilder(
     column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reminderType => $composableBuilder(
+    column: $table.reminderType,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -23289,6 +23356,11 @@ class $$PatientReminderCardsTableOrderingComposer
     column: $table.title,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get reminderType => $composableBuilder(
+    column: $table.reminderType,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$PatientReminderCardsTableAnnotationComposer
@@ -23314,6 +23386,11 @@ class $$PatientReminderCardsTableAnnotationComposer
 
   GeneratedColumn<String> get title =>
       $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get reminderType => $composableBuilder(
+    column: $table.reminderType,
+    builder: (column) => column,
+  );
 }
 
 class $$PatientReminderCardsTableTableManager
@@ -23364,6 +23441,7 @@ class $$PatientReminderCardsTableTableManager
                 Value<String> id = const Value.absent(),
                 Value<String> day = const Value.absent(),
                 Value<String> title = const Value.absent(),
+                Value<String?> reminderType = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => PatientReminderCardsCompanion(
                 patientId: patientId,
@@ -23371,6 +23449,7 @@ class $$PatientReminderCardsTableTableManager
                 id: id,
                 day: day,
                 title: title,
+                reminderType: reminderType,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -23380,6 +23459,7 @@ class $$PatientReminderCardsTableTableManager
                 required String id,
                 required String day,
                 required String title,
+                Value<String?> reminderType = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => PatientReminderCardsCompanion.insert(
                 patientId: patientId,
@@ -23387,6 +23467,7 @@ class $$PatientReminderCardsTableTableManager
                 id: id,
                 day: day,
                 title: title,
+                reminderType: reminderType,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

@@ -794,5 +794,10 @@
   "patientRemindersEmpty": "Your reminders will appear here",
   "patientReminderPending": "Still to do",
   "patientReminderSnoozed": "Later",
-  "patientReminderMissed": "Time has passed"
+  "patientReminderMissed": "Time has passed",
+  "patientAlertTitle": "Time for {title}",
+  "@patientAlertTitle": {"placeholders": {"title": {"type": "String"}}},
+  "patientAlertUnavailable": "Your reminders are in Reminders",
+  "patientAlertSaveFailed": "That wasn't saved yet. Please try again.",
+  "patientAlertBack": "Back to reminders"
 }

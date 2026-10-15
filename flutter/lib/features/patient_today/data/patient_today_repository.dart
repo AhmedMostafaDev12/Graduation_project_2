@@ -107,6 +107,11 @@ class PatientTodayRepository {
           reminderId = _text(raw, 'reminder_id'),
           status = _text(raw, 'status');
       final scheduled = _time(raw, 'scheduled_at');
+      final type = raw['type'];
+      if (type != null &&
+          !{'medication', 'appointment', 'task'}.contains(type)) {
+        throw _invalid;
+      }
       if (!ids.add(id) ||
           !ReminderStatus.values.any((v) => v.name == status) ||
           PatientTime.day(scheduled, zone) != day) {
@@ -142,6 +147,7 @@ class PatientTodayRepository {
           id: id,
           day: day,
           title: _text(raw, 'title'),
+          reminderType: Value(type as String?),
         ),
       );
     }
@@ -219,14 +225,36 @@ class PatientTodayRepository {
   }
 
   Future<void> act(String id, {required bool snooze}) async {
-    if (!_active) return;
+    await _act(id, snooze: snooze);
+  }
+
+  Future<bool> confirmAlert(
+    PatientReminderAlertTarget target, {
+    required bool snooze,
+  }) {
+    if (target.scope != key || target.dueAt.isAfter(clock())) {
+      return Future.value(false);
+    }
+    return _act(target.id, snooze: snooze, expectedDue: target.dueAt);
+  }
+
+  Future<bool> _act(
+    String id, {
+    required bool snooze,
+    DateTime? expectedDue,
+  }) async {
+    if (!_active) return false;
     final data = await read();
-    if (!_active || data.next?.id != id) return;
+    if (!_active ||
+        data.next?.id != id ||
+        (expectedDue != null && data.next?.dueAt != expectedDue)) {
+      return false;
+    }
     final log =
         await (db.select(db.reminderLogs)
               ..where((r) => r.id.equals(id) & r.patientId.equals(key.$1)))
             .getSingleOrNull();
-    if (log == null || !_active) return;
+    if (log == null || !_active) return false;
     final now = clock().toUtc();
     ++_generation;
     await db.saveReminderLog(
@@ -240,6 +268,17 @@ class PatientTodayRepository {
       completedAt: snooze ? null : now,
       confirmedVia: 'app',
     );
+    final saved =
+        await (db.select(db.reminderLogs)
+              ..where((r) => r.patientId.equals(key.$1) & r.id.equals(id)))
+            .getSingleOrNull();
+    return _active &&
+        saved != null &&
+        (snooze
+            ? saved.status == ReminderStatus.snoozed &&
+                  saved.snoozedUntil == now.add(const Duration(minutes: 15)) &&
+                  saved.updatedAt == now
+            : saved.status == ReminderStatus.completed);
   }
 
   Future<void> upload() async {
@@ -341,6 +380,7 @@ class PatientTodayRepository {
                 ? log.snoozedUntil ?? log.scheduledAt
                 : log.scheduledAt,
             status: log.status.name,
+            type: cards.firstWhere((c) => c.id == log.id).reminderType,
             scheduledAt: log.scheduledAt,
           ),
         )

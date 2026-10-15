@@ -22,6 +22,7 @@ import 'package:remori/features/patient_today/domain/patient_today_data.dart';
 import 'package:remori/features/patient_today/presentation/p1_today_screen.dart';
 import 'package:remori/features/patient_today/presentation/p2_reminders_screen.dart';
 import 'package:remori/features/patient_today/presentation/patient_today_providers.dart';
+import 'package:remori/features/patient_today/presentation/patient_reminder_alert_host.dart';
 
 import 'a6_handover_test.dart' as auth;
 import 'p1_today_test.dart' as p1;
@@ -51,6 +52,7 @@ class Adapter extends p1.Adapter {
     'reminder_id': p1.reminder,
     'title': title,
     'status': state,
+    'type': i == 2 ? 'medication' : 'task',
     'scheduled_at': DateTime.utc(2026, 10, 15, hour).toIso8601String(),
     'updated_at': p1.now.subtract(const Duration(hours: 2)).toIso8601String(),
     'snoozed_until': state == 'snoozed'
@@ -308,6 +310,7 @@ void main() {
     addTearDown(tester.view.resetPadding);
     final container = ProviderContainer(
       overrides: [
+        patientAlertCandidateProvider.overrideWithValue(null),
         appLocaleProvider.overrideWithValue(Locale(language)),
         patientTodayKeyProvider.overrideWith((ref) => ref.watch(selectedScope)),
         patientTodayRepositoryProvider(p1.key).overrideWithValue(repo),

@@ -10,6 +10,9 @@ import '../../features/caregiver_dashboard/presentation/c18_more_screen.dart';
 import '../../features/caregiver_dashboard/presentation/c19_caregivers_screen.dart';
 import '../../features/patient_today/presentation/p1_today_screen.dart';
 import '../../features/patient_today/presentation/p2_reminders_screen.dart';
+import '../../features/patient_today/presentation/p3_reminder_alert_screen.dart';
+import '../../features/patient_today/presentation/patient_reminder_alert_host.dart';
+import '../../features/patient_today/domain/patient_today_data.dart';
 import '../../features/caregiver_dashboard/presentation/home_providers.dart';
 import '../../features/people/presentation/c3_people_screen.dart';
 import '../../features/people/presentation/c4_add_person_screen.dart';
@@ -72,6 +75,11 @@ final screenBuildersProvider = Provider<Map<RemoriScreen, RemoriScreenBuilder>>(
   (ref) => {
     RemoriScreen.p1: (_, _) => const P1TodayScreen(),
     RemoriScreen.p2: (_, _) => const P2RemindersScreen(),
+    RemoriScreen.p3: (_, state) => P3ReminderAlertScreen(
+      target: state.extra is PatientReminderAlertTarget
+          ? state.extra as PatientReminderAlertTarget
+          : null,
+    ),
     RemoriScreen.c19: (_, _) => const C19CaregiversScreen(),
     RemoriScreen.c18: (_, _) => const C18MoreScreen(),
     RemoriScreen.c16: (_, _) => const C16DeviceScreen(),
@@ -355,7 +363,14 @@ class _ModeShell extends ConsumerWidget {
                 body: RemoriBackground(
                   child: Column(
                     children: [
-                      Expanded(child: child),
+                      Expanded(
+                        child: patient
+                            ? PatientReminderAlertHost(
+                                screen: screen,
+                                child: child,
+                              )
+                            : child,
+                      ),
                       if (screen.showsNavigation)
                         RemoriNavigationBar(
                           mode: mode,

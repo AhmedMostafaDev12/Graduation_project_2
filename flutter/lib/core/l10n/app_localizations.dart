@@ -3600,6 +3600,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Time has passed'**
   String get patientReminderMissed;
+
+  /// No description provided for @patientAlertTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Time for {title}'**
+  String patientAlertTitle(String title);
+
+  /// No description provided for @patientAlertUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Your reminders are in Reminders'**
+  String get patientAlertUnavailable;
+
+  /// No description provided for @patientAlertSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'That wasn\'t saved yet. Please try again.'**
+  String get patientAlertSaveFailed;
+
+  /// No description provided for @patientAlertBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to reminders'**
+  String get patientAlertBack;
 }
 
 class _AppLocalizationsDelegate

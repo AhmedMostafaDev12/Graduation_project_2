@@ -1,4 +1,9 @@
 typedef PatientTodayKey = (String, String);
+typedef PatientReminderAlertTarget = ({
+  PatientTodayKey scope,
+  String id,
+  DateTime dueAt,
+});
 
 class PatientSettings {
   const PatientSettings(
@@ -17,11 +22,13 @@ class PatientReminder {
     this.title,
     this.dueAt, {
     this.status = 'pending',
+    this.type,
     DateTime? scheduledAt,
   }) : scheduledAt = scheduledAt ?? dueAt;
   final String id, title, status;
   final DateTime dueAt;
   final DateTime scheduledAt;
+  final String? type;
 }
 
 class MetPerson {
