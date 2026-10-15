@@ -1387,8 +1387,9 @@ The Patient Mode Games tab shows Card game (`face_match`), Name the picture
 (`picture_naming`) and Remember the words (`word_recall`). Each card displays
 the actual latest score without a fabricated maximum. A successfully checked
 empty history shows “No games yet”; unchecked history shows an unavailable
-message. Card game opens P8; the other two cards remain disabled until their
-gameplay designs are approved. Ask remains disabled for Phase 2.
+message. All three cards open P8 variants. Card game saves results; Name the
+picture and Remember the words are approved interactive UI-only activities.
+Ask remains disabled for Phase 2.
 
 Schema v20 adds two patient/device/game-scoped caches: latest session display
 fields and refresh metadata. Three device-authenticated filtered GETs request
@@ -1409,8 +1410,8 @@ remain pending on macOS/iOS.
 ## P8–P9 Card Game and Result
 
 The approved first game uses four cards (two matching pairs), keeping Patient
-Mode's four-item limit. Card game opens from P7; picture naming and word recall
-remain disabled. Two real enrolled people with available photos are required.
+Mode's four-item limit. Card game opens from P7. Two real enrolled people with
+available photos are required for this matching game.
 There are no sample faces or invented scores. Correct pairs earn one point,
 mistakes do not subtract points, and Done records the actual matched-pair score
 out of two. Back discards an unfinished round.
@@ -1443,3 +1444,28 @@ both languages at 2x text on 320dp. Regenerate with
 Validation: formatting and analysis clean; all 851 tests passed, including 34
 P8–P9 tests. Android debug APK built. iOS compilation and physical-device
 lifecycle validation remain pending on macOS/iOS.
+
+## P8 Picture Naming and Word Recall UI
+
+The other two Games cards now open approved UI-only P8 variants. Picture naming
+shows a bundled object icon with four localized answer choices, gentle feedback
+and Next picture. Word recall shows Cup, Key and Book, then four recall choices
+after “I’m ready,” with an option to see the words again. Cup, Key, Book and Flower
+come from bundled Material icons and Arabic/English strings; no photos or remote
+content are loaded.
+
+Both variants reuse the patient background, large type, 64dp actions, Back, a
+foreground-only timer and Done. They scroll at large text sizes. Each activity
+explains that results are not saved yet; Done returns to Games without a P9
+result, session record or outbox entry. These views do not access repositories;
+Games retains its usual refresh when reopened. State lasts only while the view
+is open. Card matching and its existing saved results are unchanged.
+
+Review captures are `test/goldens/p8_picture_naming_*.png`,
+`p8_word_recall_*.png` and `p8_word_choices_*.png`, including Arabic/English at
+2x text on 320dp. Regenerate with
+`flutter test test/p8_other_game_ui_test.dart --update-goldens`.
+
+Validation: formatting and analysis clean; all 864 tests passed, including 13
+tests for the additional game UIs. Android debug APK built. iOS compilation and
+physical-device validation remain pending on macOS/iOS.

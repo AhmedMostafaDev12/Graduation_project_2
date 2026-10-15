@@ -10,6 +10,43 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get gameObjectCup => 'Cup';
+
+  @override
+  String get gameObjectKey => 'Key';
+
+  @override
+  String get gameObjectBook => 'Book';
+
+  @override
+  String get gameObjectFlower => 'Flower';
+
+  @override
+  String get gamePicturePrompt => 'What is in the picture?';
+
+  @override
+  String get gameWordsStudy => 'Take your time. Remember these three words.';
+
+  @override
+  String get gameWordsRecall => 'Which word did you see?';
+
+  @override
+  String get gameWordsReady => 'I’m ready';
+
+  @override
+  String get gameWordsAgain => 'See the words again';
+
+  @override
+  String get gameNextPicture => 'Next picture';
+
+  @override
+  String get gameTryAnother => 'Take your time. Try another answer.';
+
+  @override
+  String get gameUiOnlyNotice =>
+      'You can try this activity. Results aren’t saved yet.';
+
+  @override
   String get cardGameInstruction => 'Find the two cards that match';
 
   @override
