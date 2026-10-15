@@ -466,6 +466,7 @@ void main() {
                 refreshedAt: now,
               ),
             );
+        await db.customStatement('DROP TABLE cached_document_details');
         await db.customStatement('DROP TABLE cached_documents');
         await db.customStatement('DROP TABLE documents_cache_states');
         await db.customStatement('PRAGMA user_version = 10');
@@ -541,6 +542,10 @@ void main() {
           ...builders,
           RemoriScreen.c18: (_, _) => const Text('More destination'),
           RemoriScreen.c9: (_, _) => const Text('Reminder destination'),
+          RemoriScreen.c15: (_, state) => Text(
+            'Document destination',
+            key: ValueKey(state.extra.toString()),
+          ),
         }),
       ],
     );
@@ -560,33 +565,27 @@ void main() {
   }
 
   FakeRepository fake() => FakeRepository(client, db, key, () => now);
-  testWidgets(
-    'C14 shows actual title, headline, capture time and disabled detail cards',
-    (tester) async {
-      final f = fake();
-      final container = await mount(tester, f);
-      expect(find.text('Documents'), findsOneWidget);
-      expect(find.text('Pharmacy receipt'), findsOneWidget);
-      expect(find.text('120 EGP'), findsOneWidget);
-      expect(find.textContaining('Thu 15 Oct, 11:00'), findsOneWidget);
-      await tester.tap(find.text('Pharmacy receipt'));
-      await tester.pumpAndSettle();
-      expect(
-        container
-            .read(remoriRouterProvider)
-            .routeInformationProvider
-            .value
-            .uri
-            .path,
-        RemoriScreen.c14.path,
-      );
-      expect(
-        find.textContaining('Document details will be available'),
-        findsOneWidget,
-      );
-      expect(f.refreshes, 1);
-    },
-  );
+  testWidgets('C14 shows actual cards and opens scoped document details', (
+    tester,
+  ) async {
+    final f = fake();
+    await mount(tester, f);
+    expect(find.text('Documents'), findsOneWidget);
+    expect(find.text('Pharmacy receipt'), findsOneWidget);
+    expect(find.text('120 EGP'), findsOneWidget);
+    expect(find.textContaining('Thu 15 Oct, 11:00'), findsOneWidget);
+    await tester.tap(find.text('Pharmacy receipt'));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(
+        ValueKey(
+          {'patient_id': key.$1.patientId, 'document_id': 'doc-0'}.toString(),
+        ),
+      ),
+      findsOneWidget,
+    );
+    expect(f.refreshes, 1);
+  });
   testWidgets('filter changes hide old cards and clear their photos', (
     tester,
   ) async {

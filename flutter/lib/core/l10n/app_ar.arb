@@ -603,5 +603,29 @@
   "documentsEmpty": "لا توجد مستندات في هذا التصنيف حتى الآن.",
   "documentsDetailPending": "ستتاح تفاصيل المستندات عند اكتمال شاشتها.",
   "documentsPreviewUnavailable": "معاينة المستند غير متاحة",
-  "documentsPreview": "معاينة مستند"
+  "documentsPreview": "معاينة مستند",
+  "documentDetailUnavailable": "هذا المستند غير متاح للمريض المحدد.",
+  "documentDetailOffline": "تعذر التحديث. نعرض معلومات المستند المحفوظة؛ تتطلب الصورة تحديثًا عبر الإنترنت.",
+  "documentDetailPhotoUnavailable": "الصورة غير متاحة. حدّث الصفحة أثناء الاتصال لعرضها.",
+  "documentDetailPhoto": "صورة المستند",
+  "documentDetailCaptured": "التُقط في {date}",
+  "documentDetailFullText": "النص الكامل المقروء من الصورة",
+  "documentDetailNoText": "لم يُقرأ أي نص من هذه الصورة.",
+  "documentFieldAmount": "المبلغ",
+  "documentFieldDate": "التاريخ",
+  "documentFieldItems": "الأصناف",
+  "documentFieldStore": "المتجر",
+  "documentFieldCompany": "الشركة",
+  "documentFieldDueDate": "تاريخ الاستحقاق",
+  "documentFieldMedicine": "الدواء",
+  "documentFieldStrength": "التركيز",
+  "documentFieldInstructions": "طريقة الاستخدام",
+  "documentFieldExpires": "تاريخ الانتهاء",
+  "@documentDetailCaptured": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  }
 }

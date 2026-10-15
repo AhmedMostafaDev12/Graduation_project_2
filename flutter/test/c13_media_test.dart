@@ -379,6 +379,7 @@ void main() {
           status: ReminderStatus.pending,
         );
         await seedJournal(key.$1.caregiverId, key.$1.patientId, '2026-10-15');
+        await db.customStatement('DROP TABLE cached_document_details');
         await db.customStatement('DROP TABLE cached_documents');
         await db.customStatement('DROP TABLE documents_cache_states');
         await db.customStatement('DROP TABLE cached_media_details');

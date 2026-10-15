@@ -1530,4 +1530,59 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get documentsPreview => 'معاينة مستند';
+
+  @override
+  String get documentDetailUnavailable => 'هذا المستند غير متاح للمريض المحدد.';
+
+  @override
+  String get documentDetailOffline =>
+      'تعذر التحديث. نعرض معلومات المستند المحفوظة؛ تتطلب الصورة تحديثًا عبر الإنترنت.';
+
+  @override
+  String get documentDetailPhotoUnavailable =>
+      'الصورة غير متاحة. حدّث الصفحة أثناء الاتصال لعرضها.';
+
+  @override
+  String get documentDetailPhoto => 'صورة المستند';
+
+  @override
+  String documentDetailCaptured(String date) {
+    return 'التُقط في $date';
+  }
+
+  @override
+  String get documentDetailFullText => 'النص الكامل المقروء من الصورة';
+
+  @override
+  String get documentDetailNoText => 'لم يُقرأ أي نص من هذه الصورة.';
+
+  @override
+  String get documentFieldAmount => 'المبلغ';
+
+  @override
+  String get documentFieldDate => 'التاريخ';
+
+  @override
+  String get documentFieldItems => 'الأصناف';
+
+  @override
+  String get documentFieldStore => 'المتجر';
+
+  @override
+  String get documentFieldCompany => 'الشركة';
+
+  @override
+  String get documentFieldDueDate => 'تاريخ الاستحقاق';
+
+  @override
+  String get documentFieldMedicine => 'الدواء';
+
+  @override
+  String get documentFieldStrength => 'التركيز';
+
+  @override
+  String get documentFieldInstructions => 'طريقة الاستخدام';
+
+  @override
+  String get documentFieldExpires => 'تاريخ الانتهاء';
 }
