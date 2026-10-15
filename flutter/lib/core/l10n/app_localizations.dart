@@ -3318,6 +3318,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save'**
   String get moreSave;
+
+  /// No description provided for @caregiversUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an available patient to view their caregivers.'**
+  String get caregiversUnavailable;
+
+  /// No description provided for @caregiversManager.
+  ///
+  /// In en, this message translates to:
+  /// **'Manager'**
+  String get caregiversManager;
+
+  /// No description provided for @caregiversViewer.
+  ///
+  /// In en, this message translates to:
+  /// **'Viewer'**
+  String get caregiversViewer;
+
+  /// No description provided for @caregiversPrimary.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary'**
+  String get caregiversPrimary;
+
+  /// No description provided for @caregiversYou.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} (you)'**
+  String caregiversYou(String name);
+
+  /// No description provided for @caregiversPermissionHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Managers can edit people, reminders and places. Viewers can only look.'**
+  String get caregiversPermissionHelp;
+
+  /// No description provided for @caregiversAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a caregiver'**
+  String get caregiversAddTitle;
+
+  /// No description provided for @caregiversExistingAccountHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Use an existing caregiver account\'s email. No invitation email is sent.'**
+  String get caregiversExistingAccountHelp;
+
+  /// No description provided for @caregiversEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get caregiversEmail;
+
+  /// No description provided for @caregiversEmailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter caregiver\'s email'**
+  String get caregiversEmailHint;
+
+  /// No description provided for @caregiversEmailInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address.'**
+  String get caregiversEmailInvalid;
+
+  /// No description provided for @caregiversRelationship.
+  ///
+  /// In en, this message translates to:
+  /// **'Relationship'**
+  String get caregiversRelationship;
+
+  /// No description provided for @caregiversRelationshipHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Relationship to the patient'**
+  String get caregiversRelationshipHint;
+
+  /// No description provided for @caregiversRelationshipInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter their relationship to the patient.'**
+  String get caregiversRelationshipInvalid;
+
+  /// No description provided for @caregiversPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission'**
+  String get caregiversPermission;
+
+  /// No description provided for @caregiversAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add caregiver'**
+  String get caregiversAdd;
+
+  /// No description provided for @caregiversAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Caregiver added.'**
+  String get caregiversAdded;
+
+  /// No description provided for @caregiversPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Caregiver added. Retry to finish updating this phone.'**
+  String get caregiversPending;
+
+  /// No description provided for @caregiversUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'The result could not be confirmed. Refresh the caregiver list before trying again.'**
+  String get caregiversUncertain;
+
+  /// No description provided for @caregiversNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No caregiver account was found with that email. They need to create an account first.'**
+  String get caregiversNotFound;
+
+  /// No description provided for @caregiversAlreadyLinked.
+  ///
+  /// In en, this message translates to:
+  /// **'This caregiver is already linked. Refresh to see the latest list.'**
+  String get caregiversAlreadyLinked;
+
+  /// No description provided for @caregiversManagerOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Only a managing caregiver can add another caregiver. Refresh to check your access.'**
+  String get caregiversManagerOnly;
+
+  /// No description provided for @caregiversOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not complete the request. Showing saved caregivers. Check your connection and try again.'**
+  String get caregiversOffline;
+
+  /// No description provided for @caregiversEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No linked caregivers are saved.'**
+  String get caregiversEmpty;
+
+  /// No description provided for @caregiversListUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The caregiver list is unavailable. Retry to check it.'**
+  String get caregiversListUnavailable;
+
+  /// No description provided for @caregiversMoreHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked caregivers and permissions'**
+  String get caregiversMoreHelp;
+
+  /// No description provided for @caregiversLinkedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No linked caregivers} =1{1 linked caregiver} other{{count} linked caregivers}}'**
+  String caregiversLinkedCount(int count);
 }
 
 class _AppLocalizationsDelegate

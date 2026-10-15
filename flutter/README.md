@@ -1166,8 +1166,8 @@ validation remain pending on macOS/iOS.
 The More tab connects Journal, Saved places, Documents and Device. It shows the
 actual cached patient profile and caregiver account, and consent records from
 `GET /patients/{id}/consents`. `GET /auth/me` supplies account display data.
-Caregivers and Connected accounts remain visible but disabled until C19/C20;
-caregiver counts and social-link status are not invented. Place counts come only
+Caregivers opens C19 and shows a count from its refreshed scoped cache when available.
+Connected accounts remains disabled until C20; social-link status is not invented. Place counts come only
 from a refreshed scoped Places cache; absent caches use generic descriptions.
 
 Schema v14 adds a caregiver-account display cache and caregiver/patient-scoped
@@ -1196,5 +1196,36 @@ Tests use synthetic data and do not edit live profiles, revoke real consents or
 log out real sessions. No new dependencies or backend changes were introduced.
 
 Validation: formatting and analysis clean; all 640 tests passed, including 43 C18
+tests. Android debug APK built. iOS compilation and physical-device lifecycle
+validation remain pending on macOS/iOS.
+
+## C19 Caregivers
+
+Open More → Caregivers to view primary/manager/viewer links. C19 reads a
+caregiver/patient-scoped cache and refreshes through
+`GET /patients/{id}/caregivers`. Schema v15 adds linked-caregiver records and
+refresh metadata; C18 uses these for its actual cached count. Cards show the API's
+name and relationship, initials avatars, and “you” only for the authenticated
+caregiver ID. No caregiver photo URL is available from the contract.
+
+Managers can add an existing account by email, relationship and permission;
+Viewer is the default. The approved labels say Add caregiver because
+`POST /patients/{id}/caregivers` sends no invitation email. Viewers have no linking
+form. No removal or permission-edit actions were added.
+
+A confirmed link updates the cache. If that update fails, Retry applies only the
+local receipt, without repeating POST. Uncertain results lock linking until a
+successful list refresh. Missing-account and already-linked responses have
+localized explanations; an already-linked response also refreshes the list.
+Older refreshes cannot erase confirmed links. Patient-link removal purges both
+scoped caches, and late responses cannot recreate revoked access.
+
+Review captures: [English](test/goldens/c19_en.png),
+[Arabic](test/goldens/c19_ar.png). Regenerate with
+`flutter test test/c19_caregivers_test.dart test/c18_more_test.dart --update-goldens`.
+Tests use synthetic accounts and never link real users or send email. No new
+packages or backend changes were introduced.
+
+Validation: formatting and analysis clean; all 674 tests passed, including 34 C19
 tests. Android debug APK built. iOS compilation and physical-device lifecycle
 validation remain pending on macOS/iOS.

@@ -14,6 +14,7 @@ part 'media_tables.dart';
 part 'document_tables.dart';
 part 'document_detail_tables.dart';
 part 'more_tables.dart';
+part 'caregiver_tables.dart';
 
 enum ReminderStatus { pending, completed, snoozed, missed }
 
@@ -86,12 +87,14 @@ class OutboxEntries extends Table {
     CachedDocumentDetails,
     CachedCaregiverAccounts,
     CachedConsents,
+    CachedCaregiverLinks,
+    CaregiversCacheStates,
   ],
 )
 class RemoriDatabase extends _$RemoriDatabase {
   RemoriDatabase(super.executor);
   @override
-  int get schemaVersion => 14;
+  int get schemaVersion => 15;
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onUpgrade: (m, from, to) async {
@@ -147,6 +150,10 @@ class RemoriDatabase extends _$RemoriDatabase {
       if (from < 14) {
         await m.createTable(cachedCaregiverAccounts);
         await m.createTable(cachedConsents);
+      }
+      if (from < 15) {
+        await m.createTable(cachedCaregiverLinks);
+        await m.createTable(caregiversCacheStates);
       }
     },
   );

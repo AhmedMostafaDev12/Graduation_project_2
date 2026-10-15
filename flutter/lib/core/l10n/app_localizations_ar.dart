@@ -1870,4 +1870,108 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get moreSave => 'حفظ';
+
+  @override
+  String get caregiversUnavailable => 'اختر مريضًا متاحًا لعرض مقدمي الرعاية.';
+
+  @override
+  String get caregiversManager => 'مدير';
+
+  @override
+  String get caregiversViewer => 'مشاهد';
+
+  @override
+  String get caregiversPrimary => 'أساسي';
+
+  @override
+  String caregiversYou(String name) {
+    return '$name (أنت)';
+  }
+
+  @override
+  String get caregiversPermissionHelp =>
+      'يمكن للمديرين تعديل الأشخاص والتذكيرات والأماكن. يمكن للمشاهدين الاطلاع فقط.';
+
+  @override
+  String get caregiversAddTitle => 'إضافة مقدم رعاية';
+
+  @override
+  String get caregiversExistingAccountHelp =>
+      'استخدم البريد الإلكتروني لحساب مقدم رعاية موجود. لا تُرسل رسالة دعوة.';
+
+  @override
+  String get caregiversEmail => 'البريد الإلكتروني';
+
+  @override
+  String get caregiversEmailHint => 'أدخل بريد مقدم الرعاية الإلكتروني';
+
+  @override
+  String get caregiversEmailInvalid => 'أدخل بريدًا إلكترونيًا صحيحًا.';
+
+  @override
+  String get caregiversRelationship => 'صلة القرابة';
+
+  @override
+  String get caregiversRelationshipHint => 'العلاقة بالمريض';
+
+  @override
+  String get caregiversRelationshipInvalid => 'أدخل علاقته بالمريض.';
+
+  @override
+  String get caregiversPermission => 'الصلاحية';
+
+  @override
+  String get caregiversAdd => 'إضافة مقدم رعاية';
+
+  @override
+  String get caregiversAdded => 'أُضيف مقدم الرعاية.';
+
+  @override
+  String get caregiversPending =>
+      'أُضيف مقدم الرعاية. أعد المحاولة لإكمال تحديث هذا الهاتف.';
+
+  @override
+  String get caregiversUncertain =>
+      'تعذر تأكيد النتيجة. حدّث قائمة مقدمي الرعاية قبل المحاولة مجددًا.';
+
+  @override
+  String get caregiversNotFound =>
+      'لم يُعثر على حساب مقدم رعاية بهذا البريد الإلكتروني. يجب إنشاء حساب أولًا.';
+
+  @override
+  String get caregiversAlreadyLinked =>
+      'مقدم الرعاية مرتبط بالفعل. حدّث القائمة للاطلاع على أحدث البيانات.';
+
+  @override
+  String get caregiversManagerOnly =>
+      'يمكن لمقدم الرعاية المدير فقط إضافة مقدم رعاية آخر. حدّث البيانات للتحقق من صلاحيتك.';
+
+  @override
+  String get caregiversOffline =>
+      'تعذر إكمال الطلب. تظهر بيانات مقدمي الرعاية المحفوظة. تحقق من اتصالك وحاول مجددًا.';
+
+  @override
+  String get caregiversEmpty => 'لا توجد بيانات محفوظة لمقدمي رعاية مرتبطين.';
+
+  @override
+  String get caregiversListUnavailable =>
+      'قائمة مقدمي الرعاية غير متاحة. أعد المحاولة للتحقق منها.';
+
+  @override
+  String get caregiversMoreHelp => 'مقدمو الرعاية المرتبطون والصلاحيات';
+
+  @override
+  String caregiversLinkedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count مقدم رعاية مرتبط',
+      many: '$count مقدم رعاية مرتبطًا',
+      few: '$count مقدمي رعاية مرتبطين',
+      two: 'مقدما رعاية مرتبطان',
+      one: 'مقدم رعاية واحد مرتبط',
+      zero: 'لا يوجد مقدمو رعاية مرتبطون',
+    );
+    return '$_temp0';
+  }
 }
