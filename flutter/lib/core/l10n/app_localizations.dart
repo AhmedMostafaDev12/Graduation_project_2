@@ -2784,6 +2784,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Document preview'**
   String get documentsPreview;
+
+  /// No description provided for @documentDetailUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This document is unavailable for the selected patient.'**
+  String get documentDetailUnavailable;
+
+  /// No description provided for @documentDetailOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not refresh. Showing saved document information; the photo needs an online refresh.'**
+  String get documentDetailOffline;
+
+  /// No description provided for @documentDetailPhotoUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo unavailable. Refresh while online to view it.'**
+  String get documentDetailPhotoUnavailable;
+
+  /// No description provided for @documentDetailPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Document photo'**
+  String get documentDetailPhoto;
+
+  /// No description provided for @documentDetailCaptured.
+  ///
+  /// In en, this message translates to:
+  /// **'Captured {date}'**
+  String documentDetailCaptured(String date);
+
+  /// No description provided for @documentDetailFullText.
+  ///
+  /// In en, this message translates to:
+  /// **'Full text read from the photo'**
+  String get documentDetailFullText;
+
+  /// No description provided for @documentDetailNoText.
+  ///
+  /// In en, this message translates to:
+  /// **'No text was read from this photo.'**
+  String get documentDetailNoText;
+
+  /// No description provided for @documentFieldAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get documentFieldAmount;
+
+  /// No description provided for @documentFieldDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get documentFieldDate;
+
+  /// No description provided for @documentFieldItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Items'**
+  String get documentFieldItems;
+
+  /// No description provided for @documentFieldStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Store'**
+  String get documentFieldStore;
+
+  /// No description provided for @documentFieldCompany.
+  ///
+  /// In en, this message translates to:
+  /// **'Company'**
+  String get documentFieldCompany;
+
+  /// No description provided for @documentFieldDueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Due date'**
+  String get documentFieldDueDate;
+
+  /// No description provided for @documentFieldMedicine.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine'**
+  String get documentFieldMedicine;
+
+  /// No description provided for @documentFieldStrength.
+  ///
+  /// In en, this message translates to:
+  /// **'Strength'**
+  String get documentFieldStrength;
+
+  /// No description provided for @documentFieldInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'How to take'**
+  String get documentFieldInstructions;
+
+  /// No description provided for @documentFieldExpires.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires'**
+  String get documentFieldExpires;
 }
 
 class _AppLocalizationsDelegate

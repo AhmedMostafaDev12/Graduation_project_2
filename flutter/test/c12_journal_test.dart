@@ -513,6 +513,7 @@ void main() {
                 position: 0,
               ),
             );
+        await db.customStatement('DROP TABLE cached_document_details');
         await db.customStatement('DROP TABLE cached_documents');
         await db.customStatement('DROP TABLE documents_cache_states');
         await db.customStatement('DROP TABLE cached_media_details');
@@ -716,6 +717,10 @@ void main() {
           ...builders,
           RemoriScreen.c1: (_, _) => const Text('Home destination'),
           RemoriScreen.c9: (_, _) => const Text('Reminder destination'),
+          RemoriScreen.c15: (_, state) => Text(
+            'Document destination',
+            key: ValueKey(state.extra.toString()),
+          ),
         }),
       ],
     );
@@ -788,29 +793,22 @@ void main() {
       expect(container.read(journalDayProvider), '2026-10-15');
     },
   );
-  testWidgets(
-    'linked viewer reads journal without editor actions or pending detail navigation',
-    (tester) async {
-      final container = await mount(
-        tester,
-        FakeRepository(client, db, key),
-        viewer: true,
-      );
-      expect(find.byTooltip('Add reminder'), findsNothing);
-      await tester.tap(find.textContaining('Prescription · Follow-up'));
-      await tester.pumpAndSettle();
-      expect(
-        container
-            .read(remoriRouterProvider)
-            .routeInformationProvider
-            .value
-            .uri
-            .path,
-        RemoriScreen.c12.path,
-      );
-      expect(find.textContaining('Document details'), findsOneWidget);
-    },
-  );
+  testWidgets('linked viewer opens document details without editor actions', (
+    tester,
+  ) async {
+    await mount(tester, FakeRepository(client, db, key), viewer: true);
+    expect(find.byTooltip('Add reminder'), findsNothing);
+    await tester.tap(find.textContaining('Prescription · Follow-up'));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(
+        ValueKey(
+          {'patient_id': scope.patientId, 'document_id': 'doc'}.toString(),
+        ),
+      ),
+      findsOneWidget,
+    );
+  });
 
   testWidgets(
     'C12 shows actual journal data and each filter selects its event type',

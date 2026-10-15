@@ -11990,6 +11990,440 @@ class DocumentsCacheStatesCompanion
   }
 }
 
+class $CachedDocumentDetailsTable extends CachedDocumentDetails
+    with TableInfo<$CachedDocumentDetailsTable, CachedDocumentDetail> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedDocumentDetailsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _caregiverIdMeta = const VerificationMeta(
+    'caregiverId',
+  );
+  @override
+  late final GeneratedColumn<String> caregiverId = GeneratedColumn<String>(
+    'caregiver_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _mediaAssetIdMeta = const VerificationMeta(
+    'mediaAssetId',
+  );
+  @override
+  late final GeneratedColumn<String> mediaAssetId = GeneratedColumn<String>(
+    'media_asset_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> refreshedAt =
+      GeneratedColumn<int>(
+        'refreshed_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>(
+        $CachedDocumentDetailsTable.$converterrefreshedAt,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    caregiverId,
+    patientId,
+    id,
+    mediaAssetId,
+    payload,
+    refreshedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_document_details';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedDocumentDetail> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('caregiver_id')) {
+      context.handle(
+        _caregiverIdMeta,
+        caregiverId.isAcceptableOrUnknown(
+          data['caregiver_id']!,
+          _caregiverIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_caregiverIdMeta);
+    }
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('media_asset_id')) {
+      context.handle(
+        _mediaAssetIdMeta,
+        mediaAssetId.isAcceptableOrUnknown(
+          data['media_asset_id']!,
+          _mediaAssetIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_mediaAssetIdMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {caregiverId, patientId, id};
+  @override
+  CachedDocumentDetail map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedDocumentDetail(
+      caregiverId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caregiver_id'],
+      )!,
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      mediaAssetId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}media_asset_id'],
+      )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      )!,
+      refreshedAt: $CachedDocumentDetailsTable.$converterrefreshedAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}refreshed_at'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $CachedDocumentDetailsTable createAlias(String alias) {
+    return $CachedDocumentDetailsTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converterrefreshedAt = const UtcMicros();
+}
+
+class CachedDocumentDetail extends DataClass
+    implements Insertable<CachedDocumentDetail> {
+  final String caregiverId;
+  final String patientId;
+  final String id;
+  final String mediaAssetId;
+  final String payload;
+  final DateTime refreshedAt;
+  const CachedDocumentDetail({
+    required this.caregiverId,
+    required this.patientId,
+    required this.id,
+    required this.mediaAssetId,
+    required this.payload,
+    required this.refreshedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['caregiver_id'] = Variable<String>(caregiverId);
+    map['patient_id'] = Variable<String>(patientId);
+    map['id'] = Variable<String>(id);
+    map['media_asset_id'] = Variable<String>(mediaAssetId);
+    map['payload'] = Variable<String>(payload);
+    {
+      map['refreshed_at'] = Variable<int>(
+        $CachedDocumentDetailsTable.$converterrefreshedAt.toSql(refreshedAt),
+      );
+    }
+    return map;
+  }
+
+  CachedDocumentDetailsCompanion toCompanion(bool nullToAbsent) {
+    return CachedDocumentDetailsCompanion(
+      caregiverId: Value(caregiverId),
+      patientId: Value(patientId),
+      id: Value(id),
+      mediaAssetId: Value(mediaAssetId),
+      payload: Value(payload),
+      refreshedAt: Value(refreshedAt),
+    );
+  }
+
+  factory CachedDocumentDetail.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedDocumentDetail(
+      caregiverId: serializer.fromJson<String>(json['caregiverId']),
+      patientId: serializer.fromJson<String>(json['patientId']),
+      id: serializer.fromJson<String>(json['id']),
+      mediaAssetId: serializer.fromJson<String>(json['mediaAssetId']),
+      payload: serializer.fromJson<String>(json['payload']),
+      refreshedAt: serializer.fromJson<DateTime>(json['refreshedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'caregiverId': serializer.toJson<String>(caregiverId),
+      'patientId': serializer.toJson<String>(patientId),
+      'id': serializer.toJson<String>(id),
+      'mediaAssetId': serializer.toJson<String>(mediaAssetId),
+      'payload': serializer.toJson<String>(payload),
+      'refreshedAt': serializer.toJson<DateTime>(refreshedAt),
+    };
+  }
+
+  CachedDocumentDetail copyWith({
+    String? caregiverId,
+    String? patientId,
+    String? id,
+    String? mediaAssetId,
+    String? payload,
+    DateTime? refreshedAt,
+  }) => CachedDocumentDetail(
+    caregiverId: caregiverId ?? this.caregiverId,
+    patientId: patientId ?? this.patientId,
+    id: id ?? this.id,
+    mediaAssetId: mediaAssetId ?? this.mediaAssetId,
+    payload: payload ?? this.payload,
+    refreshedAt: refreshedAt ?? this.refreshedAt,
+  );
+  CachedDocumentDetail copyWithCompanion(CachedDocumentDetailsCompanion data) {
+    return CachedDocumentDetail(
+      caregiverId: data.caregiverId.present
+          ? data.caregiverId.value
+          : this.caregiverId,
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      id: data.id.present ? data.id.value : this.id,
+      mediaAssetId: data.mediaAssetId.present
+          ? data.mediaAssetId.value
+          : this.mediaAssetId,
+      payload: data.payload.present ? data.payload.value : this.payload,
+      refreshedAt: data.refreshedAt.present
+          ? data.refreshedAt.value
+          : this.refreshedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedDocumentDetail(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('id: $id, ')
+          ..write('mediaAssetId: $mediaAssetId, ')
+          ..write('payload: $payload, ')
+          ..write('refreshedAt: $refreshedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    caregiverId,
+    patientId,
+    id,
+    mediaAssetId,
+    payload,
+    refreshedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedDocumentDetail &&
+          other.caregiverId == this.caregiverId &&
+          other.patientId == this.patientId &&
+          other.id == this.id &&
+          other.mediaAssetId == this.mediaAssetId &&
+          other.payload == this.payload &&
+          other.refreshedAt == this.refreshedAt);
+}
+
+class CachedDocumentDetailsCompanion
+    extends UpdateCompanion<CachedDocumentDetail> {
+  final Value<String> caregiverId;
+  final Value<String> patientId;
+  final Value<String> id;
+  final Value<String> mediaAssetId;
+  final Value<String> payload;
+  final Value<DateTime> refreshedAt;
+  final Value<int> rowid;
+  const CachedDocumentDetailsCompanion({
+    this.caregiverId = const Value.absent(),
+    this.patientId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.mediaAssetId = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.refreshedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedDocumentDetailsCompanion.insert({
+    required String caregiverId,
+    required String patientId,
+    required String id,
+    required String mediaAssetId,
+    required String payload,
+    required DateTime refreshedAt,
+    this.rowid = const Value.absent(),
+  }) : caregiverId = Value(caregiverId),
+       patientId = Value(patientId),
+       id = Value(id),
+       mediaAssetId = Value(mediaAssetId),
+       payload = Value(payload),
+       refreshedAt = Value(refreshedAt);
+  static Insertable<CachedDocumentDetail> custom({
+    Expression<String>? caregiverId,
+    Expression<String>? patientId,
+    Expression<String>? id,
+    Expression<String>? mediaAssetId,
+    Expression<String>? payload,
+    Expression<int>? refreshedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (caregiverId != null) 'caregiver_id': caregiverId,
+      if (patientId != null) 'patient_id': patientId,
+      if (id != null) 'id': id,
+      if (mediaAssetId != null) 'media_asset_id': mediaAssetId,
+      if (payload != null) 'payload': payload,
+      if (refreshedAt != null) 'refreshed_at': refreshedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedDocumentDetailsCompanion copyWith({
+    Value<String>? caregiverId,
+    Value<String>? patientId,
+    Value<String>? id,
+    Value<String>? mediaAssetId,
+    Value<String>? payload,
+    Value<DateTime>? refreshedAt,
+    Value<int>? rowid,
+  }) {
+    return CachedDocumentDetailsCompanion(
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      id: id ?? this.id,
+      mediaAssetId: mediaAssetId ?? this.mediaAssetId,
+      payload: payload ?? this.payload,
+      refreshedAt: refreshedAt ?? this.refreshedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (caregiverId.present) {
+      map['caregiver_id'] = Variable<String>(caregiverId.value);
+    }
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (mediaAssetId.present) {
+      map['media_asset_id'] = Variable<String>(mediaAssetId.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (refreshedAt.present) {
+      map['refreshed_at'] = Variable<int>(
+        $CachedDocumentDetailsTable.$converterrefreshedAt.toSql(
+          refreshedAt.value,
+        ),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedDocumentDetailsCompanion(')
+          ..write('caregiverId: $caregiverId, ')
+          ..write('patientId: $patientId, ')
+          ..write('id: $id, ')
+          ..write('mediaAssetId: $mediaAssetId, ')
+          ..write('payload: $payload, ')
+          ..write('refreshedAt: $refreshedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$RemoriDatabase extends GeneratedDatabase {
   _$RemoriDatabase(QueryExecutor e) : super(e);
   $RemoriDatabaseManager get managers => $RemoriDatabaseManager(this);
@@ -12040,6 +12474,8 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
   );
   late final $DocumentsCacheStatesTable documentsCacheStates =
       $DocumentsCacheStatesTable(this);
+  late final $CachedDocumentDetailsTable cachedDocumentDetails =
+      $CachedDocumentDetailsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -12069,6 +12505,7 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
     cachedMediaDetails,
     cachedDocuments,
     documentsCacheStates,
+    cachedDocumentDetails,
   ];
 }
 
@@ -18680,6 +19117,264 @@ typedef $$DocumentsCacheStatesTableProcessedTableManager =
       DocumentsCacheState,
       PrefetchHooks Function()
     >;
+typedef $$CachedDocumentDetailsTableCreateCompanionBuilder =
+    CachedDocumentDetailsCompanion Function({
+      required String caregiverId,
+      required String patientId,
+      required String id,
+      required String mediaAssetId,
+      required String payload,
+      required DateTime refreshedAt,
+      Value<int> rowid,
+    });
+typedef $$CachedDocumentDetailsTableUpdateCompanionBuilder =
+    CachedDocumentDetailsCompanion Function({
+      Value<String> caregiverId,
+      Value<String> patientId,
+      Value<String> id,
+      Value<String> mediaAssetId,
+      Value<String> payload,
+      Value<DateTime> refreshedAt,
+      Value<int> rowid,
+    });
+
+class $$CachedDocumentDetailsTableFilterComposer
+    extends Composer<_$RemoriDatabase, $CachedDocumentDetailsTable> {
+  $$CachedDocumentDetailsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mediaAssetId => $composableBuilder(
+    column: $table.mediaAssetId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+}
+
+class $$CachedDocumentDetailsTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $CachedDocumentDetailsTable> {
+  $$CachedDocumentDetailsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mediaAssetId => $composableBuilder(
+    column: $table.mediaAssetId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get refreshedAt => $composableBuilder(
+    column: $table.refreshedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedDocumentDetailsTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $CachedDocumentDetailsTable> {
+  $$CachedDocumentDetailsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get caregiverId => $composableBuilder(
+    column: $table.caregiverId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get mediaAssetId => $composableBuilder(
+    column: $table.mediaAssetId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => column,
+      );
+}
+
+class $$CachedDocumentDetailsTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $CachedDocumentDetailsTable,
+          CachedDocumentDetail,
+          $$CachedDocumentDetailsTableFilterComposer,
+          $$CachedDocumentDetailsTableOrderingComposer,
+          $$CachedDocumentDetailsTableAnnotationComposer,
+          $$CachedDocumentDetailsTableCreateCompanionBuilder,
+          $$CachedDocumentDetailsTableUpdateCompanionBuilder,
+          (
+            CachedDocumentDetail,
+            BaseReferences<
+              _$RemoriDatabase,
+              $CachedDocumentDetailsTable,
+              CachedDocumentDetail
+            >,
+          ),
+          CachedDocumentDetail,
+          PrefetchHooks Function()
+        > {
+  $$CachedDocumentDetailsTableTableManager(
+    _$RemoriDatabase db,
+    $CachedDocumentDetailsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedDocumentDetailsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$CachedDocumentDetailsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$CachedDocumentDetailsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> caregiverId = const Value.absent(),
+                Value<String> patientId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> mediaAssetId = const Value.absent(),
+                Value<String> payload = const Value.absent(),
+                Value<DateTime> refreshedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedDocumentDetailsCompanion(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                id: id,
+                mediaAssetId: mediaAssetId,
+                payload: payload,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String caregiverId,
+                required String patientId,
+                required String id,
+                required String mediaAssetId,
+                required String payload,
+                required DateTime refreshedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CachedDocumentDetailsCompanion.insert(
+                caregiverId: caregiverId,
+                patientId: patientId,
+                id: id,
+                mediaAssetId: mediaAssetId,
+                payload: payload,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    $CachedDocumentDetailsTable,
+                    CachedDocumentDetail
+                  >(table),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $CachedDocumentDetailsTable,
+                    CachedDocumentDetail
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedDocumentDetailsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $CachedDocumentDetailsTable,
+      CachedDocumentDetail,
+      $$CachedDocumentDetailsTableFilterComposer,
+      $$CachedDocumentDetailsTableOrderingComposer,
+      $$CachedDocumentDetailsTableAnnotationComposer,
+      $$CachedDocumentDetailsTableCreateCompanionBuilder,
+      $$CachedDocumentDetailsTableUpdateCompanionBuilder,
+      (
+        CachedDocumentDetail,
+        BaseReferences<
+          _$RemoriDatabase,
+          $CachedDocumentDetailsTable,
+          CachedDocumentDetail
+        >,
+      ),
+      CachedDocumentDetail,
+      PrefetchHooks Function()
+    >;
 
 class $RemoriDatabaseManager {
   final _$RemoriDatabase _db;
@@ -18741,4 +19436,6 @@ class $RemoriDatabaseManager {
       $$CachedDocumentsTableTableManager(_db, _db.cachedDocuments);
   $$DocumentsCacheStatesTableTableManager get documentsCacheStates =>
       $$DocumentsCacheStatesTableTableManager(_db, _db.documentsCacheStates);
+  $$CachedDocumentDetailsTableTableManager get cachedDocumentDetails =>
+      $$CachedDocumentDetailsTableTableManager(_db, _db.cachedDocumentDetails);
 }

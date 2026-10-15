@@ -248,8 +248,6 @@ class _C12JournalScreenState extends ConsumerState<C12JournalScreen>
                               !state.busy,
                         ),
                       ),
-                  const SizedBox(height: 8),
-                  Text(s.journalDetailsPending, style: _small),
                 ],
               ),
             ),
@@ -340,13 +338,17 @@ class _EntryCard extends StatelessWidget {
     final target = e.document == null ? media : null;
     return Semantics(
       button: target != null || e.document != null,
-      enabled: target != null
-          ? true
-          : e.document != null
-          ? false
-          : null,
+      enabled: target != null || e.document != null ? true : null,
       child: GestureDetector(
-        onTap: target == null
+        onTap: e.document != null
+            ? () => context.pushNamed(
+                RemoriScreen.c15.name,
+                extra: {
+                  'patient_id': owner.$1.patientId,
+                  'document_id': e.document!.id,
+                },
+              )
+            : target == null
             ? null
             : () => context.pushNamed(
                 RemoriScreen.c13.name,

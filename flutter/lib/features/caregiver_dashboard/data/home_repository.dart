@@ -47,6 +47,12 @@ class HomeRepository {
                     p.patientId.equals(patientId),
               ))
               .go();
+          await (db.delete(db.cachedDocumentDetails)..where(
+                (p) =>
+                    p.caregiverId.equals(caregiverId) &
+                    p.patientId.equals(patientId),
+              ))
+              .go();
           await (db.delete(db.cachedDocuments)..where(
                 (p) =>
                     p.caregiverId.equals(caregiverId) &
@@ -279,6 +285,12 @@ class HomeRepository {
       }
       final allowedIds = patients.map((p) => p['id'] as String).toList();
       await (db.delete(db.cachedUnknownFaces)..where(
+            (p) =>
+                p.caregiverId.equals(caregiverId) &
+                p.patientId.isNotIn(allowedIds),
+          ))
+          .go();
+      await (db.delete(db.cachedDocumentDetails)..where(
             (p) =>
                 p.caregiverId.equals(caregiverId) &
                 p.patientId.isNotIn(allowedIds),

@@ -1012,8 +1012,8 @@ until the next manual refresh. Offline entries show photo placeholders.
 The API's actual names, relationships, transcript/rendered text, document
 summaries and media tags are displayed. Person photos, medication names, reminder
 completion details and missing question answers are not invented. Conversations
-use initials when a person is provided. Media cards now open C13; document
-navigation remains disabled with a localized notice until C15 is implemented.
+use initials when a person is provided. Media cards open C13; document cards
+open C15 with the selected patient and document IDs.
 
 Review captures: [English](test/goldens/c12_en.png),
 [Arabic](test/goldens/c12_ar.png). Regenerate with
@@ -1081,8 +1081,7 @@ keeps bytes only in memory after a successful list refresh. Leaving, covering,
 backgrounding, account/patient/filter changes and expiry clear or hide previews.
 Offline cards use placeholders; signed-URL 403 recovery is bounded by item ID.
 
-The approved staged navigation keeps document cards disabled with a localized
-notice until C15. The normal More-menu entry remains pending C18; no temporary
+Document cards open C15. The normal More-menu entry remains pending C18; no temporary
 menu entry was added. The existing C14 route, test captures and screen-builder
 override can be used to review the screen meanwhile. Managers and linked viewers
 can read documents; the existing center reminder action remains manager-only.
@@ -1094,5 +1093,37 @@ API responses and render the bundled SVG design assets as in-memory fixtures;
 they do not read real documents or mutate live patient data.
 
 Validation: formatting and analysis clean; 536 tests passed, including 32 C14
+tests. Android debug APK built with the configured live API. iOS compilation
+and physical-device lifecycle validation remain pending on macOS/iOS.
+
+## C15 Document detail
+
+Open a document card in Journal or Documents to see its full photo, ordered
+display fields, patient-local capture time and collapsible OCR text. Known field
+labels and calendar dates are localized in English and Arabic; other documents
+preserve the API's display labels. This screen is read-only for managers and viewers.
+
+Schema v12 adds one caregiver/patient/document-scoped detail cache. It stores
+only title, ordered display fields, OCR text, image references and refresh time;
+raw extracted fields and image bytes are excluded. Offline mode shows saved
+text with a photo placeholder. Patient-link removal and confirmed media deletion
+clear the affected detail cache.
+
+Because the detail response has no patient ID, C15 requires an existing scoped
+Journal or Documents cache association before its audited `GET /documents/{id}`.
+It verifies the returned event/media IDs again before saving. Uncached or
+mismatched links show unavailable. A saved detail alone cannot authorize a link.
+
+Full photos use the existing memory-only loader after a successful GET. Leaving,
+covering, backgrounding, account/patient/document changes and signed-URL expiry
+clear or hide photos. A photo 403 permits one automatic detail refresh until a
+manual refresh. No new package or backend contract was introduced.
+
+Review captures: [English](test/goldens/c15_en.png),
+[Arabic](test/goldens/c15_ar.png). Regenerate with
+`flutter test test/c15_document_detail_test.dart --update-goldens`.
+Tests use synthetic responses and bundled design assets, without live document access.
+
+Validation: formatting and analysis clean; 566 tests passed, including 30 C15
 tests. Android debug APK built with the configured live API. iOS compilation
 and physical-device lifecycle validation remain pending on macOS/iOS.

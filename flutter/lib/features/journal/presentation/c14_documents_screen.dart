@@ -84,77 +84,88 @@ class _C14DocumentsScreenState extends ConsumerState<C14DocumentsScreen>
     };
     Widget card(DocumentCard d) => Semantics(
       button: true,
-      enabled: false,
-      child: Container(
-        key: ValueKey('document-${d.id}'),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: RemoriColors.surface,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: RemoriColors.border),
+      enabled: true,
+      child: GestureDetector(
+        onTap: () => context.pushNamed(
+          RemoriScreen.c15.name,
+          extra: {'patient_id': key!.$1.patientId, 'document_id': d.id},
         ),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final content = Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  d.title?.trim().isNotEmpty == true ? d.title! : type(d.type),
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    fontFamilyFallback: ['Readex Pro'],
-                  ),
-                ),
-                Text(
-                  '${type(d.type)} · ${DateFormat('EEE d MMM, HH:mm', locale).format(PatientTime.local(d.capturedAt, key!.$1.timezone))}',
-                  style: _sub,
-                ),
-                if (MediaQuery.textScalerOf(context).scale(15) > 22 &&
-                    d.headline != null)
+        child: Container(
+          key: ValueKey('document-${d.id}'),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: RemoriColors.surface,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: RemoriColors.border),
+          ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final content = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    d.headline!,
-                    style: _headline,
-                    textDirection: Bidi.detectRtlDirectionality(d.headline!)
-                        ? TextDirection.rtl
-                        : TextDirection.ltr,
-                  ),
-              ],
-            );
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _DocumentPreview(
-                  key: ValueKey(
-                    '${key.$1.caregiverId}:${key.$1.patientId}:${filter.name}:${d.id}:${state.revision}',
-                  ),
-                  owner: key,
-                  document: d,
-                  allowed:
-                      _visible && _foreground && state.previews && !state.busy,
-                ),
-                const SizedBox(width: 12),
-                Expanded(child: content),
-                if (MediaQuery.textScalerOf(context).scale(15) <= 22 &&
-                    d.headline != null) ...[
-                  const SizedBox(width: 8),
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: constraints.maxWidth * .4,
+                    d.title?.trim().isNotEmpty == true
+                        ? d.title!
+                        : type(d.type),
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      fontFamilyFallback: ['Readex Pro'],
                     ),
-                    child: Text(
+                  ),
+                  Text(
+                    '${type(d.type)} · ${DateFormat('EEE d MMM, HH:mm', locale).format(PatientTime.local(d.capturedAt, key!.$1.timezone))}',
+                    style: _sub,
+                  ),
+                  if (MediaQuery.textScalerOf(context).scale(15) > 22 &&
+                      d.headline != null)
+                    Text(
                       d.headline!,
                       style: _headline,
                       textDirection: Bidi.detectRtlDirectionality(d.headline!)
                           ? TextDirection.rtl
                           : TextDirection.ltr,
-                      textAlign: TextAlign.end,
                     ),
-                  ),
                 ],
-              ],
-            );
-          },
+              );
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _DocumentPreview(
+                    key: ValueKey(
+                      '${key.$1.caregiverId}:${key.$1.patientId}:${filter.name}:${d.id}:${state.revision}',
+                    ),
+                    owner: key,
+                    document: d,
+                    allowed:
+                        _visible &&
+                        _foreground &&
+                        state.previews &&
+                        !state.busy,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(child: content),
+                  if (MediaQuery.textScalerOf(context).scale(15) <= 22 &&
+                      d.headline != null) ...[
+                    const SizedBox(width: 8),
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: constraints.maxWidth * .4,
+                      ),
+                      child: Text(
+                        d.headline!,
+                        style: _headline,
+                        textDirection: Bidi.detectRtlDirectionality(d.headline!)
+                            ? TextDirection.rtl
+                            : TextDirection.ltr,
+                        textAlign: TextAlign.end,
+                      ),
+                    ),
+                  ],
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
@@ -289,8 +300,6 @@ class _C14DocumentsScreenState extends ConsumerState<C14DocumentsScreen>
                       ),
                     if (state.busy && data.documents.isNotEmpty)
                       const Center(child: CircularProgressIndicator()),
-                    if (data.documents.isNotEmpty)
-                      Text(s.documentsDetailPending, style: _sub),
                   ],
                 ),
               ),

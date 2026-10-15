@@ -1540,4 +1540,60 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get documentsPreview => 'Document preview';
+
+  @override
+  String get documentDetailUnavailable =>
+      'This document is unavailable for the selected patient.';
+
+  @override
+  String get documentDetailOffline =>
+      'Could not refresh. Showing saved document information; the photo needs an online refresh.';
+
+  @override
+  String get documentDetailPhotoUnavailable =>
+      'Photo unavailable. Refresh while online to view it.';
+
+  @override
+  String get documentDetailPhoto => 'Document photo';
+
+  @override
+  String documentDetailCaptured(String date) {
+    return 'Captured $date';
+  }
+
+  @override
+  String get documentDetailFullText => 'Full text read from the photo';
+
+  @override
+  String get documentDetailNoText => 'No text was read from this photo.';
+
+  @override
+  String get documentFieldAmount => 'Amount';
+
+  @override
+  String get documentFieldDate => 'Date';
+
+  @override
+  String get documentFieldItems => 'Items';
+
+  @override
+  String get documentFieldStore => 'Store';
+
+  @override
+  String get documentFieldCompany => 'Company';
+
+  @override
+  String get documentFieldDueDate => 'Due date';
+
+  @override
+  String get documentFieldMedicine => 'Medicine';
+
+  @override
+  String get documentFieldStrength => 'Strength';
+
+  @override
+  String get documentFieldInstructions => 'How to take';
+
+  @override
+  String get documentFieldExpires => 'Expires';
 }

@@ -636,5 +636,29 @@
   "documentsEmpty": "No documents in this category yet.",
   "documentsDetailPending": "Document details will be available when their screen is ready.",
   "documentsPreviewUnavailable": "Document preview unavailable",
-  "documentsPreview": "Document preview"
+  "documentsPreview": "Document preview",
+  "documentDetailUnavailable": "This document is unavailable for the selected patient.",
+  "documentDetailOffline": "Could not refresh. Showing saved document information; the photo needs an online refresh.",
+  "documentDetailPhotoUnavailable": "Photo unavailable. Refresh while online to view it.",
+  "documentDetailPhoto": "Document photo",
+  "documentDetailCaptured": "Captured {date}",
+  "documentDetailFullText": "Full text read from the photo",
+  "documentDetailNoText": "No text was read from this photo.",
+  "documentFieldAmount": "Amount",
+  "documentFieldDate": "Date",
+  "documentFieldItems": "Items",
+  "documentFieldStore": "Store",
+  "documentFieldCompany": "Company",
+  "documentFieldDueDate": "Due date",
+  "documentFieldMedicine": "Medicine",
+  "documentFieldStrength": "Strength",
+  "documentFieldInstructions": "How to take",
+  "documentFieldExpires": "Expires",
+  "@documentDetailCaptured": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  }
 }

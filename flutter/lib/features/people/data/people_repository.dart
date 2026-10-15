@@ -168,6 +168,12 @@ class PeopleRepository {
               r.patientId.equals(scope.patientId),
         ))
         .go();
+    await (db.delete(db.cachedDocumentDetails)..where(
+          (r) =>
+              r.caregiverId.equals(scope.caregiverId) &
+              r.patientId.equals(scope.patientId),
+        ))
+        .go();
     await (db.delete(db.cachedDocuments)..where(
           (r) =>
               r.caregiverId.equals(scope.caregiverId) &
