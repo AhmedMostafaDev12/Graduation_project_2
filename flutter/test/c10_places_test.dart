@@ -341,6 +341,7 @@ void main() {
                 position: 0,
               ),
             );
+        await db.customStatement('DROP TABLE cached_media_details');
         await db.customStatement('DROP TABLE cached_journal_entries');
         await db.customStatement('DROP TABLE cached_journal_media');
         await db.customStatement('DROP TABLE journal_cache_states');

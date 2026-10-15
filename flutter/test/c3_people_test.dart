@@ -611,6 +611,7 @@ void main() {
     await db.customStatement('DROP TABLE cached_reminder_occurrences');
     await db.customStatement('DROP TABLE reminder_cache_states');
     await db.customStatement('PRAGMA user_version = 2');
+    await db.customStatement('DROP TABLE cached_media_details');
     await db.customStatement('DROP TABLE cached_journal_entries');
     await db.customStatement('DROP TABLE cached_journal_media');
     await db.customStatement('DROP TABLE journal_cache_states');

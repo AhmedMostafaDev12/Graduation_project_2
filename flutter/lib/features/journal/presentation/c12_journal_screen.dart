@@ -2,9 +2,11 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
 import '../../../core/l10n/app_localizations.dart';
+import '../../../core/router/remori_routes.dart';
 import '../../../core/theme/remori_theme.dart';
 import '../../reminders/domain/reminder_data.dart';
 import '../domain/journal_data.dart';
@@ -335,184 +337,206 @@ class _EntryCard extends StatelessWidget {
     }
 
     final text = body();
+    final target = e.document == null ? media : null;
     return Semantics(
-      button: e.media.isNotEmpty || e.document != null,
-      enabled: e.media.isNotEmpty || e.document != null ? false : null,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        decoration: BoxDecoration(
-          color: paused ? RemoriColors.lavender.withValues(alpha: .35) : null,
-          border: Border.all(color: const Color(0xFFDCD3EC)),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 40,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 2),
-                child: Text(time, style: _small),
+      button: target != null || e.document != null,
+      enabled: target != null
+          ? true
+          : e.document != null
+          ? false
+          : null,
+      child: GestureDetector(
+        onTap: target == null
+            ? null
+            : () => context.pushNamed(
+                RemoriScreen.c13.name,
+                extra: {
+                  'patient_id': owner.$1.patientId,
+                  'media_id': target.id,
+                },
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: paused
-                  ? Text(
-                      e.type == 'memory_paused'
-                          ? s.journalPaused
-                          : s.journalResumed,
-                      style: _small,
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          kind().toUpperCase(),
-                          style: const TextStyle(
-                            fontFamily: 'Manrope',
-                            fontFamilyFallback: ['Readex Pro'],
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                            color: RemoriColors.purple,
-                            letterSpacing: .4,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            color: paused ? RemoriColors.lavender.withValues(alpha: .35) : null,
+            border: Border.all(color: const Color(0xFFDCD3EC)),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 40,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Text(time, style: _small),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: paused
+                    ? Text(
+                        e.type == 'memory_paused'
+                            ? s.journalPaused
+                            : s.journalResumed,
+                        style: _small,
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            kind().toUpperCase(),
+                            style: const TextStyle(
+                              fontFamily: 'Manrope',
+                              fontFamilyFallback: ['Readex Pro'],
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              color: RemoriColors.purple,
+                              letterSpacing: .4,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 3),
-                        if (e.type == 'conversation_segment') ...[
-                          if (person != null)
-                            Row(
-                              children: [
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  alignment: Alignment.center,
-                                  decoration: const BoxDecoration(
-                                    color: RemoriColors.lavender,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Text(
-                                    person.name.trim().characters.first,
-                                    style: const TextStyle(fontSize: 10),
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(
-                                    e.endedAt == null
-                                        ? s.journalWithPerson(person.name)
-                                        : s.journalConversationDuration(
-                                            person.name,
-                                            NumberFormat.decimalPattern(locale)
-                                                .format(
-                                                  e.endedAt!
-                                                      .difference(e.occurredAt)
-                                                      .inMinutes,
-                                                ),
-                                          ),
-                                    style: _small,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          if (e.transcript != null || e.renderedText != null)
-                            Text(
-                              e.transcript ?? e.renderedText!,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              textDirection: e.language == 'ar'
-                                  ? TextDirection.rtl
-                                  : null,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontFamilyFallback: ['Readex Pro'],
-                              ),
-                            ),
-                        ] else if (e.type == 'notable_moment_captured') ...[
-                          if (media?.tags.isNotEmpty == true)
-                            Wrap(
-                              spacing: 4,
-                              runSpacing: 4,
-                              children: [
-                                for (final tag in media!.tags)
+                          const SizedBox(height: 3),
+                          if (e.type == 'conversation_segment') ...[
+                            if (person != null)
+                              Row(
+                                children: [
                                   Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 9,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: RemoriColors.surface,
-                                      borderRadius: BorderRadius.circular(26),
-                                      border: Border.all(
-                                        color: RemoriColors.border,
-                                      ),
+                                    width: 20,
+                                    height: 20,
+                                    alignment: Alignment.center,
+                                    decoration: const BoxDecoration(
+                                      color: RemoriColors.lavender,
+                                      shape: BoxShape.circle,
                                     ),
                                     child: Text(
-                                      tag,
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        fontFamilyFallback: ['Readex Pro'],
-                                      ),
+                                      person.name.trim().characters.first,
+                                      style: const TextStyle(fontSize: 10),
                                     ),
                                   ),
-                              ],
-                            ),
-                          if (media?.category == 'other' &&
-                              media?.reason != null)
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      e.endedAt == null
+                                          ? s.journalWithPerson(person.name)
+                                          : s.journalConversationDuration(
+                                              person.name,
+                                              NumberFormat.decimalPattern(
+                                                locale,
+                                              ).format(
+                                                e.endedAt!
+                                                    .difference(e.occurredAt)
+                                                    .inMinutes,
+                                              ),
+                                            ),
+                                      style: _small,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            if (e.transcript != null || e.renderedText != null)
+                              Text(
+                                e.transcript ?? e.renderedText!,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                textDirection: e.language == 'ar'
+                                    ? TextDirection.rtl
+                                    : null,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontFamilyFallback: ['Readex Pro'],
+                                ),
+                              ),
+                          ] else if (e.type == 'notable_moment_captured') ...[
+                            if (media?.tags.isNotEmpty == true)
+                              Wrap(
+                                spacing: 4,
+                                runSpacing: 4,
+                                children: [
+                                  for (final tag in media!.tags)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 9,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: RemoriColors.surface,
+                                        borderRadius: BorderRadius.circular(26),
+                                        border: Border.all(
+                                          color: RemoriColors.border,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        tag,
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          fontFamilyFallback: ['Readex Pro'],
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            if (media?.category == 'other' &&
+                                media?.reason != null)
+                              Text(
+                                media!.reason!,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: _small,
+                              ),
+                            if (media?.tags.isNotEmpty != true &&
+                                e.renderedText != null)
+                              Text(e.renderedText!, style: _small),
+                          ] else
                             Text(
-                              media!.reason!,
-                              maxLines: 2,
+                              text.isEmpty ? s.journalActivity : text,
+                              maxLines: 3,
                               overflow: TextOverflow.ellipsis,
-                              style: _small,
+                              style: TextStyle(
+                                fontSize: e.type == 'voice_query' ? 12 : 14,
+                                fontWeight: e.type == 'voice_query'
+                                    ? FontWeight.w400
+                                    : FontWeight.w600,
+                                fontFamilyFallback: const ['Readex Pro'],
+                              ),
                             ),
-                          if (media?.tags.isNotEmpty != true &&
-                              e.renderedText != null)
-                            Text(e.renderedText!, style: _small),
-                        ] else
-                          Text(
-                            text.isEmpty ? s.journalActivity : text,
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: e.type == 'voice_query' ? 12 : 14,
-                              fontWeight: e.type == 'voice_query'
-                                  ? FontWeight.w400
-                                  : FontWeight.w600,
-                              fontFamilyFallback: const ['Readex Pro'],
-                            ),
-                          ),
-                      ],
-                    ),
-            ),
-            if (e.media.isNotEmpty) ...[
-              const SizedBox(width: 8),
-              _Preview(owner: owner, media: media, now: now, allowed: previews),
-            ] else if (e.type == 'encounter' && person != null) ...[
-              const SizedBox(width: 8),
-              Container(
-                width: 44,
-                height: 44,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: RemoriColors.lavender,
-                  borderRadius: BorderRadius.circular(6),
+                        ],
+                      ),
+              ),
+              if (e.media.isNotEmpty) ...[
+                const SizedBox(width: 8),
+                _Preview(
+                  owner: owner,
+                  media: media,
+                  now: now,
+                  allowed: previews,
                 ),
-                child: Text(
-                  person.name
-                      .trim()
-                      .split(RegExp(r'\s+'))
-                      .take(2)
-                      .map((word) => word.characters.first)
-                      .join()
-                      .toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: RemoriColors.purple,
+              ] else if (e.type == 'encounter' && person != null) ...[
+                const SizedBox(width: 8),
+                Container(
+                  width: 44,
+                  height: 44,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: RemoriColors.lavender,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    person.name
+                        .trim()
+                        .split(RegExp(r'\s+'))
+                        .take(2)
+                        .map((word) => word.characters.first)
+                        .join()
+                        .toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: RemoriColors.purple,
+                    ),
                   ),
                 ),
-              ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

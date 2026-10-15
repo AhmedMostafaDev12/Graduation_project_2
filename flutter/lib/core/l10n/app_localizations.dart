@@ -2416,7 +2416,7 @@ abstract class AppLocalizations {
   /// No description provided for @journalDetailsPending.
   ///
   /// In en, this message translates to:
-  /// **'Media and document details will be available when their screens are ready.'**
+  /// **'Document details will be available when their screen is ready.'**
   String get journalDetailsPending;
 
   /// No description provided for @journalEncounter.
@@ -2538,6 +2538,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'with {name} · {minutes} min'**
   String journalConversationDuration(String name, String minutes);
+
+  /// No description provided for @mediaPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get mediaPhoto;
+
+  /// No description provided for @mediaVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get mediaVideo;
+
+  /// No description provided for @mediaUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This media is no longer available.'**
+  String get mediaUnavailable;
+
+  /// No description provided for @mediaDeletePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete photo'**
+  String get mediaDeletePhoto;
+
+  /// No description provided for @mediaDeleteVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete video'**
+  String get mediaDeleteVideo;
+
+  /// No description provided for @mediaDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this item permanently? The file will be removed and the deletion recorded in the audit log.'**
+  String get mediaDeleteConfirm;
+
+  /// No description provided for @mediaPhotoUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo unavailable. Refresh while online to view it.'**
+  String get mediaPhotoUnavailable;
+
+  /// No description provided for @mediaVideoPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Video playback will be available when the video viewer is ready.'**
+  String get mediaVideoPending;
+
+  /// No description provided for @mediaEncounter.
+  ///
+  /// In en, this message translates to:
+  /// **'Encounter with {name} ({relationship})'**
+  String mediaEncounter(String name, String relationship);
+
+  /// No description provided for @mediaKeyframe.
+  ///
+  /// In en, this message translates to:
+  /// **'keyframe from the glasses'**
+  String get mediaKeyframe;
+
+  /// No description provided for @mediaDocumentCapture.
+  ///
+  /// In en, this message translates to:
+  /// **'document captured by the glasses'**
+  String get mediaDocumentCapture;
+
+  /// No description provided for @mediaNotableCapture.
+  ///
+  /// In en, this message translates to:
+  /// **'moment captured by the glasses'**
+  String get mediaNotableCapture;
+
+  /// No description provided for @mediaRequested.
+  ///
+  /// In en, this message translates to:
+  /// **'recorded at the patient’s request'**
+  String get mediaRequested;
+
+  /// No description provided for @mediaCaptured.
+  ///
+  /// In en, this message translates to:
+  /// **'captured by the glasses'**
+  String get mediaCaptured;
+
+  /// No description provided for @mediaAiTags.
+  ///
+  /// In en, this message translates to:
+  /// **'AI tags:'**
+  String get mediaAiTags;
+
+  /// No description provided for @mediaKept.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept'**
+  String get mediaKept;
+
+  /// No description provided for @mediaPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin to keep'**
+  String get mediaPin;
+
+  /// No description provided for @mediaExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get mediaExpired;
+
+  /// No description provided for @mediaAutoDeletes.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-deletes in {days} days'**
+  String mediaAutoDeletes(String days);
+
+  /// No description provided for @mediaRetentionNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos of other people expire after 30 days unless pinned'**
+  String get mediaRetentionNote;
+
+  /// No description provided for @mediaCacheFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The change was saved. Retry to update the saved information on this phone.'**
+  String get mediaCacheFailed;
+
+  /// No description provided for @mediaUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'The change could not be confirmed. Refresh before trying again.'**
+  String get mediaUncertain;
+
+  /// No description provided for @mediaOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not refresh. Saved information is available; photos need an online refresh.'**
+  String get mediaOffline;
+
+  /// No description provided for @mediaAuditNote.
+  ///
+  /// In en, this message translates to:
+  /// **'You’ll be asked to confirm deletion. Deletions are recorded in the audit log.'**
+  String get mediaAuditNote;
 }
 
 class _AppLocalizationsDelegate

@@ -1012,8 +1012,8 @@ until the next manual refresh. Offline entries show photo placeholders.
 The API's actual names, relationships, transcript/rendered text, document
 summaries and media tags are displayed. Person photos, medication names, reminder
 completion details and missing question answers are not invented. Conversations
-use initials when a person is provided. Media/document navigation remains
-disabled with a localized notice until C13/C15 are implemented.
+use initials when a person is provided. Media cards now open C13; document
+navigation remains disabled with a localized notice until C15 is implemented.
 
 Review captures: [English](test/goldens/c12_en.png),
 [Arabic](test/goldens/c12_ar.png). Regenerate with
@@ -1023,3 +1023,38 @@ responses and bundled design assets; they do not read or modify live journals.
 Validation: formatting and analysis clean; 469 tests passed, including 36 C12
 tests. Android debug APK built with the configured live API. iOS compilation and
 device-level lifecycle checks remain validation tasks on macOS/iOS.
+
+## C13 Media viewer
+
+Tap a media card in C12 to open C13. The viewer reads a caregiver/patient/media
+metadata cache (schema v10), then refreshes it using the audited
+`GET /patients/{id}/media/{media_id}`. It displays the API's event/person details,
+patient-local capture date/time, tags, `other` reason, and actual retention.
+Kept media show “Kept”; an expiry uses the remaining days. No example names,
+tags, retention values or images are supplied as runtime data.
+
+Full photos use the existing bare HTTPS memory-only loader, keyed by account,
+patient and media ID. They load only after a successful detail refresh. Leaving,
+covering, backgrounding or changing accounts/patients clears the photos and
+Flutter image cache. Signed-URL expiry and retention expiry hide the image;
+offline mode displays saved metadata with a placeholder. One 403 recovery
+refresh is allowed until a manual refresh. Video entries show their metadata
+and an approved playback-pending placeholder; no player package was added.
+
+Managers can pin or delete online; viewers have read access only. Deletion
+requires confirmation. A confirmed write updates the detail cache and all saved
+journal media references for the same caregiver/patient. If a local update fails,
+Retry applies only that update, without replaying the API action. An uncertain
+write outcome requires a successful refresh before another write. An older
+journal refresh is invalidated before applying a confirmed media change.
+Known missing media remove saved details and journal references; revoked links
+clear affected detail/journal caches. No media bytes enter Drift.
+
+Review captures: [English](test/goldens/c13_en.png),
+[Arabic](test/goldens/c13_ar.png). Regenerate with
+`flutter test test/c13_media_test.dart --update-goldens`. Tests use synthetic API
+responses and bundled design assets; they never pin or delete live media.
+
+Validation: formatting and analysis clean; 504 tests passed, including 35 C13
+tests. Android debug APK built with the configured live API. iOS compilation
+and physical-device lifecycle validation remain pending on macOS/iOS.

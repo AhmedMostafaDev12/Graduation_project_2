@@ -99,17 +99,25 @@ final journalDataProvider = StreamProvider.autoDispose<JournalData>((ref) {
 final journalPreviewAvailableProvider = StreamProvider.autoDispose
     .family<bool, (JournalKey, JournalMedia)>((ref, value) {
       final (key, media) = value;
-      final now = ref.watch(journalClockProvider)();
+      final clock = ref.watch(journalClockProvider);
       final controller = StreamController<bool>();
-      controller.add(media.available(now));
       Timer? timer;
       final expiry = media.expiresAt;
-      if (expiry != null && expiry.isAfter(now)) {
-        timer = Timer(expiry.difference(now), () {
-          ref.read(journalPreviewsProvider(key)).expire(expiry);
-          controller.add(false);
-        });
+      void schedule() {
+        timer?.cancel();
+        final now = clock();
+        controller.add(media.available(now));
+        if (expiry != null && expiry.isAfter(now)) {
+          timer = Timer(expiry.difference(now), () {
+            ref.read(journalPreviewsProvider(key)).expire(expiry);
+            controller.add(false);
+          });
+        }
       }
+
+      schedule();
+      ref.onCancel(() => timer?.cancel());
+      ref.onResume(schedule);
       ref.onDispose(() {
         timer?.cancel();
         controller.close();
