@@ -480,6 +480,7 @@ void main() {
         screenBuildersProvider.overrideWithValue({
           ...builders,
           RemoriScreen.c8: (_, _) => const Text('Reminder destination'),
+          RemoriScreen.c16: (_, _) => const Text('Device destination'),
           RemoriScreen.c6: (_, state) =>
               Text('New faces destination', key: ValueKey(state.extra)),
         }),
@@ -517,24 +518,16 @@ void main() {
       expect(find.textContaining('PRIVATE'), findsNothing);
     },
   );
-  testWidgets(
-    'viewer can mark read while unfinished targets keep the alerts screen visible',
-    (tester) async {
-      final repository = fake()..data = fixture(viewer: true);
-      await mount(tester, repository);
-      await tester.tap(find.byKey(const ValueKey('alert-alert-1')));
-      await tester.pumpAndSettle();
-      expect(repository.posts, 1);
-      expect(find.text('1 unread'), findsOneWidget);
-      expect(
-        find.text(
-          'Alert read. This destination will be available when its screen is ready.',
-        ),
-        findsOneWidget,
-      );
-      expect(find.text('Alerts'), findsOneWidget);
-    },
-  );
+  testWidgets('viewer marks a battery alert read and opens Device', (
+    tester,
+  ) async {
+    final repository = fake()..data = fixture(viewer: true);
+    await mount(tester, repository);
+    await tester.tap(find.byKey(const ValueKey('alert-alert-1')));
+    await tester.pumpAndSettle();
+    expect(repository.posts, 1);
+    expect(find.text('Device destination'), findsOneWidget);
+  });
   testWidgets('medication alert opens C8 with the alert patient selected', (
     tester,
   ) async {

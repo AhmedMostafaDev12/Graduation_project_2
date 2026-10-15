@@ -88,7 +88,7 @@ class OutboxEntries extends Table {
 class RemoriDatabase extends _$RemoriDatabase {
   RemoriDatabase(super.executor);
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onUpgrade: (m, from, to) async {
@@ -136,6 +136,10 @@ class RemoriDatabase extends _$RemoriDatabase {
       }
       if (from < 12) {
         await m.createTable(cachedDocumentDetails);
+      }
+      if (from >= 2 && from < 13) {
+        await m.addColumn(dashboardDevices, dashboardDevices.firmwareVersion);
+        await m.addColumn(dashboardDevices, dashboardDevices.pairedAt);
       }
     },
   );

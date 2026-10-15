@@ -19,6 +19,8 @@ class DashboardDevices extends Table {
   TextColumn get patientId => text()();
   TextColumn get id => text()();
   TextColumn get serial => text()();
+  TextColumn get firmwareVersion => text().nullable()();
+  IntColumn get pairedAt => integer().map(const UtcMicros()).nullable()();
   BoolColumn get online => boolean()();
   IntColumn get batteryPct => integer().nullable()();
   IntColumn get lastSeenAt => integer().map(const UtcMicros()).nullable()();

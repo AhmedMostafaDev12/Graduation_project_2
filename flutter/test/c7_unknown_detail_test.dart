@@ -438,6 +438,12 @@ void main() {
       await db.customStatement('DROP TABLE cached_places');
       await db.customStatement('DROP TABLE places_cache_states');
       await db.customStatement('DROP TABLE cached_unknown_face_samples');
+      await db.customStatement(
+        'ALTER TABLE dashboard_devices DROP COLUMN firmware_version',
+      );
+      await db.customStatement(
+        'ALTER TABLE dashboard_devices DROP COLUMN paired_at',
+      );
       await db.customStatement('PRAGMA user_version = 6');
       await db.close();
       db = RemoriDatabase(NativeDatabase(file));

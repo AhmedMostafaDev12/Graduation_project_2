@@ -660,5 +660,35 @@
         "type": "String"
       }
     }
-  }
+  },
+
+"deviceTitle":"Device",
+"deviceGlasses":"Remori glasses",
+"deviceConnected":"Connected",
+"deviceOffline":"Offline",
+"deviceStatusUnavailable":"Status unavailable",
+"deviceSerial":"Serial",
+"deviceFirmware":"Firmware",
+"deviceBattery":"Battery",
+"deviceLastSeen":"Last seen",
+"deviceUnknown":"Unavailable",
+"deviceJustNow":"Just now",
+"deviceMinutesAgo":"{count, plural, =1{1 min ago} other{{count} min ago}}",
+"@deviceMinutesAgo":{"placeholders":{"count":{"type":"int"}}},
+"deviceHoursAgo":"{count, plural, =1{1 hour ago} other{{count} hours ago}}",
+"@deviceHoursAgo":{"placeholders":{"count":{"type":"int"}}},
+"deviceDaysAgo":"{count, plural, =1{1 day ago} other{{count} days ago}}",
+"@deviceDaysAgo":{"placeholders":{"count":{"type":"int"}}},
+"deviceMemory":"Conversation memory",
+"deviceMemoryHelp":"When off, the glasses stop capturing speech. Face recognition and reminders keep working. The patient can also pause it with a long press on the glasses.",
+"deviceHeartbeatHelp":"Connected means a heartbeat was received in the last 5 minutes. It does not confirm a direct Bluetooth connection. Offline values are last saved readings.",
+"deviceRepair":"Re-pair glasses",
+"deviceUnpair":"Unpair glasses",
+"deviceUnpairConfirm":"Unpair {serial}? Its patient phone token will stop working. You will need to pair the glasses again to reconnect.",
+"@deviceUnpairConfirm":{"placeholders":{"serial":{"type":"String"}}},
+"deviceUnavailable":"Select an available patient to view their glasses.",
+"deviceNone":"No glasses are paired with this patient.",
+"deviceLoadFailed":"Could not refresh. Showing saved device readings. Check your connection and try again.",
+"deviceSavedLocallyPending":"The change was saved. Retry to finish updating this phone.",
+"deviceUncertain":"The change could not be confirmed. Refresh before making another change."
 }

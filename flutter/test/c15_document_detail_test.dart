@@ -388,6 +388,12 @@ void main() {
         status: ReminderStatus.pending,
       );
       await db.customStatement('DROP TABLE cached_document_details');
+      await db.customStatement(
+        'ALTER TABLE dashboard_devices DROP COLUMN firmware_version',
+      );
+      await db.customStatement(
+        'ALTER TABLE dashboard_devices DROP COLUMN paired_at',
+      );
       await db.customStatement('PRAGMA user_version = 11');
       await db.close();
       db = RemoriDatabase(NativeDatabase(file));
