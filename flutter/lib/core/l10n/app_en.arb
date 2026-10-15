@@ -492,5 +492,33 @@
         "type": "String"
       }
     }
+  },
+  "placeEditTitle": "Edit place",
+  "placeName": "Place name",
+  "placeNameHint": "Home · البيت",
+  "placeSave": "Save place",
+  "placeDelete": "Delete place",
+  "placeDeleteConfirm": "Delete this saved place? It will no longer be used for Where am I?",
+  "placeUnavailable": "This place is unavailable or you do not have permission to edit it.",
+  "placeNameRequired": "Enter a place name (up to 80 characters).",
+  "placeSelectPoint": "Select the place on the map before saving.",
+  "placeLocating": "Finding this phone's location...",
+  "placeDragPin": "Drag the pin to the place",
+  "placePin": "Selected place pin; drag to move",
+  "placeAttribution": "© OpenStreetMap contributors",
+  "placeMapUnavailable": "The map is unavailable. Check your connection and try again.",
+  "placeRadiusLabel": "Radius: {meters} m",
+  "placeRadiusMinimum": "50 m",
+  "placeRadiusMaximum": "500 m",
+  "placeRadiusPreserved": "The saved radius is kept unchanged until you move the slider.",
+  "placeCacheRetry": "Change saved. Retry to finish updating this phone.",
+  "placeWriteUncertain": "Unable to confirm the change. Return to Saved places and refresh before trying again.",
+  "placeWriteFailed": "Unable to save the change. Check the details and try again.",
+  "@placeRadiusLabel": {
+    "placeholders": {
+      "meters": {
+        "type": "String"
+      }
+    }
   }
 }

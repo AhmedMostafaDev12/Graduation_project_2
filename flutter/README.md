@@ -911,8 +911,8 @@ Offline reads remain available. Empty refreshes, revoked/missing patient links
 and Home's removed-link cleanup purge only the affected scope. Stale refreshes
 cannot undo a purge, and changing accounts/patients hides the previous list.
 
-Approved staged scope: Add and place cards remain disabled until C11's separate
-PR, with a localized editing-pending notice for managers. Viewers can read places
+Add and manager-owned place cards now open C11 with their patient/place context.
+The former editing-pending notice is removed. Viewers can read places
 without editing controls. Only the API's single name is displayed: no translated
 name is invented. The existing caregiver navigation and C9 reminder action remain.
 C10's normal entry is through C18 More, which remains pending its own PR; no new
@@ -930,3 +930,59 @@ validation remain pending on this Windows environment.
 
 Validation: dart format --set-exit-if-changed ., flutter analyze (clean),
 flutter test (409 passed, including 31 new C10 tests), Android debug APK built.
+
+## C11 Add/edit place
+
+C11 opens through C10's Add button or a manager's saved-place card. It reads
+existing definitions from the scoped C10 cache and refreshes the list to detect
+removed places/access. Ahmed approved flutter_map, latlong2 and geolocator, with
+OpenStreetMap tiles for the initial project version. Maps show visible attribution
+and use the library's native HTTP tile cache, with a Remori User-Agent and no
+caregiver credentials. There is no tile prefetch, patient tracking or map on C10.
+
+Existing places use their saved coordinates without asking for GPS. New places
+request one foreground fix from the caregiver phone. Denied/disabled location
+leaves a world view with no selected point: the caregiver must select a point
+before saving. A late location fix cannot overwrite manual selection. The pin
+can be dragged, the map can be panned/zoomed and tapping selects a point. Test
+maps use deterministic generated tiles; production never substitutes them.
+
+New places default to 100 m, with the design's 50–500 m slider in 10 m steps.
+API-valid existing radii outside that range/step are preserved until the slider
+is explicitly moved. Names use the API's 80-character limit. Manager-only online
+POST/PATCH/DELETE operations update the existing cache after acknowledgement;
+Delete asks for confirmation. A confirmed write with a local failure retains a
+receipt for cache-only retry. Uncertain writes lock resubmission and ask the
+caregiver to return to/refetch Saved places before trying again. Scope changes
+ignore late results; known removed places/access purge the affected cached data.
+No tables or backend contracts change.
+
+Configure map tiles at build/run time, alongside the existing API configuration:
+
+```powershell
+flutter run --dart-define=REMORI_API_BASE_URL=https://remori-ai.duckdns.org/api/v1 '--dart-define=REMORI_MAP_TILE_URL=https://tile.openstreetmap.org/{z}/{x}/{y}.png' --dart-define=REMORI_FAKE_GLASSES=true
+```
+
+The tile URL must use the approved HTTPS OpenStreetMap endpoint. Missing or invalid
+configuration shows a localized unavailable state. Map failures do not disclose
+coordinates or raw exceptions; reopen the editor after restoring connectivity.
+The iOS foreground-location purpose is declared in English and Arabic. On macOS,
+set the geolocator SPM compile flag for foreground-only location before building:
+
+```sh
+BYPASS_PERMISSION_LOCATION_ALWAYS=1 flutter build ios --dart-define=REMORI_API_BASE_URL=https://remori-ai.duckdns.org/api/v1 '--dart-define=REMORI_MAP_TILE_URL=https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+```
+
+No Always/background location permission is requested. iOS compilation and actual
+permission dialogs remain device-validation tasks on macOS/iOS. Map setup follows
+[flutter_map caching](https://docs.fleaflet.dev/layers/tile-layer/caching) and the
+[OSM tile policy](https://operations.osmfoundation.org/policies/tiles/).
+C18 More remains a separate pending screen, so its normal menu entry is not yet
+available. Review captures: [English](test/goldens/c11_en.png),
+[Arabic](test/goldens/c11_ar.png). Regenerate with
+flutter test test/c11_edit_place_test.dart --update-goldens.
+
+Validation: dart format --set-exit-if-changed . (clean), flutter analyze (clean),
+flutter test (433 passed, including 24 new C11 tests), Android debug APK built
+with the configured live API and approved OpenStreetMap tiles. Automated tests
+never create, edit or delete live places and never query a real phone location.

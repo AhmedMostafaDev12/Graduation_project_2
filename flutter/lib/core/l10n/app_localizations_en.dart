@@ -1217,4 +1217,76 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get placesOffline =>
       'Showing saved places. Retry to check the latest list.';
+
+  @override
+  String get placeEditTitle => 'Edit place';
+
+  @override
+  String get placeName => 'Place name';
+
+  @override
+  String get placeNameHint => 'Home · البيت';
+
+  @override
+  String get placeSave => 'Save place';
+
+  @override
+  String get placeDelete => 'Delete place';
+
+  @override
+  String get placeDeleteConfirm =>
+      'Delete this saved place? It will no longer be used for Where am I?';
+
+  @override
+  String get placeUnavailable =>
+      'This place is unavailable or you do not have permission to edit it.';
+
+  @override
+  String get placeNameRequired => 'Enter a place name (up to 80 characters).';
+
+  @override
+  String get placeSelectPoint => 'Select the place on the map before saving.';
+
+  @override
+  String get placeLocating => 'Finding this phone\'s location...';
+
+  @override
+  String get placeDragPin => 'Drag the pin to the place';
+
+  @override
+  String get placePin => 'Selected place pin; drag to move';
+
+  @override
+  String get placeAttribution => '© OpenStreetMap contributors';
+
+  @override
+  String get placeMapUnavailable =>
+      'The map is unavailable. Check your connection and try again.';
+
+  @override
+  String placeRadiusLabel(String meters) {
+    return 'Radius: $meters m';
+  }
+
+  @override
+  String get placeRadiusMinimum => '50 m';
+
+  @override
+  String get placeRadiusMaximum => '500 m';
+
+  @override
+  String get placeRadiusPreserved =>
+      'The saved radius is kept unchanged until you move the slider.';
+
+  @override
+  String get placeCacheRetry =>
+      'Change saved. Retry to finish updating this phone.';
+
+  @override
+  String get placeWriteUncertain =>
+      'Unable to confirm the change. Return to Saved places and refresh before trying again.';
+
+  @override
+  String get placeWriteFailed =>
+      'Unable to save the change. Check the details and try again.';
 }

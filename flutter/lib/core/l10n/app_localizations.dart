@@ -2208,6 +2208,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Showing saved places. Retry to check the latest list.'**
   String get placesOffline;
+
+  /// No description provided for @placeEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit place'**
+  String get placeEditTitle;
+
+  /// No description provided for @placeName.
+  ///
+  /// In en, this message translates to:
+  /// **'Place name'**
+  String get placeName;
+
+  /// No description provided for @placeNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Home · البيت'**
+  String get placeNameHint;
+
+  /// No description provided for @placeSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save place'**
+  String get placeSave;
+
+  /// No description provided for @placeDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete place'**
+  String get placeDelete;
+
+  /// No description provided for @placeDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this saved place? It will no longer be used for Where am I?'**
+  String get placeDeleteConfirm;
+
+  /// No description provided for @placeUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This place is unavailable or you do not have permission to edit it.'**
+  String get placeUnavailable;
+
+  /// No description provided for @placeNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a place name (up to 80 characters).'**
+  String get placeNameRequired;
+
+  /// No description provided for @placeSelectPoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select the place on the map before saving.'**
+  String get placeSelectPoint;
+
+  /// No description provided for @placeLocating.
+  ///
+  /// In en, this message translates to:
+  /// **'Finding this phone\'s location...'**
+  String get placeLocating;
+
+  /// No description provided for @placeDragPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag the pin to the place'**
+  String get placeDragPin;
+
+  /// No description provided for @placePin.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected place pin; drag to move'**
+  String get placePin;
+
+  /// No description provided for @placeAttribution.
+  ///
+  /// In en, this message translates to:
+  /// **'© OpenStreetMap contributors'**
+  String get placeAttribution;
+
+  /// No description provided for @placeMapUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The map is unavailable. Check your connection and try again.'**
+  String get placeMapUnavailable;
+
+  /// No description provided for @placeRadiusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Radius: {meters} m'**
+  String placeRadiusLabel(String meters);
+
+  /// No description provided for @placeRadiusMinimum.
+  ///
+  /// In en, this message translates to:
+  /// **'50 m'**
+  String get placeRadiusMinimum;
+
+  /// No description provided for @placeRadiusMaximum.
+  ///
+  /// In en, this message translates to:
+  /// **'500 m'**
+  String get placeRadiusMaximum;
+
+  /// No description provided for @placeRadiusPreserved.
+  ///
+  /// In en, this message translates to:
+  /// **'The saved radius is kept unchanged until you move the slider.'**
+  String get placeRadiusPreserved;
+
+  /// No description provided for @placeCacheRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Change saved. Retry to finish updating this phone.'**
+  String get placeCacheRetry;
+
+  /// No description provided for @placeWriteUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to confirm the change. Return to Saved places and refresh before trying again.'**
+  String get placeWriteUncertain;
+
+  /// No description provided for @placeWriteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to save the change. Check the details and try again.'**
+  String get placeWriteFailed;
 }
 
 class _AppLocalizationsDelegate

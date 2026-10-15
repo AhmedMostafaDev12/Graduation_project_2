@@ -459,5 +459,33 @@
         "type": "String"
       }
     }
+  },
+  "placeEditTitle": "تعديل المكان",
+  "placeName": "اسم المكان",
+  "placeNameHint": "البيت · Home",
+  "placeSave": "حفظ المكان",
+  "placeDelete": "حذف المكان",
+  "placeDeleteConfirm": "هل تريد حذف هذا المكان المحفوظ؟ لن يُستخدم بعد ذلك للإجابة عن «أين أنا؟».",
+  "placeUnavailable": "هذا المكان غير متاح أو ليس لديك إذن بتعديله.",
+  "placeNameRequired": "أدخل اسمًا للمكان (حتى ٨٠ حرفًا).",
+  "placeSelectPoint": "اختر المكان على الخريطة قبل الحفظ.",
+  "placeLocating": "جارٍ تحديد موقع هذا الهاتف…",
+  "placeDragPin": "اسحب العلامة إلى المكان",
+  "placePin": "علامة المكان المختار؛ اسحبها لتغيير الموقع",
+  "placeAttribution": "© مساهمو OpenStreetMap",
+  "placeMapUnavailable": "الخريطة غير متاحة. تحقق من اتصالك وأعد المحاولة.",
+  "placeRadiusLabel": "النطاق: {meters} م",
+  "placeRadiusMinimum": "٥٠ م",
+  "placeRadiusMaximum": "٥٠٠ م",
+  "placeRadiusPreserved": "يبقى النطاق المحفوظ كما هو حتى تحرّك شريط النطاق.",
+  "placeCacheRetry": "تم حفظ التغيير. أعد المحاولة لإكمال تحديث هذا الهاتف.",
+  "placeWriteUncertain": "تعذّر تأكيد التغيير. ارجع إلى الأماكن المحفوظة وحدّث القائمة قبل المحاولة مجددًا.",
+  "placeWriteFailed": "تعذّر حفظ التغيير. تحقق من التفاصيل وأعد المحاولة.",
+  "@placeRadiusLabel": {
+    "placeholders": {
+      "meters": {
+        "type": "String"
+      }
+    }
   }
 }

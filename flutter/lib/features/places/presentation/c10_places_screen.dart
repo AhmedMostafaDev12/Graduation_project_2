@@ -55,7 +55,12 @@ class C10PlacesScreen extends ConsumerWidget {
                 ),
                 if (manager)
                   FilledButton(
-                    onPressed: null,
+                    onPressed: scope == null
+                        ? null
+                        : () => context.pushNamed(
+                            RemoriScreen.c11.name,
+                            extra: {'patient_id': scope.patientId},
+                          ),
                     style: FilledButton.styleFrom(
                       minimumSize: const Size(0, 36),
                       padding: const EdgeInsets.symmetric(
@@ -108,67 +113,80 @@ class C10PlacesScreen extends ConsumerWidget {
                       padding: const EdgeInsets.only(bottom: 10),
                       child: Semantics(
                         button: true,
-                        enabled: false,
-                        child: Container(
-                          key: ValueKey('place-${p.id}'),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: RemoriColors.surface,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: RemoriColors.border),
-                          ),
-                          child: Row(
-                            children: [
-                              const SizedBox(
-                                width: 40,
-                                height: 40,
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFFEEE8F7),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Icons.location_on_outlined,
-                                    size: 18,
-                                    color: RemoriColors.purple,
+                        enabled: manager,
+                        child: GestureDetector(
+                          onTap: !manager || scope == null
+                              ? null
+                              : () => context.pushNamed(
+                                  RemoriScreen.c11.name,
+                                  extra: {
+                                    'patient_id': scope.patientId,
+                                    'place_id': p.id,
+                                  },
+                                ),
+                          child: Container(
+                            key: ValueKey('place-${p.id}'),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: RemoriColors.surface,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: RemoriColors.border),
+                            ),
+                            child: Row(
+                              children: [
+                                const SizedBox(
+                                  width: 40,
+                                  height: 40,
+                                  child: DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      color: Color(0xFFEEE8F7),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.location_on_outlined,
+                                      size: 18,
+                                      color: RemoriColors.purple,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      p.name,
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600,
-                                        fontFamilyFallback: ['Readex Pro'],
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        p.name,
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          fontFamilyFallback: ['Readex Pro'],
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      s.placesRadius(number.format(p.radiusM)),
-                                      style: _small,
-                                    ),
-                                  ],
+                                      Text(
+                                        s.placesRadius(
+                                          number.format(p.radiusM),
+                                        ),
+                                        style: _small,
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 8),
-                              const Icon(
-                                Icons.chevron_right,
-                                size: 18,
-                                color: RemoriColors.muted,
-                              ),
-                            ],
+                                const SizedBox(width: 8),
+                                const Icon(
+                                  Icons.chevron_right,
+                                  size: 18,
+                                  color: RemoriColors.muted,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  if (manager) Text(s.placesEditingPending, style: _small),
                 ],
               ),
             ),
