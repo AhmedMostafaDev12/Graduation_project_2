@@ -1477,4 +1477,57 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get mediaAuditNote =>
       'سيُطلب منك تأكيد الحذف. تُسجّل عمليات الحذف في سجل التدقيق.';
+
+  @override
+  String get documentsTitle => 'المستندات';
+
+  @override
+  String get documentsAll => 'الكل';
+
+  @override
+  String get documentsReceipts => 'الإيصالات';
+
+  @override
+  String get documentsBills => 'الفواتير';
+
+  @override
+  String get documentsMedicationLabels => 'ملصقات الأدوية';
+
+  @override
+  String get documentsReceipt => 'إيصال';
+
+  @override
+  String get documentsBill => 'فاتورة';
+
+  @override
+  String get documentsMedicationLabel => 'ملصق دواء';
+
+  @override
+  String get documentsOther => 'مستند آخر';
+
+  @override
+  String get documentsIntro => 'تلتقطها النظارة وتُقرأ تلقائيًا.';
+
+  @override
+  String get documentsLoadFailed => 'تعذر تحديث المستندات. حاول مرة أخرى.';
+
+  @override
+  String get documentsOffline =>
+      'نعرض المستندات المحفوظة. تتطلب الصور تحديثًا عبر الإنترنت.';
+
+  @override
+  String get documentsUnavailable => 'اختر مريضًا لعرض مستنداته.';
+
+  @override
+  String get documentsEmpty => 'لا توجد مستندات في هذا التصنيف حتى الآن.';
+
+  @override
+  String get documentsDetailPending =>
+      'ستتاح تفاصيل المستندات عند اكتمال شاشتها.';
+
+  @override
+  String get documentsPreviewUnavailable => 'معاينة المستند غير متاحة';
+
+  @override
+  String get documentsPreview => 'معاينة مستند';
 }

@@ -619,5 +619,22 @@
         "type": "String"
       }
     }
-  }
+  },
+  "documentsTitle": "Documents",
+  "documentsAll": "All",
+  "documentsReceipts": "Receipts",
+  "documentsBills": "Bills",
+  "documentsMedicationLabels": "Medication labels",
+  "documentsReceipt": "Receipt",
+  "documentsBill": "Bill",
+  "documentsMedicationLabel": "Medication label",
+  "documentsOther": "Other document",
+  "documentsIntro": "Captured by the glasses and read automatically.",
+  "documentsLoadFailed": "Could not refresh documents. Please try again.",
+  "documentsOffline": "Showing saved documents. Photos require an online refresh.",
+  "documentsUnavailable": "Choose a patient to view their documents.",
+  "documentsEmpty": "No documents in this category yet.",
+  "documentsDetailPending": "Document details will be available when their screen is ready.",
+  "documentsPreviewUnavailable": "Document preview unavailable",
+  "documentsPreview": "Document preview"
 }

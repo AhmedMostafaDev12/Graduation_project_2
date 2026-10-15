@@ -2682,6 +2682,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You’ll be asked to confirm deletion. Deletions are recorded in the audit log.'**
   String get mediaAuditNote;
+
+  /// No description provided for @documentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents'**
+  String get documentsTitle;
+
+  /// No description provided for @documentsAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get documentsAll;
+
+  /// No description provided for @documentsReceipts.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipts'**
+  String get documentsReceipts;
+
+  /// No description provided for @documentsBills.
+  ///
+  /// In en, this message translates to:
+  /// **'Bills'**
+  String get documentsBills;
+
+  /// No description provided for @documentsMedicationLabels.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication labels'**
+  String get documentsMedicationLabels;
+
+  /// No description provided for @documentsReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt'**
+  String get documentsReceipt;
+
+  /// No description provided for @documentsBill.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill'**
+  String get documentsBill;
+
+  /// No description provided for @documentsMedicationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication label'**
+  String get documentsMedicationLabel;
+
+  /// No description provided for @documentsOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other document'**
+  String get documentsOther;
+
+  /// No description provided for @documentsIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Captured by the glasses and read automatically.'**
+  String get documentsIntro;
+
+  /// No description provided for @documentsLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not refresh documents. Please try again.'**
+  String get documentsLoadFailed;
+
+  /// No description provided for @documentsOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing saved documents. Photos require an online refresh.'**
+  String get documentsOffline;
+
+  /// No description provided for @documentsUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a patient to view their documents.'**
+  String get documentsUnavailable;
+
+  /// No description provided for @documentsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No documents in this category yet.'**
+  String get documentsEmpty;
+
+  /// No description provided for @documentsDetailPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Document details will be available when their screen is ready.'**
+  String get documentsDetailPending;
+
+  /// No description provided for @documentsPreviewUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Document preview unavailable'**
+  String get documentsPreviewUnavailable;
+
+  /// No description provided for @documentsPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Document preview'**
+  String get documentsPreview;
 }
 
 class _AppLocalizationsDelegate
