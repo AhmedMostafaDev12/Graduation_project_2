@@ -755,5 +755,110 @@
   "@patientAlertTitle": {"placeholders": {"title": {"type": "String"}}},
   "patientAlertUnavailable": "تذكيراتك موجودة في التذكيرات",
   "patientAlertSaveFailed": "لسه ما اتحفظتش. جرّب تاني.",
-  "patientAlertBack": "ارجع للتذكيرات"
+  "patientAlertBack": "ارجع للتذكيرات",
+
+    "patientDayToday":  "النهارده",
+    "patientDayYesterday":  "امبارح",
+    "patientDayOffline":  "يومك المحفوظ موجود هنا. التحديثات هتوصل لما الاتصال يرجع.",
+    "patientDayEmpty":  "لحظات من يومك هتظهر هنا",
+    "patientDayDetailPending":  "تفاصيل الذكريات هتكون متاحة قريب.",
+    "patientDayMet":  "قابلت {name} الساعة {time}",
+    "@patientDayMet":  {
+                           "placeholders":  {
+                                                "name":  {
+                                                             "type":  "String"
+                                                         },
+                                                "time":  {
+                                                             "type":  "String"
+                                                         }
+                                            }
+                       },
+    "patientDayEncounter":  "قابلت حد الساعة {time}",
+    "@patientDayEncounter":  {
+                                 "placeholders":  {
+                                                      "time":  {
+                                                                   "type":  "String"
+                                                               }
+                                                  }
+                             },
+    "patientDayTalk":  "محادثة الساعة {time}",
+    "@patientDayTalk":  {
+                            "placeholders":  {
+                                                 "time":  {
+                                                              "type":  "String"
+                                                          }
+                                             }
+                        },
+    "patientDayReminder":  "تذكير الساعة {time}",
+    "@patientDayReminder":  {
+                                "placeholders":  {
+                                                     "time":  {
+                                                                  "type":  "String"
+                                                              }
+                                                 }
+                            },
+    "patientDayRecording":  "تسجيل الساعة {time}",
+    "@patientDayRecording":  {
+                                 "placeholders":  {
+                                                      "time":  {
+                                                                   "type":  "String"
+                                                               }
+                                                  }
+                             },
+    "patientDayMoment":  "لحظة الساعة {time}",
+    "@patientDayMoment":  {
+                              "placeholders":  {
+                                                   "time":  {
+                                                                "type":  "String"
+                                                            }
+                                               }
+                          },
+    "patientDayDocument":  "مستند الساعة {time}",
+    "@patientDayDocument":  {
+                                "placeholders":  {
+                                                     "time":  {
+                                                                  "type":  "String"
+                                                              }
+                                                 }
+                            },
+    "patientDayQuestion":  "سألت سؤال الساعة {time}",
+    "@patientDayQuestion":  {
+                                "placeholders":  {
+                                                     "time":  {
+                                                                  "type":  "String"
+                                                              }
+                                                 }
+                            },
+    "patientDayGame":  "لعبة الساعة {time}",
+    "@patientDayGame":  {
+                            "placeholders":  {
+                                                 "time":  {
+                                                              "type":  "String"
+                                                          }
+                                             }
+                        },
+    "patientDayPaused":  "الذاكرة اتوقفت الساعة {time}",
+    "@patientDayPaused":  {
+                              "placeholders":  {
+                                                   "time":  {
+                                                                "type":  "String"
+                                                            }
+                                               }
+                          },
+    "patientDayResumed":  "الذاكرة رجعت تشتغل الساعة {time}",
+    "@patientDayResumed":  {
+                               "placeholders":  {
+                                                    "time":  {
+                                                                 "type":  "String"
+                                                             }
+                                                }
+                           },
+    "patientDayEvent":  "لحظة من يومك الساعة {time}",
+    "@patientDayEvent":  {
+                             "placeholders":  {
+                                                  "time":  {
+                                                               "type":  "String"
+                                                           }
+                                              }
+                         }
 }

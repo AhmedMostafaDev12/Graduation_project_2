@@ -168,6 +168,9 @@ void main() {
       await db.customStatement(
         'ALTER TABLE patient_reminder_cards DROP COLUMN reminder_type',
       );
+      await db.customStatement('DROP TABLE patient_journal_entries');
+      await db.customStatement('DROP TABLE patient_journal_media');
+      await db.customStatement('DROP TABLE patient_journal_days');
       await db.customStatement('PRAGMA user_version = 16');
       repo.dispose();
       await db.close();

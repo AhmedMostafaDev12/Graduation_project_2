@@ -1319,3 +1319,34 @@ Review captures: [English](test/goldens/p3_en.png),
 Validation: formatting and analysis clean; all 735 tests passed, including 26 P3
 tests. Android debug APK built. iOS compilation and physical-device lifecycle
 validation remain pending on macOS/iOS.
+
+## P4 My Day
+
+Patient Mode's My Day tab reads three patient/device/day-scoped caches (schema
+v18): allowlisted journal display data, media references and day/refresh metadata.
+Today and Yesterday use the patient's IANA timezone and roll by calendar day at
+local midnight. Refresh uses device credentials; caregiver journal caches are
+not reused. Raw transcripts, arbitrary metadata, embeddings, audio and image
+bytes are excluded from these tables.
+
+Cards use actual API rendered text when supplied, otherwise localized neutral
+descriptions with actual times and names. A reminder event does not imply that
+medicine was taken. Missing person photos use initials; other missing previews
+use icons. P5 links remain disabled with a gentle notice, and Phase 2 Ask is
+disabled. No patient editing or deletion controls are added in P4.
+
+Previews load into memory only after a successful refresh, and only if the exact
+media reference belongs to that fresh result. They clear on leaving, background,
+day/device changes and expiry. Retention and signed-reference deadlines evict
+bytes even without a visible image subscriber. Offline mode keeps cached text
+with placeholders and does not fetch old signed URLs. A 403 permits one automatic
+refresh per media in a refresh cycle; manual Retry starts a new cycle. Requests
+to signed image URLs use a separate unauthenticated transport, without redirects.
+
+Review captures: [English](test/goldens/p4_en.png),
+[Arabic](test/goldens/p4_ar.png). Regenerate with
+`flutter test test/p4_my_day_test.dart --update-goldens`.
+
+Validation: formatting and analysis clean; all 764 tests passed, including 29 P4
+tests. Android debug APK built. iOS compilation and physical-device lifecycle
+validation remain pending on macOS/iOS.
