@@ -1974,4 +1974,50 @@ class AppLocalizationsAr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get todayGettingReady => 'بنجهّز يومك';
+
+  @override
+  String get todayMemoryOff => 'الذاكرة مقفولة';
+
+  @override
+  String get todayMemoryUnknown => 'حالة الذاكرة مش متاحة دلوقتي';
+
+  @override
+  String get todayMemoryPaused => 'الذاكرة متوقفة مؤقتًا';
+
+  @override
+  String get todayMemoryOn => 'الذاكرة شغالة';
+
+  @override
+  String get todayGlassesConnected => 'النظارة متوصلة';
+
+  @override
+  String get todayGlassesAway => 'النظارة مش متوصلة';
+
+  @override
+  String get todayOffline =>
+      'تقدر تكمّل باليوم المحفوظ. التحديثات هتوصل لما الاتصال يرجع.';
+
+  @override
+  String get todayNextReminder => 'التذكير الجاي';
+
+  @override
+  String get todayNoReminder => 'مفيش تذكيرات دلوقتي';
+
+  @override
+  String get todayDone => 'خدته';
+
+  @override
+  String get todayLater => 'بعدين';
+
+  @override
+  String get todayPeopleMet => 'قابلت النهارده';
+
+  @override
+  String get todayNoPeople => 'الناس اللي تقابلهم هيظهروا هنا';
+
+  @override
+  String get todayAskLater => 'اسأل (المرحلة ٢)';
 }

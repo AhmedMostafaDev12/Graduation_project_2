@@ -13817,6 +13817,1262 @@ class CaregiversCacheStatesCompanion
   }
 }
 
+class $PatientTodaySettingsTable extends PatientTodaySettings
+    with TableInfo<$PatientTodaySettingsTable, PatientTodaySetting> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PatientTodaySettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fullNameMeta = const VerificationMeta(
+    'fullName',
+  );
+  @override
+  late final GeneratedColumn<String> fullName = GeneratedColumn<String>(
+    'full_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _languageMeta = const VerificationMeta(
+    'language',
+  );
+  @override
+  late final GeneratedColumn<String> language = GeneratedColumn<String>(
+    'language',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _timezoneMeta = const VerificationMeta(
+    'timezone',
+  );
+  @override
+  late final GeneratedColumn<String> timezone = GeneratedColumn<String>(
+    'timezone',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _memoryEnabledMeta = const VerificationMeta(
+    'memoryEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> memoryEnabled = GeneratedColumn<bool>(
+    'memory_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("memory_enabled" IN (0, 1))',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> refreshedAt =
+      GeneratedColumn<int>(
+        'refreshed_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>(
+        $PatientTodaySettingsTable.$converterrefreshedAt,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    patientId,
+    deviceId,
+    fullName,
+    language,
+    timezone,
+    memoryEnabled,
+    refreshedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'patient_today_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PatientTodaySetting> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    if (data.containsKey('full_name')) {
+      context.handle(
+        _fullNameMeta,
+        fullName.isAcceptableOrUnknown(data['full_name']!, _fullNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fullNameMeta);
+    }
+    if (data.containsKey('language')) {
+      context.handle(
+        _languageMeta,
+        language.isAcceptableOrUnknown(data['language']!, _languageMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_languageMeta);
+    }
+    if (data.containsKey('timezone')) {
+      context.handle(
+        _timezoneMeta,
+        timezone.isAcceptableOrUnknown(data['timezone']!, _timezoneMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_timezoneMeta);
+    }
+    if (data.containsKey('memory_enabled')) {
+      context.handle(
+        _memoryEnabledMeta,
+        memoryEnabled.isAcceptableOrUnknown(
+          data['memory_enabled']!,
+          _memoryEnabledMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_memoryEnabledMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {patientId, deviceId};
+  @override
+  PatientTodaySetting map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PatientTodaySetting(
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+      fullName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}full_name'],
+      )!,
+      language: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}language'],
+      )!,
+      timezone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}timezone'],
+      )!,
+      memoryEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}memory_enabled'],
+      )!,
+      refreshedAt: $PatientTodaySettingsTable.$converterrefreshedAt.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}refreshed_at'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $PatientTodaySettingsTable createAlias(String alias) {
+    return $PatientTodaySettingsTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converterrefreshedAt = const UtcMicros();
+}
+
+class PatientTodaySetting extends DataClass
+    implements Insertable<PatientTodaySetting> {
+  final String patientId;
+  final String deviceId;
+  final String fullName;
+  final String language;
+  final String timezone;
+  final bool memoryEnabled;
+  final DateTime refreshedAt;
+  const PatientTodaySetting({
+    required this.patientId,
+    required this.deviceId,
+    required this.fullName,
+    required this.language,
+    required this.timezone,
+    required this.memoryEnabled,
+    required this.refreshedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['patient_id'] = Variable<String>(patientId);
+    map['device_id'] = Variable<String>(deviceId);
+    map['full_name'] = Variable<String>(fullName);
+    map['language'] = Variable<String>(language);
+    map['timezone'] = Variable<String>(timezone);
+    map['memory_enabled'] = Variable<bool>(memoryEnabled);
+    {
+      map['refreshed_at'] = Variable<int>(
+        $PatientTodaySettingsTable.$converterrefreshedAt.toSql(refreshedAt),
+      );
+    }
+    return map;
+  }
+
+  PatientTodaySettingsCompanion toCompanion(bool nullToAbsent) {
+    return PatientTodaySettingsCompanion(
+      patientId: Value(patientId),
+      deviceId: Value(deviceId),
+      fullName: Value(fullName),
+      language: Value(language),
+      timezone: Value(timezone),
+      memoryEnabled: Value(memoryEnabled),
+      refreshedAt: Value(refreshedAt),
+    );
+  }
+
+  factory PatientTodaySetting.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PatientTodaySetting(
+      patientId: serializer.fromJson<String>(json['patientId']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+      fullName: serializer.fromJson<String>(json['fullName']),
+      language: serializer.fromJson<String>(json['language']),
+      timezone: serializer.fromJson<String>(json['timezone']),
+      memoryEnabled: serializer.fromJson<bool>(json['memoryEnabled']),
+      refreshedAt: serializer.fromJson<DateTime>(json['refreshedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'patientId': serializer.toJson<String>(patientId),
+      'deviceId': serializer.toJson<String>(deviceId),
+      'fullName': serializer.toJson<String>(fullName),
+      'language': serializer.toJson<String>(language),
+      'timezone': serializer.toJson<String>(timezone),
+      'memoryEnabled': serializer.toJson<bool>(memoryEnabled),
+      'refreshedAt': serializer.toJson<DateTime>(refreshedAt),
+    };
+  }
+
+  PatientTodaySetting copyWith({
+    String? patientId,
+    String? deviceId,
+    String? fullName,
+    String? language,
+    String? timezone,
+    bool? memoryEnabled,
+    DateTime? refreshedAt,
+  }) => PatientTodaySetting(
+    patientId: patientId ?? this.patientId,
+    deviceId: deviceId ?? this.deviceId,
+    fullName: fullName ?? this.fullName,
+    language: language ?? this.language,
+    timezone: timezone ?? this.timezone,
+    memoryEnabled: memoryEnabled ?? this.memoryEnabled,
+    refreshedAt: refreshedAt ?? this.refreshedAt,
+  );
+  PatientTodaySetting copyWithCompanion(PatientTodaySettingsCompanion data) {
+    return PatientTodaySetting(
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      fullName: data.fullName.present ? data.fullName.value : this.fullName,
+      language: data.language.present ? data.language.value : this.language,
+      timezone: data.timezone.present ? data.timezone.value : this.timezone,
+      memoryEnabled: data.memoryEnabled.present
+          ? data.memoryEnabled.value
+          : this.memoryEnabled,
+      refreshedAt: data.refreshedAt.present
+          ? data.refreshedAt.value
+          : this.refreshedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PatientTodaySetting(')
+          ..write('patientId: $patientId, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('fullName: $fullName, ')
+          ..write('language: $language, ')
+          ..write('timezone: $timezone, ')
+          ..write('memoryEnabled: $memoryEnabled, ')
+          ..write('refreshedAt: $refreshedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    patientId,
+    deviceId,
+    fullName,
+    language,
+    timezone,
+    memoryEnabled,
+    refreshedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PatientTodaySetting &&
+          other.patientId == this.patientId &&
+          other.deviceId == this.deviceId &&
+          other.fullName == this.fullName &&
+          other.language == this.language &&
+          other.timezone == this.timezone &&
+          other.memoryEnabled == this.memoryEnabled &&
+          other.refreshedAt == this.refreshedAt);
+}
+
+class PatientTodaySettingsCompanion
+    extends UpdateCompanion<PatientTodaySetting> {
+  final Value<String> patientId;
+  final Value<String> deviceId;
+  final Value<String> fullName;
+  final Value<String> language;
+  final Value<String> timezone;
+  final Value<bool> memoryEnabled;
+  final Value<DateTime> refreshedAt;
+  final Value<int> rowid;
+  const PatientTodaySettingsCompanion({
+    this.patientId = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.fullName = const Value.absent(),
+    this.language = const Value.absent(),
+    this.timezone = const Value.absent(),
+    this.memoryEnabled = const Value.absent(),
+    this.refreshedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PatientTodaySettingsCompanion.insert({
+    required String patientId,
+    required String deviceId,
+    required String fullName,
+    required String language,
+    required String timezone,
+    required bool memoryEnabled,
+    required DateTime refreshedAt,
+    this.rowid = const Value.absent(),
+  }) : patientId = Value(patientId),
+       deviceId = Value(deviceId),
+       fullName = Value(fullName),
+       language = Value(language),
+       timezone = Value(timezone),
+       memoryEnabled = Value(memoryEnabled),
+       refreshedAt = Value(refreshedAt);
+  static Insertable<PatientTodaySetting> custom({
+    Expression<String>? patientId,
+    Expression<String>? deviceId,
+    Expression<String>? fullName,
+    Expression<String>? language,
+    Expression<String>? timezone,
+    Expression<bool>? memoryEnabled,
+    Expression<int>? refreshedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (patientId != null) 'patient_id': patientId,
+      if (deviceId != null) 'device_id': deviceId,
+      if (fullName != null) 'full_name': fullName,
+      if (language != null) 'language': language,
+      if (timezone != null) 'timezone': timezone,
+      if (memoryEnabled != null) 'memory_enabled': memoryEnabled,
+      if (refreshedAt != null) 'refreshed_at': refreshedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PatientTodaySettingsCompanion copyWith({
+    Value<String>? patientId,
+    Value<String>? deviceId,
+    Value<String>? fullName,
+    Value<String>? language,
+    Value<String>? timezone,
+    Value<bool>? memoryEnabled,
+    Value<DateTime>? refreshedAt,
+    Value<int>? rowid,
+  }) {
+    return PatientTodaySettingsCompanion(
+      patientId: patientId ?? this.patientId,
+      deviceId: deviceId ?? this.deviceId,
+      fullName: fullName ?? this.fullName,
+      language: language ?? this.language,
+      timezone: timezone ?? this.timezone,
+      memoryEnabled: memoryEnabled ?? this.memoryEnabled,
+      refreshedAt: refreshedAt ?? this.refreshedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (fullName.present) {
+      map['full_name'] = Variable<String>(fullName.value);
+    }
+    if (language.present) {
+      map['language'] = Variable<String>(language.value);
+    }
+    if (timezone.present) {
+      map['timezone'] = Variable<String>(timezone.value);
+    }
+    if (memoryEnabled.present) {
+      map['memory_enabled'] = Variable<bool>(memoryEnabled.value);
+    }
+    if (refreshedAt.present) {
+      map['refreshed_at'] = Variable<int>(
+        $PatientTodaySettingsTable.$converterrefreshedAt.toSql(
+          refreshedAt.value,
+        ),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PatientTodaySettingsCompanion(')
+          ..write('patientId: $patientId, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('fullName: $fullName, ')
+          ..write('language: $language, ')
+          ..write('timezone: $timezone, ')
+          ..write('memoryEnabled: $memoryEnabled, ')
+          ..write('refreshedAt: $refreshedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PatientReminderCardsTable extends PatientReminderCards
+    with TableInfo<$PatientReminderCardsTable, PatientReminderCard> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PatientReminderCardsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dayMeta = const VerificationMeta('day');
+  @override
+  late final GeneratedColumn<String> day = GeneratedColumn<String>(
+    'day',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [patientId, deviceId, id, day, title];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'patient_reminder_cards';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PatientReminderCard> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('day')) {
+      context.handle(
+        _dayMeta,
+        day.isAcceptableOrUnknown(data['day']!, _dayMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dayMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {patientId, deviceId, id};
+  @override
+  PatientReminderCard map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PatientReminderCard(
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      day: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}day'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+    );
+  }
+
+  @override
+  $PatientReminderCardsTable createAlias(String alias) {
+    return $PatientReminderCardsTable(attachedDatabase, alias);
+  }
+}
+
+class PatientReminderCard extends DataClass
+    implements Insertable<PatientReminderCard> {
+  final String patientId;
+  final String deviceId;
+  final String id;
+  final String day;
+  final String title;
+  const PatientReminderCard({
+    required this.patientId,
+    required this.deviceId,
+    required this.id,
+    required this.day,
+    required this.title,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['patient_id'] = Variable<String>(patientId);
+    map['device_id'] = Variable<String>(deviceId);
+    map['id'] = Variable<String>(id);
+    map['day'] = Variable<String>(day);
+    map['title'] = Variable<String>(title);
+    return map;
+  }
+
+  PatientReminderCardsCompanion toCompanion(bool nullToAbsent) {
+    return PatientReminderCardsCompanion(
+      patientId: Value(patientId),
+      deviceId: Value(deviceId),
+      id: Value(id),
+      day: Value(day),
+      title: Value(title),
+    );
+  }
+
+  factory PatientReminderCard.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PatientReminderCard(
+      patientId: serializer.fromJson<String>(json['patientId']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+      id: serializer.fromJson<String>(json['id']),
+      day: serializer.fromJson<String>(json['day']),
+      title: serializer.fromJson<String>(json['title']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'patientId': serializer.toJson<String>(patientId),
+      'deviceId': serializer.toJson<String>(deviceId),
+      'id': serializer.toJson<String>(id),
+      'day': serializer.toJson<String>(day),
+      'title': serializer.toJson<String>(title),
+    };
+  }
+
+  PatientReminderCard copyWith({
+    String? patientId,
+    String? deviceId,
+    String? id,
+    String? day,
+    String? title,
+  }) => PatientReminderCard(
+    patientId: patientId ?? this.patientId,
+    deviceId: deviceId ?? this.deviceId,
+    id: id ?? this.id,
+    day: day ?? this.day,
+    title: title ?? this.title,
+  );
+  PatientReminderCard copyWithCompanion(PatientReminderCardsCompanion data) {
+    return PatientReminderCard(
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      id: data.id.present ? data.id.value : this.id,
+      day: data.day.present ? data.day.value : this.day,
+      title: data.title.present ? data.title.value : this.title,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PatientReminderCard(')
+          ..write('patientId: $patientId, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('id: $id, ')
+          ..write('day: $day, ')
+          ..write('title: $title')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(patientId, deviceId, id, day, title);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PatientReminderCard &&
+          other.patientId == this.patientId &&
+          other.deviceId == this.deviceId &&
+          other.id == this.id &&
+          other.day == this.day &&
+          other.title == this.title);
+}
+
+class PatientReminderCardsCompanion
+    extends UpdateCompanion<PatientReminderCard> {
+  final Value<String> patientId;
+  final Value<String> deviceId;
+  final Value<String> id;
+  final Value<String> day;
+  final Value<String> title;
+  final Value<int> rowid;
+  const PatientReminderCardsCompanion({
+    this.patientId = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.day = const Value.absent(),
+    this.title = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PatientReminderCardsCompanion.insert({
+    required String patientId,
+    required String deviceId,
+    required String id,
+    required String day,
+    required String title,
+    this.rowid = const Value.absent(),
+  }) : patientId = Value(patientId),
+       deviceId = Value(deviceId),
+       id = Value(id),
+       day = Value(day),
+       title = Value(title);
+  static Insertable<PatientReminderCard> custom({
+    Expression<String>? patientId,
+    Expression<String>? deviceId,
+    Expression<String>? id,
+    Expression<String>? day,
+    Expression<String>? title,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (patientId != null) 'patient_id': patientId,
+      if (deviceId != null) 'device_id': deviceId,
+      if (id != null) 'id': id,
+      if (day != null) 'day': day,
+      if (title != null) 'title': title,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PatientReminderCardsCompanion copyWith({
+    Value<String>? patientId,
+    Value<String>? deviceId,
+    Value<String>? id,
+    Value<String>? day,
+    Value<String>? title,
+    Value<int>? rowid,
+  }) {
+    return PatientReminderCardsCompanion(
+      patientId: patientId ?? this.patientId,
+      deviceId: deviceId ?? this.deviceId,
+      id: id ?? this.id,
+      day: day ?? this.day,
+      title: title ?? this.title,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (day.present) {
+      map['day'] = Variable<String>(day.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PatientReminderCardsCompanion(')
+          ..write('patientId: $patientId, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('id: $id, ')
+          ..write('day: $day, ')
+          ..write('title: $title, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PatientKnownEncountersTable extends PatientKnownEncounters
+    with TableInfo<$PatientKnownEncountersTable, PatientKnownEncounter> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PatientKnownEncountersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _patientIdMeta = const VerificationMeta(
+    'patientId',
+  );
+  @override
+  late final GeneratedColumn<String> patientId = GeneratedColumn<String>(
+    'patient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dayMeta = const VerificationMeta('day');
+  @override
+  late final GeneratedColumn<String> day = GeneratedColumn<String>(
+    'day',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _personIdMeta = const VerificationMeta(
+    'personId',
+  );
+  @override
+  late final GeneratedColumn<String> personId = GeneratedColumn<String>(
+    'person_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, int> firstSeen =
+      GeneratedColumn<int>(
+        'first_seen',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>(
+        $PatientKnownEncountersTable.$converterfirstSeen,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    patientId,
+    deviceId,
+    day,
+    personId,
+    name,
+    firstSeen,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'patient_known_encounters';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PatientKnownEncounter> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('patient_id')) {
+      context.handle(
+        _patientIdMeta,
+        patientId.isAcceptableOrUnknown(data['patient_id']!, _patientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_patientIdMeta);
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    if (data.containsKey('day')) {
+      context.handle(
+        _dayMeta,
+        day.isAcceptableOrUnknown(data['day']!, _dayMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dayMeta);
+    }
+    if (data.containsKey('person_id')) {
+      context.handle(
+        _personIdMeta,
+        personId.isAcceptableOrUnknown(data['person_id']!, _personIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_personIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {patientId, deviceId, day, personId};
+  @override
+  PatientKnownEncounter map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PatientKnownEncounter(
+      patientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_id'],
+      )!,
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+      day: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}day'],
+      )!,
+      personId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}person_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      firstSeen: $PatientKnownEncountersTable.$converterfirstSeen.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}first_seen'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $PatientKnownEncountersTable createAlias(String alias) {
+    return $PatientKnownEncountersTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, int> $converterfirstSeen = const UtcMicros();
+}
+
+class PatientKnownEncounter extends DataClass
+    implements Insertable<PatientKnownEncounter> {
+  final String patientId;
+  final String deviceId;
+  final String day;
+  final String personId;
+  final String name;
+  final DateTime firstSeen;
+  const PatientKnownEncounter({
+    required this.patientId,
+    required this.deviceId,
+    required this.day,
+    required this.personId,
+    required this.name,
+    required this.firstSeen,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['patient_id'] = Variable<String>(patientId);
+    map['device_id'] = Variable<String>(deviceId);
+    map['day'] = Variable<String>(day);
+    map['person_id'] = Variable<String>(personId);
+    map['name'] = Variable<String>(name);
+    {
+      map['first_seen'] = Variable<int>(
+        $PatientKnownEncountersTable.$converterfirstSeen.toSql(firstSeen),
+      );
+    }
+    return map;
+  }
+
+  PatientKnownEncountersCompanion toCompanion(bool nullToAbsent) {
+    return PatientKnownEncountersCompanion(
+      patientId: Value(patientId),
+      deviceId: Value(deviceId),
+      day: Value(day),
+      personId: Value(personId),
+      name: Value(name),
+      firstSeen: Value(firstSeen),
+    );
+  }
+
+  factory PatientKnownEncounter.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PatientKnownEncounter(
+      patientId: serializer.fromJson<String>(json['patientId']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+      day: serializer.fromJson<String>(json['day']),
+      personId: serializer.fromJson<String>(json['personId']),
+      name: serializer.fromJson<String>(json['name']),
+      firstSeen: serializer.fromJson<DateTime>(json['firstSeen']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'patientId': serializer.toJson<String>(patientId),
+      'deviceId': serializer.toJson<String>(deviceId),
+      'day': serializer.toJson<String>(day),
+      'personId': serializer.toJson<String>(personId),
+      'name': serializer.toJson<String>(name),
+      'firstSeen': serializer.toJson<DateTime>(firstSeen),
+    };
+  }
+
+  PatientKnownEncounter copyWith({
+    String? patientId,
+    String? deviceId,
+    String? day,
+    String? personId,
+    String? name,
+    DateTime? firstSeen,
+  }) => PatientKnownEncounter(
+    patientId: patientId ?? this.patientId,
+    deviceId: deviceId ?? this.deviceId,
+    day: day ?? this.day,
+    personId: personId ?? this.personId,
+    name: name ?? this.name,
+    firstSeen: firstSeen ?? this.firstSeen,
+  );
+  PatientKnownEncounter copyWithCompanion(
+    PatientKnownEncountersCompanion data,
+  ) {
+    return PatientKnownEncounter(
+      patientId: data.patientId.present ? data.patientId.value : this.patientId,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      day: data.day.present ? data.day.value : this.day,
+      personId: data.personId.present ? data.personId.value : this.personId,
+      name: data.name.present ? data.name.value : this.name,
+      firstSeen: data.firstSeen.present ? data.firstSeen.value : this.firstSeen,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PatientKnownEncounter(')
+          ..write('patientId: $patientId, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('day: $day, ')
+          ..write('personId: $personId, ')
+          ..write('name: $name, ')
+          ..write('firstSeen: $firstSeen')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(patientId, deviceId, day, personId, name, firstSeen);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PatientKnownEncounter &&
+          other.patientId == this.patientId &&
+          other.deviceId == this.deviceId &&
+          other.day == this.day &&
+          other.personId == this.personId &&
+          other.name == this.name &&
+          other.firstSeen == this.firstSeen);
+}
+
+class PatientKnownEncountersCompanion
+    extends UpdateCompanion<PatientKnownEncounter> {
+  final Value<String> patientId;
+  final Value<String> deviceId;
+  final Value<String> day;
+  final Value<String> personId;
+  final Value<String> name;
+  final Value<DateTime> firstSeen;
+  final Value<int> rowid;
+  const PatientKnownEncountersCompanion({
+    this.patientId = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.day = const Value.absent(),
+    this.personId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.firstSeen = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PatientKnownEncountersCompanion.insert({
+    required String patientId,
+    required String deviceId,
+    required String day,
+    required String personId,
+    required String name,
+    required DateTime firstSeen,
+    this.rowid = const Value.absent(),
+  }) : patientId = Value(patientId),
+       deviceId = Value(deviceId),
+       day = Value(day),
+       personId = Value(personId),
+       name = Value(name),
+       firstSeen = Value(firstSeen);
+  static Insertable<PatientKnownEncounter> custom({
+    Expression<String>? patientId,
+    Expression<String>? deviceId,
+    Expression<String>? day,
+    Expression<String>? personId,
+    Expression<String>? name,
+    Expression<int>? firstSeen,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (patientId != null) 'patient_id': patientId,
+      if (deviceId != null) 'device_id': deviceId,
+      if (day != null) 'day': day,
+      if (personId != null) 'person_id': personId,
+      if (name != null) 'name': name,
+      if (firstSeen != null) 'first_seen': firstSeen,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PatientKnownEncountersCompanion copyWith({
+    Value<String>? patientId,
+    Value<String>? deviceId,
+    Value<String>? day,
+    Value<String>? personId,
+    Value<String>? name,
+    Value<DateTime>? firstSeen,
+    Value<int>? rowid,
+  }) {
+    return PatientKnownEncountersCompanion(
+      patientId: patientId ?? this.patientId,
+      deviceId: deviceId ?? this.deviceId,
+      day: day ?? this.day,
+      personId: personId ?? this.personId,
+      name: name ?? this.name,
+      firstSeen: firstSeen ?? this.firstSeen,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (patientId.present) {
+      map['patient_id'] = Variable<String>(patientId.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (day.present) {
+      map['day'] = Variable<String>(day.value);
+    }
+    if (personId.present) {
+      map['person_id'] = Variable<String>(personId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (firstSeen.present) {
+      map['first_seen'] = Variable<int>(
+        $PatientKnownEncountersTable.$converterfirstSeen.toSql(firstSeen.value),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PatientKnownEncountersCompanion(')
+          ..write('patientId: $patientId, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('day: $day, ')
+          ..write('personId: $personId, ')
+          ..write('name: $name, ')
+          ..write('firstSeen: $firstSeen, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$RemoriDatabase extends GeneratedDatabase {
   _$RemoriDatabase(QueryExecutor e) : super(e);
   $RemoriDatabaseManager get managers => $RemoriDatabaseManager(this);
@@ -13876,6 +15132,12 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
       $CachedCaregiverLinksTable(this);
   late final $CaregiversCacheStatesTable caregiversCacheStates =
       $CaregiversCacheStatesTable(this);
+  late final $PatientTodaySettingsTable patientTodaySettings =
+      $PatientTodaySettingsTable(this);
+  late final $PatientReminderCardsTable patientReminderCards =
+      $PatientReminderCardsTable(this);
+  late final $PatientKnownEncountersTable patientKnownEncounters =
+      $PatientKnownEncountersTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -13910,6 +15172,9 @@ abstract class _$RemoriDatabase extends GeneratedDatabase {
     cachedConsents,
     cachedCaregiverLinks,
     caregiversCacheStates,
+    patientTodaySettings,
+    patientReminderCards,
+    patientKnownEncounters,
   ];
 }
 
@@ -21666,6 +22931,755 @@ typedef $$CaregiversCacheStatesTableProcessedTableManager =
       CaregiversCacheState,
       PrefetchHooks Function()
     >;
+typedef $$PatientTodaySettingsTableCreateCompanionBuilder =
+    PatientTodaySettingsCompanion Function({
+      required String patientId,
+      required String deviceId,
+      required String fullName,
+      required String language,
+      required String timezone,
+      required bool memoryEnabled,
+      required DateTime refreshedAt,
+      Value<int> rowid,
+    });
+typedef $$PatientTodaySettingsTableUpdateCompanionBuilder =
+    PatientTodaySettingsCompanion Function({
+      Value<String> patientId,
+      Value<String> deviceId,
+      Value<String> fullName,
+      Value<String> language,
+      Value<String> timezone,
+      Value<bool> memoryEnabled,
+      Value<DateTime> refreshedAt,
+      Value<int> rowid,
+    });
+
+class $$PatientTodaySettingsTableFilterComposer
+    extends Composer<_$RemoriDatabase, $PatientTodaySettingsTable> {
+  $$PatientTodaySettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fullName => $composableBuilder(
+    column: $table.fullName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get language => $composableBuilder(
+    column: $table.language,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get timezone => $composableBuilder(
+    column: $table.timezone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get memoryEnabled => $composableBuilder(
+    column: $table.memoryEnabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+}
+
+class $$PatientTodaySettingsTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $PatientTodaySettingsTable> {
+  $$PatientTodaySettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fullName => $composableBuilder(
+    column: $table.fullName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get language => $composableBuilder(
+    column: $table.language,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get timezone => $composableBuilder(
+    column: $table.timezone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get memoryEnabled => $composableBuilder(
+    column: $table.memoryEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get refreshedAt => $composableBuilder(
+    column: $table.refreshedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PatientTodaySettingsTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $PatientTodaySettingsTable> {
+  $$PatientTodaySettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<String> get fullName =>
+      $composableBuilder(column: $table.fullName, builder: (column) => column);
+
+  GeneratedColumn<String> get language =>
+      $composableBuilder(column: $table.language, builder: (column) => column);
+
+  GeneratedColumn<String> get timezone =>
+      $composableBuilder(column: $table.timezone, builder: (column) => column);
+
+  GeneratedColumn<bool> get memoryEnabled => $composableBuilder(
+    column: $table.memoryEnabled,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get refreshedAt =>
+      $composableBuilder(
+        column: $table.refreshedAt,
+        builder: (column) => column,
+      );
+}
+
+class $$PatientTodaySettingsTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $PatientTodaySettingsTable,
+          PatientTodaySetting,
+          $$PatientTodaySettingsTableFilterComposer,
+          $$PatientTodaySettingsTableOrderingComposer,
+          $$PatientTodaySettingsTableAnnotationComposer,
+          $$PatientTodaySettingsTableCreateCompanionBuilder,
+          $$PatientTodaySettingsTableUpdateCompanionBuilder,
+          (
+            PatientTodaySetting,
+            BaseReferences<
+              _$RemoriDatabase,
+              $PatientTodaySettingsTable,
+              PatientTodaySetting
+            >,
+          ),
+          PatientTodaySetting,
+          PrefetchHooks Function()
+        > {
+  $$PatientTodaySettingsTableTableManager(
+    _$RemoriDatabase db,
+    $PatientTodaySettingsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PatientTodaySettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PatientTodaySettingsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$PatientTodaySettingsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> patientId = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<String> fullName = const Value.absent(),
+                Value<String> language = const Value.absent(),
+                Value<String> timezone = const Value.absent(),
+                Value<bool> memoryEnabled = const Value.absent(),
+                Value<DateTime> refreshedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PatientTodaySettingsCompanion(
+                patientId: patientId,
+                deviceId: deviceId,
+                fullName: fullName,
+                language: language,
+                timezone: timezone,
+                memoryEnabled: memoryEnabled,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String patientId,
+                required String deviceId,
+                required String fullName,
+                required String language,
+                required String timezone,
+                required bool memoryEnabled,
+                required DateTime refreshedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => PatientTodaySettingsCompanion.insert(
+                patientId: patientId,
+                deviceId: deviceId,
+                fullName: fullName,
+                language: language,
+                timezone: timezone,
+                memoryEnabled: memoryEnabled,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PatientTodaySettingsTable, PatientTodaySetting>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $PatientTodaySettingsTable,
+                    PatientTodaySetting
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PatientTodaySettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $PatientTodaySettingsTable,
+      PatientTodaySetting,
+      $$PatientTodaySettingsTableFilterComposer,
+      $$PatientTodaySettingsTableOrderingComposer,
+      $$PatientTodaySettingsTableAnnotationComposer,
+      $$PatientTodaySettingsTableCreateCompanionBuilder,
+      $$PatientTodaySettingsTableUpdateCompanionBuilder,
+      (
+        PatientTodaySetting,
+        BaseReferences<
+          _$RemoriDatabase,
+          $PatientTodaySettingsTable,
+          PatientTodaySetting
+        >,
+      ),
+      PatientTodaySetting,
+      PrefetchHooks Function()
+    >;
+typedef $$PatientReminderCardsTableCreateCompanionBuilder =
+    PatientReminderCardsCompanion Function({
+      required String patientId,
+      required String deviceId,
+      required String id,
+      required String day,
+      required String title,
+      Value<int> rowid,
+    });
+typedef $$PatientReminderCardsTableUpdateCompanionBuilder =
+    PatientReminderCardsCompanion Function({
+      Value<String> patientId,
+      Value<String> deviceId,
+      Value<String> id,
+      Value<String> day,
+      Value<String> title,
+      Value<int> rowid,
+    });
+
+class $$PatientReminderCardsTableFilterComposer
+    extends Composer<_$RemoriDatabase, $PatientReminderCardsTable> {
+  $$PatientReminderCardsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PatientReminderCardsTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $PatientReminderCardsTable> {
+  $$PatientReminderCardsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PatientReminderCardsTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $PatientReminderCardsTable> {
+  $$PatientReminderCardsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get day =>
+      $composableBuilder(column: $table.day, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+}
+
+class $$PatientReminderCardsTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $PatientReminderCardsTable,
+          PatientReminderCard,
+          $$PatientReminderCardsTableFilterComposer,
+          $$PatientReminderCardsTableOrderingComposer,
+          $$PatientReminderCardsTableAnnotationComposer,
+          $$PatientReminderCardsTableCreateCompanionBuilder,
+          $$PatientReminderCardsTableUpdateCompanionBuilder,
+          (
+            PatientReminderCard,
+            BaseReferences<
+              _$RemoriDatabase,
+              $PatientReminderCardsTable,
+              PatientReminderCard
+            >,
+          ),
+          PatientReminderCard,
+          PrefetchHooks Function()
+        > {
+  $$PatientReminderCardsTableTableManager(
+    _$RemoriDatabase db,
+    $PatientReminderCardsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PatientReminderCardsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PatientReminderCardsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$PatientReminderCardsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> patientId = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> day = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PatientReminderCardsCompanion(
+                patientId: patientId,
+                deviceId: deviceId,
+                id: id,
+                day: day,
+                title: title,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String patientId,
+                required String deviceId,
+                required String id,
+                required String day,
+                required String title,
+                Value<int> rowid = const Value.absent(),
+              }) => PatientReminderCardsCompanion.insert(
+                patientId: patientId,
+                deviceId: deviceId,
+                id: id,
+                day: day,
+                title: title,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PatientReminderCardsTable, PatientReminderCard>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $PatientReminderCardsTable,
+                    PatientReminderCard
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PatientReminderCardsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $PatientReminderCardsTable,
+      PatientReminderCard,
+      $$PatientReminderCardsTableFilterComposer,
+      $$PatientReminderCardsTableOrderingComposer,
+      $$PatientReminderCardsTableAnnotationComposer,
+      $$PatientReminderCardsTableCreateCompanionBuilder,
+      $$PatientReminderCardsTableUpdateCompanionBuilder,
+      (
+        PatientReminderCard,
+        BaseReferences<
+          _$RemoriDatabase,
+          $PatientReminderCardsTable,
+          PatientReminderCard
+        >,
+      ),
+      PatientReminderCard,
+      PrefetchHooks Function()
+    >;
+typedef $$PatientKnownEncountersTableCreateCompanionBuilder =
+    PatientKnownEncountersCompanion Function({
+      required String patientId,
+      required String deviceId,
+      required String day,
+      required String personId,
+      required String name,
+      required DateTime firstSeen,
+      Value<int> rowid,
+    });
+typedef $$PatientKnownEncountersTableUpdateCompanionBuilder =
+    PatientKnownEncountersCompanion Function({
+      Value<String> patientId,
+      Value<String> deviceId,
+      Value<String> day,
+      Value<String> personId,
+      Value<String> name,
+      Value<DateTime> firstSeen,
+      Value<int> rowid,
+    });
+
+class $$PatientKnownEncountersTableFilterComposer
+    extends Composer<_$RemoriDatabase, $PatientKnownEncountersTable> {
+  $$PatientKnownEncountersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get personId => $composableBuilder(
+    column: $table.personId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, int> get firstSeen =>
+      $composableBuilder(
+        column: $table.firstSeen,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+}
+
+class $$PatientKnownEncountersTableOrderingComposer
+    extends Composer<_$RemoriDatabase, $PatientKnownEncountersTable> {
+  $$PatientKnownEncountersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get patientId => $composableBuilder(
+    column: $table.patientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get personId => $composableBuilder(
+    column: $table.personId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get firstSeen => $composableBuilder(
+    column: $table.firstSeen,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PatientKnownEncountersTableAnnotationComposer
+    extends Composer<_$RemoriDatabase, $PatientKnownEncountersTable> {
+  $$PatientKnownEncountersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get patientId =>
+      $composableBuilder(column: $table.patientId, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<String> get day =>
+      $composableBuilder(column: $table.day, builder: (column) => column);
+
+  GeneratedColumn<String> get personId =>
+      $composableBuilder(column: $table.personId, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, int> get firstSeen =>
+      $composableBuilder(column: $table.firstSeen, builder: (column) => column);
+}
+
+class $$PatientKnownEncountersTableTableManager
+    extends
+        RootTableManager<
+          _$RemoriDatabase,
+          $PatientKnownEncountersTable,
+          PatientKnownEncounter,
+          $$PatientKnownEncountersTableFilterComposer,
+          $$PatientKnownEncountersTableOrderingComposer,
+          $$PatientKnownEncountersTableAnnotationComposer,
+          $$PatientKnownEncountersTableCreateCompanionBuilder,
+          $$PatientKnownEncountersTableUpdateCompanionBuilder,
+          (
+            PatientKnownEncounter,
+            BaseReferences<
+              _$RemoriDatabase,
+              $PatientKnownEncountersTable,
+              PatientKnownEncounter
+            >,
+          ),
+          PatientKnownEncounter,
+          PrefetchHooks Function()
+        > {
+  $$PatientKnownEncountersTableTableManager(
+    _$RemoriDatabase db,
+    $PatientKnownEncountersTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PatientKnownEncountersTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$PatientKnownEncountersTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$PatientKnownEncountersTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> patientId = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<String> day = const Value.absent(),
+                Value<String> personId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<DateTime> firstSeen = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PatientKnownEncountersCompanion(
+                patientId: patientId,
+                deviceId: deviceId,
+                day: day,
+                personId: personId,
+                name: name,
+                firstSeen: firstSeen,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String patientId,
+                required String deviceId,
+                required String day,
+                required String personId,
+                required String name,
+                required DateTime firstSeen,
+                Value<int> rowid = const Value.absent(),
+              }) => PatientKnownEncountersCompanion.insert(
+                patientId: patientId,
+                deviceId: deviceId,
+                day: day,
+                personId: personId,
+                name: name,
+                firstSeen: firstSeen,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    $PatientKnownEncountersTable,
+                    PatientKnownEncounter
+                  >(table),
+                  BaseReferences<
+                    _$RemoriDatabase,
+                    $PatientKnownEncountersTable,
+                    PatientKnownEncounter
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PatientKnownEncountersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RemoriDatabase,
+      $PatientKnownEncountersTable,
+      PatientKnownEncounter,
+      $$PatientKnownEncountersTableFilterComposer,
+      $$PatientKnownEncountersTableOrderingComposer,
+      $$PatientKnownEncountersTableAnnotationComposer,
+      $$PatientKnownEncountersTableCreateCompanionBuilder,
+      $$PatientKnownEncountersTableUpdateCompanionBuilder,
+      (
+        PatientKnownEncounter,
+        BaseReferences<
+          _$RemoriDatabase,
+          $PatientKnownEncountersTable,
+          PatientKnownEncounter
+        >,
+      ),
+      PatientKnownEncounter,
+      PrefetchHooks Function()
+    >;
 
 class $RemoriDatabaseManager {
   final _$RemoriDatabase _db;
@@ -21740,4 +23754,13 @@ class $RemoriDatabaseManager {
       $$CachedCaregiverLinksTableTableManager(_db, _db.cachedCaregiverLinks);
   $$CaregiversCacheStatesTableTableManager get caregiversCacheStates =>
       $$CaregiversCacheStatesTableTableManager(_db, _db.caregiversCacheStates);
+  $$PatientTodaySettingsTableTableManager get patientTodaySettings =>
+      $$PatientTodaySettingsTableTableManager(_db, _db.patientTodaySettings);
+  $$PatientReminderCardsTableTableManager get patientReminderCards =>
+      $$PatientReminderCardsTableTableManager(_db, _db.patientReminderCards);
+  $$PatientKnownEncountersTableTableManager get patientKnownEncounters =>
+      $$PatientKnownEncountersTableTableManager(
+        _db,
+        _db.patientKnownEncounters,
+      );
 }

@@ -25,6 +25,7 @@ import 'package:remori/core/router/remori_router.dart';
 import 'package:remori/core/router/remori_routes.dart';
 import 'package:remori/features/device_pairing/domain/pairing_info.dart';
 import 'package:remori/features/device_pairing/presentation/handover_providers.dart';
+import 'package:remori/features/patient_today/presentation/patient_today_providers.dart';
 
 import 'a6_permissions_test.dart' as permissions;
 
@@ -212,6 +213,8 @@ Future<ProviderContainer> mount(
     ProviderScope(
       overrides: [
         appLocaleProvider.overrideWithValue(Locale(language)),
+        // Authentication fixtures do not bootstrap Today's database/network.
+        patientTodayKeyProvider.overrideWithValue(null),
         credentialStoreProvider.overrideWithValue(credentials),
         // These fixtures test A6 authentication, not Home's cache/bootstrap calls.
         caregiverIdentityProvider.overrideWith((ref) async => null),

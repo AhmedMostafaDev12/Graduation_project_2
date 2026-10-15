@@ -1229,3 +1229,31 @@ packages or backend changes were introduced.
 Validation: formatting and analysis clean; all 674 tests passed, including 34 C19
 tests. Android debug APK built. iOS compilation and physical-device lifecycle
 validation remain pending on macOS/iOS.
+
+## P1 Today
+
+Patient Mode opens Today using device credentials and three patient/device-scoped
+caches (schema v16): profile/settings, reminder-card metadata and known encounters.
+Foreground refresh reads settings from `/sync` without storing its people payload
+or advancing a shared sync cursor, then fetches today's reminder logs and journal
+using the patient's IANA timezone. The UI reads local data, uses the patient's
+language, and displays up to three distinct known people with initials.
+
+The next actual pending/snoozed occurrence supports Done and Later (15 minutes).
+Both actions persist atomically with an outbox snapshot before uploading through
+the reminder-log batch endpoint. Only captured operations confirmed by the batch
+receipt are acknowledged; rejected or uncertain uploads remain queued. Completed
+occurrences cannot regress to pending after refresh.
+
+Connection status requires the current device's local handshake. Memory status
+uses the master switch and recent telemetry; unavailable status is stated gently.
+Ask stays visible and disabled for Phase 2. Recurrence expansion, background
+notifications, full BLE delivery, P2 and C20 remain separate work.
+
+Review captures: [English](test/goldens/p1_en.png),
+[Arabic](test/goldens/p1_ar.png). Regenerate with
+`flutter test test/p1_today_test.dart --update-goldens`.
+
+Validation: formatting and analysis clean; all 691 tests passed, including 17 P1
+tests. Android debug APK built. iOS compilation and physical-device integration
+remain pending on macOS/iOS.

@@ -3480,6 +3480,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =0{No linked caregivers} =1{1 linked caregiver} other{{count} linked caregivers}}'**
   String caregiversLinkedCount(int count);
+
+  /// No description provided for @todayGettingReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Getting your day ready'**
+  String get todayGettingReady;
+
+  /// No description provided for @todayMemoryOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory is off'**
+  String get todayMemoryOff;
+
+  /// No description provided for @todayMemoryUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory status unavailable'**
+  String get todayMemoryUnknown;
+
+  /// No description provided for @todayMemoryPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory is paused'**
+  String get todayMemoryPaused;
+
+  /// No description provided for @todayMemoryOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory is working'**
+  String get todayMemoryOn;
+
+  /// No description provided for @todayGlassesConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Glasses connected'**
+  String get todayGlassesConnected;
+
+  /// No description provided for @todayGlassesAway.
+  ///
+  /// In en, this message translates to:
+  /// **'Glasses not connected'**
+  String get todayGlassesAway;
+
+  /// No description provided for @todayOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'You can keep using your saved day. Updates will arrive when connected.'**
+  String get todayOffline;
+
+  /// No description provided for @todayNextReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Next reminder'**
+  String get todayNextReminder;
+
+  /// No description provided for @todayNoReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'No reminders for now'**
+  String get todayNoReminder;
+
+  /// No description provided for @todayDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get todayDone;
+
+  /// No description provided for @todayLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get todayLater;
+
+  /// No description provided for @todayPeopleMet.
+  ///
+  /// In en, this message translates to:
+  /// **'People you met today'**
+  String get todayPeopleMet;
+
+  /// No description provided for @todayNoPeople.
+  ///
+  /// In en, this message translates to:
+  /// **'People you meet will appear here'**
+  String get todayNoPeople;
+
+  /// No description provided for @todayAskLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask (Phase 2)'**
+  String get todayAskLater;
 }
 
 class _AppLocalizationsDelegate
