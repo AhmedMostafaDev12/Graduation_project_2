@@ -3036,6 +3036,288 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The change could not be confirmed. Refresh before making another change.'**
   String get deviceUncertain;
+
+  /// No description provided for @moreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get moreTitle;
+
+  /// No description provided for @morePatientGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Patient'**
+  String get morePatientGroup;
+
+  /// No description provided for @morePatientProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Patient profile'**
+  String get morePatientProfile;
+
+  /// No description provided for @moreCaregivers.
+  ///
+  /// In en, this message translates to:
+  /// **'Caregivers'**
+  String get moreCaregivers;
+
+  /// No description provided for @moreCaregiversPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Caregiver management coming soon.'**
+  String get moreCaregiversPending;
+
+  /// No description provided for @moreConsents.
+  ///
+  /// In en, this message translates to:
+  /// **'Consent records'**
+  String get moreConsents;
+
+  /// No description provided for @moreConversationConsent.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation memory'**
+  String get moreConversationConsent;
+
+  /// No description provided for @moreCloudConsent.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud AI processing'**
+  String get moreCloudConsent;
+
+  /// No description provided for @moreFaceConsent.
+  ///
+  /// In en, this message translates to:
+  /// **'Face enrollment'**
+  String get moreFaceConsent;
+
+  /// No description provided for @moreFaceConsentFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Face enrollment · {name}'**
+  String moreFaceConsentFor(String name);
+
+  /// No description provided for @moreGiven.
+  ///
+  /// In en, this message translates to:
+  /// **'given {date}'**
+  String moreGiven(String date);
+
+  /// No description provided for @moreRevoked.
+  ///
+  /// In en, this message translates to:
+  /// **'revoked {date}'**
+  String moreRevoked(String date);
+
+  /// No description provided for @moreRevoke.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke'**
+  String get moreRevoke;
+
+  /// No description provided for @moreRevokeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke consent?'**
+  String get moreRevokeTitle;
+
+  /// No description provided for @moreRevokeHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'This removes permission for future processing covered by this consent. Existing records are not deleted.'**
+  String get moreRevokeHelp;
+
+  /// No description provided for @moreRevokeFaceHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'This archives the enrolled person and deletes their face data. The glasses will stop recognizing them.'**
+  String get moreRevokeFaceHelp;
+
+  /// No description provided for @moreNoConsents.
+  ///
+  /// In en, this message translates to:
+  /// **'No consent records.'**
+  String get moreNoConsents;
+
+  /// No description provided for @moreConsentsUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Consent records are unavailable. Retry to check them.'**
+  String get moreConsentsUnavailable;
+
+  /// No description provided for @moreJournal.
+  ///
+  /// In en, this message translates to:
+  /// **'Journal'**
+  String get moreJournal;
+
+  /// No description provided for @moreJournalHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The day, hour by hour'**
+  String get moreJournalHelp;
+
+  /// No description provided for @morePlaces.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved places'**
+  String get morePlaces;
+
+  /// No description provided for @morePlacesHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Places for “Where am I?”'**
+  String get morePlacesHelp;
+
+  /// No description provided for @morePlacesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No saved places for “Where am I?”} =1{1 place for “Where am I?”} other{{count} places for “Where am I?”}}'**
+  String morePlacesCount(int count);
+
+  /// No description provided for @moreDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents'**
+  String get moreDocuments;
+
+  /// No description provided for @moreDocumentsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipts, bills, medication labels'**
+  String get moreDocumentsHelp;
+
+  /// No description provided for @moreDeviceHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Glasses · memory switch'**
+  String get moreDeviceHelp;
+
+  /// No description provided for @moreDeviceSerial.
+  ///
+  /// In en, this message translates to:
+  /// **'Glasses {serial} · memory switch'**
+  String moreDeviceSerial(String serial);
+
+  /// No description provided for @moreAccountGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get moreAccountGroup;
+
+  /// No description provided for @moreMyAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'My account'**
+  String get moreMyAccount;
+
+  /// No description provided for @moreAccountUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Account details are unavailable.'**
+  String get moreAccountUnavailable;
+
+  /// No description provided for @moreConnectedAccounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected accounts'**
+  String get moreConnectedAccounts;
+
+  /// No description provided for @moreConnectedPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Account linking coming soon.'**
+  String get moreConnectedPending;
+
+  /// No description provided for @moreLogout.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out'**
+  String get moreLogout;
+
+  /// No description provided for @moreUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Account details are unavailable. Check your connection and try again.'**
+  String get moreUnavailable;
+
+  /// No description provided for @moreNoPatient.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a patient from Home.'**
+  String get moreNoPatient;
+
+  /// No description provided for @moreOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not complete the request. Showing saved information. Check your connection and try again.'**
+  String get moreOffline;
+
+  /// No description provided for @morePending.
+  ///
+  /// In en, this message translates to:
+  /// **'The change was saved. Retry to finish updating this phone.'**
+  String get morePending;
+
+  /// No description provided for @moreUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'The change could not be confirmed. Refresh before making another change.'**
+  String get moreUncertain;
+
+  /// No description provided for @moreFullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get moreFullName;
+
+  /// No description provided for @moreNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter patient\'s full name'**
+  String get moreNameHint;
+
+  /// No description provided for @moreLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred language'**
+  String get moreLanguage;
+
+  /// No description provided for @moreArabic.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic'**
+  String get moreArabic;
+
+  /// No description provided for @moreEnglish.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get moreEnglish;
+
+  /// No description provided for @moreTimezone.
+  ///
+  /// In en, this message translates to:
+  /// **'Time zone'**
+  String get moreTimezone;
+
+  /// No description provided for @moreTimezoneHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Africa/Cairo'**
+  String get moreTimezoneHint;
+
+  /// No description provided for @moreProfileInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a name (up to 120 characters) and a valid time zone, such as Africa/Cairo.'**
+  String get moreProfileInvalid;
+
+  /// No description provided for @moreSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get moreSave;
 }
 
 class _AppLocalizationsDelegate

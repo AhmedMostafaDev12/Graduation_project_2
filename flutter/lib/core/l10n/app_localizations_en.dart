@@ -1703,4 +1703,170 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get deviceUncertain =>
       'The change could not be confirmed. Refresh before making another change.';
+
+  @override
+  String get moreTitle => 'More';
+
+  @override
+  String get morePatientGroup => 'Patient';
+
+  @override
+  String get morePatientProfile => 'Patient profile';
+
+  @override
+  String get moreCaregivers => 'Caregivers';
+
+  @override
+  String get moreCaregiversPending => 'Caregiver management coming soon.';
+
+  @override
+  String get moreConsents => 'Consent records';
+
+  @override
+  String get moreConversationConsent => 'Conversation memory';
+
+  @override
+  String get moreCloudConsent => 'Cloud AI processing';
+
+  @override
+  String get moreFaceConsent => 'Face enrollment';
+
+  @override
+  String moreFaceConsentFor(String name) {
+    return 'Face enrollment · $name';
+  }
+
+  @override
+  String moreGiven(String date) {
+    return 'given $date';
+  }
+
+  @override
+  String moreRevoked(String date) {
+    return 'revoked $date';
+  }
+
+  @override
+  String get moreRevoke => 'Revoke';
+
+  @override
+  String get moreRevokeTitle => 'Revoke consent?';
+
+  @override
+  String get moreRevokeHelp =>
+      'This removes permission for future processing covered by this consent. Existing records are not deleted.';
+
+  @override
+  String get moreRevokeFaceHelp =>
+      'This archives the enrolled person and deletes their face data. The glasses will stop recognizing them.';
+
+  @override
+  String get moreNoConsents => 'No consent records.';
+
+  @override
+  String get moreConsentsUnavailable =>
+      'Consent records are unavailable. Retry to check them.';
+
+  @override
+  String get moreJournal => 'Journal';
+
+  @override
+  String get moreJournalHelp => 'The day, hour by hour';
+
+  @override
+  String get morePlaces => 'Saved places';
+
+  @override
+  String get morePlacesHelp => 'Places for “Where am I?”';
+
+  @override
+  String morePlacesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count places for “Where am I?”',
+      one: '1 place for “Where am I?”',
+      zero: 'No saved places for “Where am I?”',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get moreDocuments => 'Documents';
+
+  @override
+  String get moreDocumentsHelp => 'Receipts, bills, medication labels';
+
+  @override
+  String get moreDeviceHelp => 'Glasses · memory switch';
+
+  @override
+  String moreDeviceSerial(String serial) {
+    return 'Glasses $serial · memory switch';
+  }
+
+  @override
+  String get moreAccountGroup => 'Account';
+
+  @override
+  String get moreMyAccount => 'My account';
+
+  @override
+  String get moreAccountUnavailable => 'Account details are unavailable.';
+
+  @override
+  String get moreConnectedAccounts => 'Connected accounts';
+
+  @override
+  String get moreConnectedPending => 'Account linking coming soon.';
+
+  @override
+  String get moreLogout => 'Log out';
+
+  @override
+  String get moreUnavailable =>
+      'Account details are unavailable. Check your connection and try again.';
+
+  @override
+  String get moreNoPatient => 'Select a patient from Home.';
+
+  @override
+  String get moreOffline =>
+      'Could not complete the request. Showing saved information. Check your connection and try again.';
+
+  @override
+  String get morePending =>
+      'The change was saved. Retry to finish updating this phone.';
+
+  @override
+  String get moreUncertain =>
+      'The change could not be confirmed. Refresh before making another change.';
+
+  @override
+  String get moreFullName => 'Full name';
+
+  @override
+  String get moreNameHint => 'Enter patient\'s full name';
+
+  @override
+  String get moreLanguage => 'Preferred language';
+
+  @override
+  String get moreArabic => 'Arabic';
+
+  @override
+  String get moreEnglish => 'English';
+
+  @override
+  String get moreTimezone => 'Time zone';
+
+  @override
+  String get moreTimezoneHint => 'Africa/Cairo';
+
+  @override
+  String get moreProfileInvalid =>
+      'Enter a name (up to 120 characters) and a valid time zone, such as Africa/Cairo.';
+
+  @override
+  String get moreSave => 'Save';
 }

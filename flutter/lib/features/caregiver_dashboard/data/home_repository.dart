@@ -5,6 +5,7 @@ import '../../../core/api/api_client.dart';
 import '../../../core/api/api_failure.dart';
 import '../../../core/db/remori_database.dart';
 import '../domain/home_data.dart';
+import '../domain/more_data.dart';
 
 /// API responses populate the private, caregiver-scoped read cache. UI reads SQLite.
 class HomeRepository {
@@ -53,6 +54,12 @@ class HomeRepository {
           segments[1] == 'patients') {
         final patientId = segments[2];
         await db.transaction(() async {
+          await (db.delete(db.cachedConsents)..where(
+                (p) =>
+                    p.caregiverId.equals(caregiverId) &
+                    p.patientId.equals(patientId),
+              ))
+              .go();
           await (db.delete(db.cachedUnknownFaces)..where(
                 (p) =>
                     p.caregiverId.equals(caregiverId) &
@@ -298,6 +305,12 @@ class HomeRepository {
             );
       }
       final allowedIds = patients.map((p) => p['id'] as String).toList();
+      await (db.delete(db.cachedConsents)..where(
+            (p) =>
+                p.caregiverId.equals(caregiverId) &
+                p.patientId.isNotIn(allowedIds),
+          ))
+          .go();
       await (db.delete(db.cachedUnknownFaces)..where(
             (p) =>
                 p.caregiverId.equals(caregiverId) &
@@ -865,6 +878,76 @@ class HomeRepository {
               ),
             );
       }
+    });
+  }
+
+  Future<dynamic> getConsents(String patientId) =>
+      _get('/patients/$patientId/consents');
+
+  Future<HomePatient> changeProfile(
+    String patientId,
+    PatientProfile profile,
+  ) async {
+    final old = await _devicePatient(patientId);
+    if (old?.permission != 'manager' || !profile.isValid) {
+      throw ApiFailure(ApiFailureKind.invalidResponse);
+    }
+    final data = <String, Object?>{
+      if (profile.name.trim() != old!.fullName)
+        'full_name': profile.name.trim(),
+      if (profile.language != old.preferredLanguage)
+        'preferred_language': profile.language,
+      if (profile.timezone != old.timezone) 'timezone': profile.timezone,
+    };
+    if (data.isEmpty) {
+      return HomePatient(
+        id: old.id,
+        name: old.fullName,
+        language: old.preferredLanguage,
+        timezone: old.timezone,
+        memoryEnabled: old.memoryCaptureEnabled,
+        permission: old.permission,
+      );
+    }
+    final response = await _request(
+      '/patients/$patientId',
+      method: 'PATCH',
+      data: data,
+    );
+    final p = response.data;
+    if (p is! Map ||
+        p['id'] != patientId ||
+        p['full_name'] != profile.name.trim() ||
+        p['preferred_language'] != profile.language ||
+        p['timezone'] != profile.timezone ||
+        p['memory_capture_enabled'] is! bool) {
+      throw ApiFailure(ApiFailureKind.invalidResponse);
+    }
+    ++_deviceGeneration;
+    return HomePatient(
+      id: patientId,
+      name: p['full_name'],
+      language: p['preferred_language'],
+      timezone: p['timezone'],
+      memoryEnabled: p['memory_capture_enabled'],
+      permission: old.permission,
+    );
+  }
+
+  Future<void> cacheProfile(HomePatient patient) {
+    ++_deviceGeneration;
+    return db.transaction(() async {
+      if (_disposed || await _devicePatient(patient.id) == null) return;
+      await (db.update(db.dashboardPatients)..where(
+            (p) => p.caregiverId.equals(caregiverId) & p.id.equals(patient.id),
+          ))
+          .write(
+            DashboardPatientsCompanion(
+              fullName: Value(patient.name),
+              preferredLanguage: Value(patient.language),
+              timezone: Value(patient.timezone),
+            ),
+          );
     });
   }
 

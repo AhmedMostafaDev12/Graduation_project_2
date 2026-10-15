@@ -178,6 +178,12 @@ class MediaRepository {
     } else if (e.code == 'PATIENT_NOT_FOUND') {
       ++_generation;
       await db.transaction(() async {
+        await (db.delete(db.cachedConsents)..where(
+              (r) =>
+                  r.caregiverId.equals(key.$1.caregiverId) &
+                  r.patientId.equals(key.$1.patientId),
+            ))
+            .go();
         await (db.delete(db.cachedDocumentDetails)..where(
               (r) =>
                   r.caregiverId.equals(key.$1.caregiverId) &

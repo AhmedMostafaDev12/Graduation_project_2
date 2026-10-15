@@ -915,8 +915,7 @@ Add and manager-owned place cards now open C11 with their patient/place context.
 The former editing-pending notice is removed. Viewers can read places
 without editing controls. Only the API's single name is displayed: no translated
 name is invented. The existing caregiver navigation and C9 reminder action remain.
-C10's normal entry is through C18 More, which remains pending its own PR; no new
-entry point or partial C18 screen is added. The C10 route is implemented and
+C10's normal entry is through C18 More. The C10 route is implemented and
 covered by widget tests, including its Back destination.
 
 Review captures: [English](test/goldens/c10_en.png), [Arabic](test/goldens/c10_ar.png).
@@ -977,8 +976,8 @@ No Always/background location permission is requested. iOS compilation and actua
 permission dialogs remain device-validation tasks on macOS/iOS. Map setup follows
 [flutter_map caching](https://docs.fleaflet.dev/layers/tile-layer/caching) and the
 [OSM tile policy](https://operations.osmfoundation.org/policies/tiles/).
-C18 More remains a separate pending screen, so its normal menu entry is not yet
-available. Review captures: [English](test/goldens/c11_en.png),
+C18 More opens Saved places, where managers can add or edit a place.
+Review captures: [English](test/goldens/c11_en.png),
 [Arabic](test/goldens/c11_ar.png). Regenerate with
 flutter test test/c11_edit_place_test.dart --update-goldens.
 
@@ -1081,9 +1080,9 @@ keeps bytes only in memory after a successful list refresh. Leaving, covering,
 backgrounding, account/patient/filter changes and expiry clear or hide previews.
 Offline cards use placeholders; signed-URL 403 recovery is bounded by item ID.
 
-Document cards open C15. The normal More-menu entry remains pending C18; no temporary
-menu entry was added. The existing C14 route, test captures and screen-builder
-override can be used to review the screen meanwhile. Managers and linked viewers
+Document cards open C15. The normal entry is available through C18 More.
+The existing C14 route, test captures and screen-builder
+override can also be used to review the screen. Managers and linked viewers
 can read documents; the existing center reminder action remains manager-only.
 
 Review captures: [English](test/goldens/c14_en.png),
@@ -1151,7 +1150,7 @@ Older device/Home responses cannot restore values changed by a confirmed action.
 
 Unpairing clears a matching locally known pairing grant and disconnects its glasses;
 other local grants are preserved. The server immediately revokes the removed device's
-token. Re-pair opens the existing A5 → A6 flow. C18's More entry remains pending.
+token. Re-pair opens the existing A5 → A6 flow. C18 More also opens Device.
 
 Review captures: [English](test/goldens/c16_en.png),
 [Arabic](test/goldens/c16_ar.png). Regenerate with
@@ -1160,4 +1159,42 @@ Tests use synthetic responses and do not change live patient settings or devices
 
 Validation: formatting and analysis clean; all 597 tests passed, including 31
 C16 tests. Android debug APK built. iOS compilation and physical-device lifecycle
+validation remain pending on macOS/iOS.
+
+## C18 More and settings
+
+The More tab connects Journal, Saved places, Documents and Device. It shows the
+actual cached patient profile and caregiver account, and consent records from
+`GET /patients/{id}/consents`. `GET /auth/me` supplies account display data.
+Caregivers and Connected accounts remain visible but disabled until C19/C20;
+caregiver counts and social-link status are not invented. Place counts come only
+from a refreshed scoped Places cache; absent caches use generic descriptions.
+
+Schema v14 adds a caregiver-account display cache and caregiver/patient-scoped
+consent cache. Account names/emails and allowlisted consent metadata are stored;
+tokens remain exclusively in secure storage. Offline mode preserves available
+display data. Patient-link removal clears the scoped consents, and late responses
+cannot recreate a removed link.
+
+Managers can edit patient name, Arabic/English preference and IANA timezone in
+the approved dialog. Saves PATCH only changed fields and update the shared Home
+cache after acknowledgment. Viewers cannot edit or revoke. Consent revocation
+requires an effects confirmation. Face-enrollment revocation archives the person,
+invalidates pending People requests, evicts photo caches and deletes enrolled-photo
+metadata; the same cleanup applies to revocations discovered during refresh.
+Other revocations do not invent changes to the memory switch or delete history.
+
+Confirmed writes with local failures retry only local effects. Uncertain writes
+require refresh before another change. Logout sends the refresh token without an
+authorization header, then clears only caregiver credentials and invalidates the
+session. A secure-storage retry does not repeat an acknowledged logout POST.
+
+Review captures: [English](test/goldens/c18_en.png),
+[Arabic](test/goldens/c18_ar.png). Regenerate with
+`flutter test test/c18_more_test.dart --update-goldens`.
+Tests use synthetic data and do not edit live profiles, revoke real consents or
+log out real sessions. No new dependencies or backend changes were introduced.
+
+Validation: formatting and analysis clean; all 640 tests passed, including 43 C18
+tests. Android debug APK built. iOS compilation and physical-device lifecycle
 validation remain pending on macOS/iOS.

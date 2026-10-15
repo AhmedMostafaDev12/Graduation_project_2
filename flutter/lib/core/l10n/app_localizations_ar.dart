@@ -1701,4 +1701,173 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get deviceUncertain =>
       'تعذر تأكيد التغيير. حدّث البيانات قبل إجراء تغيير آخر.';
+
+  @override
+  String get moreTitle => 'المزيد';
+
+  @override
+  String get morePatientGroup => 'المريض';
+
+  @override
+  String get morePatientProfile => 'ملف المريض';
+
+  @override
+  String get moreCaregivers => 'مقدمو الرعاية';
+
+  @override
+  String get moreCaregiversPending => 'ستتوفر إدارة مقدمي الرعاية قريبًا.';
+
+  @override
+  String get moreConsents => 'سجلات الموافقة';
+
+  @override
+  String get moreConversationConsent => 'ذاكرة المحادثات';
+
+  @override
+  String get moreCloudConsent => 'المعالجة السحابية بالذكاء الاصطناعي';
+
+  @override
+  String get moreFaceConsent => 'تسجيل الوجه';
+
+  @override
+  String moreFaceConsentFor(String name) {
+    return 'تسجيل الوجه · $name';
+  }
+
+  @override
+  String moreGiven(String date) {
+    return 'مُنحت في $date';
+  }
+
+  @override
+  String moreRevoked(String date) {
+    return 'سُحبت في $date';
+  }
+
+  @override
+  String get moreRevoke => 'سحب';
+
+  @override
+  String get moreRevokeTitle => 'هل تريد سحب الموافقة؟';
+
+  @override
+  String get moreRevokeHelp =>
+      'يُلغي هذا الإذن بالمعالجة المستقبلية التي تشملها هذه الموافقة. لا تُحذف السجلات الحالية.';
+
+  @override
+  String get moreRevokeFaceHelp =>
+      'سيُؤرشف هذا الشخص وتُحذف بيانات وجهه. ستتوقف النظارة عن التعرف عليه.';
+
+  @override
+  String get moreNoConsents => 'لا توجد سجلات موافقة.';
+
+  @override
+  String get moreConsentsUnavailable =>
+      'سجلات الموافقة غير متاحة. أعد المحاولة للتحقق منها.';
+
+  @override
+  String get moreJournal => 'اليوميات';
+
+  @override
+  String get moreJournalHelp => 'اليوم، ساعة بساعة';
+
+  @override
+  String get morePlaces => 'الأماكن المحفوظة';
+
+  @override
+  String get morePlacesHelp => 'أماكن لسؤال «أين أنا؟»';
+
+  @override
+  String morePlacesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count مكان لسؤال «أين أنا؟»',
+      many: '$count مكانًا لسؤال «أين أنا؟»',
+      few: '$count أماكن لسؤال «أين أنا؟»',
+      two: 'مكانان لسؤال «أين أنا؟»',
+      one: 'مكان واحد لسؤال «أين أنا؟»',
+      zero: 'لا توجد أماكن محفوظة لسؤال «أين أنا؟»',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get moreDocuments => 'المستندات';
+
+  @override
+  String get moreDocumentsHelp => 'الإيصالات والفواتير وملصقات الأدوية';
+
+  @override
+  String get moreDeviceHelp => 'النظارة · مفتاح الذاكرة';
+
+  @override
+  String moreDeviceSerial(String serial) {
+    return 'النظارة $serial · مفتاح الذاكرة';
+  }
+
+  @override
+  String get moreAccountGroup => 'الحساب';
+
+  @override
+  String get moreMyAccount => 'حسابي';
+
+  @override
+  String get moreAccountUnavailable => 'تفاصيل الحساب غير متاحة.';
+
+  @override
+  String get moreConnectedAccounts => 'الحسابات المرتبطة';
+
+  @override
+  String get moreConnectedPending => 'سيتوفر ربط الحسابات قريبًا.';
+
+  @override
+  String get moreLogout => 'تسجيل الخروج';
+
+  @override
+  String get moreUnavailable =>
+      'تفاصيل الحساب غير متاحة. تحقق من اتصالك وحاول مجددًا.';
+
+  @override
+  String get moreNoPatient => 'اختر مريضًا من الرئيسية.';
+
+  @override
+  String get moreOffline =>
+      'تعذر إكمال الطلب. تظهر المعلومات المحفوظة. تحقق من اتصالك وحاول مجددًا.';
+
+  @override
+  String get morePending =>
+      'حُفظ التغيير. أعد المحاولة لإكمال تحديث هذا الهاتف.';
+
+  @override
+  String get moreUncertain =>
+      'تعذر تأكيد التغيير. حدّث البيانات قبل إجراء تغيير آخر.';
+
+  @override
+  String get moreFullName => 'الاسم الكامل';
+
+  @override
+  String get moreNameHint => 'أدخل الاسم الكامل للمريض';
+
+  @override
+  String get moreLanguage => 'اللغة المفضلة';
+
+  @override
+  String get moreArabic => 'العربية';
+
+  @override
+  String get moreEnglish => 'الإنجليزية';
+
+  @override
+  String get moreTimezone => 'المنطقة الزمنية';
+
+  @override
+  String get moreTimezoneHint => 'Africa/Cairo';
+
+  @override
+  String get moreProfileInvalid =>
+      'أدخل اسمًا لا يتجاوز ١٢٠ حرفًا ومنطقة زمنية صحيحة مثل Africa/Cairo.';
+
+  @override
+  String get moreSave => 'حفظ';
 }
