@@ -2168,6 +2168,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get todayGlassesAway => 'النظارة مش متوصلة';
 
   @override
+  String get todayGlassesDisconnected => 'النضارة مش متوصلة';
+
+  @override
+  String get todayGlassesCheck => 'اتأكد إن النضارة شغالة وقريبة من التليفون.';
+
+  @override
+  String get todayTryAgain => 'حاول تاني';
+
+  @override
+  String get todayReconnectUnavailable =>
+      'مش قادرين نتصل دلوقتي. تقدر تحاول تاني.';
+
+  @override
   String get todayOffline =>
       'تقدر تكمّل باليوم المحفوظ. التحديثات هتوصل لما الاتصال يرجع.';
 

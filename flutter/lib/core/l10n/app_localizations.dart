@@ -3823,6 +3823,30 @@ abstract class AppLocalizations {
   /// **'Glasses not connected'**
   String get todayGlassesAway;
 
+  /// No description provided for @todayGlassesDisconnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Glasses not connected'**
+  String get todayGlassesDisconnected;
+
+  /// No description provided for @todayGlassesCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Make sure the glasses are switched on and near the phone.'**
+  String get todayGlassesCheck;
+
+  /// No description provided for @todayTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get todayTryAgain;
+
+  /// No description provided for @todayReconnectUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn’t connect yet. You can try again.'**
+  String get todayReconnectUnavailable;
+
   /// No description provided for @todayOffline.
   ///
   /// In en, this message translates to:

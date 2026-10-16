@@ -61,6 +61,7 @@ class _P1TodayScreenState extends ConsumerState<P1TodayScreen>
         settings = data.settings;
     final link =
         ref.watch(patientLinkProvider).value ?? const PatientLinkStatus();
+    final reconnect = ref.watch(patientReconnectProvider);
     ref.listen(patientTodayNowProvider, (old, next) {
       if (key == null ||
           settings == null ||
@@ -142,24 +143,75 @@ class _P1TodayScreenState extends ConsumerState<P1TodayScreen>
                         ),
                       ),
                     const SizedBox(height: 14),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: [
-                        status(
-                          link.connected
-                              ? s.todayGlassesConnected
-                              : s.todayGlassesAway,
-                          link.connected,
+                    if (!link.connected)
+                      Container(
+                        key: const Key('d5-disconnected'),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: RemoriColors.warning,
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                        status(
-                          memory(),
-                          settings?.memoryEnabled == true &&
-                              link.connected &&
-                              link.paused == false,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              s.todayGlassesDisconnected,
+                              style: const TextStyle(
+                                fontSize: 30,
+                                fontWeight: FontWeight.w600,
+                                color: RemoriColors.warningInk,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              s.todayGlassesCheck,
+                              style: const TextStyle(
+                                fontSize: 22,
+                                color: RemoriColors.warningInk,
+                              ),
+                            ),
+                            if (reconnect.offline) ...[
+                              const SizedBox(height: 12),
+                              Text(
+                                s.todayReconnectUnavailable,
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  color: RemoriColors.warningInk,
+                                ),
+                              ),
+                            ],
+                            const SizedBox(height: 12),
+                            RemoriButton(
+                              label: s.todayTryAgain,
+                              outlined: true,
+                              onPressed: reconnect.busy
+                                  ? null
+                                  : () => ref
+                                        .read(patientReconnectProvider.notifier)
+                                        .retry(),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      )
+                    else
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: [
+                          status(
+                            link.connected
+                                ? s.todayGlassesConnected
+                                : s.todayGlassesAway,
+                            link.connected,
+                          ),
+                          status(
+                            memory(),
+                            settings?.memoryEnabled == true &&
+                                link.connected &&
+                                link.paused == false,
+                          ),
+                        ],
+                      ),
                     const SizedBox(height: 14),
                     if (state.offline || snapshot?.hasError == true) ...[
                       Text(

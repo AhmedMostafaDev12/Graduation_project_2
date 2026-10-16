@@ -16,6 +16,7 @@ import 'package:remori/core/relay/glasses_message.dart';
 import 'package:remori/core/db/remori_database.dart';
 import 'package:remori/core/l10n/app_localizations.dart';
 import 'package:remori/core/theme/remori_theme.dart';
+import 'package:remori/core/theme/remori_widgets.dart';
 import 'package:remori/features/patient_today/data/patient_today_repository.dart';
 import 'package:remori/features/patient_today/domain/patient_today_data.dart';
 import 'package:remori/features/patient_today/presentation/p1_today_screen.dart';
@@ -443,10 +444,25 @@ void main() {
             ),
           );
           await tester.pumpAndSettle();
-          if (scale == 1 && autoUpdateGoldenFiles) {
+          expect(find.byKey(const Key('d5-disconnected')), findsOneWidget);
+          final retry = find.text(locale == 'en' ? 'Try again' : 'حاول تاني');
+          expect(retry, findsOneWidget);
+          expect(
+            tester
+                .getSize(
+                  find.ancestor(of: retry, matching: find.byType(RemoriButton)),
+                )
+                .height,
+            greaterThanOrEqualTo(64),
+          );
+          if (autoUpdateGoldenFiles) {
             await expectLater(
               find.byKey(const Key('p1-preview')),
-              matchesGoldenFile('goldens/p1_$locale.png'),
+              matchesGoldenFile(
+                scale == 1
+                    ? 'goldens/p1_$locale.png'
+                    : 'goldens/d5_${locale}_2x.png',
+              ),
             );
           }
           expect(tester.takeException(), isNull);
