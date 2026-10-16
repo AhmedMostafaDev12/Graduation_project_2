@@ -98,6 +98,78 @@ abstract class AppLocalizations {
     Locale('ar'),
   ];
 
+  /// No description provided for @gameObjectCup.
+  ///
+  /// In en, this message translates to:
+  /// **'Cup'**
+  String get gameObjectCup;
+
+  /// No description provided for @gameObjectKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Key'**
+  String get gameObjectKey;
+
+  /// No description provided for @gameObjectBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Book'**
+  String get gameObjectBook;
+
+  /// No description provided for @gameObjectFlower.
+  ///
+  /// In en, this message translates to:
+  /// **'Flower'**
+  String get gameObjectFlower;
+
+  /// No description provided for @gamePicturePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'What is in the picture?'**
+  String get gamePicturePrompt;
+
+  /// No description provided for @gameWordsStudy.
+  ///
+  /// In en, this message translates to:
+  /// **'Take your time. Remember these three words.'**
+  String get gameWordsStudy;
+
+  /// No description provided for @gameWordsRecall.
+  ///
+  /// In en, this message translates to:
+  /// **'Which word did you see?'**
+  String get gameWordsRecall;
+
+  /// No description provided for @gameWordsReady.
+  ///
+  /// In en, this message translates to:
+  /// **'I’m ready'**
+  String get gameWordsReady;
+
+  /// No description provided for @gameWordsAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'See the words again'**
+  String get gameWordsAgain;
+
+  /// No description provided for @gameNextPicture.
+  ///
+  /// In en, this message translates to:
+  /// **'Next picture'**
+  String get gameNextPicture;
+
+  /// No description provided for @gameTryAnother.
+  ///
+  /// In en, this message translates to:
+  /// **'Take your time. Try another answer.'**
+  String get gameTryAnother;
+
+  /// No description provided for @gameUiOnlyNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'You can try this activity. Results aren’t saved yet.'**
+  String get gameUiOnlyNotice;
+
   /// No description provided for @cardGameInstruction.
   ///
   /// In en, this message translates to:

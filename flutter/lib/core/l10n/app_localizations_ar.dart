@@ -10,6 +10,42 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
+  String get gameObjectCup => 'كوب';
+
+  @override
+  String get gameObjectKey => 'مفتاح';
+
+  @override
+  String get gameObjectBook => 'كتاب';
+
+  @override
+  String get gameObjectFlower => 'وردة';
+
+  @override
+  String get gamePicturePrompt => 'إيه اللي في الصورة؟';
+
+  @override
+  String get gameWordsStudy => 'خد وقتك. افتكر الكلمات التلاتة دي.';
+
+  @override
+  String get gameWordsRecall => 'إيه الكلمة اللي شفتها؟';
+
+  @override
+  String get gameWordsReady => 'أنا جاهز';
+
+  @override
+  String get gameWordsAgain => 'شوف الكلمات تاني';
+
+  @override
+  String get gameNextPicture => 'الصورة اللي بعدها';
+
+  @override
+  String get gameTryAnother => 'خد وقتك. جرّب إجابة تانية.';
+
+  @override
+  String get gameUiOnlyNotice => 'تقدر تجرّب النشاط ده. النتائج مش بتتحفظ لسه.';
+
+  @override
   String get cardGameInstruction => 'لاقي الكارتين اللي شبه بعض';
 
   @override

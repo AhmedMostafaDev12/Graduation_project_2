@@ -1,6 +1,7 @@
 import '../../patient_today/domain/patient_today_data.dart';
 
 typedef GameResultTarget = ({PatientTodayKey scope, String id});
+typedef GameUiTarget = ({PatientTodayKey scope, String type});
 
 class GamePerson {
   const GamePerson(this.id, this.name, this.url, this.validUntil);

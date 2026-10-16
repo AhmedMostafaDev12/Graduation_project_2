@@ -88,10 +88,15 @@ class _P7GamesScreenState extends ConsumerState<P7GamesScreen>
           for (var i = 0; i < patientGameTypes.length; i++) ...[
             Semantics(
               button: true,
-              enabled: i == 0 && key != null,
+              enabled: key != null,
               child: InkWell(
-                onTap: i == 0 && key != null
-                    ? () => context.pushNamed(RemoriScreen.p8.name, extra: key)
+                onTap: key != null
+                    ? () => context.pushNamed(
+                        RemoriScreen.p8.name,
+                        extra: i == 0
+                            ? key
+                            : (scope: key, type: patientGameTypes[i]),
+                      )
                     : null,
                 borderRadius: BorderRadius.circular(18),
                 child: Container(
@@ -161,10 +166,6 @@ class _P7GamesScreenState extends ConsumerState<P7GamesScreen>
             ),
             const SizedBox(height: 14),
           ],
-          Text(
-            s.patientGamesPending,
-            style: const TextStyle(fontSize: 22, color: RemoriColors.muted),
-          ),
         ],
       ),
     );
