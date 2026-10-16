@@ -482,6 +482,30 @@ abstract class AppLocalizations {
   /// **'Caregiver Log in'**
   String get loginTitle;
 
+  /// No description provided for @accountExistsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'An account with this email already exists'**
+  String get accountExistsTitle;
+
+  /// No description provided for @accountExistsGuidance.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with your existing account.'**
+  String get accountExistsGuidance;
+
+  /// No description provided for @accountExistsEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Log in with email'**
+  String get accountExistsEmail;
+
+  /// No description provided for @accountExistsExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Accounts aren’t joined automatically. Use your existing sign-in method.'**
+  String get accountExistsExplanation;
+
   /// No description provided for @emailLabel.
   ///
   /// In en, this message translates to:

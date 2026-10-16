@@ -1283,6 +1283,26 @@ working enrollment navigation. Four review captures are
 Validation: formatting and analysis clean; all 913 Flutter tests passed. Configured
 Android x64 debug APK built. Physical-device and iOS validation remain pending.
 
+## D7 Account Exists
+
+The approved D7 stage replaces the existing route's placeholder with the
+account-exists design in English/Arabic. Back and Log in with email both open
+the existing A2 login form, including when D7 is opened without navigation
+history. Google remains visible and disabled. Guidance says to use the existing
+account and sign-in method, without directing users to the postponed C20 flow.
+
+Automatic entry from a social-sign-in collision remains deferred with social
+auth and C20. No temporary menu entry, new route, package, table or endpoint is
+added. D7 makes no authentication calls and does not merge or link accounts.
+
+Six tests cover disabled Google, email/back navigation without authentication
+calls, and normal/2x English/Arabic layouts. Four review captures are
+`test/goldens/d7_{en,ar}_{1.0,2.0}x.png`; regenerate with
+`flutter test test/d7_account_exists_test.dart --update-goldens`.
+
+Validation: formatting and analysis clean; all 919 Flutter tests passed. Configured
+Android x64 debug APK built. Physical-device and iOS validation remain pending.
+
 Validation: formatting and analysis clean; all 691 tests passed, including 17 P1
 tests. Android debug APK built. iOS compilation and physical-device integration
 remain pending on macOS/iOS.

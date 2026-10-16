@@ -223,6 +223,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get loginTitle => 'تسجيل دخول مقدم الرعاية';
 
   @override
+  String get accountExistsTitle => 'يوجد حساب بهذا البريد الإلكتروني بالفعل';
+
+  @override
+  String get accountExistsGuidance => 'سجّل الدخول بحسابك الحالي.';
+
+  @override
+  String get accountExistsEmail => 'تسجيل الدخول بالبريد الإلكتروني';
+
+  @override
+  String get accountExistsExplanation =>
+      'لا ندمج الحسابات تلقائيًا. استخدم طريقة تسجيل دخولك الحالية.';
+
+  @override
   String get emailLabel => 'البريد الإلكتروني';
 
   @override
