@@ -2170,6 +2170,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get todayGlassesAway => 'Glasses not connected';
 
   @override
+  String get todayGlassesDisconnected => 'Glasses not connected';
+
+  @override
+  String get todayGlassesCheck =>
+      'Make sure the glasses are switched on and near the phone.';
+
+  @override
+  String get todayTryAgain => 'Try again';
+
+  @override
+  String get todayReconnectUnavailable =>
+      'We couldn’t connect yet. You can try again.';
+
+  @override
   String get todayOffline =>
       'You can keep using your saved day. Updates will arrive when connected.';
 

@@ -1255,6 +1255,10 @@ Review captures: [English](test/goldens/p1_en.png),
 [Arabic](test/goldens/p1_ar.png). Regenerate with
 `flutter test test/p1_today_test.dart --update-goldens`.
 
+Validation: formatting and analysis clean; all 905 Flutter tests passed. Configured
+Android x64 debug APK built. Real-hardware BLE and physical-device/iOS validation
+remain pending.
+
 Validation: formatting and analysis clean; all 691 tests passed, including 17 P1
 tests. Android debug APK built. iOS compilation and physical-device integration
 remain pending on macOS/iOS.
@@ -1568,3 +1572,29 @@ captures are `test/goldens/d4_{en,ar}_{1.0,2.0}x.png`; regenerate with
 Validation: formatting and analysis clean; all 898 Flutter tests passed. Android
 x64 debug APK built. No native service behavior changes in D4; physical-device
 and iOS validation remain pending.
+
+## D5 Disconnected Glasses
+
+Patient Today now shows the D5 amber card when the trusted local glasses link is
+unavailable. It uses the board's nearby/powered-on guidance and a large Try again
+button, with the lead-approved omission of the unverified promise that reminders
+are already running on the glasses. Cached phone reminders remain usable.
+
+Retry uses the existing `GlassesConnection` interface and saved patient-session
+serial, subscribes before connecting, requires a matching Hello and connected
+transport, and sends the existing UTC time-sync message. Connection, identity
+and clock-sync waits are bounded. Duplicate taps are ignored while busy; wrong
+identity, missing Hello and unimplemented BLE leave a gentle retry state.
+Session changes/disposal invalidate pending work so a late connection cannot
+publish success or send a clock sync for the old session. Connected status still
+comes from `patientLinkProvider`; retry does not grant Patient Mode or create a
+new pairing. No package, table, endpoint or route is added.
+
+Real BLE and glasses schedule delivery remain deferred. Development reconnection
+uses the existing simulation when configured; its D1 notification continues to
+identify it as simulated. Seven focused D5 tests cover identity, missing Hello,
+unsupported BLE, repeated taps, session loss and the live retry UI. Existing P1
+layout tests also check the disconnected card and 64dp action in Arabic/English
+at normal and 2x text. Captures are `test/goldens/p1_{en,ar}.png` and
+`test/goldens/d5_{en,ar}_2x.png`; regenerate with
+`flutter test test/p1_today_test.dart --update-goldens`.

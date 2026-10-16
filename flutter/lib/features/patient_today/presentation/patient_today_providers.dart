@@ -144,6 +144,87 @@ class PatientLinkStatus {
   final bool? paused;
 }
 
+final patientReconnectProvider =
+    NotifierProvider.autoDispose<PatientReconnect, PatientTodayState>(
+      PatientReconnect.new,
+    );
+
+class PatientReconnect extends Notifier<PatientTodayState> {
+  int _generation = 0;
+  StreamSubscription<IncomingGlassesMessage>? _subscription;
+  Completer<bool>? _pending;
+  @override
+  PatientTodayState build() {
+    ref.watch(patientSessionProvider);
+    ref.watch(glassesConnectionProvider);
+    ++_generation;
+    ref.onDispose(() {
+      final pending = _pending;
+      if (pending != null && !pending.isCompleted) pending.complete(false);
+      unawaited(_subscription?.cancel());
+    });
+    return const PatientTodayState();
+  }
+
+  Future<void> retry() async {
+    final context = ref.read(patientSessionProvider).context;
+    if (context == null || state.busy) return;
+    final connection = ref.read(glassesConnectionProvider);
+    final generation = ++_generation;
+    bool current() =>
+        ref.mounted &&
+        generation == _generation &&
+        ref.read(patientSessionProvider).context == context;
+    state = const PatientTodayState(busy: true);
+    StreamSubscription<IncomingGlassesMessage>? subscription;
+    final hello = Completer<bool>();
+    _pending = hello;
+    void finish(bool value) {
+      if (!hello.isCompleted) hello.complete(value);
+    }
+
+    try {
+      subscription = connection.messages.listen(
+        (message) {
+          if (message is Hello) finish(message.deviceSerial == context.serial);
+        },
+        onError: (Object _) => finish(false),
+        onDone: () => finish(false),
+      );
+      _subscription = subscription;
+      await connection
+          .connect(context.serial)
+          .timeout(const Duration(seconds: 10));
+      final matches = await hello.future.timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => false,
+      );
+      if (!current()) return;
+      if (!matches || connection.state != GlassesConnectionState.connected) {
+        state = const PatientTodayState(offline: true);
+        return;
+      }
+      final settings = ref
+          .read(patientTodayDataProvider((context.patientId, context.deviceId)))
+          .value
+          ?.settings;
+      await connection
+          .send(
+            TimeSync(
+              utc: DateTime.now().toUtc().toIso8601String(),
+              timezone: settings?.timezone ?? 'UTC',
+            ),
+          )
+          .timeout(const Duration(seconds: 10));
+      if (current()) state = const PatientTodayState();
+    } catch (_) {
+      if (current()) state = const PatientTodayState(offline: true);
+    } finally {
+      unawaited(subscription?.cancel());
+    }
+  }
+}
+
 final patientLinkProvider = StreamProvider.autoDispose<PatientLinkStatus>((
   ref,
 ) {
