@@ -1,0 +1,11 @@
+<resources>
+    <string name="relay_channel">اتصال النظارة</string>
+    <string name="relay_connected">ريموري متصل بنظارتك</string>
+    <string name="relay_connecting">ريموري بيتصل بنظارتك</string>
+    <string name="relay_disconnected">ريموري مستني نظارتك</string>
+    <string name="relay_pending_body">المزامنة في الخلفية مش شغالة لسه. اضغط عشان تفتح ريموري.</string>
+    <string name="relay_simulation">ريموري — محاكاة للتطوير</string>
+    <string name="relay_simulation_connected_body">النظارة الافتراضية متصلة. المزامنة في الخلفية مش شغالة لسه. اضغط عشان تفتح.</string>
+    <string name="relay_simulation_connecting_body">جاري الاتصال بالنظارة الافتراضية. المزامنة في الخلفية مش شغالة لسه. اضغط عشان تفتح.</string>
+    <string name="relay_simulation_disconnected_body">النظارة الافتراضية مش متصلة. المزامنة في الخلفية مش شغالة لسه. اضغط عشان تفتح.</string>
+</resources>

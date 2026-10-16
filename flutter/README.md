@@ -1469,3 +1469,37 @@ Review captures are `test/goldens/p8_picture_naming_*.png`,
 Validation: formatting and analysis clean; all 864 tests passed, including 13
 tests for the additional game UIs. Android debug APK built. iOS compilation and
 physical-device validation remain pending on macOS/iOS.
+
+## D1 Android Foreground Notification
+
+The approved D1 foundation adds a native Kotlin foreground service behind
+`RelayService` and a private `remori/relay` platform channel. Foreground Patient
+Mode may start it only when Android's Bluetooth-connect and notification checks
+pass. No permission prompt is triggered by D1. Session loss stops the service,
+including while Flutter frames are paused. Updates and stop calls are serialized
+so a late start cannot outlive logout or a device-scope change.
+
+The low-priority ongoing Android notification uses English/Arabic resources,
+actual trusted connection status and an explicit development-simulation label
+when the existing fake connection is selected. Its body states that background
+sync is not active yet. No patient names, IDs, serials or tokens cross the channel
+or appear in the notification. Tapping opens Patient Today only after secure
+session restoration confirms an active patient session; it cannot sign in a user.
+
+This stage does not implement real BLE, continuous uploads, reminder scheduling,
+GPS, a headless Flutter worker or iOS relay. The service is non-sticky, stops with
+the task/engine, and has no boot receiver or automatic background start. Foreground
+resume rechecks permissions and can restart it for an active patient session.
+Android controls notification rendering and dismissal; ongoing notifications can
+be dismissible on newer Android versions, so D1 does not override that behavior.
+See [Android foreground-service requirements](https://developer.android.com/develop/background-work/services/fgs/service-types)
+and [Android 14 notification behavior](https://developer.android.com/about/versions/14/behavior-changes-all#non-dismissable-notifications).
+
+Validation: formatting and analysis clean; all 879 Flutter tests passed, including
+15 D1 tests. Android x64 debug APK built. A dependency-free Android instrumentation
+runner passed native permission, foreground start, notification content, Arabic
+simulation status, update and stop checks on an isolated read-only API 37 emulator.
+Run the native checks on a clean, disposable API 33+ emulator after building
+`:app:assembleDebugAndroidTest` and installing both APKs:
+`adb shell am instrument -w -r org.AI.remori.test/org.AI.remori.RelayServiceInstrumentation`.
+Physical-device and iOS validation remain pending.

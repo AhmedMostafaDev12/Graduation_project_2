@@ -1,0 +1,11 @@
+<resources>
+    <string name="relay_channel">Glasses connection</string>
+    <string name="relay_connected">Remori is connected to your glasses</string>
+    <string name="relay_connecting">Remori is connecting to your glasses</string>
+    <string name="relay_disconnected">Remori is waiting for your glasses</string>
+    <string name="relay_pending_body">Background sync is not active yet. Tap to open Remori.</string>
+    <string name="relay_simulation">Remori — development simulation</string>
+    <string name="relay_simulation_connected_body">Simulated glasses connected. Background sync is not active yet. Tap to open.</string>
+    <string name="relay_simulation_connecting_body">Connecting to simulated glasses. Background sync is not active yet. Tap to open.</string>
+    <string name="relay_simulation_disconnected_body">Simulated glasses disconnected. Background sync is not active yet. Tap to open.</string>
+</resources>

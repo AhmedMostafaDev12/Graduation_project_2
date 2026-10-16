@@ -11,8 +11,46 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
+    private var relayChannel: MethodChannel? = null
+    private var resumed = false
+
+    override fun onResume() { super.onResume(); resumed = true }
+    override fun onPause() { resumed = false; super.onPause() }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (intent.getBooleanExtra(RemoriRelayService.OPEN_PATIENT, false)) {
+            relayChannel?.invokeMethod("openPatient", null)
+        }
+    }
+
+    override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        relayChannel?.setMethodCallHandler(null)
+        relayChannel = null
+        RemoriRelayService.stop(this)
+        super.cleanUpFlutterEngine(flutterEngine)
+    }
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        relayChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "remori/relay")
+        relayChannel!!.setMethodCallHandler { call, result ->
+            when (call.method) {
+                "apply" -> result.success(RemoriRelayService.apply(this,
+                    call.argument<String>("language") ?: "ar",
+                    call.argument<String>("link") ?: "disconnected",
+                    call.argument<Boolean>("simulated") == true,
+                    resumed && call.argument<Boolean>("mayStart") == true))
+                "stop" -> { RemoriRelayService.stop(this); result.success(null) }
+                "takeOpenRequest" -> {
+                    val open = intent?.getBooleanExtra(RemoriRelayService.OPEN_PATIENT, false) == true
+                    intent?.removeExtra(RemoriRelayService.OPEN_PATIENT)
+                    result.success(open)
+                }
+                else -> result.notImplemented()
+            }
+        }
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "remori/permissions")
             .setMethodCallHandler { call, result ->
                 when (call.method) {
