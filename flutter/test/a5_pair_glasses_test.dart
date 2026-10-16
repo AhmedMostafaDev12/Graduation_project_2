@@ -8,6 +8,8 @@ import 'package:remori/app.dart';
 import 'package:remori/core/api/api_client.dart';
 import 'package:remori/core/api/api_config.dart';
 import 'package:remori/core/api/api_failure.dart';
+import 'package:remori/core/api/api_providers.dart';
+import 'package:remori/features/device_pairing/presentation/handover_providers.dart';
 import 'package:remori/core/api/credential_store.dart';
 import 'package:remori/core/l10n/locale_providers.dart';
 import 'package:remori/core/relay/permission_service.dart';
@@ -119,6 +121,25 @@ void main() {
       await (FontLoader(family)..addFont(rootBundle.load(file))).load();
     }
   });
+  testWidgets(
+    'late pairing result cannot publish a grant after caregiver logout',
+    (tester) async {
+      final repository = TestPairingRepository()..pending = Completer<void>();
+      final container = await mount(tester, repository);
+      container.read(caregiverSessionProvider.notifier).signedIn();
+      await tester.pumpAndSettle();
+      final pending = container
+          .read(pairingControllerProvider.notifier)
+          .pair(patientId, 'RMR-0007');
+      container.read(caregiverSessionProvider.notifier).invalidate();
+      await tester.pump();
+      repository.pending!.complete();
+      await tester.pumpAndSettle();
+      await pending;
+      expect(container.read(pairedGlassesProvider), isNull);
+      expect(container.read(pairingControllerProvider).info, isNull);
+    },
+  );
   testWidgets(
     'scan is explicit and Continue waits for secure association; BLE stays pending',
     (tester) async {

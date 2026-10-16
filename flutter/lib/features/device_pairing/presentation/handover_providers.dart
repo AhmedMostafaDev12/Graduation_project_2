@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/api/patient_session_store.dart';
+import '../../../core/api/api_providers.dart';
+import '../../../core/api/patient_session_provider.dart';
 import '../../../core/relay/glasses_connection.dart';
 import '../../../core/relay/glasses_connection_provider.dart';
 import '../../../core/relay/glasses_message.dart';
@@ -15,7 +17,14 @@ final pairedGlassesProvider = NotifierProvider<PairedGlasses, PairingInfo?>(
 
 class PairedGlasses extends Notifier<PairingInfo?> {
   @override
-  PairingInfo? build() => null;
+  PairingInfo? build() {
+    ref.listen(caregiverSessionProvider, (_, active) {
+      // A successful handover intentionally ends the caregiver session.
+      if (!active && !ref.read(patientSessionProvider).active) state = null;
+    });
+    return null;
+  }
+
   void paired(PairingInfo info) => state = info;
 }
 

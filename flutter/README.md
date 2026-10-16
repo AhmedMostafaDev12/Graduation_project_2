@@ -480,6 +480,20 @@ Integration-fix validation: formatting and analysis clean; all 926 Flutter tests
 passed. Configured Android x64 debug APK built. Hardware BLE and physical-device
 validation remain pending.
 
+Account-boundary review correction: caregiver logout or access invalidation
+clears the in-memory A5 pairing grant and A6 readiness. Successful login/signup
+starts fresh setup state even without an intervening logout. Pairing repositories
+discard pending storage-retry grants when their session scope ends, and late
+results cannot publish metadata into a replacement setup controller. Same-session
+storage retries still reuse the received grant. A completed patient handover
+preserves its valid pairing context; stored device credentials keep their
+existing lifecycle. Five added regressions cover logout, re-login, late results
+and repository disposal. No package, table, endpoint or screen layout is added.
+
+Account-boundary validation: formatting and analysis clean; all 931 Flutter
+tests passed. Configured Android x64 debug APK built. Physical-device validation
+remains pending.
+
 Handover verifies A5's saved device token using GET /patients/{id}/devices and
 matches patient ID, device ID and serial. It records secure local session context,
 clears caregiver credentials and opens the existing P1 Patient shell. Patient
