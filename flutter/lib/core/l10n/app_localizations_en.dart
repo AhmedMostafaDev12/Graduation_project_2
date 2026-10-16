@@ -1491,6 +1491,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Showing saved journal text. Photos require a successful refresh.';
 
   @override
+  String get journalOfflineStatus => 'Offline';
+
+  @override
+  String get journalNoSavedEntries => 'No saved journal entries for this day.';
+
+  @override
+  String get journalSavedExplanation =>
+      'Showing what\'s saved on this phone. New items appear when you\'re back online.';
+
+  @override
   String get journalUnavailable => 'Choose a patient to view their journal.';
 
   @override
