@@ -44,13 +44,28 @@ class RelayServiceInstrumentation : Instrumentation() {
             check(notice.extras.getString(Notification.EXTRA_TITLE)?.contains("محاكاة") == true) { "Arabic development simulation label" }
             check(notice.extras.getString(Notification.EXTRA_TEXT)?.contains("مش متصلة") == true) { "Disconnected simulation status" }
 
+            val reminder = mapOf("token" to "test-receipt", "due" to System.currentTimeMillis() + 500,
+                "title" to "Test reminder", "time" to "9:00 AM", "language" to "en")
+            runOnMainSync { ReminderNotifications.update(app, reminder) }
+            check(manager.activeNotifications.none { it.id == 102 }) { "Future reminder must wait" }
+            waitFor { manager.activeNotifications.any { it.id == 102 } }
+            val reminderNotice = manager.activeNotifications.single { it.id == 102 }.notification
+            check(reminderNotice.extras.getString(Notification.EXTRA_TITLE) == "Test reminder") { "Actual reminder title" }
+            check(reminderNotice.actions.map { it.title.toString() } == listOf("Taken", "Later")) { "Reminder actions" }
+            check(reminderNotice.contentIntent.isImmutable && reminderNotice.actions.all { it.actionIntent.isImmutable }) { "Immutable reminder intents" }
+            check(reminderNotice.visibility == Notification.VISIBILITY_PRIVATE) { "Lock-screen privacy" }
+            runOnMainSync { ReminderNotifications.clear(app) }
+            runOnMainSync { ReminderNotifications.update(app, reminder + mapOf("token" to "future", "due" to System.currentTimeMillis() + 3000)) }
+
             runOnMainSync { RemoriRelayService.stop(app) }
             waitFor { manager.activeNotifications.isEmpty() }
+            Thread.sleep(3200)
+            check(manager.activeNotifications.isEmpty()) { "Stopped relay must cancel pending reminders" }
             runOnMainSync { activity.moveTaskToBack(true) }
             runOnMainSync { accepted = RemoriRelayService.apply(app, "en", "connected", false, false) }
             check(!accepted && manager.activeNotifications.isEmpty()) { "No new background start" }
             runOnMainSync { activity.finishAndRemoveTask() }
-            report.putString("stream", "D1 native permission, foreground, notification, locale, update and stop checks passed\n")
+            report.putString("stream", "D1/D2 native permission, foreground, reminder scheduling, actions, privacy and stop checks passed\n")
             finish(Activity.RESULT_OK, report)
         } catch (error: Throwable) {
             runOnMainSync { RemoriRelayService.stop(targetContext) }

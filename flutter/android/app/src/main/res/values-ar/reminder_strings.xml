@@ -1,0 +1,5 @@
+<resources>
+    <string name="reminder_channel">التذكيرات</string>
+    <string name="reminder_taken">خدته</string>
+    <string name="reminder_later">بعدين</string>
+</resources>
