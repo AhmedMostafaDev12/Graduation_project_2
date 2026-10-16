@@ -48,6 +48,8 @@ class PeopleAdapter implements HttpClientAdapter {
       denied = false,
       malformed = false,
       empty = false,
+      archivedOnly = false,
+      reviewWhileEmpty = false,
       archiveFirst = false;
   int rotation = 0;
   final requests = <RequestOptions>[];
@@ -88,7 +90,7 @@ class PeopleAdapter implements HttpClientAdapter {
       final status = options.queryParameters['status'] as String;
       return json(
         200,
-        empty
+        empty || (archivedOnly && status == 'active')
             ? []
             : status == 'active'
             ? [
@@ -101,7 +103,7 @@ class PeopleAdapter implements HttpClientAdapter {
     if (options.path.endsWith('/unknown-faces')) {
       return json(
         200,
-        empty
+        (empty && !reviewWhileEmpty) || archivedOnly
             ? []
             : [
                 {
@@ -557,12 +559,15 @@ void main() {
   ) async {
     adapter.empty = true;
     await mount(tester, db, adapter, photos);
-    expect(find.text('Active (0)'), findsOneWidget);
-    expect(find.text('No active people have been added yet.'), findsOneWidget);
+    expect(find.text('No one enrolled yet'), findsOneWidget);
+    expect(
+      find.text('Add the first person your patient should recognize.'),
+      findsOneWidget,
+    );
     expect(find.textContaining('new faces to review'), findsNothing);
-    await tester.tap(find.text('Archived'));
+    await tester.tap(find.text('+ Add person'));
     await tester.pumpAndSettle();
-    expect(find.text('No archived people.'), findsOneWidget);
+    expect(find.byType(RouteTarget), findsOneWidget);
   });
   testWidgets('account changes cannot reuse another caregiver cached people', (
     tester,
@@ -584,6 +589,82 @@ void main() {
     expect(container.read(peopleScopeProvider)!.caregiverId, 'caregiver-B');
     expect(container.read(peopleDataProvider).value!.people, isEmpty);
   });
+  testWidgets('D6 viewer has explanatory text without enrollment actions', (
+    tester,
+  ) async {
+    adapter.empty = true;
+    await mount(tester, db, adapter, photos, viewer: true);
+    expect(find.byKey(const Key('d6-empty-people')), findsOneWidget);
+    expect(
+      find.text('People added by a caregiver will appear here.'),
+      findsOneWidget,
+    );
+    expect(find.text('+ Add person'), findsNothing);
+    expect(find.byTooltip('Add reminder'), findsNothing);
+  });
+  testWidgets('archived-only people do not imply nobody was enrolled', (
+    tester,
+  ) async {
+    adapter.archivedOnly = true;
+    await mount(tester, db, adapter, photos);
+    expect(find.byKey(const Key('d6-empty-people')), findsNothing);
+    expect(find.text('No active people have been added yet.'), findsOneWidget);
+    await tester.tap(find.text('Archived'));
+    await tester.pumpAndSettle();
+    expect(find.text('Archived person'), findsOneWidget);
+  });
+  testWidgets('failed uncached request never displays D6 as confirmed empty', (
+    tester,
+  ) async {
+    adapter.fail = true;
+    await mount(tester, db, adapter, photos);
+    expect(find.byKey(const Key('d6-empty-people')), findsNothing);
+    expect(find.text('No one enrolled yet'), findsNothing);
+    expect(find.text('Retry'), findsOneWidget);
+  });
+  testWidgets('D6 retains the unknown-face review entry', (tester) async {
+    adapter.empty = true;
+    adapter.reviewWhileEmpty = true;
+    await mount(tester, db, adapter, photos);
+    expect(find.byKey(const Key('d6-empty-people')), findsOneWidget);
+    await tester.tap(find.text('2 new faces to review'));
+    await tester.pumpAndSettle();
+    expect(find.byType(RouteTarget), findsOneWidget);
+  });
+  for (final language in ['en', 'ar']) {
+    for (final scale in [1.0, 2.0]) {
+      testWidgets(
+        'D6 $language at ${scale}x stays readable and opens enrollment',
+        (tester) async {
+          adapter.empty = true;
+          await mount(
+            tester,
+            db,
+            adapter,
+            photos,
+            language: language,
+            scale: scale,
+            size: scale == 1 ? const Size(390, 844) : const Size(320, 844),
+          );
+          expect(find.byKey(const Key('d6-empty-people')), findsOneWidget);
+          expect(tester.takeException(), isNull);
+          if (autoUpdateGoldenFiles) {
+            await expectLater(
+              find.byKey(const Key('c3-preview')),
+              matchesGoldenFile('goldens/d6_${language}_${scale}x.png'),
+            );
+          }
+          final add = find.text(
+            language == 'en' ? '+ Add person' : '+ إضافة شخص',
+          );
+          await tester.ensureVisible(add);
+          await tester.tap(add);
+          await tester.pumpAndSettle();
+          expect(find.byType(RouteTarget), findsOneWidget);
+        },
+      );
+    }
+  }
   test('v2 upgrade preserves dashboard, reminder log and outbox caches', () async {
     await db.close();
     migrationDirectory = await Directory.systemTemp.createTemp(

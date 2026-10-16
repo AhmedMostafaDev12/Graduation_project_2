@@ -1400,6 +1400,24 @@ abstract class AppLocalizations {
   /// **'No active people have been added yet.'**
   String get peopleNoActive;
 
+  /// No description provided for @peopleEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No one enrolled yet'**
+  String get peopleEmptyTitle;
+
+  /// No description provided for @peopleEmptyManager.
+  ///
+  /// In en, this message translates to:
+  /// **'Add the first person your patient should recognize.'**
+  String get peopleEmptyManager;
+
+  /// No description provided for @peopleEmptyViewer.
+  ///
+  /// In en, this message translates to:
+  /// **'People added by a caregiver will appear here.'**
+  String get peopleEmptyViewer;
+
   /// No description provided for @peopleNoArchived.
   ///
   /// In en, this message translates to:

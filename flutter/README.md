@@ -1259,6 +1259,30 @@ Validation: formatting and analysis clean; all 905 Flutter tests passed. Configu
 Android x64 debug APK built. Real-hardware BLE and physical-device/iOS validation
 remain pending.
 
+## D6 Empty People
+
+D6 is the People screen's confirmed-empty variant, with the exported line
+illustration, centered heading and manager-only Add person action opening the
+existing C4 flow. It requires a loaded caregiver/patient-scoped cache with no
+active or archived people and no loading, refresh or error state. Archived-only
+lists retain their normal filters and empty-active message. Pending unknown-face
+review remains reachable even when no known people are enrolled.
+
+The lead approved omitting the unverified glasses-speech promise. Managers see
+"Add the first person your patient should recognize"; viewers see "People added
+by a caregiver will appear here" without an enrollment action. Pull-to-refresh
+and existing navigation remain available. No package, table, endpoint or route
+is added.
+
+Eight added tests cover viewer permissions, archived-only lists, uncached
+failures, unknown-face review and Arabic/English layouts at normal/2x text with
+working enrollment navigation. Four review captures are
+`test/goldens/d6_{en,ar}_{1.0,2.0}x.png`; regenerate with
+`flutter test test/c3_people_test.dart --update-goldens`.
+
+Validation: formatting and analysis clean; all 913 Flutter tests passed. Configured
+Android x64 debug APK built. Physical-device and iOS validation remain pending.
+
 Validation: formatting and analysis clean; all 691 tests passed, including 17 P1
 tests. Android debug APK built. iOS compilation and physical-device integration
 remain pending on macOS/iOS.

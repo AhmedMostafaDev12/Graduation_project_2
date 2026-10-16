@@ -742,6 +742,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get peopleNoActive => 'No active people have been added yet.';
 
   @override
+  String get peopleEmptyTitle => 'No one enrolled yet';
+
+  @override
+  String get peopleEmptyManager =>
+      'Add the first person your patient should recognize.';
+
+  @override
+  String get peopleEmptyViewer =>
+      'People added by a caregiver will appear here.';
+
+  @override
   String get peopleNoArchived => 'No archived people.';
 
   @override
