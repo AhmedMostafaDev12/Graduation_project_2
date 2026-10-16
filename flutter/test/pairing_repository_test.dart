@@ -156,6 +156,52 @@ void main() {
     expect(requests, 1);
     expect(store.device, 'test-only-device-secret');
   });
+  test(
+    'disposed storage retry cannot reuse the previous session grant',
+    () async {
+      var requests = 0;
+      final store = RetryStore();
+      final client = _client(store, (_) {
+        requests++;
+        return _json(201, grant);
+      });
+      final old = PairingRepository(client, store);
+      await expectLater(
+        old.pair(patientId, 'RMR-0007'),
+        throwsA(isA<ApiFailure>()),
+      );
+      old.dispose();
+      store.fails = false;
+      await expectLater(
+        old.pair(patientId, 'RMR-0007'),
+        throwsA(isA<ApiFailure>()),
+      );
+      expect(requests, 1);
+      expect(store.device, 'device-token');
+      await PairingRepository(client, store).pair(patientId, 'RMR-0007');
+      expect(requests, 2);
+    },
+  );
+  test(
+    'disposed in-flight pairing cannot store or return a late grant',
+    () async {
+      final started = Completer<void>(), release = Completer<void>();
+      final store = _Store();
+      final client = _client(store, (_) async {
+        started.complete();
+        await release.future;
+        return _json(201, grant);
+      });
+      final repository = PairingRepository(client, store);
+      final pending = repository.pair(patientId, 'RMR-0007');
+      await started.future;
+      repository.dispose();
+      release.complete();
+      await expectLater(pending, throwsA(isA<ApiFailure>()));
+      expect(store.device, 'device-token');
+    },
+  );
+
   test('pairing conflicts never overwrite existing credentials', () async {
     final store = _Store();
     final client = _client(store, (_) => _error(409, 'DEVICE_ALREADY_PAIRED'));

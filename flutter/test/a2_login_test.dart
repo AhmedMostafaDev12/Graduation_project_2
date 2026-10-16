@@ -9,6 +9,9 @@ import 'package:remori/app.dart';
 import 'package:remori/core/api/api_client.dart';
 import 'package:remori/core/api/api_config.dart';
 import 'package:remori/core/api/api_failure.dart';
+import 'package:remori/core/api/api_providers.dart';
+import 'package:remori/features/device_pairing/domain/pairing_info.dart';
+import 'package:remori/features/device_pairing/presentation/handover_providers.dart';
 import 'package:remori/core/api/credential_store.dart';
 import 'package:remori/core/l10n/locale_providers.dart';
 import 'package:remori/core/router/remori_router.dart';
@@ -142,6 +145,32 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+  testWidgets('successful re-login clears previous account pairing setup', (
+    tester,
+  ) async {
+    final repository = TestAuthRepository();
+    final container = await mount(tester, repository);
+    container.read(caregiverSessionProvider.notifier).signedIn();
+    container
+        .read(pairedGlassesProvider.notifier)
+        .paired(
+          const PairingInfo(
+            deviceId: 'old-device',
+            patientId: 'old-patient',
+            serial: 'OLD',
+          ),
+        );
+    expect(container.read(pairedGlassesProvider), isNotNull);
+    expect(
+      await container
+          .read(loginControllerProvider.notifier)
+          .login('carer@example.test', 'password'),
+      true,
+    );
+    await tester.pumpAndSettle();
+    expect(container.read(pairedGlassesProvider), isNull);
+  });
+
   testWidgets('empty inputs do not request authentication', (tester) async {
     final repository = TestAuthRepository();
     await mount(tester, repository);

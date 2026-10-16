@@ -10,11 +10,23 @@ class PairingRepository {
   PairingInfo? _pendingInfo;
   String? _pendingToken;
   bool _busy = false;
+  bool _disposed = false;
+  void dispose() {
+    _disposed = true;
+    _pendingInfo = null;
+    _pendingToken = null;
+  }
+
+  void _checkActive() {
+    if (_disposed) throw ApiFailure(ApiFailureKind.cancelled);
+  }
+
   static bool isUuid(String value) => RegExp(
     r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
   ).hasMatch(value);
 
   Future<PairingInfo> pair(String patientId, String serial) async {
+    _checkActive();
     if (_busy) throw ApiFailure(ApiFailureKind.cancelled);
     if (!isUuid(patientId) || serial.trim().isEmpty) {
       throw ApiFailure(ApiFailureKind.invalidResponse);
@@ -31,6 +43,7 @@ class PairingRepository {
           data: {'serial_number': serial, 'patient_id': patientId},
         );
         final data = response.data;
+        _checkActive();
         if (response.statusCode != 201 ||
             data is! Map ||
             data['device_id'] is! String ||
@@ -50,12 +63,15 @@ class PairingRepository {
       }
       // Preserve a received grant in memory on storage failure. Retry storage,
       // not POST /devices/pair: re-pairing rotates the server device token.
+      _checkActive();
+      final result = _pendingInfo!;
+      final token = _pendingToken!;
       try {
-        await credentials.saveDevice(_pendingToken!);
+        await credentials.saveDevice(token);
       } catch (_) {
         throw ApiFailure(ApiFailureKind.credentials);
       }
-      final result = _pendingInfo!;
+      _checkActive();
       _pendingInfo = null;
       _pendingToken = null;
       return result;

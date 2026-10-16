@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/api_providers.dart';
 import '../../../core/api/api_failure.dart';
 import '../data/auth_repository.dart';
+import '../../device_pairing/presentation/pairing_providers.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>(
   (ref) => AuthRepository(
@@ -23,6 +24,7 @@ class LoginController extends Notifier<AsyncValue<void>> {
     state = const AsyncLoading();
     try {
       await ref.read(authRepositoryProvider).login(email, password);
+      resetPairingSetup(ref);
       ref.read(caregiverSessionProvider.notifier).signedIn();
       state = const AsyncData(null);
       return true;
@@ -77,6 +79,7 @@ class SignUpController extends Notifier<SignUpState> {
       if (!ref.mounted) return false;
       await repository.login(email, password);
       if (!ref.mounted) return false;
+      resetPairingSetup(ref);
       ref.read(caregiverSessionProvider.notifier).signedIn();
       state = const SignUpState(accountCreated: true);
       return true;

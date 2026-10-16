@@ -334,6 +334,11 @@ void main() {
       await tester.tap(find.text(handoverLabel));
       await tester.pumpAndSettle();
       expect(route(container), '/p1');
+      expect(container.read(pairedGlassesProvider), isNotNull);
+      expect(
+        container.read(handoverConnectionProvider).readyFor(patient),
+        true,
+      );
       // Dispose the provider-owned fake timer before the widget-test timer audit.
       await tester.pumpWidget(const SizedBox());
       await tester.pumpAndSettle();
@@ -619,6 +624,23 @@ void main() {
       );
     },
   );
+
+  testWidgets('caregiver logout clears pairing grant and handover readiness', (
+    tester,
+  ) async {
+    final container = await mount(
+      tester,
+      ControlledGlasses(),
+      TestCredentials(),
+      TestSessionStore(),
+      TestAdapter(),
+    );
+    expect(container.read(pairedGlassesProvider), isNotNull);
+    container.read(caregiverSessionProvider.notifier).invalidate();
+    await tester.pumpAndSettle();
+    expect(container.read(pairedGlassesProvider), isNull);
+    expect(container.read(handoverConnectionProvider).readyFor(patient), false);
+  });
 
   testWidgets('disconnected link keeps pending text and disabled handover', (
     tester,
