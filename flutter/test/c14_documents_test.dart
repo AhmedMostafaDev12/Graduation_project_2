@@ -563,6 +563,7 @@ void main() {
           ...builders,
           RemoriScreen.c18: (_, _) => const Text('More destination'),
           RemoriScreen.c9: (_, _) => const Text('Reminder destination'),
+          RemoriScreen.c1: (_, _) => const Text('Home destination'),
           RemoriScreen.c15: (_, state) => Text(
             'Document destination',
             key: ValueKey(state.extra.toString()),
@@ -732,27 +733,23 @@ void main() {
       expect(find.byType(Image), findsNothing);
     },
   );
-  testWidgets('viewer reads documents without the manager center action', (
-    tester,
-  ) async {
+  testWidgets('viewer reads documents and can return Home', (tester) async {
     await mount(tester, fake(), viewer: true);
     expect(find.text('Pharmacy receipt'), findsOneWidget);
     expect(find.byTooltip('Add reminder'), findsNothing);
+    expect(find.byTooltip('Home'), findsOneWidget);
   });
-  testWidgets(
-    'Back opens More and the existing manager center action opens C9',
-    (tester) async {
-      final container = await mount(tester, fake());
-      await tester.tap(find.byTooltip('Back'));
-      await tester.pumpAndSettle();
-      expect(find.text('More destination'), findsOneWidget);
-      container.read(remoriRouterProvider).goNamed(RemoriScreen.c14.name);
-      await tester.pumpAndSettle();
-      await tester.tap(find.byTooltip('Add reminder'));
-      await tester.pumpAndSettle();
-      expect(find.text('Reminder destination'), findsOneWidget);
-    },
-  );
+  testWidgets('Back opens More and the center Home opens C1', (tester) async {
+    final container = await mount(tester, fake());
+    await tester.tap(find.byTooltip('Back'));
+    await tester.pumpAndSettle();
+    expect(find.text('More destination'), findsOneWidget);
+    container.read(remoriRouterProvider).goNamed(RemoriScreen.c14.name);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Home'));
+    await tester.pumpAndSettle();
+    expect(find.text('Home destination'), findsOneWidget);
+  });
   for (final language in ['en', 'ar']) {
     testWidgets('C14 $language reference capture', (tester) async {
       debugDisableShadows = false;

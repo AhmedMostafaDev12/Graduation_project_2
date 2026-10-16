@@ -1,4 +1,11 @@
 {
+  "askPhaseTwo": "المرحلة ٢",
+  "askTapSpeak": "اضغط واتكلم",
+  "askQuestionHint": "أو اكتب سؤالك هنا",
+  "askPending": "تسجيل الأسئلة والحصول على إجابات سيتوفران في المرحلة الثانية.",
+  "authConfigurationError": "إعدادات اتصال التطبيق غير موجودة أو غير صالحة. يرجى التواصل مع الدعم.",
+  "patientPreviewStart": "معاينة وضع المريض (بدون نظارة)",
+  "patientPreviewExit": "معاينة الشاشات · إنهاء المعاينة",
   "gameObjectCup": "كوب",
   "gameObjectKey": "مفتاح",
   "gameObjectBook": "كتاب",

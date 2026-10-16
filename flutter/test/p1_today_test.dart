@@ -481,7 +481,7 @@ void main() {
             ),
             matching: find.byType(OutlinedButton),
           );
-          expect(tester.widget<OutlinedButton>(button).onPressed, isNull);
+          expect(tester.widget<OutlinedButton>(button).onPressed, isNotNull);
           expect(tester.getSize(button).height, greaterThanOrEqualTo(64));
           expect(tester.takeException(), isNull);
           await tester.pumpWidget(const SizedBox());

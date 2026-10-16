@@ -189,7 +189,12 @@ class _C18MoreScreenState extends ConsumerState<C18MoreScreen>
       ),
     );
     void open(RemoriScreen screen) {
-      if (scope?.$2 != null) context.goNamed(screen.name);
+      if (scope?.$2 == null) return;
+      if (screen == RemoriScreen.c12) {
+        context.pushNamed(screen.name);
+      } else {
+        context.goNamed(screen.name);
+      }
     }
 
     final locale = Localizations.localeOf(context).languageCode;

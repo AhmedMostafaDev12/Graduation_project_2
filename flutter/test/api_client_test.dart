@@ -443,6 +443,7 @@ void main() {
       for (final (type, kind) in [
         (DioExceptionType.connectionTimeout, ApiFailureKind.timeout),
         (DioExceptionType.connectionError, ApiFailureKind.network),
+        (DioExceptionType.unknown, ApiFailureKind.invalidResponse),
       ]) {
         final store = _Store();
         final client = _client(

@@ -98,6 +98,48 @@ abstract class AppLocalizations {
     Locale('ar'),
   ];
 
+  /// No description provided for @askPhaseTwo.
+  ///
+  /// In en, this message translates to:
+  /// **'Phase 2'**
+  String get askPhaseTwo;
+
+  /// No description provided for @askTapSpeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap and speak'**
+  String get askTapSpeak;
+
+  /// No description provided for @askQuestionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Or type your question here'**
+  String get askQuestionHint;
+
+  /// No description provided for @askPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording questions and receiving answers will be available in Phase 2.'**
+  String get askPending;
+
+  /// No description provided for @authConfigurationError.
+  ///
+  /// In en, this message translates to:
+  /// **'The app’s connection settings are missing or invalid. Please contact support.'**
+  String get authConfigurationError;
+
+  /// No description provided for @patientPreviewStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview Patient Mode (no glasses)'**
+  String get patientPreviewStart;
+
+  /// No description provided for @patientPreviewExit.
+  ///
+  /// In en, this message translates to:
+  /// **'Screen preview · Exit preview'**
+  String get patientPreviewExit;
+
   /// No description provided for @gameObjectCup.
   ///
   /// In en, this message translates to:

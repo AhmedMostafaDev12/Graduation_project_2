@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../core/router/remori_routes.dart';
 
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/remori_theme.dart';
@@ -343,7 +346,7 @@ class _P1TodayScreenState extends ConsumerState<P1TodayScreen>
                     RemoriButton(
                       label: s.todayAskLater,
                       outlined: true,
-                      onPressed: null,
+                      onPressed: () => context.pushNamed(RemoriScreen.p6.name),
                     ),
                   ],
                 ),

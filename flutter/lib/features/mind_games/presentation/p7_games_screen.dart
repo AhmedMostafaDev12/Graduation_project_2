@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/router/remori_routes.dart';
+import '../../../core/router/patient_preview_provider.dart';
 
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/remori_theme.dart';
@@ -60,6 +61,7 @@ class _P7GamesScreenState extends ConsumerState<P7GamesScreen>
       s.patientGamePicture,
       s.patientGameWords,
     ];
+    final preview = ref.watch(patientPreviewProvider);
     const icons = [Icons.copy_outlined, Icons.image_outlined, Icons.notes];
     return SafeArea(
       bottom: false,
@@ -88,12 +90,12 @@ class _P7GamesScreenState extends ConsumerState<P7GamesScreen>
           for (var i = 0; i < patientGameTypes.length; i++) ...[
             Semantics(
               button: true,
-              enabled: key != null,
+              enabled: key != null || preview,
               child: InkWell(
-                onTap: key != null
+                onTap: key != null || preview
                     ? () => context.pushNamed(
                         RemoriScreen.p8.name,
-                        extra: i == 0
+                        extra: i == 0 && !preview
                             ? key
                             : (scope: key, type: patientGameTypes[i]),
                       )

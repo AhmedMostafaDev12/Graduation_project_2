@@ -660,7 +660,7 @@ void main() {
         tester
             .widget<RemoriNavigationBar>(find.byType(RemoriNavigationBar))
             .onAction,
-        isNull,
+        isNotNull,
       );
       await tester.tap(find.textContaining('You met Ahmed'));
       await tester.pumpAndSettle();

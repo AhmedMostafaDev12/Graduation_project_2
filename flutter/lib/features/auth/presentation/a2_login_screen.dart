@@ -56,6 +56,8 @@ class _A2LoginScreenState extends ConsumerState<A2LoginScreen> {
               (failure.kind == ApiFailureKind.network ||
                   failure.kind == ApiFailureKind.timeout)
         ? s.loginConnectionError
+        : failure is ApiFailure && failure.code == 'APP_CONFIGURATION'
+        ? s.authConfigurationError
         : s.loginRetry;
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(28, 30, 28, 28),
@@ -89,6 +91,16 @@ class _A2LoginScreenState extends ConsumerState<A2LoginScreen> {
               hint: s.passwordHint,
 
               busy: busy,
+            ),
+            Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: TextButton(
+                onPressed: null,
+                style: TextButton.styleFrom(
+                  disabledForegroundColor: RemoriColors.purple,
+                ),
+                child: Text(s.forgotPassword),
+              ),
             ),
             if (failure != null)
               Semantics(
@@ -191,18 +203,6 @@ class _A2LoginScreenState extends ConsumerState<A2LoginScreen> {
                 ),
               ),
             ),
-            if (!email)
-              Semantics(
-                button: true,
-                enabled: false,
-                child: Text(
-                  s.forgotPassword,
-                  style: theme.textTheme.bodySmall!.copyWith(
-                    color: RemoriColors.purple.withValues(alpha: .5),
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
           ],
         ),
         const SizedBox(height: 6),

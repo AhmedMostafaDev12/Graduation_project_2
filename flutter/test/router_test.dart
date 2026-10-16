@@ -6,6 +6,8 @@ import 'package:remori/app.dart';
 import 'package:remori/features/caregiver_dashboard/presentation/home_providers.dart';
 import 'package:remori/core/router/remori_router.dart';
 import 'package:remori/core/router/remori_routes.dart';
+import 'package:remori/core/router/patient_preview_provider.dart';
+import 'package:remori/core/api/patient_session_provider.dart';
 import 'package:remori/core/theme/remori_navigation_bar.dart';
 import 'package:remori/core/theme/remori_theme.dart';
 
@@ -31,8 +33,8 @@ Future<ProviderContainer> _mount(
       }),
       shellLabelsProvider.overrideWithValue({
         RemoriMode.caregiver: RemoriShellLabels(
-          destinations: ['Home', 'People', 'Reminders', 'More'],
-          action: 'Add reminder',
+          destinations: ['Journal', 'People', 'Reminders', 'More'],
+          action: 'Home',
           direction: TextDirection.ltr,
         ),
         RemoriMode.patient: RemoriShellLabels(
@@ -55,6 +57,32 @@ Future<ProviderContainer> _mount(
 String _path(GoRouter router) => router.routeInformationProvider.value.uri.path;
 
 void main() {
+  testWidgets('temporary preview grants UI access without a device session', (
+    tester,
+  ) async {
+    final container = await _mount(
+      tester,
+      const RouteAccess(caregiverAuthenticated: true),
+    );
+    final router = container.read(remoriRouterProvider);
+    container.read(patientPreviewProvider.notifier).start();
+    for (final screen in [
+      RemoriScreen.p1,
+      RemoriScreen.p2,
+      RemoriScreen.p4,
+      RemoriScreen.p7,
+    ]) {
+      router.goNamed(screen.name);
+      await tester.pumpAndSettle();
+      expect(_path(router), screen.path);
+      expect(container.read(patientSessionProvider).active, isFalse);
+      expect(container.read(routeAccessProvider).devicePaired, isFalse);
+    }
+    container.read(patientPreviewProvider.notifier).stop();
+    await tester.pumpAndSettle();
+    expect(_path(router), RemoriScreen.a2.path);
+  });
+
   testWidgets('signed-out entry pages stay outside either mode shell', (
     tester,
   ) async {
@@ -124,7 +152,7 @@ void main() {
     },
   );
 
-  testWidgets('caregiver navigation and center action follow exported links', (
+  testWidgets('caregiver Journal and center Home preserve navigation state', (
     tester,
   ) async {
     final container = await _mount(
@@ -139,14 +167,33 @@ void main() {
     await tester.tap(find.text('People'));
     await tester.pumpAndSettle();
     expect(find.text('c3'), findsOneWidget);
-    await tester.tap(find.byIcon(Icons.add));
+    await tester.tap(find.text('Journal'));
     await tester.pumpAndSettle();
-    expect(find.text('c9'), findsOneWidget);
-    expect(find.byType(RemoriNavigationBar), findsNothing);
+    expect(find.text('c12'), findsOneWidget);
+    expect(
+      tester
+          .widget<RemoriNavigationBar>(find.byType(RemoriNavigationBar))
+          .selectedIndex,
+      0,
+    );
+    await tester.tap(find.text('Journal'));
+    await tester.pumpAndSettle();
     router.pop();
     await tester.pumpAndSettle();
     expect(find.text('c3'), findsOneWidget);
     expect(find.byType(RemoriNavigationBar), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.home_outlined));
+    await tester.pumpAndSettle();
+    expect(find.text('c1'), findsOneWidget);
+    expect(
+      tester
+          .widget<RemoriNavigationBar>(find.byType(RemoriNavigationBar))
+          .actionSelected,
+      isTrue,
+    );
+    expect(find.byIcon(Icons.add), findsNothing);
+    router.goNamed(RemoriScreen.c3.name);
+    await tester.pumpAndSettle();
     router.pushNamed(RemoriScreen.c5.name);
     await tester.pumpAndSettle();
     expect(find.byType(RemoriNavigationBar), findsNothing);
@@ -155,41 +202,39 @@ void main() {
     expect(find.text('c3'), findsOneWidget);
   });
 
-  testWidgets(
-    'patient auto-entry uses RTL and keeps Phase 2 Ask disabled on P1/P2',
-    (tester) async {
-      await _mount(
-        tester,
-        const RouteAccess(devicePaired: true, entryMode: RemoriMode.patient),
-      );
-      expect(find.text('p1'), findsOneWidget);
-      expect(
-        tester
-            .widget<RemoriNavigationBar>(find.byType(RemoriNavigationBar))
-            .onAction,
-        isNull,
-      );
-      final context = tester.element(find.text('p1'));
-      expect(Directionality.of(context), TextDirection.rtl);
-      expect(
-        Theme.of(context).textTheme.bodyMedium!.fontSize,
-        greaterThanOrEqualTo(22),
-      );
-      await tester.tap(find.text('التذكيرات'));
-      await tester.pumpAndSettle();
-      expect(find.text('p2'), findsOneWidget);
-      expect(
-        tester
-            .widget<RemoriNavigationBar>(find.byType(RemoriNavigationBar))
-            .onAction,
-        isNull,
-      );
-      await tester.tap(find.byIcon(Icons.mic_none));
-      await tester.pumpAndSettle();
-      expect(find.text('p2'), findsOneWidget);
-      expect(find.text('p6'), findsNothing);
-    },
-  );
+  testWidgets('patient auto-entry uses RTL and opens P6 from the microphone', (
+    tester,
+  ) async {
+    await _mount(
+      tester,
+      const RouteAccess(devicePaired: true, entryMode: RemoriMode.patient),
+    );
+    expect(find.text('p1'), findsOneWidget);
+    expect(
+      tester
+          .widget<RemoriNavigationBar>(find.byType(RemoriNavigationBar))
+          .onAction,
+      isNotNull,
+    );
+    final context = tester.element(find.text('p1'));
+    expect(Directionality.of(context), TextDirection.rtl);
+    expect(
+      Theme.of(context).textTheme.bodyMedium!.fontSize,
+      greaterThanOrEqualTo(22),
+    );
+    await tester.tap(find.text('التذكيرات'));
+    await tester.pumpAndSettle();
+    expect(find.text('p2'), findsOneWidget);
+    expect(
+      tester
+          .widget<RemoriNavigationBar>(find.byType(RemoriNavigationBar))
+          .onAction,
+      isNotNull,
+    );
+    await tester.tap(find.byIcon(Icons.mic_none));
+    await tester.pumpAndSettle();
+    expect(find.text('p6'), findsOneWidget);
+  });
 
   testWidgets(
     'credential revocation refreshes guards without rebuilding router',

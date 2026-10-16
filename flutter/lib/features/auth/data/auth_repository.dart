@@ -33,7 +33,10 @@ class AuthRepository {
         data['id'] is! String ||
         (data['id'] as String).isEmpty ||
         data['role'] != 'caregiver') {
-      throw ApiFailure(ApiFailureKind.invalidResponse);
+      throw ApiFailure(
+        ApiFailureKind.invalidResponse,
+        statusCode: response.statusCode,
+      );
     }
   }
 
@@ -54,7 +57,10 @@ class AuthRepository {
         data['token_type'] != 'bearer' ||
         data['expires_in'] is! int ||
         (data['expires_in'] as int) <= 0) {
-      throw ApiFailure(ApiFailureKind.invalidResponse);
+      throw ApiFailure(
+        ApiFailureKind.invalidResponse,
+        statusCode: response.statusCode,
+      );
     }
     try {
       await credentials.saveCaregiver(

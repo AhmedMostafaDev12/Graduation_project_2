@@ -19,9 +19,11 @@ class RemoriNavigationBar extends StatelessWidget {
     required this.actionIcon,
     required this.onAction,
     this.showAction = true,
+    this.actionSelected = false,
+    this.showActionLabel = false,
     this.mode = RemoriMode.caregiver,
   }) : assert(items.length == 4),
-       assert(selectedIndex >= 0 && selectedIndex < 4);
+       assert(selectedIndex >= -1 && selectedIndex < 4);
 
   final List<RemoriNavigationItem> items;
   final int selectedIndex;
@@ -30,6 +32,8 @@ class RemoriNavigationBar extends StatelessWidget {
   final Widget actionIcon;
   final VoidCallback? onAction;
   final bool showAction;
+  final bool actionSelected;
+  final bool showActionLabel;
   final RemoriMode mode;
 
   @override
@@ -89,36 +93,63 @@ class RemoriNavigationBar extends StatelessWidget {
                 child: Semantics(
                   button: true,
                   enabled: onAction != null,
+                  selected: actionSelected,
                   label: actionLabel,
                   child: Tooltip(
                     message: actionLabel,
-                    child: DecoratedBox(
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [RemoriTheme.actionShadow],
-                      ),
-                      child: Material(
-                        color: RemoriColors.surface,
-                        shape: const CircleBorder(),
-                        clipBehavior: Clip.antiAlias,
-                        child: InkWell(
-                          onTap: onAction,
-                          customBorder: const CircleBorder(),
-                          child: SizedBox(
-                            width: actionSize,
-                            height: actionSize,
-                            child: IconTheme(
-                              data: const IconThemeData(
-                                color: RemoriColors.purple,
-                                size: 28,
-                              ),
-                              child: Center(
-                                child: ExcludeSemantics(child: actionIcon),
+                    child: Column(
+                      children: [
+                        DecoratedBox(
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [RemoriTheme.actionShadow],
+                          ),
+                          child: Material(
+                            color: actionSelected
+                                ? RemoriColors.purple
+                                : RemoriColors.surface,
+                            shape: const CircleBorder(),
+                            clipBehavior: Clip.antiAlias,
+                            child: InkWell(
+                              onTap: onAction,
+                              customBorder: const CircleBorder(),
+                              child: SizedBox(
+                                width: actionSize,
+                                height: actionSize,
+                                child: IconTheme(
+                                  data: IconThemeData(
+                                    color: actionSelected
+                                        ? Colors.white
+                                        : RemoriColors.purple,
+                                    size: 28,
+                                  ),
+                                  child: Center(
+                                    child: ExcludeSemantics(child: actionIcon),
+                                  ),
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
+                        if (showActionLabel)
+                          ExcludeSemantics(
+                            child: InkWell(
+                              onTap: onAction,
+                              child: Text(
+                                actionLabel,
+                                style: TextStyle(
+                                  color: actionSelected
+                                      ? RemoriColors.purple
+                                      : RemoriColors.muted,
+                                  fontSize: 12,
+                                  fontWeight: actionSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.w400,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ),

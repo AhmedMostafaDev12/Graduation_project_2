@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/router/remori_routes.dart';
+import '../../../core/router/patient_preview_provider.dart';
 import '../../../core/theme/remori_theme.dart';
 import '../../../core/theme/remori_widgets.dart';
 import '../domain/home_data.dart';
@@ -221,152 +222,172 @@ class _C16DeviceScreenState extends ConsumerState<C16DeviceScreen>
       );
     }
 
-    return SafeArea(
-      bottom: false,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.fromLTRB(12, 12, 20, 12),
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: RemoriColors.border)),
-            ),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 32,
-                  height: 38,
-                  child: IconButton(
-                    tooltip: MaterialLocalizations.of(context)
-                        .backButtonTooltip,
-                    padding: EdgeInsets.zero,
-                    icon: const Icon(Icons.chevron_left, size: 26),
-                    onPressed: () => context.goNamed(RemoriScreen.c18.name),
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    s.deviceTitle,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: () async {
-                if (scope != null) {
-                  await ref
-                      .read(deviceControllerProvider(scope).notifier)
-                      .refresh();
-                }
-              },
-              child: LayoutBuilder(
-                builder: (context, constraints) => SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 12),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: (constraints.maxHeight - 26).clamp(
-                        0,
-                        double.infinity,
-                      ),
+    return PopScope(
+      canPop: context.canPop(),
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) context.goNamed(RemoriScreen.c18.name);
+      },
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.fromLTRB(12, 12, 20, 12),
+              decoration: const BoxDecoration(
+                border: Border(bottom: BorderSide(color: RemoriColors.border)),
+              ),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 32,
+                    height: 38,
+                    child: IconButton(
+                      tooltip: MaterialLocalizations.of(context)
+                          .backButtonTooltip,
+                      padding: EdgeInsets.zero,
+                      icon: const Icon(Icons.chevron_left, size: 26),
+                      onPressed: () => context.goNamed(RemoriScreen.c18.name),
                     ),
-                    child: IntrinsicHeight(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          if (scope == null || patient == null)
-                            Text(s.deviceUnavailable, style: _sub)
-                          else ...[
-                            if (state.failed) ...[
-                              Text(
-                                state.pending
-                                    ? s.deviceSavedLocallyPending
-                                    : state.uncertain
-                                    ? s.deviceUncertain
-                                    : s.deviceLoadFailed,
-                                style: _sub,
-                              ),
-                              TextButton(
-                                onPressed: state.busy
-                                    ? null
-                                    : () => ref
-                                          .read(
-                                            deviceControllerProvider(scope)
-                                                .notifier,
-                                          )
-                                          .refresh(),
-                                child: Text(s.homeRetry),
-                              ),
-                            ],
-                            if (state.busy) const LinearProgressIndicator(),
-                            for (final device in devices) ...[
-                              card(device),
-                              const SizedBox(height: 12),
-                            ],
-                            if (devices.isEmpty && !state.busy) ...[
-                              Text(s.deviceNone, style: _sub),
-                              const SizedBox(height: 12),
-                            ],
-                            _card(
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          s.deviceMemory,
-                                          style: _heading,
+                  ),
+                  Expanded(
+                    child: Text(
+                      s.deviceTitle,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  if (scope != null) {
+                    await ref
+                        .read(deviceControllerProvider(scope).notifier)
+                        .refresh();
+                  }
+                },
+                child: LayoutBuilder(
+                  builder: (context, constraints) => SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(20, 14, 20, 12),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: (constraints.maxHeight - 26).clamp(
+                          0,
+                          double.infinity,
+                        ),
+                      ),
+                      child: IntrinsicHeight(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (scope == null || patient == null)
+                              Text(s.deviceUnavailable, style: _sub)
+                            else ...[
+                              if (state.failed) ...[
+                                Text(
+                                  state.pending
+                                      ? s.deviceSavedLocallyPending
+                                      : state.uncertain
+                                      ? s.deviceUncertain
+                                      : s.deviceLoadFailed,
+                                  style: _sub,
+                                ),
+                                TextButton(
+                                  onPressed: state.busy
+                                      ? null
+                                      : () => ref
+                                            .read(
+                                              deviceControllerProvider(scope)
+                                                  .notifier,
+                                            )
+                                            .refresh(),
+                                  child: Text(s.homeRetry),
+                                ),
+                              ],
+                              if (state.busy) const LinearProgressIndicator(),
+                              for (final device in devices) ...[
+                                card(device),
+                                const SizedBox(height: 12),
+                              ],
+                              if (devices.isEmpty && !state.busy) ...[
+                                Text(s.deviceNone, style: _sub),
+                                const SizedBox(height: 12),
+                              ],
+                              _card(
+                                Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            s.deviceMemory,
+                                            style: _heading,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Switch(
-                                        value: patient.memoryEnabled,
-                                        onChanged: writable
-                                            ? (value) => ref
-                                                  .read(
-                                                    deviceControllerProvider(
-                                                      scope,
-                                                    ).notifier,
-                                                  )
-                                                  .change(memoryEnabled: value)
-                                            : null,
-                                      ),
-                                    ],
-                                  ),
-                                  Text(s.deviceMemoryHelp, style: _sub),
-                                ],
+                                        const SizedBox(width: 8),
+                                        Switch(
+                                          value: patient.memoryEnabled,
+                                          onChanged: writable
+                                              ? (value) => ref
+                                                    .read(
+                                                      deviceControllerProvider(
+                                                        scope,
+                                                      ).notifier,
+                                                    )
+                                                    .change(
+                                                      memoryEnabled: value,
+                                                    )
+                                              : null,
+                                        ),
+                                      ],
+                                    ),
+                                    Text(s.deviceMemoryHelp, style: _sub),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(s.deviceHeartbeatHelp, style: _sub),
-                            const Spacer(),
-                            const SizedBox(height: 20),
-                            if (patient.permission == 'manager') ...[
-                              RemoriButton(
-                                label: s.deviceRepair,
-                                outlined: true,
-                                onPressed: writable
-                                    ? () => context.pushNamed(
-                                        RemoriScreen.a5.name,
-                                        extra: scope.$2,
-                                      )
-                                    : null,
-                              ),
-                              if (devices.length == 1) unpair(devices.single),
+                              const SizedBox(height: 8),
+                              Text(s.deviceHeartbeatHelp, style: _sub),
+                              const Spacer(),
+                              const SizedBox(height: 20),
+                              if (patientPreviewEnabled)
+                                RemoriButton(
+                                  label: s.patientPreviewStart,
+                                  outlined: true,
+                                  onPressed: () {
+                                    ref
+                                        .read(patientPreviewProvider.notifier)
+                                        .start();
+                                    context.goNamed(RemoriScreen.p1.name);
+                                  },
+                                ),
+                              if (patient.permission == 'manager') ...[
+                                RemoriButton(
+                                  label: s.deviceRepair,
+                                  outlined: true,
+                                  onPressed: writable
+                                      ? () => context.pushNamed(
+                                          RemoriScreen.a5.name,
+                                          extra: scope.$2,
+                                        )
+                                      : null,
+                                ),
+                                if (devices.length == 1) unpair(devices.single),
+                              ],
                             ],
                           ],
-                        ],
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

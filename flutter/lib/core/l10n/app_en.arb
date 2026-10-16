@@ -1,4 +1,11 @@
 {
+  "askPhaseTwo": "Phase 2",
+  "askTapSpeak": "Tap and speak",
+  "askQuestionHint": "Or type your question here",
+  "askPending": "Recording questions and receiving answers will be available in Phase 2.",
+  "authConfigurationError": "The app’s connection settings are missing or invalid. Please contact support.",
+  "patientPreviewStart": "Preview Patient Mode (no glasses)",
+  "patientPreviewExit": "Screen preview · Exit preview",
   "gameObjectCup": "Cup",
   "gameObjectKey": "Key",
   "gameObjectBook": "Book",

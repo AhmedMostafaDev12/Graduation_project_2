@@ -493,7 +493,7 @@ void main() {
     await unmount(tester, container);
   });
   testWidgets(
-    'P2 tab and P1 Today share the local result; Phase 2 Ask stays disabled',
+    'P2 tab and P1 Today share the local result and allow opening P6',
     (tester) async {
       final container = await mount(tester, shell: true);
       expect(find.byType(P2RemindersScreen), findsOneWidget);
@@ -501,7 +501,7 @@ void main() {
         tester
             .widget<RemoriNavigationBar>(find.byType(RemoriNavigationBar))
             .onAction,
-        isNull,
+        isNotNull,
       );
       final controller = container.read(
         patientTodayControllerProvider(p1.key).notifier,

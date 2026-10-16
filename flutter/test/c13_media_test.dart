@@ -713,7 +713,7 @@ void main() {
     expect(find.text('Encounter with Ahmed (son)'), findsOneWidget);
     await tester.tap(find.byTooltip('Back'));
     await tester.pumpAndSettle();
-    expect(find.text('Journal'), findsOneWidget);
+    expect(find.text('Journal'), findsNWidgets(2));
   });
   testWidgets(
     'uncertain write stays locked after failed refresh until a successful refresh',

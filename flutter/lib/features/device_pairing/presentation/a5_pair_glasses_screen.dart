@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/api/api_failure.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/router/remori_routes.dart';
+import '../../../core/router/patient_preview_provider.dart';
 import '../../../core/theme/remori_theme.dart';
 import '../../../core/theme/remori_widgets.dart';
 import '../data/pairing_repository.dart';
@@ -70,207 +71,225 @@ class _A5PairGlassesScreenState extends ConsumerState<A5PairGlassesScreen> {
               failure?.kind == ApiFailureKind.timeout
         ? s.loginConnectionError
         : s.pairRetry;
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18, 16, 18, 12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Semantics(
-                    button: true,
-                    child: InkWell(
-                      onTap: state.busy
-                          ? null
-                          : () {
-                              if (context.canPop()) {
-                                context.pop();
-                              } else {
-                                context.goNamed(RemoriScreen.a4.name);
-                              }
-                            },
-                      child: Row(
-                        children: [
-                          Transform.flip(
-                            flipX:
-                                Directionality.of(context) == TextDirection.rtl,
-                            child: const Icon(Icons.chevron_left, size: 22),
-                          ),
-                          const SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              s.pairGlasses,
-                              style: theme.textTheme.titleLarge,
+    return PopScope(
+      canPop: context.canPop(),
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) context.goNamed(RemoriScreen.a4.name);
+      },
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 16, 18, 12),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Semantics(
+                      button: true,
+                      child: InkWell(
+                        onTap: state.busy
+                            ? null
+                            : () {
+                                if (context.canPop()) {
+                                  context.pop();
+                                } else {
+                                  context.goNamed(RemoriScreen.a4.name);
+                                }
+                              },
+                        child: Row(
+                          children: [
+                            Transform.flip(
+                              flipX:
+                                  Directionality.of(context) ==
+                                  TextDirection.rtl,
+                              child: const Icon(Icons.chevron_left, size: 22),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  s.pairStepTwo,
-                  style: theme.textTheme.bodySmall!.copyWith(
-                    color: RemoriColors.purple,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          LinearProgressIndicator(
-            value: 2 / 3,
-            minHeight: 3,
-            color: RemoriColors.purple,
-            backgroundColor: RemoriColors.purple.withValues(alpha: .18),
-            semanticsLabel: s.pairStepTwo,
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(22, 14, 22, 28),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: 10,
-              children: [
-                if (_scanning)
-                  SizedBox(
-                    height: 188,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: KeyedSubtree(
-                        key: ValueKey(_attempt),
-                        child: ref.watch(qrScannerBuilderProvider)(
-                          context,
-                          _detected,
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                s.pairGlasses,
+                                style: theme.textTheme.titleLarge,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  )
-                else
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(minHeight: 188),
-                    child: RemoriCard(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset(
-                            'assets/images/pair-qr.svg',
-                            width: 40,
-                            height: 40,
-                            excludeFromSemantics: true,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            s.pairScanTitle,
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.bodyMedium!.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            s.pairScanPosition,
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.bodySmall,
-                          ),
-                        ],
-                      ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    s.pairStepTwo,
+                    style: theme.textTheme.bodySmall!.copyWith(
+                      color: RemoriColors.purple,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                Text(
-                  s.pairCameraHint,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodySmall!.copyWith(fontSize: 12),
-                ),
-                RemoriButton(
-                  label: state.busy
-                      ? s.pairLinking
-                      : failure?.kind == ApiFailureKind.credentials
-                      ? s.pairRetrySave
-                      : s.pairScanButton,
-                  onPressed: !_hasPatient || state.busy || linked
-                      ? null
-                      : _scan,
-                ),
-                Text(
-                  s.pairContinueHint,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodySmall!.copyWith(fontSize: 12),
-                ),
-                _step(1, s.pairScanStep, s.pairScanStepDetail),
-                _step(2, s.pairConnectStep, s.pairBluetoothPending),
-                _step(3, s.pairConfirmStep, s.pairConfirmDetail),
-                RemoriCard(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SvgPicture.asset(
-                        'assets/images/pair-info.svg',
-                        width: 20,
-                        height: 20,
-                        excludeFromSemantics: true,
+                ],
+              ),
+            ),
+            LinearProgressIndicator(
+              value: 2 / 3,
+              minHeight: 3,
+              color: RemoriColors.purple,
+              backgroundColor: RemoriColors.purple.withValues(alpha: .18),
+              semanticsLabel: s.pairStepTwo,
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(22, 14, 22, 28),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: 10,
+                children: [
+                  if (_scanning)
+                    SizedBox(
+                      height: 188,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: KeyedSubtree(
+                          key: ValueKey(_attempt),
+                          child: ref.watch(qrScannerBuilderProvider)(
+                            context,
+                            _detected,
+                          ),
+                        ),
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
+                    )
+                  else
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(minHeight: 188),
+                      child: RemoriCard(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
+                            SvgPicture.asset(
+                              'assets/images/pair-qr.svg',
+                              width: 40,
+                              height: 40,
+                              excludeFromSemantics: true,
+                            ),
+                            const SizedBox(height: 8),
                             Text(
-                              s.pairDeviceStatus,
+                              s.pairScanTitle,
+                              textAlign: TextAlign.center,
                               style: theme.textTheme.bodyMedium!.copyWith(
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            Semantics(
-                              liveRegion: true,
-                              child: Text(
-                                !_hasPatient
-                                    ? s.pairNeedsPatient
-                                    : linked
-                                    ? s.pairLinkedPending
-                                    : state.busy
-                                    ? s.pairLinking
-                                    : s.pairStatusInitial,
-                                style: theme.textTheme.bodySmall,
-                              ),
+                            const SizedBox(height: 8),
+                            Text(
+                              s.pairScanPosition,
+                              textAlign: TextAlign.center,
+                              style: theme.textTheme.bodySmall,
                             ),
-                            if (linked)
-                              Text(
-                                s.pairSerial(state.info!.serial),
-                                style: theme.textTheme.bodySmall,
-                              ),
                           ],
                         ),
                       ),
-                    ],
+                    ),
+                  Text(
+                    s.pairCameraHint,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodySmall!.copyWith(fontSize: 12),
                   ),
-                ),
-                if (failure != null)
-                  Semantics(
-                    liveRegion: true,
-                    child: Text(
-                      error,
-                      style: TextStyle(color: theme.colorScheme.error),
+                  RemoriButton(
+                    label: state.busy
+                        ? s.pairLinking
+                        : failure?.kind == ApiFailureKind.credentials
+                        ? s.pairRetrySave
+                        : s.pairScanButton,
+                    onPressed: !_hasPatient || state.busy || linked
+                        ? null
+                        : _scan,
+                  ),
+                  Text(
+                    s.pairContinueHint,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodySmall!.copyWith(fontSize: 12),
+                  ),
+                  _step(1, s.pairScanStep, s.pairScanStepDetail),
+                  _step(2, s.pairConnectStep, s.pairBluetoothPending),
+                  _step(3, s.pairConfirmStep, s.pairConfirmDetail),
+                  RemoriCard(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/images/pair-info.svg',
+                          width: 20,
+                          height: 20,
+                          excludeFromSemantics: true,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                s.pairDeviceStatus,
+                                style: theme.textTheme.bodyMedium!.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              Semantics(
+                                liveRegion: true,
+                                child: Text(
+                                  !_hasPatient
+                                      ? s.pairNeedsPatient
+                                      : linked
+                                      ? s.pairLinkedPending
+                                      : state.busy
+                                      ? s.pairLinking
+                                      : s.pairStatusInitial,
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                              ),
+                              if (linked)
+                                Text(
+                                  s.pairSerial(state.info!.serial),
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(40, 4, 40, 0),
-                  child: RemoriButton(
-                    label: s.continueLabel,
-                    onPressed: linked
-                        ? () => context.pushNamed(
-                            RemoriScreen.a6.name,
-                            extra: widget.patientId,
-                          )
-                        : null,
+                  if (failure != null)
+                    Semantics(
+                      liveRegion: true,
+                      child: Text(
+                        error,
+                        style: TextStyle(color: theme.colorScheme.error),
+                      ),
+                    ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(40, 4, 40, 0),
+                    child: RemoriButton(
+                      label: s.continueLabel,
+                      onPressed: linked
+                          ? () => context.pushNamed(
+                              RemoriScreen.a6.name,
+                              extra: widget.patientId,
+                            )
+                          : null,
+                    ),
                   ),
-                ),
-              ],
+                  if (patientPreviewEnabled)
+                    RemoriButton(
+                      label: s.patientPreviewStart,
+                      outlined: true,
+                      onPressed: state.busy
+                          ? null
+                          : () {
+                              ref.read(patientPreviewProvider.notifier).start();
+                              context.goNamed(RemoriScreen.p1.name);
+                            },
+                    ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
