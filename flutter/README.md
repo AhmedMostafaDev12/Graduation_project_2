@@ -1503,3 +1503,41 @@ Run the native checks on a clean, disposable API 33+ emulator after building
 `:app:assembleDebugAndroidTest` and installing both APKs:
 `adb shell am instrument -w -r org.AI.remori.test/org.AI.remori.RelayServiceInstrumentation`.
 Physical-device and iOS validation remain pending.
+
+## D2 Android Reminder Notification
+
+The approved D2 stage delivers the next actual pending/snoozed occurrence from
+the current patient's device-scoped local cache. A native in-memory timer runs
+only while D1 is alive, with a high-importance reminder channel, actual title,
+patient-timezone time and Arabic/English Taken/Later actions. Android controls
+the notification layout and whether heads-up presentation is allowed. Reminder
+details are private on the lock screen. No new packages, tables or permissions
+are added.
+
+Tapping opens P3. Taken/Later opens the app, validates a random in-memory receipt,
+the active patient/device, occurrence ID and effective due time, then reuses
+P3's local persistence/outbox path. P2 opens only after a successful local save;
+failed saves open P3 for retry. Stale or forged intents cannot perform actions.
+The receipt changes on snoozing, switching devices/patients or losing the session.
+Native timers and reminders clear when the relay stops. No credentials, patient
+names or patient/device IDs cross the notification channel.
+
+This is next-occurrence delivery from today's actual cached logs, not recurrence
+expansion or a continuous reminder refresh worker. It does not use exact alarms,
+wake locks, boot receivers or a headless engine. Delivery may be delayed while
+Android sleeps, and process/task termination cancels it. Actions require opening
+the app. Full background scheduling and simultaneous glasses speech remain
+separate work. D1's notification still accurately states that background sync
+is pending.
+
+See [Android notification navigation](https://developer.android.com/develop/ui/views/notifications/navigation)
+and [notification actions](https://developer.android.com/develop/ui/compose/notifications/create-notification).
+Run `flutter test test/d2_reminder_notification_test.dart` for scoped delivery,
+receipt rejection and save-before-navigation checks. The existing SDK-only D1
+instrumentation runner also checks delayed D2 delivery, action labels, immutable
+intents, private visibility and cancellation on service stop.
+
+Validation: formatting and analysis clean; all 888 Flutter tests passed,
+including nine focused D2 tests. Android x64 debug APK built. D1/D2 native
+instrumentation passed on an isolated read-only API 37 emulator. Physical-device
+delivery under power saving and iOS validation remain pending.

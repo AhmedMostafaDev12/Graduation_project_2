@@ -22,6 +22,7 @@ class RemoriRelayService : Service() {
         private const val NOTICE_ID = 101
         private var instance: RemoriRelayService? = null
         private var desired = false
+        fun running(): Boolean = desired && instance != null
 
         fun permitted(context: Context): Boolean {
             if (Build.VERSION.SDK_INT >= 31 &&
@@ -50,6 +51,7 @@ class RemoriRelayService : Service() {
 
         fun stop(context: Context) {
             desired = false
+            ReminderNotifications.clear(context)
             context.stopService(Intent(context, RemoriRelayService::class.java))
             context.getSystemService(NotificationManager::class.java).cancel(NOTICE_ID)
         }
@@ -113,6 +115,7 @@ class RemoriRelayService : Service() {
     override fun onTaskRemoved(rootIntent: Intent?) { desired = false; stopSelf() }
 
     override fun onDestroy() {
+        ReminderNotifications.clear(this)
         stopForeground(STOP_FOREGROUND_REMOVE)
         if (instance === this) instance = null
         super.onDestroy()

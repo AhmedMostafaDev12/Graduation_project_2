@@ -1,0 +1,5 @@
+<resources>
+    <string name="reminder_channel">Reminders</string>
+    <string name="reminder_taken">Taken</string>
+    <string name="reminder_later">Later</string>
+</resources>

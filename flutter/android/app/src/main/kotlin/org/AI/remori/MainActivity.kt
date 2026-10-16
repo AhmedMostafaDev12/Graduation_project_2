@@ -12,6 +12,7 @@ import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
     private var relayChannel: MethodChannel? = null
+    private var reminderChannel: MethodChannel? = null
     private var resumed = false
 
     override fun onResume() { super.onResume(); resumed = true }
@@ -20,6 +21,7 @@ class MainActivity : FlutterActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        if (intent.hasExtra(ReminderNotifications.TOKEN)) reminderChannel?.invokeMethod("open", null)
         if (intent.getBooleanExtra(RemoriRelayService.OPEN_PATIENT, false)) {
             relayChannel?.invokeMethod("openPatient", null)
         }
@@ -28,12 +30,28 @@ class MainActivity : FlutterActivity() {
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
         relayChannel?.setMethodCallHandler(null)
         relayChannel = null
+        reminderChannel?.setMethodCallHandler(null)
+        reminderChannel = null
         RemoriRelayService.stop(this)
         super.cleanUpFlutterEngine(flutterEngine)
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        reminderChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "remori/reminders")
+        reminderChannel!!.setMethodCallHandler { call, result ->
+            when (call.method) {
+                "update" -> { ReminderNotifications.update(applicationContext, call.arguments as? Map<*, *>); result.success(RemoriRelayService.running()) }
+                "take" -> {
+                    val token = intent?.getStringExtra(ReminderNotifications.TOKEN)
+                    val action = intent?.getStringExtra(ReminderNotifications.ACTION)
+                    intent?.removeExtra(ReminderNotifications.TOKEN)
+                    intent?.removeExtra(ReminderNotifications.ACTION)
+                    result.success(if (token == null) null else mapOf("token" to token, "action" to action))
+                }
+                else -> result.notImplemented()
+            }
+        }
         relayChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "remori/relay")
         relayChannel!!.setMethodCallHandler { call, result ->
             when (call.method) {
