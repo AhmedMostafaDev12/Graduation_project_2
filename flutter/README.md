@@ -468,6 +468,18 @@ non-release build; the BLE placeholder leaves the existing pending text and
 disabled handover button. iOS remains caregiver-only. A6 sends time_sync after
 hello in UTC; profile timezone synchronization belongs to the full relay.
 
+Integration review correction: a connected transport alone cannot enable
+handover. A6 requires Hello to match A5's paired serial and the existing
+time-sync send to complete successfully. Stream errors, disconnects, pairing
+changes and disposal revoke readiness; late send results cannot restore it.
+This adds no protocol message or remote acknowledgement requirement. Seven
+regression tests cover missing/wrong identity, pending/failed sends, disconnects
+and pairing changes, alongside the existing successful handover/session tests.
+
+Integration-fix validation: formatting and analysis clean; all 926 Flutter tests
+passed. Configured Android x64 debug APK built. Hardware BLE and physical-device
+validation remain pending.
+
 Handover verifies A5's saved device token using GET /patients/{id}/devices and
 matches patient ID, device ID and serial. It records secure local session context,
 clears caregiver credentials and opens the existing P1 Patient shell. Patient

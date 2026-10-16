@@ -85,6 +85,10 @@ class ControlledGlasses implements GlassesConnection {
   final incoming = StreamController<IncomingGlassesMessage>.broadcast();
   final sent = <OutgoingGlassesMessage>[];
   bool connectWorks = true;
+  bool emitHello = true;
+  String? reportedSerial;
+  Completer<void>? clockPending;
+  bool clockFails = false;
   String? connectedSerial;
   @override
   GlassesConnectionState state = GlassesConnectionState.disconnected;
@@ -106,10 +110,10 @@ class ControlledGlasses implements GlassesConnection {
           ? GlassesConnectionState.connected
           : GlassesConnectionState.disconnected,
     );
-    if (connectWorks) {
+    if (connectWorks && emitHello) {
       incoming.add(
         Hello(
-          deviceSerial: value,
+          deviceSerial: reportedSerial ?? value,
           firmwareVersion: '0.3.1',
           protocolVersion: 1,
           queue: const GlassesQueue(events: 0, audioSegments: 0, media: 0),
@@ -122,7 +126,14 @@ class ControlledGlasses implements GlassesConnection {
   Future<void> disconnect() async =>
       change(GlassesConnectionState.disconnected);
   @override
-  Future<void> send(OutgoingGlassesMessage message) async => sent.add(message);
+  Future<void> send(OutgoingGlassesMessage message) async {
+    sent.add(message);
+    if (message is TimeSync) {
+      if (clockFails) throw StateError('Synthetic clock failure');
+      await clockPending?.future;
+    }
+  }
+
   @override
   void dispose() {
     unawaited(stateEvents.close());
@@ -459,6 +470,153 @@ void main() {
       await glasses.disconnect();
       await tester.pumpAndSettle();
       expect(route(container), '/p1');
+    },
+  );
+
+  for (final identity in ['missing', 'wrong']) {
+    testWidgets('A6 rejects $identity glasses identity before handover', (
+      tester,
+    ) async {
+      final glasses = ControlledGlasses()
+        ..emitHello = identity != 'missing'
+        ..reportedSerial = 'OTHER';
+      final adapter = TestAdapter();
+      final container = await mount(
+        tester,
+        glasses,
+        TestCredentials(),
+        TestSessionStore(),
+        adapter,
+      );
+      expect(handover(tester).onPressed, isNull);
+      expect(container.read(patientSessionProvider).active, false);
+      expect(adapter.deviceRequests, 0);
+      expect(glasses.sent.whereType<TimeSync>(), isEmpty);
+    });
+  }
+  testWidgets('A6 waits for clock sync and ignores success after disconnect', (
+    tester,
+  ) async {
+    final glasses = ControlledGlasses()..clockPending = Completer<void>();
+    await mount(
+      tester,
+      glasses,
+      TestCredentials(),
+      TestSessionStore(),
+      TestAdapter(),
+    );
+    expect(handover(tester).onPressed, isNull);
+    glasses.change(GlassesConnectionState.disconnected);
+    glasses.clockPending!.complete();
+    await tester.pumpAndSettle();
+    expect(handover(tester).onPressed, isNull);
+  });
+
+  testWidgets('A6 enables handover only after matching clock sync completes', (
+    tester,
+  ) async {
+    final glasses = ControlledGlasses()..clockPending = Completer<void>();
+    await mount(
+      tester,
+      glasses,
+      TestCredentials(),
+      TestSessionStore(),
+      TestAdapter(),
+    );
+    expect(handover(tester).onPressed, isNull);
+    glasses.clockPending!.complete();
+    await tester.pumpAndSettle();
+    expect(handover(tester).onPressed, isNotNull);
+  });
+  testWidgets(
+    'A6 clock-sync failure cannot be overwritten by transport success',
+    (tester) async {
+      final glasses = ControlledGlasses()..clockFails = true;
+      await mount(
+        tester,
+        glasses,
+        TestCredentials(),
+        TestSessionStore(),
+        TestAdapter(),
+      );
+      expect(handover(tester).onPressed, isNull);
+    },
+  );
+  testWidgets('A6 ignores the old connection after pairing changes', (
+    tester,
+  ) async {
+    final glasses = ControlledGlasses()..clockPending = Completer<void>();
+    final adapter = TestAdapter();
+    final container = await mount(
+      tester,
+      glasses,
+      TestCredentials(),
+      TestSessionStore(),
+      adapter,
+    );
+    container
+        .read(pairedGlassesProvider.notifier)
+        .paired(
+          const PairingInfo(
+            deviceId: 'new-device',
+            patientId: patient,
+            serial: 'OTHER',
+          ),
+        );
+    await tester.pumpAndSettle();
+    glasses.clockPending!.complete();
+    await tester.pumpAndSettle();
+    expect(handover(tester).onPressed, isNull);
+    expect(container.read(handoverConnectionProvider).context, isNull);
+    expect(adapter.deviceRequests, 0);
+  });
+
+  testWidgets(
+    'A6 can prepare a new pairing while the old clock send is pending',
+    (tester) async {
+      final oldClock = Completer<void>();
+      final glasses = ControlledGlasses()..clockPending = oldClock;
+      final container = await mount(
+        tester,
+        glasses,
+        TestCredentials(),
+        TestSessionStore(),
+        TestAdapter(),
+      );
+      container
+          .read(pairedGlassesProvider.notifier)
+          .paired(
+            const PairingInfo(
+              deviceId: 'new-device',
+              patientId: patient,
+              serial: 'OTHER',
+            ),
+          );
+      await tester.pumpAndSettle();
+      glasses.clockPending = null;
+      final pending = container
+          .read(handoverConnectionProvider.notifier)
+          .prepare(patient);
+      await tester.pumpAndSettle();
+      await pending;
+      expect(
+        container.read(handoverConnectionProvider).context?.deviceId,
+        'new-device',
+      );
+      expect(
+        container.read(handoverConnectionProvider).readyFor(patient),
+        true,
+      );
+      oldClock.complete();
+      await tester.pumpAndSettle();
+      expect(
+        container.read(handoverConnectionProvider).context?.deviceId,
+        'new-device',
+      );
+      expect(
+        container.read(handoverConnectionProvider).readyFor(patient),
+        true,
+      );
     },
   );
 
