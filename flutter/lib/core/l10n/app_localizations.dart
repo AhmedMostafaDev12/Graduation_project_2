@@ -2683,6 +2683,24 @@ abstract class AppLocalizations {
   /// **'Showing saved journal text. Photos require a successful refresh.'**
   String get journalOffline;
 
+  /// No description provided for @journalOfflineStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline'**
+  String get journalOfflineStatus;
+
+  /// No description provided for @journalNoSavedEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved journal entries for this day.'**
+  String get journalNoSavedEntries;
+
+  /// No description provided for @journalSavedExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing what\'s saved on this phone. New items appear when you\'re back online.'**
+  String get journalSavedExplanation;
+
   /// No description provided for @journalUnavailable.
   ///
   /// In en, this message translates to:

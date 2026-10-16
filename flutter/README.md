@@ -1541,3 +1541,30 @@ Validation: formatting and analysis clean; all 888 Flutter tests passed,
 including nine focused D2 tests. Android x64 debug APK built. D1/D2 native
 instrumentation passed on an isolated read-only API 37 emulator. Physical-device
 delivery under power saving and iOS validation remain pending.
+
+## D4 Offline Journal
+
+D4 is an offline variant of C12, using its existing caregiver/patient/day-scoped
+cache and navigation. A failed journal refresh with a network/timeout error shows
+the design's full-width amber Offline banner and localized saved-data explanation.
+This reflects the last refresh result, not continuous connectivity monitoring.
+Server, invalid-response and local failures retain the existing refresh-error
+message. Cached entries remain readable and photos stay as placeholders until a
+successful refresh. Retry and the existing resume/pull-to-refresh paths restore
+the normal display after success; the offline state survives an in-progress
+retry and resets when the scope changes.
+
+The lead approved omitting the design's illustrative pending-sync count: the
+existing outbox belongs to the patient relay and has no caregiver account scope.
+No queue count, new package, table, endpoint or route is added. An uncached day
+shows an explicit no-saved-entries message. D3 remains deferred pending Firebase
+configuration and the backend push-delivery contract.
+
+Ten additional tests cover timeout versus server/local failures, retry/scope
+transitions, an uncached day and Arabic/English layouts at 1x/2x text. Review
+captures are `test/goldens/d4_{en,ar}_{1.0,2.0}x.png`; regenerate with
+`flutter test test/c12_journal_test.dart --update-goldens`.
+
+Validation: formatting and analysis clean; all 898 Flutter tests passed. Android
+x64 debug APK built. No native service behavior changes in D4; physical-device
+and iOS validation remain pending.

@@ -1480,6 +1480,16 @@ class AppLocalizationsAr extends AppLocalizations {
       'نعرض النص المحفوظ من اليوميات. تتطلب الصور تحديثًا ناجحًا.';
 
   @override
+  String get journalOfflineStatus => 'غير متصل';
+
+  @override
+  String get journalNoSavedEntries => 'لا توجد يوميات محفوظة لهذا اليوم.';
+
+  @override
+  String get journalSavedExplanation =>
+      'نعرض المحفوظ على هذا الهاتف. تظهر العناصر الجديدة عند عودة الاتصال بالإنترنت.';
+
+  @override
   String get journalUnavailable => 'اختر مريضًا لعرض يومياته.';
 
   @override

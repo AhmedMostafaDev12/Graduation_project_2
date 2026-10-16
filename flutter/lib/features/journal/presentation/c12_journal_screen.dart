@@ -156,6 +156,47 @@ class _C12JournalScreenState extends ConsumerState<C12JournalScreen>
               },
             ),
           ),
+          if (key != null && state.offline)
+            Semantics(
+              liveRegion: true,
+              child: Container(
+                key: const Key('d4-offline-banner'),
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
+                decoration: const BoxDecoration(
+                  color: RemoriColors.warning,
+                  border: Border(
+                    bottom: BorderSide(color: RemoriColors.warning),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: RemoriColors.warningInk,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        s.journalOfflineStatus,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: RemoriColors.warningInk,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           Expanded(
             child: RefreshIndicator(
               onRefresh: () =>
@@ -164,6 +205,10 @@ class _C12JournalScreenState extends ConsumerState<C12JournalScreen>
                 padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
+                  if (key != null && state.offline) ...[
+                    Text(s.journalSavedExplanation, style: _small),
+                    const SizedBox(height: 8),
+                  ],
                   Wrap(
                     spacing: 6,
                     runSpacing: 6,
@@ -207,12 +252,13 @@ class _C12JournalScreenState extends ConsumerState<C12JournalScreen>
                   ),
                   const SizedBox(height: 7),
                   if (state.failed || snapshot.hasError) ...[
-                    Text(
-                      data.entries.isEmpty
-                          ? s.journalLoadFailed
-                          : s.journalOffline,
-                      style: _small,
-                    ),
+                    if (!state.offline)
+                      Text(
+                        data.entries.isEmpty
+                            ? s.journalLoadFailed
+                            : s.journalOffline,
+                        style: _small,
+                      ),
                     TextButton(
                       onPressed: state.busy
                           ? null
@@ -229,7 +275,12 @@ class _C12JournalScreenState extends ConsumerState<C12JournalScreen>
                   else if (key == null)
                     Text(s.journalUnavailable, style: _small)
                   else if (entries.isEmpty)
-                    Text(s.journalEmpty, style: _small),
+                    Text(
+                      state.offline && data.entries.isEmpty
+                          ? s.journalNoSavedEntries
+                          : s.journalEmpty,
+                      style: _small,
+                    ),
                   if (key != null)
                     for (final e in entries)
                       Padding(

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/api/api_providers.dart';
+import '../../../core/api/api_failure.dart';
 import '../../../core/db/database_providers.dart';
 import '../../caregiver_dashboard/presentation/home_providers.dart';
 import '../../reminders/domain/reminder_data.dart';
@@ -143,10 +144,11 @@ class JournalRefreshState {
   const JournalRefreshState({
     this.busy = false,
     this.failed = false,
+    this.offline = false,
     this.previews = false,
     this.revision = 0,
   });
-  final bool busy, failed, previews;
+  final bool busy, failed, offline, previews;
   final int revision;
 }
 
@@ -182,7 +184,11 @@ class JournalRefresh extends Notifier<JournalRefreshState> {
     final key = ref.read(journalKeyProvider);
     if (key != null) ref.read(journalPreviewsProvider(key)).clear();
     ++_epoch;
-    state = JournalRefreshState(failed: state.failed, revision: ++_revision);
+    state = JournalRefreshState(
+      failed: state.failed,
+      offline: state.offline,
+      revision: ++_revision,
+    );
   }
 
   void expire(DateTime now) {
@@ -196,7 +202,11 @@ class JournalRefresh extends Notifier<JournalRefreshState> {
     hidePreviews();
     final epoch = _epoch;
     var key = ref.read(journalKeyProvider);
-    state = JournalRefreshState(busy: true, revision: _revision);
+    state = JournalRefreshState(
+      busy: true,
+      offline: state.offline,
+      revision: _revision,
+    );
     try {
       if (ref.read(caregiverIdentityProvider).hasError) {
         ref.invalidate(caregiverIdentityProvider);
@@ -218,9 +228,18 @@ class JournalRefresh extends Notifier<JournalRefreshState> {
           key == ref.read(journalKeyProvider)) {
         state = JournalRefreshState(previews: true, revision: _revision);
       }
-    } catch (_) {
+    } catch (error) {
       if (ref.mounted && epoch == _epoch) {
-        state = JournalRefreshState(failed: true, revision: _revision);
+        state = JournalRefreshState(
+          failed: true,
+          offline:
+              error is ApiFailure &&
+              {
+                ApiFailureKind.network,
+                ApiFailureKind.timeout,
+              }.contains(error.kind),
+          revision: _revision,
+        );
       }
     }
   }

@@ -206,6 +206,7 @@ class FakeRepository extends JournalRepository {
   FakeRepository(super.client, super.db, super.key);
   JournalData data = fixture();
   bool fail = false;
+  Object? failure;
   int refreshes = 0;
   Completer<void>? gate;
   final updates = StreamController<void>.broadcast();
@@ -213,7 +214,7 @@ class FakeRepository extends JournalRepository {
   Future<void> refresh() async {
     refreshes++;
     if (gate != null) await gate!.future;
-    if (fail) throw ApiFailure(ApiFailureKind.network);
+    if (fail) throw failure ?? ApiFailure(ApiFailureKind.network);
     updates.add(null);
   }
 
@@ -867,7 +868,12 @@ void main() {
       final fake = FakeRepository(client, db, key)..fail = true;
       final previews = FakePreviews(bytes);
       await mount(tester, fake, previews: previews);
-      expect(find.textContaining('Showing saved journal text'), findsOneWidget);
+      expect(find.text('Offline'), findsOneWidget);
+      expect(
+        find.textContaining("Showing what's saved on this phone"),
+        findsOneWidget,
+      );
+      expect(find.textContaining('Mona (Sister)'), findsOneWidget);
       expect(find.byType(Image), findsNothing);
       expect(previews.loads, 0);
       fake.fail = false;
@@ -875,6 +881,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(previews.loads, 1);
       expect(fake.refreshes, 2);
+      expect(find.byKey(const Key('d4-offline-banner')), findsNothing);
     },
   );
   testWidgets('day navigation resets previews and uses calendar dates', (
@@ -896,6 +903,114 @@ void main() {
     await tester.pumpAndSettle();
     expect(container.read(journalDayProvider), key.$2);
   });
+  for (final failure in [
+    ApiFailure(ApiFailureKind.timeout),
+    ApiFailure(ApiFailureKind.server, statusCode: 503),
+    ApiFailure(ApiFailureKind.invalidResponse),
+    StateError('Synthetic local failure'),
+  ]) {
+    testWidgets(
+      'D4 distinguishes ${failure.runtimeType} ${failure is ApiFailure ? failure.kind : "local"} from offline',
+      (tester) async {
+        final fake = FakeRepository(client, db, key)
+          ..fail = true
+          ..failure = failure;
+        final container = await mount(tester, fake);
+        final offline =
+            failure is ApiFailure && failure.kind == ApiFailureKind.timeout;
+        expect(container.read(journalRefreshProvider).offline, offline);
+        expect(
+          find.byKey(const Key('d4-offline-banner')),
+          offline ? findsOneWidget : findsNothing,
+        );
+        expect(find.textContaining('Mona (Sister)'), findsOneWidget);
+        expect(find.byType(Image), findsNothing);
+        if (!offline) {
+          expect(
+            find.textContaining('Showing saved journal text'),
+            findsOneWidget,
+          );
+        }
+      },
+    );
+  }
+  testWidgets(
+    'D4 keeps offline status through retry and resets it on scope loss',
+    (tester) async {
+      JournalScope? selected = scope;
+      final fake = FakeRepository(client, db, key)..fail = true;
+      final container = await mount(tester, fake, selected: () => selected);
+      fake.fail = false;
+      fake.gate = Completer<void>();
+      final refresh = container.read(journalRefreshProvider.notifier).refresh();
+      await tester.pump();
+      expect(container.read(journalRefreshProvider).busy, true);
+      expect(find.byKey(const Key('d4-offline-banner')), findsOneWidget);
+      selected = null;
+      container.invalidate(journalScopeProvider);
+      await tester.pump();
+      fake.gate!.complete();
+      await refresh;
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('d4-offline-banner')), findsNothing);
+      expect(find.textContaining('Mona (Sister)'), findsNothing);
+      expect(container.read(journalRefreshProvider).offline, false);
+    },
+  );
+  testWidgets(
+    'D4 with no cached day does not invent journal entries or a queue count',
+    (tester) async {
+      await mount(
+        tester,
+        FakeRepository(client, db, key)
+          ..fail = true
+          ..data = const JournalData(),
+      );
+      expect(
+        find.text('No saved journal entries for this day.'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('Mona'), findsNothing);
+      expect(find.textContaining('waiting to sync'), findsNothing);
+    },
+  );
+  for (final language in ['en', 'ar']) {
+    for (final scale in [1.0, 2.0]) {
+      testWidgets('D4 $language at ${scale}x keeps saved data readable', (
+        tester,
+      ) async {
+        await mount(
+          tester,
+          FakeRepository(client, db, key)..fail = true,
+          language: language,
+          scale: scale,
+          size: scale == 1 ? const Size(390, 844) : const Size(320, 844),
+        );
+        final banner = find.byKey(const Key('d4-offline-banner'));
+        expect(banner, findsOneWidget);
+        expect(
+          tester.widget<Container>(banner).decoration,
+          isA<BoxDecoration>().having(
+            (d) => d.color,
+            'amber background',
+            const Color(0xFFFBE7B5),
+          ),
+        );
+        expect(
+          find.text(language == 'en' ? 'Offline' : 'غير متصل'),
+          findsOneWidget,
+        );
+        expect(find.byType(Image), findsNothing);
+        expect(tester.takeException(), isNull);
+        if (autoUpdateGoldenFiles) {
+          await expectLater(
+            find.byKey(const Key('c12-preview')),
+            matchesGoldenFile('goldens/d4_${language}_${scale}x.png'),
+          );
+        }
+      });
+    }
+  }
   testWidgets('patient switch hides old journal and ignores late refresh', (
     tester,
   ) async {
