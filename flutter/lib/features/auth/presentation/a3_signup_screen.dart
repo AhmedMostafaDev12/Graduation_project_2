@@ -72,6 +72,8 @@ class _A3SignupScreenState extends ConsumerState<A3SignupScreen> {
         : failure?.kind == ApiFailureKind.network ||
               failure?.kind == ApiFailureKind.timeout
         ? s.loginConnectionError
+        : failure?.code == 'APP_CONFIGURATION'
+        ? s.authConfigurationError
         : s.signupRetry;
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(28, 28, 28, 28),
@@ -123,6 +125,16 @@ class _A3SignupScreenState extends ConsumerState<A3SignupScreen> {
               type: TextInputType.visiblePassword,
               asset: 'assets/images/login-password.svg',
               password: true,
+            ),
+            Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: TextButton(
+                onPressed: null,
+                style: TextButton.styleFrom(
+                  disabledForegroundColor: RemoriColors.purple,
+                ),
+                child: Text(s.forgotPassword),
+              ),
             ),
             if (failure != null)
               Semantics(

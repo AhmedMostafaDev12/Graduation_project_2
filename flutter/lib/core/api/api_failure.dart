@@ -65,7 +65,9 @@ class ApiFailure implements Exception {
       DioExceptionType.sendTimeout ||
       DioExceptionType.receiveTimeout => ApiFailureKind.timeout,
       DioExceptionType.badResponse => ApiFailureKind.invalidResponse,
-      _ => ApiFailureKind.network,
+      DioExceptionType.connectionError ||
+      DioExceptionType.badCertificate => ApiFailureKind.network,
+      _ => ApiFailureKind.invalidResponse,
     }, statusCode: status);
   }
 

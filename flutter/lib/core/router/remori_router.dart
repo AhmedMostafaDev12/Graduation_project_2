@@ -9,6 +9,7 @@ import '../../features/caregiver_dashboard/presentation/c16_device_screen.dart';
 import '../../features/caregiver_dashboard/presentation/c18_more_screen.dart';
 import '../../features/caregiver_dashboard/presentation/c19_caregivers_screen.dart';
 import '../../features/patient_today/presentation/p1_today_screen.dart';
+import '../../features/patient_today/presentation/p6_ask_screen.dart';
 import '../../features/patient_today/presentation/p2_reminders_screen.dart';
 import '../../features/patient_today/presentation/p3_reminder_alert_screen.dart';
 import '../../features/patient_journal/presentation/p4_my_day_screen.dart';
@@ -45,11 +46,11 @@ import '../../features/device_pairing/presentation/a6_permissions_screen.dart';
 import '../api/api_providers.dart';
 import '../api/patient_session_provider.dart';
 import '../l10n/app_localizations.dart';
-import '../l10n/locale_providers.dart';
 import '../theme/remori_background.dart';
 import '../theme/remori_navigation_bar.dart';
 import '../theme/remori_theme.dart';
 import 'remori_routes.dart';
+import 'patient_preview_provider.dart';
 
 /// Authentication will supply these facts after secure credential restoration.
 /// This holds no tokens and grants no API authorization.
@@ -83,6 +84,7 @@ typedef RemoriScreenBuilder = Widget Function(BuildContext, GoRouterState);
 final screenBuildersProvider = Provider<Map<RemoriScreen, RemoriScreenBuilder>>(
   (ref) => {
     RemoriScreen.p1: (_, _) => const P1TodayScreen(),
+    RemoriScreen.p6: (_, _) => const P6AskScreen(),
     RemoriScreen.p2: (_, _) => const P2RemindersScreen(),
     RemoriScreen.p4: (_, _) => const P4MyDayScreen(),
     RemoriScreen.p7: (_, _) => const P7GamesScreen(),
@@ -224,6 +226,7 @@ final shellLabelsProvider = Provider<Map<RemoriMode, RemoriShellLabels>>(
 final remoriRouterProvider = Provider<GoRouter>((ref) {
   final refresh = ValueNotifier<int>(0);
   ref.listen(routeAccessProvider, (_, _) => refresh.value++);
+  ref.listen(patientPreviewProvider, (_, _) => refresh.value++);
   final router = GoRouter(
     initialLocation: RemoriScreen.a0.path,
     refreshListenable: refresh,
@@ -231,6 +234,7 @@ final remoriRouterProvider = Provider<GoRouter>((ref) {
       final screen = RemoriScreen.fromPath(state.uri.path);
       if (screen == null) return RemoriScreen.a0.path;
       final access = ref.read(routeAccessProvider);
+      if (screen.isPatient && ref.read(patientPreviewProvider)) return null;
       if (access.entryMode == RemoriMode.patient &&
           access.devicePaired &&
           !screen.isPatient) {
@@ -309,9 +313,22 @@ class _ScreenSlot extends ConsumerWidget {
   final GoRouterState state;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) =>
-      ref.watch(screenBuildersProvider)[screen]?.call(context, state) ??
-      SizedBox.expand(key: ValueKey(screen));
+  Widget build(BuildContext context, WidgetRef ref) {
+    final child =
+        ref.watch(screenBuildersProvider)[screen]?.call(context, state) ??
+        SizedBox.expand(key: ValueKey(screen));
+    if (!screen.isPatient || !ref.watch(patientPreviewProvider)) return child;
+    return PopScope(
+      canPop: context.canPop(),
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          ref.read(patientPreviewProvider.notifier).stop();
+          context.goNamed(RemoriScreen.c16.name);
+        }
+      },
+      child: child,
+    );
+  }
 }
 
 class _ModeShell extends ConsumerWidget {
@@ -328,9 +345,7 @@ class _ModeShell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final patient = mode == RemoriMode.patient;
     final labelOverride = ref.watch(shellLabelsProvider)[mode];
-    final locale = patient
-        ? ref.watch(patientLocaleProvider)
-        : Localizations.localeOf(context);
+    final locale = Localizations.localeOf(context);
     final destinations = patient
         ? const [
             RemoriScreen.p1,
@@ -339,7 +354,7 @@ class _ModeShell extends ConsumerWidget {
             RemoriScreen.p7,
           ]
         : const [
-            RemoriScreen.c1,
+            RemoriScreen.c12,
             RemoriScreen.c3,
             RemoriScreen.c8,
             RemoriScreen.c18,
@@ -352,7 +367,7 @@ class _ModeShell extends ConsumerWidget {
             Icons.sports_esports_outlined,
           ]
         : const [
-            Icons.home_outlined,
+            Icons.menu_book_outlined,
             Icons.people_outline,
             Icons.notifications_none,
             Icons.more_horiz,
@@ -374,12 +389,12 @@ class _ModeShell extends ConsumerWidget {
                         strings.patientGames,
                       ]
                     : [
-                        strings.caregiverHome,
+                        strings.journalTitle,
                         strings.caregiverPeople,
                         strings.reminders,
                         strings.caregiverMore,
                       ],
-                action: patient ? strings.ask : strings.addReminder,
+                action: patient ? strings.ask : strings.caregiverHome,
                 direction: Directionality.of(context),
               );
           final direction = labels.direction;
@@ -394,6 +409,22 @@ class _ModeShell extends ConsumerWidget {
                 body: RemoriBackground(
                   child: Column(
                     children: [
+                      if (patient && ref.watch(patientPreviewProvider))
+                        SafeArea(
+                          bottom: false,
+                          child: TextButton.icon(
+                            icon: const BackButtonIcon(),
+                            onPressed: () {
+                              ref.read(patientPreviewProvider.notifier).stop();
+                              context.goNamed(RemoriScreen.c16.name);
+                            },
+                            style: TextButton.styleFrom(
+                              minimumSize: const Size(0, 64),
+                              textStyle: const TextStyle(fontSize: 22),
+                            ),
+                            label: Text(strings.patientPreviewExit),
+                          ),
+                        ),
                       Expanded(
                         child: patient
                             ? PatientReminderAlertHost(
@@ -412,26 +443,34 @@ class _ModeShell extends ConsumerWidget {
                                 icon: Icon(icons[index]),
                               ),
                           ],
-                          selectedIndex: screen.navigationIndex,
-                          onSelected: (index) =>
-                              context.goNamed(destinations[index].name),
+                          selectedIndex:
+                              !patient &&
+                                  screen != RemoriScreen.c12 &&
+                                  screen.navigationIndex == 0
+                              ? -1
+                              : screen.navigationIndex,
+                          onSelected: (index) {
+                            final destination = destinations[index];
+                            if (screen == destination) return;
+                            if (destination == RemoriScreen.c12) {
+                              context.pushNamed(destination.name);
+                            } else {
+                              context.goNamed(destination.name);
+                            }
+                          },
                           actionLabel: labels.action,
-                          showAction:
-                              patient || ref.watch(caregiverCanManageProvider),
+                          showAction: true,
+                          showActionLabel: !patient,
+                          actionSelected: !patient && screen == RemoriScreen.c1,
                           actionIcon: Icon(
-                            patient ? Icons.mic_none : Icons.add,
+                            patient ? Icons.mic_none : Icons.home_outlined,
                           ),
-                          onAction:
-                              patient &&
-                                  (screen == RemoriScreen.p1 ||
-                                      screen == RemoriScreen.p2 ||
-                                      screen == RemoriScreen.p4 ||
-                                      screen == RemoriScreen.p7)
-                              ? null
+                          onAction: !patient
+                              ? () => context.goNamed(RemoriScreen.c1.name)
                               : () => context.pushNamed(
                                   patient
                                       ? RemoriScreen.p6.name
-                                      : RemoriScreen.c9.name,
+                                      : RemoriScreen.c1.name,
                                   extra: patient
                                       ? null
                                       : {

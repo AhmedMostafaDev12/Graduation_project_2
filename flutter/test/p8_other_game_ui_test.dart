@@ -6,6 +6,7 @@ import 'package:remori/app.dart';
 import 'package:remori/core/l10n/locale_providers.dart';
 import 'package:remori/core/router/remori_router.dart';
 import 'package:remori/core/router/remori_routes.dart';
+import 'package:remori/core/router/patient_preview_provider.dart';
 import 'package:remori/core/theme/remori_navigation_bar.dart';
 import 'package:remori/core/theme/remori_theme.dart';
 import 'package:remori/features/mind_games/domain/patient_games_data.dart';
@@ -47,6 +48,7 @@ void main() {
     String language = 'en',
     double scale = 1,
     bool menu = false,
+    bool preview = false,
   }) async {
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
     tester.view.physicalSize = Size(scale == 1 ? 390 : 320, 844);
@@ -64,7 +66,7 @@ void main() {
         appLocaleProvider.overrideWithValue(Locale(language)),
         patientLocaleProvider.overrideWithValue(Locale(language)),
         patientTodayKeyProvider.overrideWith(
-          (ref) => ref.watch(p2.selectedScope),
+          (ref) => preview ? null : ref.watch(p2.selectedScope),
         ),
         patientAlertCandidateProvider.overrideWithValue(null),
         cardGameStopwatchProvider.overrideWithValue(() => watch),
@@ -81,6 +83,7 @@ void main() {
         ),
       ],
     );
+    if (preview) c.read(patientPreviewProvider.notifier).start();
     addTearDown(c.dispose);
     await tester.pumpWidget(
       UncontrolledProviderScope(
@@ -113,6 +116,30 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  testWidgets('preview opens every game without a device or repository', (
+    tester,
+  ) async {
+    final c = await mount(tester, menu: true, preview: true);
+    for (final title in [
+      'Card game',
+      'Name the picture',
+      'Remember the words',
+    ]) {
+      await tap(tester, title);
+      expect(find.byType(P8PracticeScreen), findsOneWidget);
+      if (title == 'Card game') {
+        await tester.tap(find.byKey(const ValueKey('preview-card-0')));
+        await tester.pump();
+        await tester.tap(find.byKey(const ValueKey('preview-card-3')));
+        await tester.pump();
+        expect(find.byIcon(Icons.local_cafe_outlined), findsNWidgets(2));
+      }
+      await tap(tester, 'Done');
+      expect(find.byType(P7GamesScreen), findsOneWidget);
+    }
+    expect(repositoryReads, 0);
+    await unmount(tester, c);
+  });
   testWidgets(
     'picture choices give gentle feedback and cycle bundled objects without a session',
     (tester) async {

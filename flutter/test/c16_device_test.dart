@@ -17,6 +17,7 @@ import 'package:remori/core/db/remori_database.dart';
 import 'package:remori/core/l10n/locale_providers.dart';
 import 'package:remori/core/router/remori_router.dart';
 import 'package:remori/core/router/remori_routes.dart';
+import 'package:remori/core/router/patient_preview_provider.dart';
 import 'package:remori/features/caregiver_dashboard/data/home_repository.dart';
 import 'package:remori/features/caregiver_dashboard/domain/home_data.dart';
 import 'package:remori/features/caregiver_dashboard/presentation/device_providers.dart';
@@ -463,6 +464,37 @@ void main() {
     expect(find.text('Connected'), findsOneWidget);
     expect(tester.widget<Switch>(find.byType(Switch)).value, true);
   });
+  testWidgets(
+    'preview exit and system back return to Device without stale setup routes',
+    (tester) async {
+      final container = await mount(tester);
+      final router = container.read(remoriRouterProvider);
+      for (final systemBack in [false, true]) {
+        final start = find.text('Preview Patient Mode (no glasses)');
+        await tester.ensureVisible(start);
+        await tester.tap(start);
+        await tester.pumpAndSettle();
+        expect(container.read(patientPreviewProvider), true);
+        if (systemBack) {
+          await tester.binding.handlePopRoute();
+        } else {
+          await tester.tap(find.text('Screen preview · Exit preview'));
+        }
+        await tester.pumpAndSettle();
+        expect(container.read(patientPreviewProvider), false);
+        expect(
+          router.routeInformationProvider.value.uri.path,
+          RemoriScreen.c16.path,
+        );
+        expect(router.canPop(), false);
+        expect(tester.widget<Switch>(find.byType(Switch)).value, true);
+      }
+      expect(adapter.requests.where((r) => r.method != 'GET'), isEmpty);
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.text('More destination'), findsOneWidget);
+    },
+  );
   testWidgets('memory toggle persists acknowledged value', (tester) async {
     await mount(tester);
     await tester.tap(find.byType(Switch));

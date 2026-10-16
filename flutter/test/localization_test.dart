@@ -9,7 +9,11 @@ import 'package:remori/core/l10n/app_localizations.dart';
 import 'package:remori/core/l10n/locale_providers.dart';
 import 'package:remori/core/router/remori_router.dart';
 import 'package:remori/core/router/remori_routes.dart';
+import 'package:remori/core/router/patient_preview_provider.dart';
 import 'package:remori/core/theme/remori_theme.dart';
+import 'package:remori/features/caregiver_dashboard/presentation/home_providers.dart';
+import 'package:remori/features/caregiver_dashboard/domain/home_data.dart';
+import 'package:remori/features/patient_today/presentation/patient_today_providers.dart';
 
 final _testLocale = NotifierProvider<_Locale, Locale?>(_Locale.new);
 
@@ -23,16 +27,19 @@ Future<ProviderContainer> mount(
   WidgetTester tester, {
   required RemoriMode mode,
   Locale appLocale = const Locale('en'),
-  Locale patientLocale = const Locale('ar'),
+  bool preview = false,
+  bool bothModes = false,
 }) async {
   final container = ProviderContainer(
     overrides: [
-      appLocaleProvider.overrideWith((ref) => ref.watch(_testLocale)),
-      patientLocaleProvider.overrideWithValue(patientLocale),
+      appLocaleProvider.overrideWith(
+        (ref) =>
+            ref.watch(appLanguageSelectionProvider) ?? ref.watch(_testLocale),
+      ),
       routeAccessProvider.overrideWithValue(
         RouteAccess(
           caregiverAuthenticated: mode == RemoriMode.caregiver,
-          devicePaired: mode == RemoriMode.patient,
+          devicePaired: bothModes || mode == RemoriMode.patient,
           entryMode: mode,
         ),
       ),
@@ -43,6 +50,7 @@ Future<ProviderContainer> mount(
     ],
   );
   container.read(_testLocale.notifier).set(appLocale);
+  if (preview) container.read(patientPreviewProvider.notifier).start();
   addTearDown(container.dispose);
   await tester.pumpWidget(
     UncontrolledProviderScope(container: container, child: const RemoriApp()),
@@ -52,6 +60,91 @@ Future<ProviderContainer> mount(
 }
 
 void main() {
+  test('shared locale restores from the existing cached profile', () {
+    ProviderContainer restore() => ProviderContainer(
+      overrides: [
+        patientTodayKeyProvider.overrideWithValue(null),
+        selectedHomePatientProvider.overrideWithValue(
+          const HomePatient(
+            id: 'patient',
+            name: 'Test',
+            language: 'en',
+            timezone: 'UTC',
+            memoryEnabled: true,
+            permission: 'manager',
+          ),
+        ),
+      ],
+    );
+    final first = restore();
+    expect(first.read(appLocaleProvider), const Locale('en'));
+    expect(first.read(patientLocaleProvider), const Locale('en'));
+    first.read(appLanguageSelectionProvider.notifier).select('ar');
+    expect(first.read(appLocaleProvider), const Locale('ar'));
+    expect(first.read(patientLocaleProvider), const Locale('ar'));
+    first.dispose();
+    final restarted = restore();
+    expect(restarted.read(appLocaleProvider), const Locale('en'));
+    restarted.dispose();
+  });
+
+  testWidgets('shared selection changes both real mode shells immediately', (
+    tester,
+  ) async {
+    final container = await mount(
+      tester,
+      mode: RemoriMode.caregiver,
+      bothModes: true,
+    );
+    final router = container.read(remoriRouterProvider);
+    container.read(appLanguageSelectionProvider.notifier).select('en');
+    router.goNamed(RemoriScreen.p1.name);
+    await tester.pumpAndSettle();
+    expect(find.text('Today'), findsOneWidget);
+    container.read(appLanguageSelectionProvider.notifier).select('ar');
+    await tester.pumpAndSettle();
+    expect(find.text('اليوم'), findsOneWidget);
+    expect(
+      Directionality.of(tester.element(find.text('p1'))),
+      TextDirection.rtl,
+    );
+    router.goNamed(RemoriScreen.c3.name);
+    await tester.pumpAndSettle();
+    expect(find.text('الأشخاص'), findsOneWidget);
+    container.read(appLanguageSelectionProvider.notifier).select('en');
+    await tester.pumpAndSettle();
+    expect(find.text('People'), findsOneWidget);
+    expect(
+      Directionality.of(tester.element(find.text('c3'))),
+      TextDirection.ltr,
+    );
+  });
+
+  testWidgets('patient preview follows app language and direction changes', (
+    tester,
+  ) async {
+    final container = await mount(
+      tester,
+      mode: RemoriMode.patient,
+      preview: true,
+    );
+    expect(find.text('Screen preview · Exit preview'), findsOneWidget);
+    expect(
+      Directionality.of(tester.element(find.text('p1'))),
+      TextDirection.ltr,
+    );
+    container.read(_testLocale.notifier).set(const Locale('ar'));
+    await tester.pumpAndSettle();
+    expect(find.text('معاينة الشاشات · إنهاء المعاينة'), findsOneWidget);
+    expect(
+      Directionality.of(tester.element(find.text('p1'))),
+      TextDirection.rtl,
+    );
+    container.read(_testLocale.notifier).set(const Locale('en'));
+    await tester.pumpAndSettle();
+    expect(find.text('Screen preview · Exit preview'), findsOneWidget);
+  });
+
   test('Arabic and English resources have complete matching keys', () {
     final english =
         jsonDecode(File('lib/core/l10n/app_en.arb').readAsStringSync()) as Map;
@@ -98,10 +191,12 @@ void main() {
     );
   });
 
-  testWidgets('Patient Mode defaults to Arabic despite an English app locale', (
-    tester,
-  ) async {
-    await mount(tester, mode: RemoriMode.patient);
+  testWidgets('Patient Mode uses the shared Arabic app locale', (tester) async {
+    await mount(
+      tester,
+      mode: RemoriMode.patient,
+      appLocale: const Locale('ar'),
+    );
     expect(find.text('اليوم'), findsOneWidget);
     expect(find.text('التذكيرات'), findsOneWidget);
     final context = tester.element(find.text('p1'));
@@ -116,24 +211,25 @@ void main() {
     semantics.dispose();
   });
 
-  testWidgets('English patient preference retains large typography with LTR', (
-    tester,
-  ) async {
-    await mount(
-      tester,
-      mode: RemoriMode.patient,
-      patientLocale: const Locale('en'),
-    );
-    expect(find.text('Today'), findsOneWidget);
-    expect(find.text('My Day'), findsOneWidget);
-    final context = tester.element(find.text('p1'));
-    expect(Directionality.of(context), TextDirection.ltr);
-    expect(Theme.of(context).textTheme.bodyMedium!.fontFamily, 'DM Sans');
-    expect(
-      Theme.of(context).textTheme.bodyMedium!.fontSize,
-      greaterThanOrEqualTo(22),
-    );
-  });
+  testWidgets(
+    'shared English language retains large patient typography with LTR',
+    (tester) async {
+      await mount(
+        tester,
+        mode: RemoriMode.patient,
+        appLocale: const Locale('en'),
+      );
+      expect(find.text('Today'), findsOneWidget);
+      expect(find.text('My Day'), findsOneWidget);
+      final context = tester.element(find.text('p1'));
+      expect(Directionality.of(context), TextDirection.ltr);
+      expect(Theme.of(context).textTheme.bodyMedium!.fontFamily, 'DM Sans');
+      expect(
+        Theme.of(context).textTheme.bodyMedium!.fontSize,
+        greaterThanOrEqualTo(22),
+      );
+    },
+  );
 
   testWidgets(
     'changing app locale retains the router and current destination',

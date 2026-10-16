@@ -15,6 +15,8 @@ import 'package:remori/core/l10n/locale_providers.dart';
 import 'package:remori/core/relay/permission_service.dart';
 import 'package:remori/core/router/remori_router.dart';
 import 'package:remori/core/router/remori_routes.dart';
+import 'package:remori/core/router/patient_preview_provider.dart';
+import 'package:remori/core/api/patient_session_provider.dart';
 import 'package:remori/features/device_pairing/domain/pairing_info.dart';
 import 'package:remori/features/device_pairing/data/pairing_repository.dart';
 import 'package:remori/features/device_pairing/presentation/a5_pair_glasses_screen.dart';
@@ -120,6 +122,64 @@ void main() {
     ]) {
       await (FontLoader(family)..addFont(rootBundle.load(file))).load();
     }
+  });
+  testWidgets(
+    'system back preserves pairing and returns to the previous screen',
+    (tester) async {
+      final repository = TestPairingRepository();
+      final container = await mount(tester, repository);
+      final router = container.read(remoriRouterProvider);
+      router.goNamed(RemoriScreen.a4.name);
+      await tester.pumpAndSettle();
+      router.pushNamed(RemoriScreen.a5.name, extra: patientId);
+      await tester.pumpAndSettle();
+      await container
+          .read(pairingControllerProvider.notifier)
+          .pair(patientId, 'RMR-0008');
+      await tester.pumpAndSettle();
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        RemoriScreen.a4.path,
+      );
+      expect(container.read(pairedGlassesProvider)?.serial, 'RMR-0008');
+      expect(repository.calls, 1);
+    },
+  );
+  testWidgets('preview opens patient screens without scanning or pairing', (
+    tester,
+  ) async {
+    final repository = TestPairingRepository();
+    final container = await mount(tester, repository, patient: null);
+    final button = find.text('Preview Patient Mode (no glasses)');
+    await tester.ensureVisible(button);
+    await tester.tap(button);
+    await tester.pumpAndSettle();
+    expect(container.read(patientPreviewProvider), isTrue);
+    expect(container.read(patientSessionProvider).active, isFalse);
+    expect(repository.calls, 0);
+    expect(
+      container
+          .read(remoriRouterProvider)
+          .routeInformationProvider
+          .value
+          .uri
+          .path,
+      RemoriScreen.p1.path,
+    );
+    await tester.tap(find.text('Screen preview · Exit preview'));
+    await tester.pumpAndSettle();
+    expect(container.read(patientPreviewProvider), isFalse);
+    expect(
+      container
+          .read(remoriRouterProvider)
+          .routeInformationProvider
+          .value
+          .uri
+          .path,
+      RemoriScreen.c16.path,
+    );
   });
   testWidgets(
     'late pairing result cannot publish a grant after caregiver logout',

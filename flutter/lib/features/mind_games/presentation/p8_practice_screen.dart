@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/router/remori_routes.dart';
+import '../../../core/router/patient_preview_provider.dart';
 import '../../../core/theme/remori_theme.dart';
 import '../../../core/theme/remori_widgets.dart';
 import '../../patient_today/presentation/patient_today_providers.dart';
@@ -29,6 +30,8 @@ class _P8PracticeScreenState extends ConsumerState<P8PracticeScreen>
   bool _study = true;
   int _picture = 0;
   int? _choice;
+  CardRound _round = CardRound([0, 1, 1, 0]);
+  Timer? _mismatch;
   static const _icons = [
     Icons.local_cafe_outlined,
     Icons.key_outlined,
@@ -51,6 +54,7 @@ class _P8PracticeScreenState extends ConsumerState<P8PracticeScreen>
   @override
   void dispose() {
     _ticker?.cancel();
+    _mismatch?.cancel();
     _watch.stop();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -70,9 +74,13 @@ class _P8PracticeScreenState extends ConsumerState<P8PracticeScreen>
     final s = AppLocalizations.of(context);
     final target = widget.target;
     final picture = target.type == 'picture_naming';
+    final preview = ref.watch(patientPreviewProvider) && target.scope == null;
+    final matching = preview && target.type == 'face_match';
     final active =
-        ref.watch(patientTodayKeyProvider) == target.scope &&
-        (picture || target.type == 'word_recall');
+        (preview ||
+            (target.scope != null &&
+                ref.watch(patientTodayKeyProvider) == target.scope)) &&
+        (picture || target.type == 'word_recall' || matching);
     final visible = ModalRoute.isCurrentOf(context) ?? true;
     if (active && visible && _foreground) {
       _watch.start();
@@ -135,7 +143,11 @@ class _P8PracticeScreenState extends ConsumerState<P8PracticeScreen>
                   const SizedBox(height: 16),
                   if (active) ...[
                     Text(
-                      picture ? s.patientGamePicture : s.patientGameWords,
+                      matching
+                          ? s.patientGameCards
+                          : picture
+                          ? s.patientGamePicture
+                          : s.patientGameWords,
                       style: const TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.w600,
@@ -143,7 +155,9 @@ class _P8PracticeScreenState extends ConsumerState<P8PracticeScreen>
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      picture
+                      matching
+                          ? s.cardGameInstruction
+                          : picture
                           ? s.gamePicturePrompt
                           : _study
                           ? s.gameWordsStudy
@@ -154,7 +168,21 @@ class _P8PracticeScreenState extends ConsumerState<P8PracticeScreen>
                       ),
                     ),
                     const SizedBox(height: 20),
-                    if (picture)
+                    if (matching)
+                      for (var row = 0; row < 2; row++) ...[
+                        Row(
+                          children: [
+                            for (var col = 0; col < 2; col++) ...[
+                              if (col > 0) const SizedBox(width: 14),
+                              Expanded(
+                                child: _previewCard(row * 2 + col, labels, s),
+                              ),
+                            ],
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                      ]
+                    else if (picture)
                       Semantics(
                         image: true,
                         label: labels[_picture],
@@ -205,7 +233,7 @@ class _P8PracticeScreenState extends ConsumerState<P8PracticeScreen>
                         const SizedBox(height: 14),
                       ],
                     const SizedBox(height: 16),
-                    if (picture || !_study)
+                    if (!matching && (picture || !_study))
                       for (var i = 0; i < 4; i++) ...[
                         Semantics(
                           selected: _choice == i,
@@ -234,7 +262,7 @@ class _P8PracticeScreenState extends ConsumerState<P8PracticeScreen>
                       ),
                       const SizedBox(height: 16),
                     ],
-                    if (!picture && _study)
+                    if (!matching && !picture && _study)
                       RemoriButton(
                         label: s.gameWordsReady,
                         onPressed: () => setState(() {
@@ -278,6 +306,47 @@ class _P8PracticeScreenState extends ConsumerState<P8PracticeScreen>
                 ],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _previewCard(int index, List<String> labels, AppLocalizations s) {
+    final up = _round.up(index), value = _round.cards[index];
+    return Semantics(
+      button: true,
+      label: up ? labels[value] : s.cardGameHidden(index + 1),
+      selected: _round.matched.contains(index),
+      child: SizedBox(
+        height: 150,
+        child: Material(
+          color: up ? const Color(0xffeee8f7) : RemoriColors.purple,
+          borderRadius: BorderRadius.circular(18),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            key: ValueKey('preview-card-$index'),
+            onTap: up || _round.waiting
+                ? null
+                : () {
+                    setState(() => _round = _round.pick(index));
+                    if (_round.waiting) {
+                      _mismatch = Timer(const Duration(seconds: 1), () {
+                        if (mounted) {
+                          setState(() => _round = _round.hideMismatch());
+                        }
+                      });
+                    }
+                  },
+            child: up
+                ? ExcludeSemantics(
+                    child: Icon(
+                      _icons[value],
+                      size: 64,
+                      color: RemoriColors.purple,
+                    ),
+                  )
+                : const SizedBox.expand(),
           ),
         ),
       ),

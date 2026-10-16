@@ -174,6 +174,12 @@ void main() {
   testWidgets('empty inputs do not request authentication', (tester) async {
     final repository = TestAuthRepository();
     await mount(tester, repository);
+    final recovery = find.widgetWithText(TextButton, 'Forgot password');
+    expect(tester.widget<TextButton>(recovery).onPressed, isNull);
+    expect(
+      tester.getTopLeft(recovery).dy,
+      greaterThan(tester.getBottomLeft(find.byType(TextField).last).dy),
+    );
     await tester.tap(find.text('Log In'));
     await tester.pumpAndSettle();
     expect(find.text('This field is required'), findsNWidgets(2));

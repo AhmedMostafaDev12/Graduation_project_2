@@ -439,6 +439,7 @@ void main() {
           ...builders,
           RemoriScreen.c18: (_, _) => const Text('More destination'),
           RemoriScreen.c9: (_, _) => const Text('Reminder destination'),
+          RemoriScreen.c1: (_, _) => const Text('Home destination'),
           RemoriScreen.c11: (_, state) =>
               Text('Place editor destination', key: ValueKey(state.extra)),
         }),
@@ -536,18 +537,16 @@ void main() {
       expect(find.textContaining('Select a patient'), findsOneWidget);
     },
   );
-  testWidgets('Back uses More and the existing center action opens C9', (
-    tester,
-  ) async {
+  testWidgets('Back uses More and the center Home opens C1', (tester) async {
     final container = await mount(tester, FakeRepository(client, db, scope));
     await tester.tap(find.byTooltip('Back'));
     await tester.pumpAndSettle();
     expect(find.text('More destination'), findsOneWidget);
     container.read(remoriRouterProvider).goNamed(RemoriScreen.c10.name);
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Add reminder'));
+    await tester.tap(find.byTooltip('Home'));
     await tester.pumpAndSettle();
-    expect(find.text('Reminder destination'), findsOneWidget);
+    expect(find.text('Home destination'), findsOneWidget);
   });
   for (final language in ['en', 'ar']) {
     testWidgets('C10 $language reference capture', (tester) async {

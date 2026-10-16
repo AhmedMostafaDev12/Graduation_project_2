@@ -319,7 +319,7 @@ class _C1HomeScreenState extends ConsumerState<C1HomeScreen>
                 _link(
                   context,
                   s.homeOpenJournal,
-                  () => context.goNamed(RemoriScreen.c12.name),
+                  () => context.pushNamed(RemoriScreen.c12.name),
                 ),
               ],
             ),

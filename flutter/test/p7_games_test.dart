@@ -401,7 +401,7 @@ void main() {
       tester
           .widget<RemoriNavigationBar>(find.byType(RemoriNavigationBar))
           .onAction,
-      isNull,
+      isNotNull,
     );
     await tester.tap(find.text('Card game'));
     await tester.pumpAndSettle();

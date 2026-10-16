@@ -10,6 +10,29 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
+  String get askPhaseTwo => 'المرحلة ٢';
+
+  @override
+  String get askTapSpeak => 'اضغط واتكلم';
+
+  @override
+  String get askQuestionHint => 'أو اكتب سؤالك هنا';
+
+  @override
+  String get askPending =>
+      'تسجيل الأسئلة والحصول على إجابات سيتوفران في المرحلة الثانية.';
+
+  @override
+  String get authConfigurationError =>
+      'إعدادات اتصال التطبيق غير موجودة أو غير صالحة. يرجى التواصل مع الدعم.';
+
+  @override
+  String get patientPreviewStart => 'معاينة وضع المريض (بدون نظارة)';
+
+  @override
+  String get patientPreviewExit => 'معاينة الشاشات · إنهاء المعاينة';
+
+  @override
   String get gameObjectCup => 'كوب';
 
   @override

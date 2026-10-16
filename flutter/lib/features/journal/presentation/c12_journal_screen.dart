@@ -87,223 +87,269 @@ class _C12JournalScreenState extends ConsumerState<C12JournalScreen>
       s.journalMedia,
       s.journalDocs,
     ];
-    return SafeArea(
-      bottom: false,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 6),
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: RemoriColors.border)),
-            ),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final date = Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      tooltip: s.journalPreviousDay,
-                      onPressed: () =>
-                          ref.read(journalDayProvider.notifier).shift(-1),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(
-                        minWidth: 28,
-                        minHeight: 36,
+    return PopScope(
+      canPop: context.canPop(),
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) context.goNamed(RemoriScreen.c1.name);
+      },
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 6),
+              decoration: const BoxDecoration(
+                border: Border(bottom: BorderSide(color: RemoriColors.border)),
+              ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final date = Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        tooltip: s.journalPreviousDay,
+                        onPressed: () =>
+                            ref.read(journalDayProvider.notifier).shift(-1),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(
+                          minWidth: 28,
+                          minHeight: 36,
+                        ),
+                        icon: const Icon(Icons.chevron_left, size: 18),
                       ),
-                      icon: const Icon(Icons.chevron_left, size: 18),
-                    ),
-                    Flexible(
-                      child: Text(
-                        DateFormat(
-                          'EEE d MMM',
-                          locale,
-                        ).format(DateTime.parse(day)),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                      Flexible(
+                        child: Text(
+                          DateFormat(
+                            'EEE d MMM',
+                            locale,
+                          ).format(DateTime.parse(day)),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                    ),
-                    IconButton(
-                      tooltip: s.journalNextDay,
-                      onPressed: () =>
-                          ref.read(journalDayProvider.notifier).shift(1),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(
-                        minWidth: 28,
-                        minHeight: 36,
+                      IconButton(
+                        tooltip: s.journalNextDay,
+                        onPressed: () =>
+                            ref.read(journalDayProvider.notifier).shift(1),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(
+                          minWidth: 28,
+                          minHeight: 36,
+                        ),
+                        icon: const Icon(Icons.chevron_right, size: 18),
                       ),
-                      icon: const Icon(Icons.chevron_right, size: 18),
-                    ),
-                  ],
-                );
-                final title = Text(
-                  s.journalTitle,
-                  style: Theme.of(context).textTheme.titleLarge,
-                );
-                return MediaQuery.textScalerOf(context).scale(14) > 20
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [title, date],
-                      )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Flexible(child: title),
-                          Flexible(flex: 2, child: date),
-                        ],
-                      );
-              },
-            ),
-          ),
-          if (key != null && state.offline)
-            Semantics(
-              liveRegion: true,
-              child: Container(
-                key: const Key('d4-offline-banner'),
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
-                ),
-                decoration: const BoxDecoration(
-                  color: RemoriColors.warning,
-                  border: Border(
-                    bottom: BorderSide(color: RemoriColors.warning),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: RemoriColors.warningInk,
-                        shape: BoxShape.circle,
+                    ],
+                  );
+                  final title = Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        tooltip: MaterialLocalizations.of(context)
+                            .backButtonTooltip,
+                        icon: const BackButtonIcon(),
+                        onPressed: () {
+                          if (context.canPop()) {
+                            context.pop();
+                          } else {
+                            context.goNamed(RemoriScreen.c1.name);
+                          }
+                        },
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        s.journalOfflineStatus,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: RemoriColors.warningInk,
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Text(
+                            s.journalTitle,
+                            key: const Key('journal-title'),
+                            maxLines: 1,
+                            softWrap: false,
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
                         ),
                       ),
+                    ],
+                  );
+                  final titlePainter = TextPainter(
+                    text: TextSpan(
+                      text: s.journalTitle,
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
-                  ],
-                ),
+                    textDirection: Directionality.of(context),
+                    textScaler: MediaQuery.textScalerOf(context),
+                  )..layout();
+                  final titleWidth = titlePainter.width + 48;
+                  titlePainter.dispose();
+                  return constraints.maxWidth < titleWidth + 190 ||
+                          MediaQuery.textScalerOf(context).scale(14) > 20
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [title, date],
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(width: titleWidth, child: title),
+                            const SizedBox(width: 8),
+                            Expanded(child: date),
+                          ],
+                        );
+                },
               ),
             ),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: () =>
-                  ref.read(journalRefreshProvider.notifier).refresh(),
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: [
-                  if (key != null && state.offline) ...[
-                    Text(s.journalSavedExplanation, style: _small),
-                    const SizedBox(height: 8),
-                  ],
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
+            if (key != null && state.offline)
+              Semantics(
+                liveRegion: true,
+                child: Container(
+                  key: const Key('d4-offline-banner'),
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  decoration: const BoxDecoration(
+                    color: RemoriColors.warning,
+                    border: Border(
+                      bottom: BorderSide(color: RemoriColors.warning),
+                    ),
+                  ),
+                  child: Row(
                     children: [
-                      for (final f in JournalFilter.values)
-                        Semantics(
-                          button: true,
-                          selected: filter == f,
-                          child: GestureDetector(
-                            onTap: () => ref
-                                .read(journalFilterProvider.notifier)
-                                .select(f),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 9,
-                                vertical: 3,
-                              ),
-                              decoration: BoxDecoration(
-                                color: filter == f
-                                    ? RemoriColors.purple
-                                    : RemoriColors.surface,
-                                borderRadius: BorderRadius.circular(26),
-                                border: Border.all(color: RemoriColors.border),
-                              ),
-                              child: Text(
-                                names[f.index],
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: filter == f
-                                      ? FontWeight.w600
-                                      : FontWeight.w400,
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: const BoxDecoration(
+                          color: RemoriColors.warningInk,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          s.journalOfflineStatus,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: RemoriColors.warningInk,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () =>
+                    ref.read(journalRefreshProvider.notifier).refresh(),
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    if (key != null && state.offline) ...[
+                      Text(s.journalSavedExplanation, style: _small),
+                      const SizedBox(height: 8),
+                    ],
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: [
+                        for (final f in JournalFilter.values)
+                          Semantics(
+                            button: true,
+                            selected: filter == f,
+                            child: GestureDetector(
+                              onTap: () => ref
+                                  .read(journalFilterProvider.notifier)
+                                  .select(f),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 9,
+                                  vertical: 3,
+                                ),
+                                decoration: BoxDecoration(
                                   color: filter == f
-                                      ? RemoriColors.surface
-                                      : RemoriColors.purple,
+                                      ? RemoriColors.purple
+                                      : RemoriColors.surface,
+                                  borderRadius: BorderRadius.circular(26),
+                                  border: Border.all(
+                                    color: RemoriColors.border,
+                                  ),
+                                ),
+                                child: Text(
+                                  names[f.index],
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: filter == f
+                                        ? FontWeight.w600
+                                        : FontWeight.w400,
+                                    color: filter == f
+                                        ? RemoriColors.surface
+                                        : RemoriColors.purple,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
+                      ],
+                    ),
+                    const SizedBox(height: 7),
+                    if (state.failed || snapshot.hasError) ...[
+                      if (!state.offline)
+                        Text(
+                          data.entries.isEmpty
+                              ? s.journalLoadFailed
+                              : s.journalOffline,
+                          style: _small,
                         ),
+                      TextButton(
+                        onPressed: state.busy
+                            ? null
+                            : () => ref
+                                  .read(journalRefreshProvider.notifier)
+                                  .refresh(),
+                        child: Text(s.homeRetry),
+                      ),
                     ],
-                  ),
-                  const SizedBox(height: 7),
-                  if (state.failed || snapshot.hasError) ...[
-                    if (!state.offline)
+                    if (entries.isEmpty &&
+                        (state.busy || snapshot.isLoading) &&
+                        data.entries.isEmpty)
+                      const Center(child: CircularProgressIndicator())
+                    else if (key == null)
+                      Text(s.journalUnavailable, style: _small)
+                    else if (entries.isEmpty)
                       Text(
-                        data.entries.isEmpty
-                            ? s.journalLoadFailed
-                            : s.journalOffline,
+                        state.offline && data.entries.isEmpty
+                            ? s.journalNoSavedEntries
+                            : s.journalEmpty,
                         style: _small,
                       ),
-                    TextButton(
-                      onPressed: state.busy
-                          ? null
-                          : () => ref
-                                .read(journalRefreshProvider.notifier)
-                                .refresh(),
-                      child: Text(s.homeRetry),
-                    ),
-                  ],
-                  if (entries.isEmpty &&
-                      (state.busy || snapshot.isLoading) &&
-                      data.entries.isEmpty)
-                    const Center(child: CircularProgressIndicator())
-                  else if (key == null)
-                    Text(s.journalUnavailable, style: _small)
-                  else if (entries.isEmpty)
-                    Text(
-                      state.offline && data.entries.isEmpty
-                          ? s.journalNoSavedEntries
-                          : s.journalEmpty,
-                      style: _small,
-                    ),
-                  if (key != null)
-                    for (final e in entries)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 7),
-                        child: _EntryCard(
-                          key: ValueKey(
-                            '${key.$1.caregiverId}:${key.$1.patientId}:$day:${e.id}:${state.revision}',
+                    if (key != null)
+                      for (final e in entries)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 7),
+                          child: _EntryCard(
+                            key: ValueKey(
+                              '${key.$1.caregiverId}:${key.$1.patientId}:$day:${e.id}:${state.revision}',
+                            ),
+                            owner: key,
+                            entry: e,
+                            now: now,
+                            previews:
+                                _visible &&
+                                _foreground &&
+                                state.previews &&
+                                !state.busy,
                           ),
-                          owner: key,
-                          entry: e,
-                          now: now,
-                          previews:
-                              _visible &&
-                              _foreground &&
-                              state.previews &&
-                              !state.busy,
                         ),
-                      ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

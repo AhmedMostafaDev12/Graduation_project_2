@@ -73,7 +73,11 @@ starts in a Riverpod `ProviderScope` and uses `MaterialApp.router`.
 - Shell labels come from generated Arabic/English ARB resources. The optional
   `shellLabelsProvider` override is used by routing tests; production navigation
   uses localized labels and direction.
-- Caregiver destinations: C1, C3, C8, C18; center action pushes C9. Patient
+- Caregiver destinations: C12 Journal, C3 People, C8 Reminders, C18 More;
+  the center Home button opens C1 and displays its selected state. Journal
+  pushes only when it is not already current, so Back returns to the previous
+  screen; direct Journal entry returns to Home. C8 retains its Add reminder action.
+  Patient
   destinations: P1, P2, P4, P7; center action pushes P6. Detail screens omit the
   navigation bar, as in the HTML, and pushed routes retain the back destination.
 - D1-D3 represent OS notifications, and D4-D6 are existing-screen variants.
@@ -98,7 +102,11 @@ flutter run --dart-define=REMORI_API_BASE_URL=https://remori-ai.duckdns.org/api/
 ```
 
 There is no source-code default. Configuration is validated lazily when the client
-is used. Release configuration requires HTTPS; debug/test configuration may use
+is used. Missing or invalid configuration produces a localized setup error in
+Login/Sign up, rather than a false connection error. Unexpected local/response
+errors use the retry message; only actual transport failures/timeouts use the
+connection message. Build defines require a full restart when changed.
+Release configuration requires HTTPS; debug/test configuration may use
 the development URLs in the API contract. Native cleartext permissions, if needed
 for a debug backend, are separate platform setup.
 
@@ -185,13 +193,16 @@ The foundation currently includes shell destination and center-action labels;
 individual screen strings are added in their feature PRs.
 
 MaterialApp registers Arabic and English delegates, including localized Flutter
-controls and layout direction. `appLocaleProvider` defaults to the device locale,
-with English fallback for unsupported languages. `patientLocaleProvider` defaults
-to Arabic and provides the integration point for the synced patient profile's
-preferred_language. Both providers may be overridden by profile/auth integration;
-no persisted app preference or new settings screen is introduced.
+controls and layout direction. `appLocaleProvider` supplies one shared locale for
+Caregiver Mode, Patient Mode and previews. A confirmed Profile language save
+updates `appLanguageSelectionProvider` immediately, including when only the cache
+update needs retrying. The existing scoped profile/settings caches restore the
+saved language; without a saved selection the app follows the device locale,
+with English fallback for unsupported languages. `patientLocaleProvider` is a
+compatibility alias for relay notifications, not a separate language setting.
+No new preference table or settings screen is introduced.
 
-Patient shells override their locale independently of the caregiver/app locale.
+Both shells follow the MaterialApp locale.
 Arabic uses RTL and Readex Pro; English uses LTR and DM Sans/Manrope. Patient text
 and control sizes remain large in either language. Locale changes do not recreate
 the router or reset the current destination.
@@ -207,7 +218,7 @@ flutter analyze
 flutter test
 ```
 
-Tests check matching translation keys, both caregiver languages, Arabic-first and
+Tests check matching translation keys, both caregiver languages, Arabic and
 English patient shells, accessibility action labels, fonts/direction, unsupported
 locale fallback, and preservation of routing when the locale changes. Native
 Android/iOS validation and complete screen comparisons remain integration work.
@@ -286,7 +297,9 @@ remain part of the pairing integration.
 
 As approved for this PR, Google, Facebook, and Forgot password remain visible
 and disabled: social backend endpoints are postponed, and password reset has no
-contract. Errors use local translations, never raw server messages. Duplicate
+contract. Forgot password sits immediately below the password input on both A2
+and A3; it stays disabled until a recovery endpoint is approved and implemented.
+Errors use local translations, never raw server messages. Duplicate
 submission is blocked; password fields are cleared after successful navigation.
 
 Review captures: [English](test/goldens/a2_en.png) and
@@ -1274,7 +1287,7 @@ occurrences cannot regress to pending after refresh.
 
 Connection status requires the current device's local handshake. Memory status
 uses the master switch and recent telemetry; unavailable status is stated gently.
-Ask stays visible and disabled for Phase 2. Recurrence expansion, background
+Ask opens the P6 presentation; recording and answers remain Phase 2. Recurrence expansion, background
 notifications, full BLE delivery, P2 and C20 remain separate work.
 
 Review captures: [English](test/goldens/p1_en.png),
@@ -1346,7 +1359,7 @@ P1 and P2 share the repository, foreground refresh, completion-wins merge and
 atomic reminder/outbox writes. Actions remain on P2, work offline, and upload
 through the existing device-authenticated batch path. Retry checks connectivity,
 uploads pending snapshots, then refreshes. Leaving and returning to P1 shows the
-same local result. Ask remains disabled for Phase 2 on both screens.
+same local result. Ask opens P6 on both screens; recording and answers remain Phase 2.
 
 No new packages, database tables or API contracts were added. Recurrence
 expansion, background notifications, full BLE schedule delivery and P3 remain
@@ -1408,7 +1421,7 @@ Cards use actual API rendered text when supplied, otherwise localized neutral
 descriptions with actual times and names. A reminder event does not imply that
 medicine was taken. Missing person photos use initials; other missing previews
 use icons. Cards with an actual media ID open P5; text-only cards remain read-only.
-Phase 2 Ask is disabled. No patient editing or deletion controls are added in P4.
+Ask opens P6, with recording and answers marked as Phase 2. No patient editing or deletion controls are added in P4.
 
 Previews load into memory only after a successful refresh, and only if the exact
 media reference belongs to that fresh result. They clear on leaving, background,
@@ -1463,7 +1476,7 @@ the actual latest score without a fabricated maximum. A successfully checked
 empty history shows “No games yet”; unchecked history shows an unavailable
 message. All three cards open P8 variants. Card game saves results; Name the
 picture and Remember the words are approved interactive UI-only activities.
-Ask remains disabled for Phase 2.
+Ask opens the P6 presentation; recording and answers remain Phase 2.
 
 Schema v20 adds two patient/device/game-scoped caches: latest session display
 fields and refresh metadata. Three device-authenticated filtered GETs request
@@ -1668,3 +1681,21 @@ layout tests also check the disconnected card and 64dp action in Arabic/English
 at normal and 2x text. Captures are `test/goldens/p1_{en,ar}.png` and
 `test/goldens/d5_{en,ar}_2x.png`; regenerate with
 `flutter test test/p1_today_test.dart --update-goldens`.
+
+## Patient screen preview and P6 presentation
+
+Debug builds expose “Preview Patient Mode (no glasses)” on A5 and C16. This
+transient routing permission does not create a device session, store credentials,
+request patient data, or start the patient relay. Release/profile builds never
+expose it. Set `--dart-define=REMORI_PATIENT_PREVIEW=false` to hide it in debug.
+Exit or system back from a top-level preview returns to C16 Device, whose back
+control returns to C18 More. A5 remains available for real QR pairing.
+
+Preview Games opens all three interactive UI views without saving scores. The
+matching preview uses cup/key illustrations; real paired matching still requires
+two enrolled people and their actual photos. Picture/word games remain UI-only.
+
+The patient microphone action and P1 Ask button open P6. Its layout follows
+P6_Ask.html with Arabic/English text and back navigation. Recording, question
+submission and AI answers remain unavailable for Phase 2; no sample answer is
+presented as patient data and no assistance endpoint is called.

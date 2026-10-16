@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -837,7 +838,7 @@ void main() {
     (tester) async {
       final fake = FakeRepository(client, db, key);
       await mount(tester, fake);
-      expect(find.text('Journal'), findsOneWidget);
+      expect(find.text('Journal'), findsNWidgets(2));
       expect(find.text('Reminder activity recorded.'), findsOneWidget);
       expect(find.textContaining('Mona (Sister)'), findsOneWidget);
       expect(find.text('Done'), findsNothing);
@@ -1071,18 +1072,34 @@ void main() {
     expect(previews.loads, 2);
     expect(find.byType(Image), findsNothing);
   });
-  testWidgets(
-    'existing center action opens reminder editor and clears previews',
-    (tester) async {
-      final previews = FakePreviews(bytes);
-      await mount(tester, FakeRepository(client, db, key), previews: previews);
-      final old = previews.clears;
-      await tester.tap(find.byTooltip('Add reminder'));
+  testWidgets('center Home opens Home and clears previews', (tester) async {
+    final previews = FakePreviews(bytes);
+    await mount(tester, FakeRepository(client, db, key), previews: previews);
+    final old = previews.clears;
+    await tester.tap(find.byTooltip('Home'));
+    await tester.pumpAndSettle();
+    expect(find.text('Home destination'), findsOneWidget);
+    expect(previews.clears, greaterThan(old));
+  });
+  testWidgets('Journal toolbar and system back return to the previous screen', (
+    tester,
+  ) async {
+    final container = await mount(tester, FakeRepository(client, db, key));
+    final router = container.read(remoriRouterProvider);
+    for (final systemBack in [false, true]) {
+      router.goNamed(RemoriScreen.c1.name);
       await tester.pumpAndSettle();
-      expect(find.text('Reminder destination'), findsOneWidget);
-      expect(previews.clears, greaterThan(old));
-    },
-  );
+      router.pushNamed(RemoriScreen.c12.name);
+      await tester.pumpAndSettle();
+      if (systemBack) {
+        await tester.binding.handlePopRoute();
+      } else {
+        await tester.tap(find.byTooltip('Back'));
+      }
+      await tester.pumpAndSettle();
+      expect(find.text('Home destination'), findsOneWidget);
+    }
+  });
   for (final language in ['en', 'ar']) {
     testWidgets('C12 $language reference capture', (tester) async {
       debugDisableShadows = false;
@@ -1117,6 +1134,18 @@ void main() {
         scale: 2,
         size: const Size(320, 844),
       );
+      final title = find.byKey(const Key('journal-title'));
+      final paragraph = tester.renderObject<RenderParagraph>(title);
+      expect(paragraph.didExceedMaxLines, false);
+      final boxes = paragraph.getBoxesForSelection(
+        TextSelection(
+          baseOffset: 0,
+          extentOffset: paragraph.text.toPlainText().length,
+        ),
+      );
+      expect(boxes.map((box) => box.top).toSet(), hasLength(1));
+      expect(tester.getRect(title).left, greaterThanOrEqualTo(0));
+      expect(tester.getRect(title).right, lessThanOrEqualTo(320));
       await tester.drag(find.byType(ListView), const Offset(0, -1200));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);

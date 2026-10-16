@@ -10,6 +10,29 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get askPhaseTwo => 'Phase 2';
+
+  @override
+  String get askTapSpeak => 'Tap and speak';
+
+  @override
+  String get askQuestionHint => 'Or type your question here';
+
+  @override
+  String get askPending =>
+      'Recording questions and receiving answers will be available in Phase 2.';
+
+  @override
+  String get authConfigurationError =>
+      'The app’s connection settings are missing or invalid. Please contact support.';
+
+  @override
+  String get patientPreviewStart => 'Preview Patient Mode (no glasses)';
+
+  @override
+  String get patientPreviewExit => 'Screen preview · Exit preview';
+
+  @override
   String get gameObjectCup => 'Cup';
 
   @override

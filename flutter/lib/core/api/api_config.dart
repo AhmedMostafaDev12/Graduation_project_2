@@ -1,5 +1,12 @@
 import 'package:flutter/foundation.dart';
 
+class ApiConfigurationException extends ArgumentError {
+  ApiConfigurationException()
+    : super(
+        'Configure a valid /api/v1 base URL; release builds require HTTPS.',
+      );
+}
+
 class ApiConfig {
   ApiConfig(String value, {bool allowInsecure = !kReleaseMode}) {
     final uri = Uri.tryParse(value);
@@ -10,9 +17,7 @@ class ApiConfig {
         uri.hasFragment ||
         (uri.scheme != 'https' && !(allowInsecure && uri.scheme == 'http')) ||
         uri.path.replaceFirst(RegExp(r'/$'), '') != '/api/v1') {
-      throw ArgumentError(
-        'Configure a valid /api/v1 base URL; release builds require HTTPS.',
-      );
+      throw ApiConfigurationException();
     }
     baseUrl = value.replaceFirst(RegExp(r'/$'), '');
   }

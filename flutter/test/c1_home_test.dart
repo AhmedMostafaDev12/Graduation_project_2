@@ -23,6 +23,7 @@ import 'package:remori/core/router/remori_routes.dart';
 import 'package:remori/features/caregiver_dashboard/data/home_repository.dart';
 import 'package:remori/features/caregiver_dashboard/presentation/c1_home_screen.dart';
 import 'package:remori/features/caregiver_dashboard/presentation/home_providers.dart';
+import 'package:remori/features/journal/presentation/c12_journal_screen.dart';
 
 import 'a6_handover_test.dart' as handover;
 import 'a6_permissions_test.dart' as permissions;
@@ -406,18 +407,14 @@ void main() {
       find.text('Daily summaries will be available in Phase 2.'),
       findsOneWidget,
     );
-    expect(find.byTooltip('Add reminder'), findsOneWidget);
+    expect(find.byTooltip('Home'), findsOneWidget);
     await tester.tap(find.text('Open journal ›'));
     await tester.pumpAndSettle();
-    expect(
-      container
-          .read(remoriRouterProvider)
-          .routeInformationProvider
-          .value
-          .uri
-          .path,
-      '/c12',
-    );
+    expect(find.byType(C12JournalScreen), findsOneWidget);
+    expect(container.read(remoriRouterProvider).canPop(), isTrue);
+    await tester.tap(find.byTooltip('Back'));
+    await tester.pumpAndSettle();
+    expect(find.byType(C1HomeScreen), findsOneWidget);
   });
   testWidgets(
     'patient switching isolates card data and hides viewer write action',

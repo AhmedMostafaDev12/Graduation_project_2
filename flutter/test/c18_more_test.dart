@@ -24,6 +24,7 @@ import 'package:remori/features/caregiver_dashboard/domain/home_data.dart';
 import 'package:remori/features/caregiver_dashboard/domain/more_data.dart';
 import 'package:remori/features/caregiver_dashboard/presentation/home_providers.dart';
 import 'package:remori/features/caregiver_dashboard/presentation/more_providers.dart';
+import 'package:remori/features/caregiver_dashboard/presentation/c18_more_screen.dart';
 
 import 'a6_handover_test.dart' as auth;
 import 'c1_home_test.dart' as c1;
@@ -614,6 +615,7 @@ void main() {
     bool viewer = false,
     double scale = 1,
     MoreScope? Function()? selected,
+    bool sharedLanguage = false,
   }) async {
     await tester.runAsync(() async {
       if ((await db.select(db.dashboardPatients).get()).isEmpty) {
@@ -648,7 +650,11 @@ void main() {
         moreRepositoryProvider(scope).overrideWithValue(repo),
         credentialStoreProvider.overrideWithValue(credentials),
         homeRefreshProvider.overrideWith(c8.QuietHome.new),
-        appLocaleProvider.overrideWithValue(Locale(language)),
+        appLocaleProvider.overrideWith(
+          (ref) => sharedLanguage
+              ? ref.watch(appLanguageSelectionProvider) ?? Locale(language)
+              : Locale(language),
+        ),
         screenBuildersProvider.overrideWithValue({
           ...builders,
           for (final screen in [
@@ -702,8 +708,8 @@ void main() {
   }.entries) {
     testWidgets('${destination.key} opens the existing screen', (tester) async {
       await mount(tester);
-      await tester.ensureVisible(find.text(destination.key));
-      await tester.tap(find.text(destination.key));
+      await tester.ensureVisible(find.text(destination.key).first);
+      await tester.tap(find.text(destination.key).first);
       await tester.pumpAndSettle();
       expect(
         find.text('${destination.value.name} destination'),
@@ -711,6 +717,32 @@ void main() {
       );
     });
   }
+  testWidgets(
+    'confirmed Profile language changes update the shared locale and existing cache',
+    (tester) async {
+      final container = await mount(tester, sharedLanguage: true);
+      for (final language in ['ar', 'en']) {
+        await tester.runAsync(
+          () => container
+              .read(moreControllerProvider(scope).notifier)
+              .change(
+                profile: PatientProfile('Patient', language, 'Africa/Cairo'),
+              ),
+        );
+        await tester.pumpAndSettle();
+        expect(container.read(appLocaleProvider), Locale(language));
+        expect(
+          Localizations.localeOf(tester.element(find.byType(C18MoreScreen))),
+          Locale(language),
+        );
+        final saved = await home.read();
+        expect(
+          saved.patients.firstWhere((p) => p.id == scope.$2).language,
+          language,
+        );
+      }
+    },
+  );
   testWidgets('profile dialog validates timezone and saves changed name', (
     tester,
   ) async {
@@ -775,6 +807,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(container.read(moreControllerProvider(scope)).pending, true);
+      expect(container.read(appLanguageSelectionProvider), const Locale('ar'));
       repo.cacheFails = false;
       await tester.tap(find.text('Retry'));
       await tester.pumpAndSettle();

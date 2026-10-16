@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/locale_providers.dart';
+
 import '../../../core/api/api_providers.dart';
 import '../../../core/db/database_providers.dart';
 import '../../people/domain/people_data.dart';
@@ -142,6 +144,9 @@ class MoreController extends Notifier<MoreState> {
         final receipt = await repo.editProfile(profile);
         if (!_current) return false;
         _profile = receipt;
+        ref
+            .read(appLanguageSelectionProvider.notifier)
+            .select(receipt.language);
       } else {
         final receipt = await repo.revoke(revokeId!);
         if (!_current) return false;
