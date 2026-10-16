@@ -737,6 +737,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get peopleNoActive => 'لم تتم إضافة أشخاص نشطين بعد.';
 
   @override
+  String get peopleEmptyTitle => 'لم تتم إضافة أي شخص بعد';
+
+  @override
+  String get peopleEmptyManager => 'أضف أول شخص تريد أن يتعرّف عليه المريض.';
+
+  @override
+  String get peopleEmptyViewer =>
+      'سيظهر هنا الأشخاص الذين يضيفهم مقدم الرعاية.';
+
+  @override
   String get peopleNoArchived => 'لا يوجد أشخاص مؤرشفون.';
 
   @override

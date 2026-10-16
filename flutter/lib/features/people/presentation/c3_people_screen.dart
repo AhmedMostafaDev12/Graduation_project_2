@@ -7,6 +7,7 @@ import 'package:intl/intl.dart' show NumberFormat;
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/router/remori_routes.dart';
 import '../../../core/theme/remori_theme.dart';
+import '../../../core/theme/remori_widgets.dart';
 import '../../caregiver_dashboard/presentation/home_providers.dart';
 import '../domain/people_data.dart';
 import 'people_providers.dart';
@@ -94,6 +95,124 @@ class _C3PeopleScreenState extends ConsumerState<C3PeopleScreen>
     );
     final small = Theme.of(context).textTheme.bodySmall
         ?.copyWith(fontFamilyFallback: const ['Readex Pro']);
+    final empty =
+        scope != null &&
+        data.loaded &&
+        data.people.isEmpty &&
+        !refresh.busy &&
+        !refresh.failed &&
+        !snapshot.isLoading &&
+        !snapshot.hasError;
+    if (empty) {
+      return LayoutBuilder(
+        builder: (context, constraints) => RefreshIndicator(
+          onRefresh: () => ref.read(peopleRefreshProvider.notifier).refresh(),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color: RemoriColors.border),
+                    ),
+                  ),
+                  child: Text(
+                    s.caregiverPeople,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ),
+                if (data.unknownCount > 0)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+                    child: Material(
+                      color: RemoriColors.warning,
+                      borderRadius: BorderRadius.circular(10),
+                      child: ListTile(
+                        title: Text(s.peopleReviewCount(data.unknownCount)),
+                        trailing: Icon(
+                          Directionality.of(context) == TextDirection.rtl
+                              ? Icons.chevron_left
+                              : Icons.chevron_right,
+                        ),
+                        onTap: () => context.pushNamed(
+                          RemoriScreen.c6.name,
+                          extra: scope.patientId,
+                        ),
+                      ),
+                    ),
+                  ),
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight:
+                        (constraints.maxHeight -
+                                70 -
+                                (data.unknownCount > 0 ? 80 : 0))
+                            .clamp(0, double.infinity),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      key: const Key('d6-empty-people'),
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 120,
+                          height: 120,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFEEE8F7),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: ExcludeSemantics(
+                              child: CustomPaint(
+                                size: const Size(56, 56),
+                                painter: _EmptyPeoplePainter(),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          s.peopleEmptyTitle,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          canAdd ? s.peopleEmptyManager : s.peopleEmptyViewer,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            height: 1.5,
+                            color: RemoriColors.muted,
+                          ),
+                        ),
+                        if (canAdd) ...[
+                          const SizedBox(height: 14),
+                          RemoriButton(
+                            label: s.peopleAdd,
+                            onPressed: () => context.pushNamed(
+                              RemoriScreen.c4.name,
+                              extra: scope.patientId,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     return RefreshIndicator(
       onRefresh: () => ref.read(peopleRefreshProvider.notifier).refresh(),
       child: SingleChildScrollView(
@@ -359,4 +478,30 @@ class _C3PeopleScreenState extends ConsumerState<C3PeopleScreen>
       ),
     );
   }
+}
+
+/// The line illustration exported in D6, drawn without another asset package.
+class _EmptyPeoplePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.scale(size.width / 24, size.height / 24);
+    final ink = Paint()
+      ..color = RemoriColors.purple
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.6
+      ..strokeCap = StrokeCap.round;
+    canvas.drawCircle(const Offset(9, 8), 3.5, ink);
+    canvas.drawArc(
+      const Rect.fromLTWH(2.5, 13.5, 13, 13),
+      3.141592653589793,
+      3.141592653589793,
+      false,
+      ink,
+    );
+    canvas.drawLine(const Offset(19, 8), const Offset(19, 14), ink);
+    canvas.drawLine(const Offset(16, 11), const Offset(22, 11), ink);
+  }
+
+  @override
+  bool shouldRepaint(covariant _EmptyPeoplePainter oldDelegate) => false;
 }
