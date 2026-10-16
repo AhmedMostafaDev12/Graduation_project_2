@@ -227,6 +227,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginTitle => 'Caregiver Log in';
 
   @override
+  String get accountExistsTitle => 'An account with this email already exists';
+
+  @override
+  String get accountExistsGuidance => 'Sign in with your existing account.';
+
+  @override
+  String get accountExistsEmail => 'Log in with email';
+
+  @override
+  String get accountExistsExplanation =>
+      'Accounts aren’t joined automatically. Use your existing sign-in method.';
+
+  @override
   String get emailLabel => 'Email';
 
   @override

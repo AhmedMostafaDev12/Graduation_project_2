@@ -37,6 +37,7 @@ import '../../features/reminders/presentation/c8_reminders_screen.dart';
 import '../../features/reminders/presentation/c9_edit_reminder_screen.dart';
 import '../../features/auth/presentation/a1_mode_select_screen.dart';
 import '../../features/auth/presentation/a2_login_screen.dart';
+import '../../features/auth/presentation/d7_account_exists_screen.dart';
 import '../../features/auth/presentation/a3_signup_screen.dart';
 import '../../features/enrollment/presentation/a4_patient_profile_screen.dart';
 import '../../features/device_pairing/presentation/a5_pair_glasses_screen.dart';
@@ -192,6 +193,7 @@ final screenBuildersProvider = Provider<Map<RemoriScreen, RemoriScreenBuilder>>(
     RemoriScreen.a4: (context, state) => const A4PatientProfileScreen(),
     RemoriScreen.a3: (context, state) => const A3SignupScreen(),
     RemoriScreen.a2: (context, state) => const A2LoginScreen(),
+    RemoriScreen.d7: (context, state) => const D7AccountExistsScreen(),
     RemoriScreen.a1: (context, state) => A1ModeSelectScreen(
       onCaregiver: () => context.goNamed(RemoriScreen.a2.name),
       onPatientPhone: () => context.goNamed(RemoriScreen.a2.name),
@@ -262,7 +264,9 @@ final remoriRouterProvider = Provider<GoRouter>((ref) {
           name: screen.name,
           builder: (context, state) => Scaffold(
             body: RemoriBackground(
-              kind: RemoriBackgroundKind.onboarding,
+              kind: screen == RemoriScreen.d7
+                  ? RemoriBackgroundKind.wave
+                  : RemoriBackgroundKind.onboarding,
               child: _ScreenSlot(screen: screen, state: state),
             ),
           ),
