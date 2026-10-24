@@ -110,6 +110,7 @@ The **product** uses cloud APIs (reliable now). The **engine chooses its models 
 |---|---|
 | `ml/capture_gate/` | gate rules tuning, stage-2 classifier training on the dev set, export |
 | `ml/rag_eval/` | the benchmark: question records, scripts, scoring code |
+| `ml/face/` | face recognition evaluation (§9.1) and threshold choice |
 | `ml/replay/` (new) | replay harness + baseline systems (§7) |
 | `ml/datasets/` | local only (gitignored): recordings never go into git |
 
@@ -128,7 +129,7 @@ SuperMemory-VQA generates questions from AI captions, so anything the captioner 
 | Camera | Phone or GoPro on a **head strap at eye level**, recording **full video (1080p, 30 fps) + audio** | Remori gets a 1 fps downsample in the replay. The full video keeps store-everything and Video-RAG fair and allows testing an adaptive frame rate later without re-recording |
 | Microphone | the device's single microphone | matches the glasses |
 | Sync | **clap + a phone clock shown to the camera** at the start of every session | aligns video, observer log and multi-day sessions |
-| Observer log | a Google Form/Sheet: time, room, what happened, category, question IDs it supports | the ground truth |
+| Observer log | a Google Form/Sheet: time, room, what happened, category, question IDs it supports, and for people: who, entering/leaving, condition tags (§9.1) | the ground truth |
 
 ### 5.3 Roles
 - **Wearer:** a volunteer playing the patient, under a code name.
@@ -147,7 +148,7 @@ SuperMemory-VQA generates questions from AI captions, so anything the captioner 
 |---|---|---|
 | Making tea or koshary | ingredient order; "did I turn off the stove?" | timeline, state change |
 | Taking medicine | before or after eating; reading the label (Concor 5 mg) | intent recall, timeline, visual recall |
-| A visitor arrives | the daughter visits; later an unknown delivery person | conversational, people, abstention |
+| A visitor arrives | the daughter visits; later an unknown delivery person (extra face plants: §9.4) | conversational, people, abstention |
 | A phone call with a plan | "I'll call the doctor tomorrow at 5" → it never happens | intent recall (proving absence) |
 | Hiding objects | keys or glasses moved between rooms, sometimes twice | object location, counting |
 | Paying the doorman | amounts said aloud, change given | in-context retrieval |
@@ -218,6 +219,7 @@ The weights are adjusted after a short caregiver survey (which memory failures t
     "wrong": "Yes, you called him at 5"
   },
   "reference_open_answer": "لا، كنت ناوي تكلمه الساعة ٥ بس ماكلمتهوش",
+  "involves_person": false, "people": [],
   "safety_weight": 2, "author": "caregiver", "llm_drafted": false,
   "is_guessable": false, "contains_pii": false, "verified_by": ["A", "B"]
 }
@@ -260,7 +262,62 @@ Results are reported **per category**, plus multi-moment vs single-moment and sh
 
 ---
 
-## 9. The paper
+## 9. People and face recognition evaluation
+
+Recognizing family members is the feature patients notice most, so it is evaluated on its own, at three levels. Level 1 needs no extra filming: it reuses the session recordings.
+
+| Level | Question it answers | Where |
+|---|---|---|
+| **1. Component** | Does the face model name the right person in one frame? | `ml/face/` (D14) |
+| **2. Encounter** | When Mona walks in, do the glasses say "Mona, your daughter" once, quickly, and never the wrong name? | `ml/replay/` |
+| **3. Memory** | Later, can Remori answer "Who visited me today?", "When did Sara last come?" | the benchmark (§6) |
+
+### 9.1 Level 1: the face model, per frame
+- **Enrollment set:** each family actor enrolls with **1–5 phone photos through the real C4 flow**, exactly as a caregiver would.
+- **Test set:** faces in the 1 fps session frames, labelled with a box and a name or "unknown". The observer log (who entered when) makes this quick.
+- **Condition tags on every test face:** distance, angle (front / side), lighting, motion blur, and occlusion (**headscarf, niqab, glasses, mask**). These are common in Egypt and under-represented in public face datasets.
+
+| Metric | Meaning |
+|---|---|
+| Detection recall | visible faces found in egocentric 1 fps frames (blur, partial faces) |
+| Rank-1 identification | the right name among enrolled people |
+| Open-set rejection | an unknown face labelled "unknown", not matched to a family member |
+| TPIR at fixed FPIR | family members recognized when false matches are held at e.g. 1% |
+| Per condition | every metric split by headscarf, niqab, glasses, lighting, angle, … |
+| Enrollment size | 1 vs 3 vs 5 photos: how many a caregiver really needs |
+| Pi cost | ms per frame and energy, measured together with the frame-embedding model (D34) |
+
+### 9.2 Level 2: the encounter (what the patient experiences)
+The evidence rule applies to faces too: **a wrong name is far worse than no name**.
+
+| Metric | Meaning | Target |
+|---|---|---|
+| **Wrong-name rate** | wrong announcements per hour of video | operating point **≤ 1 per 10 hours**, chosen on the dev sessions; the full trade-off curve is reported too |
+| Announce recall | % of family visits announced | high |
+| Time to announce | seconds from entering to the announcement | low |
+| Duplicates | announced more than once in one encounter (D13: once) | 0 |
+| Recurring unknown visitor | a stranger seen on ≥ 3 days is flagged for review (D23), measured on the multi-day series | flagged; no family member flagged by mistake |
+
+The recognition **threshold is chosen once on the dev sessions** and reported on the test sessions, with the same split rule as the gate classifier (§6.1).
+
+### 9.3 Level 3: memory of people
+- Every question involving a person is tagged (`involves_person`, `people`) and reported as a **"people" slice** next to the six categories.
+- Unanswerable people questions are included ("What did Hany say?" when Hany never came), to test that Remori never invents a visit.
+
+### 9.4 Extra plants for faces
+| Plant | Tests |
+|---|---|
+| A family member enters while the wearer looks away, then turns to them | time to announce |
+| A family member wearing glasses or a mask, or seen side-on | condition robustness |
+| The same "doorman" on every day of a multi-day series | recurring unknown visitor (D23) |
+| A second unknown person who appears once only | must **not** be flagged as recurring |
+
+### 9.5 Privacy for face data
+- Family actors give **separate consent for biometric face data**.
+- Enrollment photos and face crops are **never released**. The public dataset contains blurred faces plus identity labels only, and the paper says so.
+- Face labels use code names, never real names.
+
+## 10. The paper
 
 **Working title:** *Remember What Matters: Gated Memory for Wearable Alzheimer's Assistance in Egyptian Arabic and English* (to refine).
 
@@ -270,7 +327,7 @@ Results are reported **per category**, plus multi-moment vs single-moment and sh
 | 2. Related work | egocentric datasets → memory benchmarks (SuperMemory-VQA, MyEgo, EgoLife, EgoMemReason) → long-video retrieval (Video-RAG, AdaVideoRAG, MemVid) → the step they skip: storage-limited memory for patients |
 | 3. Remori | gate, memory, answering, privacy (§3 of this plan) |
 | 4. Benchmark | recording protocol, question design, clinically weighted mix, scoring |
-| 5. Experiments | systems, metrics, main results, ablations, small models, cost |
+| 5. Experiments | systems, metrics, main results, ablations, small models, cost; face recognition at component, encounter and memory level (§9) |
 | 6. Limitations & ethics | proxy recordings, healthy volunteers, small pool, sensors, consent |
 | 7. Conclusion | |
 
@@ -283,11 +340,12 @@ Results are reported **per category**, plus multi-moment vs single-moment and sh
 
 ---
 
-## 10. Ethics, privacy and data
+## 11. Ethics, privacy and data
 
 - **Ethics approval first:** ask the supervisor about ethics committee approval at Mansoura before recording anyone outside the team. This is the critical path.
 - **Consent:** signed by everyone on camera, including whether blurred data may be released publicly; volunteers are told some identifiability can remain.
 - **Code names** for every participant and in every file.
+- **Biometric consent:** family actors consent separately to face data; their photos and face crops are never released (§9.5).
 - **No bystanders:** record indoors, in prepared homes.
 - **Before any release:** EgoBlur on faces and plates; manual redaction of names, phone numbers and addresses in transcripts; transcripts in Egyptian Arabic get extra review.
 - **Storage:** raw recordings live in a private Drive/S3 folder, **never in git**. The repo holds scripts, question records (no personal data) and code.
@@ -296,7 +354,7 @@ Results are reported **per category**, plus multi-moment vs single-moment and sh
 
 ---
 
-## 11. Timeline (target)
+## 12. Timeline (target)
 
 | Week | Dates (2026) | Track B: research |
 |---|---|---|
@@ -311,7 +369,7 @@ Results are reported **per category**, plus multi-moment vs single-moment and sh
 
 ---
 
-## 12. Impact on the system
+## 13. Impact on the system
 
 | Area | Change | When |
 |---|---|---|
@@ -324,7 +382,7 @@ Results are reported **per category**, plus multi-moment vs single-moment and sh
 
 ---
 
-## 13. Risks
+## 14. Risks
 
 | Risk | Mitigation |
 |---|---|
@@ -337,7 +395,7 @@ Results are reported **per category**, plus multi-moment vs single-moment and sh
 
 ---
 
-## 14. Open items (not decided yet)
+## 15. Open items (not decided yet)
 
 | Item | Proposal |
 |---|---|
@@ -350,7 +408,7 @@ Results are reported **per category**, plus multi-moment vs single-moment and sh
 
 ---
 
-## 15. Decisions (spec §0)
+## 16. Decisions (spec §0)
 
 | ID | Decision |
 |---|---|
