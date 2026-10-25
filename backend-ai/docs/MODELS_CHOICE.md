@@ -132,7 +132,7 @@ A 32-second WhatsApp voice note (two people, one voice much quieter; heavily com
 | Speech-to-text | Deepgram Nova-3 `ar-EG` + diarization, volume boosted first | WhisperX (self-hosted) | **decided** (measured, §7); speaker separation still open |
 | LLM | Gemini Flash-Lite / Flash (paid) | Qwen3 via Groq | to confirm |
 | Vision | Gemini Flash (paid) | Qwen2.5-VL | to confirm |
-| Text embeddings | `text-embedding-3-small` | Qwen3-Embedding | **decided (D15)** |
+| Text embeddings | `text-embedding-3-small` (`clients/embeddings.py`, phase 7.3) | Qwen3-Embedding | **decided (D15), implemented** |
 
 Keys go in `backend-ai/.env` locally and in the server's environment, **never in git**.
 
