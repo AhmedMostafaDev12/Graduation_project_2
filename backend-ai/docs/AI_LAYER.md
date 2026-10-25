@@ -23,13 +23,17 @@ Rule of thumb: **if it runs on the server, it belongs here. If it runs on the gl
 
 ```
 app/ai/
-├── clients/          # one module per capability, each behind a small interface
+├── interfaces.py     # one Protocol per capability + result types (§6)
+├── registry.py       # profiles production / small / stub → get_ai() (§6)
+├── fakes.py          # deterministic fakes for the stub profile and tests
+├── clients/          # real providers, one module per capability, each implementing its interface
 │   ├── stt.py        #   transcribe(audio) -> Transcript       (Whisper-large-v3-class API, spec D3)
 │   ├── llm.py        #   complete(prompt) -> text               (Haiku / 4o-mini class)
 │   ├── vision.py     #   review(image) -> ReviewResult          (keep/discard + tags + OCR, spec D20)
 │   └── embeddings.py #   embed(texts) -> list[vector]           (text-embedding-3-small, 1536-d, spec D15)
 ├── inference/
 │   └── face.py       #   embed_face(image) -> vector(512)       (server-side face embedder for enrollment, spec D14; STUB 'stub-0' until Phase 8)
+├── memory/           # structured memory (§6.4, spec D40): consolidation + the five structures
 ├── rag/
 │   ├── render.py     #   event -> one sentence ("09:20 talked with Ahmed (son): ...")
 │   ├── retriever.py  #   SQL time window + person filter, then pgvector ranking (spec D22)
@@ -81,3 +85,40 @@ The vision prompt (Phase 7) must return `ReviewResult` from [`app/ai/review_cont
 | Daily summary (Phase 2) | `clients/llm.py` | Beat → task `summaries` |
 | Enrollment face embedding | `inference/face.py` | request |
 | Unknown-face clustering | `clustering.py` | task `cluster` (queue `cpu`) |
+
+---
+
+## 6. Model interfaces and profiles (spec D37, D38)
+
+**Server engine only.** Gate rules, the frame embedder and audio events run on the glasses and live in `ml/edge/` (D38); this section covers what the backend runs.
+
+### 6.1 One interface per capability (`app/ai/interfaces.py`)
+| Interface | Method | Production (cloud) | Small (open) |
+|---|---|---|---|
+| `SpeechToText` | `transcribe(audio, content_type, language_hint) -> Transcript` (segments with times and speaker labels) | Whisper-class API + diarization | WhisperX |
+| `TextEmbedder` | `embed(texts) -> list[vector]` | `text-embedding-3-small` (1536-d, D15) | a multilingual open embedder |
+| `VisionReviewer` | `review(image, language) -> dict` (shaped by `review_contract`) | cloud vision model | Qwen2.5-VL |
+| `Captioner` | `caption(images, transcript, language) -> str` | cloud vision model | small VLM |
+| `LLM` | `complete(messages, json_schema=None) -> str` | Haiku / 4o-mini class | Qwen / Gemma via a local server |
+| `FaceEmbedder` | `embed_face(image) -> vector(512)` | MobileFaceNet ONNX (D14) | same |
+
+Every implementation exposes `model_id`, and anything it produces is stored with that id (for example, which model embedded an event).
+
+### 6.2 Profiles and the registry (`app/ai/registry.py`)
+- `AI_PROFILE=production | small | stub` picks an implementation for every capability. One capability can be overridden: `AI_STT`, `AI_TEXT_EMBEDDER`, `AI_VISION`, `AI_CAPTIONER`, `AI_LLM`, `AI_FACE`.
+- `get_ai()` builds the models **once per process** (rule 4) and caches them. Services call `get_ai().stt.transcribe(...)`, never a provider SDK.
+- A provider that isn't implemented yet fails with a clear error naming the capability. The default profile stays `stub` until the real clients exist.
+- `stub` uses `app/ai/fakes.py`: deterministic fakes with the right shapes and dimensions, for tests and local work without API keys.
+
+### 6.3 Rules for swapping models
+1. **Vectors from different models never mix.** Changing the product's `TextEmbedder` means re-embedding everything (rule 7, a lead decision).
+2. **Experiments never write to the product database.** The replay harness (`ml/replay/`) uses its own memory store with the `small` or `production` profile.
+3. **Adding a provider** = a class implementing the interface + one entry in the registry + tests with mocked HTTP (rule 9). Services don't change.
+
+### 6.4 Structured memory (spec D40)
+- **Layers:** raw evidence (events, verbatim transcripts with speakers, kept frames, frame embeddings, OCR) → **five structures** → day/week summaries. Summaries never answer alone.
+- **The five structures:** object sightings/states, action log (one row per action, never merged), facts (speaker + exact quote + typed numbers/dates), intentions (plan, due time, status, settling evidence), entity index.
+- **Consolidation** (`app/ai/memory/`): Celery tasks after transcription and review extract the structures with versioned prompts. Every record stores the ids of the evidence it came from and the `model_id` that extracted it. Quotes are copied verbatim, never paraphrased.
+- **Intentions are re-checked** when new actions or events arrive: status moves from unknown to done / not done, with the evidence that settled it.
+- **Answering** (`rag/`): route by question type to the structures first, then vector search; the premise check queries the entity index.
+- **Switchable:** a setting turns the structures off, giving the flat-memory baseline used in the research (H6).
