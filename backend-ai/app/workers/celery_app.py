@@ -19,6 +19,7 @@ celery_app = Celery(
         "app.workers.tasks.alerts",
         "app.workers.tasks.retention",
         "app.workers.tasks.media",
+        "app.workers.tasks.transcription",
     ],
 )
 
@@ -50,6 +51,7 @@ celery_app.conf.update(
         "alerts.*": {"queue": "default"},
         "retention.*": {"queue": "default"},
         "media.*": {"queue": "cpu"},  # image/video work is CPU-bound
+        "transcribe.*": {"queue": "ai_io"},  # waits on the speech-to-text API
     },
 )
 

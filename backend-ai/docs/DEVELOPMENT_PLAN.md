@@ -216,12 +216,12 @@ Build in the order the Flutter screens need them (spec §12: Caregiver Mode firs
 | 7.0 Model interfaces | `ai/interfaces.py` (one interface per capability), `ai/fakes.py`, `ai/registry.py` with profiles `production` / `small` / `stub` (spec D37, D38, AI_LAYER.md §6). Tests use `stub` |
 | 7.0b Contract PRs | spec §6 (frame-embeddings table, `media.gate_rule`, speaker labels, the five memory-structure tables of D40), §7.1 (frame-embedding message, `gate_rule`), §8 (retention), agreed with hardware + Flutter before any ingestion code |
 | 7.1 `ai/clients/stt.py` | STT API client with timeout + `TransientError`, implementing `SpeechToText`; diarization adds speaker labels (D36). **Done:** Deepgram Nova-3 `ar-EG` ([MODELS_CHOICE.md](MODELS_CHOICE.md) §7) |
-| 7.2 Task `transcribe` | audio from S3 → **volume boost** (`dynaudnorm` + `loudnorm`, 16 kHz mono; recovers quiet speech, MODELS_CHOICE §7.3) → transcript with speaker-labelled `metadata.segments` → `conversation_segment` event with `present_person_ids` → **delete the audio** |
+| 7.2 Task `transcribe` | audio from S3 → **volume boost** (`dynaudnorm` + `loudnorm`, 16 kHz mono; recovers quiet speech, MODELS_CHOICE §7.3) → transcript with speaker-labelled `metadata.segments` → `conversation_segment` event with `present_person_ids` → **delete the audio**. No transcription without the master switch + household and cloud consents (spec §7.3). **Done:** task `transcribe.segment` (queue `ai_io`), `services/transcription_service.py` |
 | 7.3 `ai/clients/embeddings.py` + `ai/rag/render.py` | task `embed`: render each event to a sentence and store its embedding |
 | 7.4 Wire it | `uploads/{id}/complete` for audio → enqueue `transcribe` (after commit) |
 | 7.5 Consolidation from speech | `ai/memory/`: after `transcribe`, extract **intentions** and **facts** (exact quotes, typed numbers), and feed the **entity index**; re-check open intentions when new events arrive (spec D40) |
 
-**Status (25 Oct 2026):** 7.0 done (PR #67), 7.0b done (PR #69, spec D41), 7.1 done (PR #71: Deepgram Nova-3 `ar-EG` with speaker labels, chosen by measurement in [MODELS_CHOICE.md](MODELS_CHOICE.md) §7). **Next: 7.2.**
+**Status (25 Oct 2026):** 7.0 done (PR #67), 7.0b done (PR #69, spec D41), 7.1 done (PR #71: Deepgram Nova-3 `ar-EG` with speaker labels, chosen by measurement in [MODELS_CHOICE.md](MODELS_CHOICE.md) §7), 7.2 done (task `transcribe.segment`). **Next: 7.4** (wire audio uploads to the task), then 7.3.
 
 **Done when (M5):** a real recording uploaded from the phone shows up as a transcript in C12 / P4, and the audio is gone from S3.
 
