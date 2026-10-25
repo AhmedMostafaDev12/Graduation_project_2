@@ -115,6 +115,8 @@ Every implementation exposes `model_id`, and anything it produces is stored with
 2. **Experiments never write to the product database.** The replay harness (`ml/replay/`) uses its own memory store with the `small` or `production` profile.
 3. **Adding a provider** = a class implementing the interface + one entry in the registry + tests with mocked HTTP (rule 9). Services don't change.
 
+**Which provider for each capability, and the data rule for free tiers:** [MODELS_CHOICE.md](MODELS_CHOICE.md).
+
 ### 6.4 Structured memory (spec D40)
 - **Layers:** raw evidence (events, verbatim transcripts with speakers, kept frames, frame embeddings, OCR) → **five structures** → day/week summaries. Summaries never answer alone.
 - **The five structures:** object sightings/states, action log (one row per action, never merged), facts (speaker + exact quote + typed numbers/dates), intentions (plan, due time, status, settling evidence), entity index.

@@ -31,6 +31,7 @@ Use **current library versions**, not the course's 2021 ones: Pydantic v2, SQLAl
 | [`docs/AI_LAYER.md`](docs/AI_LAYER.md) | touch STT, LLM, vision, embeddings, RAG, vector search or face inference. Includes the boundary between `backend-ai/app/ai/` and `ml/` |
 | [`docs/CELERY_REDIS.md`](docs/CELERY_REDIS.md) | write or change a background task, a schedule, or anything with Redis. **Not covered by the course**, so follow it closely |
 | [`docs/DATABASE.md`](docs/DATABASE.md) | change a table, write a migration, or connect to local Postgres or Supabase |
+| [`docs/MODELS_CHOICE.md`](docs/MODELS_CHOICE.md) | pick or change a cloud AI provider (speech-to-text, LLM, vision, embeddings): options, prices, free tiers, the data rule |
 
 Spec sections you'll need most: §6 (tables), §7.2 (endpoints), §7.3–7.4 (AI pipelines), §8 (retention), §9 (privacy).
 
