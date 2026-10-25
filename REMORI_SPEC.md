@@ -43,6 +43,16 @@ Decisions taken in the 2026-10-03 design session. **P** = product decision by th
 | D29 | **Smart-review contract:** keep/discard is separate from category; fixed shapes for receipt, bill, medication label and `ai_tags`; everything else is `other` with the model's own title, labels or reason (never dropped, never an error); unknown categories kept in `raw_category` and promoted to real ones only by the lead (§7.4). Documents and media responses are ready to show (`title`, `headline`, `fields`, `captured_at`, event summary). | P |
 | D30 | **Background jobs (Phase 6):** one Celery worker + one Beat + Redis (AOF) on the API server, no Flower. Caregiver alerts every 5 min: missed medication (marked missed, or pending 60 min after its time), glasses offline 30 min (once per spell), battery <= 20% (at most every 12 h), to every linked caregiver once. Retention hourly: expired unpinned photos, audio untranscribed after 7 days. Upload previews (photos and videos) made by the worker. | P |
 | D31 | **Flutter packages, pairing QR, fake glasses.** Approved on top of the §10 stack: `flutter_secure_storage` (auth + device tokens), `flutter_svg`, `mobile_scanner` (A5), `permission_handler` (A6), `flutter_blue_plus` (BLE relay), and `uuid`, `intl`, `path_provider`, `sqlite3` (drift); fonts are bundled as assets. The glasses-case QR holds **only the plain serial** (§7.1). Until the glasses run the §7.1 service, **development builds** use a `FakeGlassesConnection` that sends §7.1 messages, so A6 handover, Patient Mode and every glasses-dependent screen can be built and tested; release builds use real BLE only. | P |
+| D32 | **Research track (gated memory).** A research paper runs in parallel with the build: Remori's capture-time gate vs store-everything and published baselines, on a benchmark of ~200–250 planted patient-memory questions (Egyptian Arabic + English) recorded with head-mounted phone/GoPro proxies, replayed offline; real-glasses data later as validation. Target: arXiv around mid-December 2026. Plan: [`docs/RESEARCH_PLAN.md`](docs/RESEARCH_PLAN.md). | P |
+| D33 | **Capture gate v1:** face, text, medication (open-vocabulary detector) and novelty (from the frame embedding) rules, plus a stage-2 classifier trained on dev-set labels, plus audio-event triggers (YAMNet: doorbell, pill bottle, kettle, door). Every kept item records the `gate_rule` that kept it. IMU and adaptive frame rate come in semester 2. The §7.1 message and §6 column changes are specified contract-first before implementation. | T |
+| D34 | **Frame embeddings:** the glasses compute a small image embedding (~1 KB, CLIP/SigLIP class, INT8) for **every** 1 fps frame and send only the vector; the image is discarded unless the gate keeps it. Discarded frames never leave the glasses. Table, message and retention are specified in §6/§7.1/§8 before implementation. | T |
+| D35 | **Unknown faces:** raw face samples exist only inside the unknown-face review cluster (C6/C7) until the caregiver promotes or dismisses it (at most 30 days, §8). Everywhere else, unknown people are blurred before any cloud call (D20) and kept only as text descriptions. | P |
+| D36 | **Who said what:** conversation segments keep `present_person_ids` (from faces) and add speaker labels from diarization (Speaker A/B) in the cloud transcription worker (§7.3). No voice enrollment. | T |
+| D37 | **Models:** the product keeps cloud AI APIs. The memory engine chooses its models from configuration, so experiments run the same memory with cloud and small open models (e.g. Qwen2.5-VL, Gemma) and the paper reports both. | T |
+| D38 | **Memory engine packaging (two parts, one copy of each):** the **edge engine** (gate rules, frame embedder, face preprocessing, audio-event classifier) is a light package in `ml/edge/` (plain Python + ONNX, no server dependencies) used by the Pi, the replay harness and the backend's enrollment embedder; the **server engine** (speech-to-text with speaker labels, vision review, captioner, text embeddings, retriever, answerer, evidence rule) lives in `backend-ai/app/ai/` behind one interface per capability, with models chosen by profile (`production` / `small` / `stub`, D37). `ml/replay/` installs both. Experiments never write to the product database. | T |
+| D39 | **Answering with evidence:** free-form answers follow plan → up to 3 hybrid searches (now including frame embeddings) → evidence and premise check → answer with source events, or a kind "I'm not sure" when the evidence doesn't support every part of the question. The whole path fits the 20 s glasses fallback (§7.1). | P |
+| D40 | **Structured memory (three layers).** Layer 1 raw evidence (events, verbatim transcripts with speakers, kept frames, frame embeddings, OCR text); layer 2 **five structures** extracted by a consolidation job, every record linked to its evidence: object sightings/states, an action log (one row per action instance, never merged), facts (speaker + exact quote + typed numbers/dates), intentions (plan, due time, status done / not done / unknown + the evidence that settled it), and an entity index (every person, object, place seen or mentioned); layer 3 day/week summaries, never the only source of an answer. Answering routes by question type to the structures, then falls back to vector search; the premise check queries the entity index. Structures can be switched off for the flat-memory ablation (H6). Tables are specified contract-first in §6 before implementation. Suggesting reminders from intentions is a separate, later decision. | T |
+| D41 | **Memory contract (phase 7.0b) for D33, D34, D36, D40.** (1) **Two-tier frame memory:** the glasses embed every frame. Postgres keeps **scene segments** (a run of similar frames, cut where the novelty rule fires, at most 30 s) with **3 representative frame vectors** each (first, middle, most different; ~6 MB/day). **Every per-frame vector** goes to S3 as **hourly 8-bit files** (~30 MB/day, sent over the Wi-Fi burst and uploaded on Wi-Fi only). Retrieval is two-stage: segments find the candidate minutes, the hourly files re-rank every frame inside them. (2) Every kept frame carries `gate_rule`. (3) Non-speech sounds are `sound_detected` events. (4) Transcripts keep speaker-labelled segments in `events.metadata.segments`. (5) Five memory tables: `memory_entities`, `object_sightings`, `memory_actions`, `memory_facts`, `memory_intentions`, each row linked to its evidence and the `model_id` that extracted it. (6) Retention: segments and frame-vector files 90 days; structures like journal text, deleted with the evidence they came from (§8). | T |
 
 ---
 
@@ -110,7 +120,7 @@ Remori helps a person living with Alzheimer's recognize the people around them, 
 | On-device inference | TFLite / ONNX Runtime, INT8 |
 | Face detection | Ultra-Light-Fast-Generic-Face-Detector |
 | Face embedding | MobileFaceNet, InsightFace `w600k_mbf`, 512-d (D14) |
-| Capture gate | Phase 1 heuristics (face present · text-density/edge document detector · frame-difference novelty). A quantized MobileNetV3 replaces them if time allows |
+| Capture gate | Gate v1 (D33): face · text · medication · novelty rules + stage-2 classifier + audio events; every frame also gets an on-device embedding (D34) |
 | VAD | Silero VAD |
 | Intent classifier | Small log-mel CNN, push-to-talk utterance only (D17) |
 | Audio codec | Opus, 16 kbps mono |
@@ -326,7 +336,8 @@ events (
   source ENUM('glasses','app','server'),
   event_type ENUM('encounter','conversation_segment','voice_query','reminder',
                   'mind_game_session','manual_note','user_requested_recording',
-                  'document_captured','notable_moment_captured','memory_paused','memory_resumed'),
+                  'document_captured','notable_moment_captured','memory_paused','memory_resumed',
+                  'sound_detected'),         -- non-speech sound from the glasses (D33, D41)
   encounter_id UUID FK -> encounters NULLABLE,
   person_id UUID FK -> enrolled_people NULLABLE,
   reminder_log_id UUID FK -> reminder_logs NULLABLE,
@@ -338,6 +349,8 @@ events (
   rendered_text TEXT NULLABLE,         -- one-sentence rendering for RAG (D22)
   embedding VECTOR(1536) NULLABLE,     -- of rendered_text (D15)
   metadata JSONB,                      -- e.g. {"present_person_ids":[...], "place_id": "..."}
+                                       -- conversation_segment: "segments":[{"start_s","end_s","speaker":"A","text"}] (D36)
+                                       -- sound_detected: {"label":"doorbell","score":0.91}
   created_at, synced_at, updated_at, deleted_at TIMESTAMPTZ
 )
 
@@ -361,6 +374,7 @@ media_assets (
   storage_key TEXT,                    -- private S3 key, never a public URL
   thumbnail_key TEXT NULLABLE,         -- ~320 px JPEG preview, NULL for videos (D28)
   trigger ENUM('encounter_keyframe','document_signal','salient_frame','user_requested'),
+  gate_rule ENUM('face','text','medication','novelty','audio_event','classifier','user_requested') NULLABLE, -- which gate rule kept it (D33)
   status ENUM('pending_review','confirmed','discarded'),
   ai_tags JSONB NULLABLE,              -- {category, tags[], reason, raw_category?} (D29)
   contains_other_people BOOLEAN NULLABLE,
@@ -379,6 +393,117 @@ captured_documents (
   ocr_text TEXT,
   extracted_fields JSONB,              -- per-type keys, or {title, fields[]} for other (D29)
   created_at TIMESTAMPTZ
+)
+
+-- ===== Memory (D33, D34, D36, D40, D41) =====
+scene_segments (                       -- one row per run of similar frames, at most 30 s (D41)
+  id UUID PK,                          -- generated on glasses
+  patient_id UUID FK -> users,
+  device_id UUID FK -> devices,
+  started_at, ended_at TIMESTAMPTZ,
+  frame_count INT,
+  model_id TEXT,                       -- edge image embedder, e.g. 'mobileclip-s0@1.0'
+  kept_media_ids UUID[],               -- frames the gate kept inside this segment
+  created_at TIMESTAMPTZ               -- deleted after 90 days (§8)
+)
+
+scene_vectors (                        -- tier 1: 3 real frame vectors per segment, searched first (D41)
+  id UUID PK,
+  segment_id UUID FK -> scene_segments,
+  patient_id UUID FK -> users,
+  captured_at TIMESTAMPTZ,             -- the frame's own second
+  role ENUM('first','middle','most_different'),
+  embedding HALFVEC(512)               -- dimension fixed by the edge model card (D34)
+)
+
+frame_vector_files (                   -- tier 2: EVERY frame's vector, one 8-bit file per hour in S3 (D41)
+  id UUID PK,                          -- generated on glasses
+  patient_id UUID FK -> users,
+  device_id UUID FK -> devices,
+  hour_start TIMESTAMPTZ,
+  frame_count INT,
+  model_id TEXT, dim INT,
+  storage_key TEXT,                    -- private S3 key; the vectors are never stored in Postgres
+  created_at TIMESTAMPTZ,              -- deleted after 90 days (§8)
+  UNIQUE (patient_id, device_id, hour_start)
+)
+
+memory_entities (                      -- entity index: every person, object, place seen or mentioned (D40)
+  id UUID PK,
+  patient_id UUID FK -> users,
+  kind ENUM('person','object','place'),
+  name TEXT,                           -- normalized label in the patient's language: "النضارة", "keys"
+  aliases TEXT[],
+  person_id UUID FK -> enrolled_people NULLABLE,
+  place_id UUID FK -> places NULLABLE,
+  name_embedding VECTOR(1536) NULLABLE,-- matches "my glasses" to "النضارة" (D15)
+  first_seen_at, last_seen_at TIMESTAMPTZ,
+  mention_count INT,
+  updated_at, deleted_at TIMESTAMPTZ,
+  UNIQUE (patient_id, kind, name)
+)
+
+object_sightings (                     -- where an object was and in what state (D40)
+  id UUID PK,
+  patient_id UUID FK -> users,
+  entity_id UUID FK -> memory_entities,
+  state TEXT NULLABLE,                 -- short: 'on', 'off', 'washed', 'open', 'in the drawer'
+  room TEXT NULLABLE,                  -- from the image: 'kitchen', 'bedroom' (GPS has no rooms)
+  place_id UUID FK -> places NULLABLE,
+  seen_at TIMESTAMPTZ,
+  media_asset_id UUID FK -> media_assets NULLABLE,
+  scene_segment_id UUID FK -> scene_segments NULLABLE,
+  confidence REAL,
+  model_id TEXT,
+  created_at, deleted_at TIMESTAMPTZ
+)
+
+memory_actions (                       -- action log: ONE ROW PER INSTANCE, never merged (D40)
+  id UUID PK,
+  patient_id UUID FK -> users,
+  verb TEXT,                           -- normalized: 'take_medication', 'add_ingredient', 'turn_off', 'pay'
+  entity_id UUID FK -> memory_entities NULLABLE,
+  quantity REAL NULLABLE, unit TEXT NULLABLE,
+  occurred_at TIMESTAMPTZ,
+  source ENUM('vision','speech','sound','reminder'),
+  evidence_event_id UUID FK -> events NULLABLE,
+  media_asset_id UUID FK -> media_assets NULLABLE,
+  confidence REAL,
+  model_id TEXT,
+  created_at, deleted_at TIMESTAMPTZ
+)
+
+memory_facts (                         -- who said what, verbatim (D36, D40)
+  id UUID PK,
+  patient_id UUID FK -> users,
+  event_id UUID FK -> events,          -- the conversation_segment
+  segment_index INT,                   -- index into events.metadata.segments
+  speaker_label TEXT NULLABLE,         -- diarization label 'A', 'B'
+  speaker_person_id UUID FK -> enrolled_people NULLABLE,
+  quote TEXT,                          -- copied verbatim, never paraphrased
+  language ENUM('ar','en','mixed'),
+  about_entity_ids UUID[],
+  values JSONB,                        -- typed: [{"kind":"number|money|date|time|dose","value":...,"unit":...,"text":"..."}]
+  said_at TIMESTAMPTZ,
+  model_id TEXT,
+  created_at, deleted_at TIMESTAMPTZ
+)
+
+memory_intentions (                    -- plans and whether they happened (D40)
+  id UUID PK,
+  patient_id UUID FK -> users,
+  holder ENUM('patient','other'),
+  holder_person_id UUID FK -> enrolled_people NULLABLE,
+  description TEXT,                    -- normalized: "call the doctor"
+  quote TEXT,                          -- the words that stated it, verbatim
+  source_event_id UUID FK -> events,
+  stated_at TIMESTAMPTZ,
+  due_at TIMESTAMPTZ NULLABLE, due_until TIMESTAMPTZ NULLABLE,
+  status ENUM('open','done','not_done','unknown'),
+  settled_by_event_ids UUID[],         -- the evidence that settled it
+  settled_at TIMESTAMPTZ NULLABLE,
+  model_id TEXT,
+  updated_at, deleted_at TIMESTAMPTZ
 )
 
 -- ===== Reminders (D6) =====
@@ -463,6 +588,9 @@ audit_log (
 | Media | metadata + S3 | pending uploads | bytes until acked |
 | Reminders, logs | ✅ | ✅ scheduler | today's schedule + statuses |
 | Places | ✅ | ✅ (GPS matching) | – |
+| Scene segments + 3 vectors each (D41) | Postgres, 90 days | outbox | queue until acked |
+| Per-frame vectors, hourly files (D41) | S3, 90 days | upload queue (Wi-Fi only) | queue until acked |
+| Memory structures (D40) | ✅ (built in the cloud) | – | – |
 
 ---
 
@@ -482,7 +610,7 @@ The link uses LE Secure Connections bonding. **Video** goes over a Wi-Fi burst: 
 // ---------- session ----------
 // G->P on connect
 { "type": "hello", "device_serial": "RMR-0007", "firmware_version": "0.3.1", "protocol_version": 1,
-  "queue": { "events": 12, "audio_segments": 40, "media": 3 } }
+  "queue": { "events": 12, "audio_segments": 40, "media": 3, "scene_segments": 85, "frame_vector_files": 2 } }
 // P->G right after hello (Pi has no RTC; ESP32 keeps time between syncs)
 { "type": "time_sync", "utc": "2026-10-01T09:00:00Z", "timezone": "Africa/Cairo" }
 // G->P every 60 s
@@ -492,11 +620,28 @@ The link uses LE Secure Connections bonding. **Video** goes over a Wi-Fi burst: 
 // G->P when an encounter closes (person left view + grace period)
 { "type": "encounter", "id": "uuid", "person_id": "uuid-or-null",
   "started_at": "...", "ended_at": "...", "best_confidence": 0.94, "announced": true,
-  "keyframe_ref": "img-456",
+  "keyframe_ref": "img-456", "gate_rule": "face",
   "unknown_embedding": "base64-float16-or-null" }   // only when person_id is null
 { "type": "document_detected", "id": "uuid", "suspected_type": "receipt|bill|medication_label|other",
-  "media_ref": "img-458", "at": "..." }
-{ "type": "salient_frame_detected", "id": "uuid", "salience_score": 0.78, "media_ref": "img-459", "at": "..." }
+  "media_ref": "img-458", "gate_rule": "text|medication", "at": "..." }
+{ "type": "salient_frame_detected", "id": "uuid", "salience_score": 0.78, "media_ref": "img-459",
+  "gate_rule": "novelty|medication|audio_event|classifier", "at": "..." }
+// G->P scene segments (D34, D41): runs of similar frames (at most 30 s), each with 3 real frame vectors
+// (first, middle, most different), batched about every 60 s. Too big for `control`: they come on `bulk`.
+{ "type": "scene_segments", "ids": ["uuid", "uuid"], "model_id": "mobileclip-s0@1.0", "dim": 512,
+  "ref": "seg-301", "bytes": 6400 }
+// bulk record per segment, little-endian: 16 B uuid · int64 started_at (unix ms) · int64 ended_at ·
+// uint16 frame_count · uint8 n_kept · n_kept × 16 B kept media uuids ·
+// 3 × (uint8 role [0 first, 1 middle, 2 most_different] · int64 captured_at · dim × float16 vector)
+
+// G->P every frame's vector for one hour (D41), fetched over the Wi-Fi burst like video (not BLE)
+{ "type": "frame_vectors_ready", "id": "uuid", "hour_start": "2026-10-01T09:00:00Z", "frame_count": 3412,
+  "model_id": "mobileclip-s0@1.0", "dim": 512, "ref": "fv-0900", "bytes": 1782000 }
+// file layout, little-endian: per frame · int64 captured_at (unix ms) · float32 scale · dim × int8
+
+// ---------- sounds (D33) ----------
+// G->P a non-speech sound the audio-event classifier recognized; also triggers the gate (keep the next frames)
+{ "type": "sound_event", "id": "uuid", "label": "doorbell|pill_bottle|kettle|door|...", "score": 0.91, "at": "..." }
 
 // ---------- ambient memory (D1) ----------
 { "type": "audio_segment", "id": "uuid", "started_at": "...", "ended_at": "...",
@@ -548,7 +693,7 @@ The link uses LE Secure Connections bonding. **Video** goes over a Wi-Fi burst: 
 
 **Reminder merge rule (phone ↔ glasses ↔ cloud):** the phone and glasses each fire the same `log_id` independently. When states disagree, **`completed` always wins**. Otherwise the state with the latest `at` wins. `missed` is set by whichever side reaches the grace period first, and a later `completed` still overrides it (late confirmation).
 
-**Glasses-side queue limits:** if storage falls below 500 MB, evict in this order: salient frames → document frames → encounter keyframes (event metadata is kept) → oldest audio. User-requested clips are never evicted automatically.
+**Glasses-side queue limits:** if storage falls below 500 MB, evict in this order: salient frames → document frames → encounter keyframes (event metadata is kept) → oldest audio → oldest frame-vector files → oldest scene segments. User-requested clips are never evicted automatically.
 
 ### 7.2 Phone ↔ Backend (REST, FastAPI)
 
@@ -581,7 +726,7 @@ Base `/api/v1`. Auth: JWT access (15 min) + refresh token for caregivers, who si
 | PATCH / DELETE | `/people/{id}` | Edit / archive (face data and photos are deleted; the row stays for the journal) |
 | GET | `/patients/{id}/unknown-faces` | Clusters awaiting caregiver |
 | POST | `/unknown-faces/{id}/promote` · `/dismiss` | Caregiver decision. Dismiss deletes every photo of that face at once (§8) |
-| POST | `/patients/{id}/events:batch` | Idempotent batch upload (events + encounters) |
+| POST | `/patients/{id}/events:batch` | Idempotent batch upload (events + encounters + scene segments, D41) |
 | POST | `/patients/{id}/uploads` | Request presigned S3 URL for media or audio |
 | POST | `/uploads/{id}/complete` | Confirm upload → enqueue review (media) or STT (audio). Body carries `patient_id`, `kind` and the row's fields, since the path has no patient |
 | GET | `/patients/{id}/media/{media_id}` | Short-lived signed URL (audit-logged) |
@@ -611,7 +756,11 @@ Example — idempotent batch:
 ```jsonc
 // POST /patients/{id}/events:batch
 { "encounters": [ { "id": "uuid", "person_id": "uuid", "started_at": "...", "ended_at": "...", "best_confidence": 0.94, "announced": true } ],
-  "events": [ { "id": "uuid", "event_type": "encounter", "encounter_id": "uuid", "occurred_at": "...", "source": "glasses" } ] }
+  "events": [ { "id": "uuid", "event_type": "encounter", "encounter_id": "uuid", "occurred_at": "...", "source": "glasses" } ],
+  "scene_segments": [ { "id": "uuid", "started_at": "...", "ended_at": "...", "frame_count": 30,
+                        "model_id": "mobileclip-s0@1.0", "kept_media_ids": ["uuid"],
+                        "vectors": [ { "role": "first", "captured_at": "...", "embedding": "base64 float16" } ] } ] }
+// hourly frame-vector files go through POST /patients/{id}/uploads with kind "frame_vectors" (Wi-Fi only)
 // 200 → { "accepted": ["uuid", ...], "duplicates": ["uuid"], "rejected": ["uuid"] }
 // rejected = points at something this patient doesn't have; the rest of the batch is still stored
 ```
@@ -619,9 +768,10 @@ Example — idempotent batch:
 ### 7.3 Ambient memory pipeline (cloud)
 
 1. `uploads/{id}/complete` for an audio segment → enqueue `transcribe(segment)`.
-2. The worker calls the STT API (language auto-detect, ar/en) and writes a `conversation_segment` event with `transcript_text`, `language`, and `metadata.present_person_ids` (enrolled people whose encounters overlap the segment, so "who was I talking to" works without diarization).
+2. The worker calls the STT API (language auto-detect, ar/en) and writes a `conversation_segment` event with `transcript_text`, `language`, `metadata.present_person_ids` (enrolled people whose encounters overlap the segment) and `metadata.segments` with speaker labels from diarization (D36).
 3. On success the worker **deletes the S3 audio** and sets `audio_segments.status = deleted` (D4). On failure it retries up to 3 times. Audio still untranscribed after 7 days is deleted regardless.
 4. The event's `rendered_text` (e.g. "09:20–09:24, talking with Ahmed (son): '...'") is embedded for RAG.
+5. **Consolidation (D40):** `memory_facts` (verbatim quotes with speaker and typed values) and `memory_intentions` are extracted, `memory_entities` updated, and open intentions re-checked against new evidence.
 
 Silence and non-speech never leave the glasses: only VAD-positive segments are encoded.
 
@@ -636,6 +786,7 @@ The on-device gate proposes (`pending_review`). The worker blurs faces that don'
 4. **An unexpected answer never fails the job.** An unknown category is stored as `other` with the model's word in `raw_category`; known keys are matched by common variants (`amount` → `total`, `dosage` → `strength`).
 5. **Categories grow through the lead.** Frequent `raw_category` values are reviewed; adding one is a spec change, a prompt version bump, a new app layout and a backfill from `raw_category`.
 6. **`other` never creates event types or alerts.** It appears in the journal as a notable moment or a document.
+7. **Memory fields (D40, D41):** the same call also returns `room`, `objects` `[{name, state}]` and `actions` `[{verb, object, quantity, unit}]`, which feed `object_sightings`, `memory_actions` and `memory_entities`. The media's `gate_rule` is kept as sent by the glasses.
 
 ### 7.5 Error shape (all endpoints)
 
@@ -657,6 +808,9 @@ The on-device gate proposes (`pending_review`). The worker blurs faces that don'
 | Documents, own notable moments (no other people) | `keep_indefinitely` |
 | Discarded media | Deleted immediately |
 | Face embeddings | Deleted with the person (hard delete on caregiver request) |
+| Scene segments and their vectors (D41) | Deleted after **90 days**; the structures already extracted from them remain |
+| Per-frame vector files in S3 (D41) | Deleted after **90 days** (a privacy choice: S3 itself is cheap) |
+| Memory structures (D40) | Kept like journal text. Deleting an event or photo also deletes the structure rows whose only evidence it was |
 
 ---
 

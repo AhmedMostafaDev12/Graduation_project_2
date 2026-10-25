@@ -29,6 +29,7 @@ Remori is a graduation project: AI memory-assistant smart glasses for people liv
    - [`docs/TEAM_WORKFLOW.md`](docs/TEAM_WORKFLOW.md): branches, pull requests, CI, resolving conflicts
    - [UI board](https://claude.ai/artifact/C5jiujr2ASCXQiREpHPCdW): every screen of the app (layout, colors, text, flows), nothing more and nothing less. Exported as plain files (HTML + PNG + images) in [`flutter/design/screens/`](flutter/design/screens/README.md). Endpoints per screen and the Patient Mode rules: [`flutter/AGENTS.md`](flutter/AGENTS.md) §1
    - [`docs/diagrams/`](docs/diagrams/README.md): architecture, ERD, sequences, state machines
+   - [`docs/RESEARCH_PLAN.md`](docs/RESEARCH_PLAN.md): the research paper and experiments (gated memory, benchmark, recording protocol), run in parallel with the build (D32–D40)
    - [`docs/BACKEND_STUDY_GUIDE.md`](docs/BACKEND_STUDY_GUIDE.md): what the backend needs beyond the freeCodeCamp FastAPI course
 
 ---
@@ -66,7 +67,7 @@ glasses (hardware/) ──BLE §7.1──> flutter/ (relay + UI) ──REST §7.
 
 | Topic | Question |
 |---|---|
-| ml ↔ backend packaging | How `backend-ai` imports the shared face preprocessing from `ml/` (local package install, copied module, or published wheel) |
+| ml ↔ backend packaging | How `backend-ai` imports the shared face preprocessing from `ml/` (local package install, copied module, or published wheel). The memory engine is decided (D38): edge part in `ml/edge/`, server part in `backend-ai/app/ai/` |
 | Model files in git | Whether exported models (`*.onnx`, `*.tflite`) use Git LFS or are downloaded from S3 at build time |
 | Team assignment | Names per track (spec §11) |
 | Email verification | Whether email + password accounts must verify their email (link sent by AWS SES), or stay unverified |
