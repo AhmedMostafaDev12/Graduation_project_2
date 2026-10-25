@@ -17,7 +17,7 @@ from pathlib import Path
 
 import imageio_ffmpeg
 
-from app.ai.clients.stt import AssemblyAISpeechToText, DeepgramSpeechToText
+from app.ai.clients.stt import DeepgramSpeechToText
 
 CONTENT_TYPES = {".ogg": "audio/ogg", ".opus": "audio/ogg", ".m4a": "audio/mp4"}
 
@@ -60,12 +60,6 @@ def main() -> None:
     parser.add_argument(
         "--normalize", action="store_true", help="boost quiet voices before sending"
     )
-    parser.add_argument(
-        "--provider", choices=["deepgram", "assemblyai"], default="deepgram"
-    )
-    parser.add_argument(
-        "--speakers", type=int, help="expected speakers (AssemblyAI only)"
-    )
     args = parser.parse_args()
 
     content_type = (
@@ -78,12 +72,9 @@ def main() -> None:
         audio, content_type = normalize(audio), "audio/wav"
 
     started = time.perf_counter()
-    stt = (
-        AssemblyAISpeechToText(speakers_expected=args.speakers)
-        if args.provider == "assemblyai"
-        else DeepgramSpeechToText()
+    result = DeepgramSpeechToText().transcribe(
+        audio, content_type, language_hint=args.lang
     )
-    result = stt.transcribe(audio, content_type, language_hint=args.lang)
     seconds = time.perf_counter() - started
 
     mode = "normalized" if args.normalize else "original"
