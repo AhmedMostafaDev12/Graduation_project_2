@@ -70,6 +70,11 @@ celery_app.conf.beat_schedule = {
         "task": "media.backfill_thumbnails",
         "schedule": crontab(minute="*/10"),
     },
+    # audio segments whose transcription was never queued or died mid-way, spec §7.3
+    "transcribe-backfill": {
+        "task": "transcribe.backfill",
+        "schedule": crontab(minute="*/10"),
+    },
     # events without an embedding yet (phone batches, transcripts, failed tasks), spec §7.3
     "embed-backfill": {"task": "embed.backfill", "schedule": crontab(minute="*/5")},
     # summaries.generate_due arrives in Phase 9

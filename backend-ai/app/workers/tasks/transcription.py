@@ -1,7 +1,9 @@
-"""Ambient memory: transcribe one audio segment (queue `ai_io`, phase 7.2, spec §7.3).
+"""Ambient memory: transcribe one audio segment (queue `ai_io`, phases 7.2 + 7.4, spec §7.3).
 
-transcribe.segment: queued after an audio upload is committed (wired in 7.4). The work is in
-services/transcription_service.py; this task only adds the lock and the retries.
+transcribe.segment: queued by uploads/{id}/complete for audio, after its commit (7.4).
+transcribe.backfill: every 10 minutes (Beat), re-queues segments whose queueing failed (Redis
+down at upload time) or whose task died mid-way, until retention removes them at 7 days.
+The work is in services/transcription_service.py; tasks only add the lock and the retries.
 """
 
 import logging
@@ -50,6 +52,17 @@ def transcribe_segment(self, segment_id: str) -> str | None:
         if result == "transcribed":
             _enqueue_embedding(uuid.UUID(segment_id))
         return result
+
+
+@celery_app.task(name="transcribe.backfill", soft_time_limit=60, time_limit=90)
+def backfill() -> int:
+    with db.make_session() as session:
+        ids = transcription_service.stuck_segment_ids(session, max_attempts=MAX_RETRIES)
+    for segment_id in ids:
+        transcribe_segment.delay(str(segment_id))
+    if ids:
+        logger.info("re-queued %d audio segments", len(ids))
+    return len(ids)
 
 
 def _enqueue_embedding(segment_id: uuid.UUID) -> None:

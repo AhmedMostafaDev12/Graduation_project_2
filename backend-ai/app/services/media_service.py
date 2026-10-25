@@ -96,8 +96,11 @@ def complete_upload(
             )
             db.add(segment)
             db.commit()
-        # Phase 7: enqueue transcribe(segment) here
-        return UploadDone(id=upload_id, kind="audio", status=segment.status)
+        status = segment.status  # what the phone sees; the task changes it afterwards
+        if status == "uploaded":
+            # rule 1: enqueue only after the commit, so the worker finds the row
+            _enqueue_transcription(segment.id)
+        return UploadDone(id=upload_id, kind="audio", status=status)
 
     asset = _already_done(db, MediaAsset, upload_id, patient_id)
     if asset is None:
@@ -141,6 +144,17 @@ def _enqueue_thumbnail(media_id: uuid.UUID) -> None:
         make_thumbnail.delay(str(media_id))  # IDs only (rule 2)
     except (KombuOperationalError, RedisError):
         logger.warning("thumbnail not queued; the backfill sweep will retry")
+
+
+def _enqueue_transcription(segment_id: uuid.UUID) -> None:
+    """Never fails the upload: if Redis is down, the transcribe.backfill sweep picks the
+    segment up later (phase 7.4)."""
+    from app.workers.tasks.transcription import transcribe_segment
+
+    try:
+        transcribe_segment.delay(str(segment_id))  # IDs only (rule 2)
+    except (KombuOperationalError, RedisError):
+        logger.warning("transcription not queued; the backfill sweep will retry")
 
 
 def audit(db: Session, access: PatientAccess, action: str, media_ids: list) -> None:
