@@ -32,7 +32,7 @@ The hardest capability: **Egyptian Arabic is weak almost everywhere.** On real c
 
 **Recommendation:**
 1. **Phase 7.1 starts with Deepgram Nova-3 Arabic + diarization.** It is the only option that names Egyptian Arabic explicitly, it has speaker labels, and the $200 credit covers development and the whole research pilot.
-2. **Measure, don't trust marketing.** Run the pilot recordings through Deepgram, AssemblyAI and Speechmatics (and Munsit if its API is available), compare word error rates, and keep the best. The `SpeechToText` interface makes switching a configuration change. The comparison is also a result for the paper.
+2. **Measure, don't trust marketing.** Measured in §7: Deepgram beats AssemblyAI on Egyptian Arabic (WER 32.7 % vs 41.1 % conversational, 4.6 % vs 9.0 % read). Re-check on the pilot recordings (and Speechmatics / Munsit if needed); the `SpeechToText` interface makes switching a configuration change.
 
 ---
 
@@ -86,11 +86,50 @@ Realistically **under $10 a month** until the credits run out.
 
 ---
 
-## 7. Status
+## 7. Measured results: speech-to-text on Egyptian Arabic (October 2026)
+
+### 7.1 Public datasets (WER / CER)
+**What:** 40 clips with human-written transcripts, 20 from each dataset, spread across the split. Each clip transcribed with the provider's Arabic setting; both texts normalized the same way (diacritics, tatweel and punctuation removed; alef / ya / ta marbuta / hamza seats unified) so spelling variants don't count as errors.
+**Script:** [`ml/rag_eval/stt_quick_check.py`](../../ml/rag_eval/stt_quick_check.py) (re-run it to reproduce the Deepgram numbers; audio is cached outside the repo).
+
+| Dataset | What it is | Deepgram Nova-3 (`ar-EG`) | AssemblyAI Universal (`ar`) |
+|---|---|---|---|
+| **MGB-3 Egyptian** (`MightyStudent/Egyptian-ASR-MGB-3`) | real Egyptian TV / YouTube speech: spontaneous, hesitations, fast | **WER 32.7 %** · CER 19.5 % | WER 41.1 % · CER 22.7 % |
+| **FLEURS `ar_eg`** (`google/fleurs`, CC-BY 4.0) | Egyptian speakers reading sentences | **WER 4.6 %** · CER 1.0 % | WER 9.0 % · CER 2.7 % |
+
+*WER = share of words wrong, CER = share of characters wrong; lower is better.* For context: the best published systems average word error rates in the mid-20s % on multi-dialect Arabic benchmarks, and Whisper large-v3 about 37 % (§2).
+
+**Reading the numbers:**
+- Deepgram wins on both datasets, by about 8 points on conversational speech and half the errors on read speech.
+- Clear speech is almost perfect (about 1 word in 20 wrong). Real conversational Egyptian is about 1 word in 3, close to the state of the art.
+- Many of the remaining "errors" aren't real mistakes: the human transcripts keep hesitations (`ن ن`, `آ`) and `...`, and spoken forms are spelled differently (`حاله` / `حالة`). The real errors are mostly names and similar-sounding words (`استضفنا` → `اصطادتنا`, `سواق` → `سواء`).
+
+### 7.2 Our own two-person recording (qualitative)
+A 32-second WhatsApp voice note (two people, one voice much quieter; heavily compressed at 15 kb/s):
+
+| | Result |
+|---|---|
+| Deepgram, original audio | words good (`عيني حاضر`, `اعملي لنا حاجة فيها بروتين`), but the quiet opening and the last sentence were **missing**; **everyone labelled speaker A** |
+| Deepgram, volume boosted (`try_stt.py --normalize`) | about **20 % more speech recovered** (`ازيك يا ماما عامله ايه`, `العطف واللطف…`); speakers **still all A** |
+| AssemblyAI, told "2 speakers", boosted | **speakers alternate A / B** like a real dialogue, but many Egyptian phrases garbled (`زي كمان عم لقيه`, `ثابروتين`, `أنا إيه خاطر`); without the speaker hint, no separation at all |
+| Speed | Deepgram ~4 s, AssemblyAI ~10 s (upload + job polling) |
+
+### 7.3 Decisions from these results
+1. **Speech-to-text: Deepgram Nova-3 `ar-EG`** (better words on every test, faster). AssemblyAI is not kept as a provider.
+2. **Boost the volume before transcribing** (`dynaudnorm` + `loudnorm`, 16 kHz mono) in the real pipeline (phase 7.2): it clearly recovers quiet speech.
+3. **Speaker separation is still open:** Deepgram's diarization failed on the two-person clip. Candidates: pyannote matched to Deepgram's word timestamps, plus faces (`present_person_ids`) and the wearer's voice being the loudest on the glasses.
+
+### 7.4 Caveats
+- 20 clips per dataset is a quick check, not the research benchmark (RESEARCH_PLAN §6 uses our own recordings).
+- MGB-3 and FLEURS are public and widely used, so commercial models may have trained on them, which can flatter the results.
+- The AssemblyAI numbers came from a temporary client that wasn't kept, so the script reproduces only the Deepgram numbers.
+- Speaker separation wasn't measured on the datasets (their clips are single-speaker).
+
+## 8. Status
 
 | Capability | Recommended `production` | Recommended `small` | Decided? |
 |---|---|---|---|
-| Speech-to-text | Deepgram Nova-3 Arabic + diarization | WhisperX (self-hosted) | to confirm by the lead, then by the pilot WER comparison |
+| Speech-to-text | Deepgram Nova-3 `ar-EG` + diarization, volume boosted first | WhisperX (self-hosted) | **decided** (measured, §7); speaker separation still open |
 | LLM | Gemini Flash-Lite / Flash (paid) | Qwen3 via Groq | to confirm |
 | Vision | Gemini Flash (paid) | Qwen2.5-VL | to confirm |
 | Text embeddings | `text-embedding-3-small` | Qwen3-Embedding | **decided (D15)** |
