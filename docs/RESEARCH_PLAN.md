@@ -44,7 +44,7 @@ X and Y are measured, not promised. We report them whatever they turn out to be.
 ### 3.1 Memory on the glasses (D33, D34)
 
 ```
-camera 1 fps ──► frame embedding on the glasses (every frame, ~1 KB) ──► kept as memory (D34)
+camera 1 fps ──► frame embedding on the glasses (every frame) ──► segments + 3 vectors (Postgres) · every vector (S3) (D41)
      │
      └──► GATE (D33): does this frame deserve to be kept as an image?
             ├─ face rule        a face is present (enrolled person or unknown)
@@ -59,8 +59,9 @@ camera 1 fps ──► frame embedding on the glasses (every frame, ~1 KB) ─�
 microphone ──► speech segments ──► cloud transcription + speaker labels (D36) ──► journal
 ```
 
-- **Why frame embeddings matter:** "Where did I put my glasses?" usually concerns a moment no rule fired on. The embedding of every second lets the answerer find that moment even when its image was never kept.
-- **Privacy by design:** discarded frames never leave the glasses; only a ~1 KB vector does. We measure and report the fraction of frames never stored.
+- **Why frame embeddings matter:** "Where did I put my glasses?" usually concerns a moment no rule fired on. The embeddings let the answerer find that moment even when its image was never kept.
+- **Two-tier frame memory (D41):** every frame is embedded on the glasses. **Tier 1 (Postgres):** scene segments of at most 30 s, each with 3 real frame vectors (first, middle, most different), ~6 MB/day, searched first. **Tier 2 (S3):** every per-frame vector in hourly 8-bit files, ~30 MB/day, re-ranked only inside the minutes tier 1 found. Nothing is thrown away, and the replay harness uses the same two tiers.
+- **Privacy by design:** discarded frames never leave the glasses; only segment vectors do. We measure and report the fraction of frames never stored.
 - **Later (semester 2):** IMU (skip blurry frames, head-still = attention) and an adaptive frame rate. In the first paper, these are Future Work.
 
 ### 3.2 People and privacy (D35)
@@ -274,6 +275,7 @@ Every system answers the **same test questions** from the **same recordings**, w
 | Small models | Remori with small open models instead of cloud models | H5 |
 | Flat memory | Remori with the structures switched off (vector search over raw evidence only) | H6 |
 | Structure ablations | Remori minus one structure (objects / actions / facts / intentions / entity index) | H6, per concern |
+| Frame-memory resolution | tier 1 only (3 representatives) vs one mean per segment vs two-tier (all frames) | retrieval recall vs storage (H1) |
 
 ---
 
@@ -432,7 +434,6 @@ The recognition **threshold is chosen once on the dev sessions** and reported on
 
 | Item | Proposal |
 |---|---|
-| Retention of frame embeddings | same as journal text (§8): kept until the patient or caregiver deletes |
 | Captions of kept photos after the photo expires (30 days) | keep the caption text, delete the image |
 | Week summaries for long-horizon questions | a nightly job building on daily summaries |
 | Suggesting reminders from intentions ("Fatma planned to call the doctor at 5. Add a reminder?") | a separate, later product decision: needs a new alert type and a caregiver action |

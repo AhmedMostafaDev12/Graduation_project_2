@@ -337,6 +337,8 @@ List items also carry `"photo_url"` (the first photo's ~320 px preview, signed).
 ```
 `event_type`: `encounter | voice_query | reminder | mind_game_session | manual_note | user_requested_recording | document_captured | notable_moment_captured | memory_paused | memory_resumed`. Encounters only come from the phone (a caregiver's are `rejected`). Events from a caregiver are stored with `source: "app"`. Max 500 of each per call.
 
+⏳ **Agreed, not built yet (spec D41, backend phase 8):** the batch also takes `scene_segments` (`id`, `started_at`, `ended_at`, `frame_count`, `model_id`, `kept_media_ids`, and 3 `vectors` with `role`, `captured_at`, `embedding` as base64 float16); hourly per-frame vector files are uploaded with `POST /patients/{id}/uploads` and `kind: "frame_vectors"`, **on Wi-Fi only**, and `event_type` gains `sound_detected` (`metadata`: `label`, `score`). Media uploads carry `gate_rule`. Conversation segments get speaker-labelled `metadata.segments` from the server. The phone relay forwards these exactly as the glasses send them (spec §7.1).
+
 #### `GET /patients/{id}/journal?date=YYYY-MM-DD` · screens C12, P4
 The day in the **patient's** timezone (default: today), oldest first.
 ```json

@@ -121,4 +121,5 @@ Every implementation exposes `model_id`, and anything it produces is stored with
 - **Consolidation** (`app/ai/memory/`): Celery tasks after transcription and review extract the structures with versioned prompts. Every record stores the ids of the evidence it came from and the `model_id` that extracted it. Quotes are copied verbatim, never paraphrased.
 - **Intentions are re-checked** when new actions or events arrive: status moves from unknown to done / not done, with the evidence that settled it.
 - **Answering** (`rag/`): route by question type to the structures first, then vector search; the premise check queries the entity index.
+- **Two-stage visual search (D41):** first the scene-segment vectors in Postgres find the candidate minutes; then only the matching hourly frame-vector files are loaded from S3 and every frame inside those minutes is re-ranked in memory.
 - **Switchable:** a setting turns the structures off, giving the flat-memory baseline used in the research (H6).
