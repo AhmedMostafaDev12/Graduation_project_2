@@ -33,6 +33,7 @@ app/ai/
 │   └── embeddings.py #   embed(texts) -> list[vector]           (text-embedding-3-small, 1536-d, spec D15)
 ├── inference/
 │   └── face.py       #   embed_face(image) -> vector(512)       (server-side face embedder for enrollment, spec D14; STUB 'stub-0' until Phase 8)
+├── memory/           # structured memory (§6.4, spec D40): consolidation + the five structures
 ├── rag/
 │   ├── render.py     #   event -> one sentence ("09:20 talked with Ahmed (son): ...")
 │   ├── retriever.py  #   SQL time window + person filter, then pgvector ranking (spec D22)
@@ -113,3 +114,11 @@ Every implementation exposes `model_id`, and anything it produces is stored with
 1. **Vectors from different models never mix.** Changing the product's `TextEmbedder` means re-embedding everything (rule 7, a lead decision).
 2. **Experiments never write to the product database.** The replay harness (`ml/replay/`) uses its own memory store with the `small` or `production` profile.
 3. **Adding a provider** = a class implementing the interface + one entry in the registry + tests with mocked HTTP (rule 9). Services don't change.
+
+### 6.4 Structured memory (spec D40)
+- **Layers:** raw evidence (events, verbatim transcripts with speakers, kept frames, frame embeddings, OCR) → **five structures** → day/week summaries. Summaries never answer alone.
+- **The five structures:** object sightings/states, action log (one row per action, never merged), facts (speaker + exact quote + typed numbers/dates), intentions (plan, due time, status, settling evidence), entity index.
+- **Consolidation** (`app/ai/memory/`): Celery tasks after transcription and review extract the structures with versioned prompts. Every record stores the ids of the evidence it came from and the `model_id` that extracted it. Quotes are copied verbatim, never paraphrased.
+- **Intentions are re-checked** when new actions or events arrive: status moves from unknown to done / not done, with the evidence that settled it.
+- **Answering** (`rag/`): route by question type to the structures first, then vector search; the premise check queries the entity index.
+- **Switchable:** a setting turns the structures off, giving the flat-memory baseline used in the research (H6).

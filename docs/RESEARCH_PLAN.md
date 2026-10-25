@@ -28,12 +28,13 @@ Remori asks the opposite question: **what should a wearable memory aid keep in t
 | H3 | The evidence rule reduces confident wrong answers, especially on unanswerable and false-premise questions | safety-weighted score, Ans-F1 |
 | H4 | Each gate rule matters for its own category (medication rule → medication questions, …) | ablation: remove one rule at a time |
 | H5 | Small open models keep most of the cloud models' accuracy on the same memory | cloud vs small models, same test set |
+| H6 | Structured memory beats flat event search on the same stored evidence, especially on intent recall, counts, time order and false-premise questions | structured vs flat memory, reported per concern |
 
 X and Y are measured, not promised. We report them whatever they turn out to be.
 
 **Planned contributions** (final wording after the results):
 1. A bilingual **Egyptian Arabic–English benchmark** of Alzheimer's-patient memory questions, designed **before** recording (not generated from AI captions), with multiple-choice, open-ended and **safety-weighted** scoring.
-2. **Remori's gated memory architecture:** capture-time selection with explainable rules + a learned classifier, frame embeddings kept for every second, and an evidence rule for abstention.
+2. **Remori's gated, structured memory architecture:** capture-time selection with explainable rules + a learned classifier, frame embeddings kept for every second, explicit memory structures (objects, actions, facts, intentions, entities), and an evidence rule for abstention.
 3. Measured results: accuracy against storage, safety, and cost (storage, latency), on the cloud and on small open models.
 
 ---
@@ -81,11 +82,36 @@ question ─► PLAN     what is asked, which time window(s), which people/objec
 - **Time budget:** the glasses speak a fallback after 20 s (§7.1), so the whole path must fit in about 15 s (at most 3 searches and one reasoning call).
 - **Natural questions:** Egyptian Arabic first, vague references ("the paper", "him", "this morning") resolved from context, answers short and kind, no IDs or technical words.
 - **Long horizon:** questions about past days use explicit time windows ("last Friday" → a date range in the patient's timezone).
+- **Structures first:** PLAN routes the question to the memory structures (§3.5) before the vector search, and CHECK uses the entity index for the premise check.
 
 ### 3.4 Models (D37)
 The **product** uses cloud APIs (reliable now). The **engine chooses its models from configuration**, so the experiments run the same memory with cloud models **and** small open models (e.g. Qwen2.5-VL 3B/7B, Gemma 4B) and report both.
 
 ---
+
+### 3.5 Structured memory (D40)
+SuperMemory-VQA's qualitative analysis concludes that higher accuracy needs **explicit memory structures** for object state, counts, time order and premise checking. Flat event search loses exactly these. Remori's memory therefore has three layers:
+
+```
+LAYER 3  SUMMARIES     day / week summaries → overview questions only, never the sole source
+LAYER 2  STRUCTURES    objects · actions · facts · intentions · entities
+                       (built by a consolidation job; every record links to its evidence)
+LAYER 1  RAW EVIDENCE  events · verbatim transcripts with speakers · kept frames ·
+                       frame embeddings (D34) · OCR text
+```
+
+| Structure | One record | Built from | Concern it answers |
+|---|---|---|---|
+| **Object sightings / states** | object, state (on/off, washed, open…), room, time, frame | vision review of kept frames + frame-embedding search | object location and state ("where are my glasses?", "did I wash the pan?") |
+| **Action log** | one row **per action instance** (added salt, took a pill), time; never merged | review + transcripts ("خدت الدوا") | counts and time order ("did I already add salt?", "medicine before or after food?") |
+| **Facts** | speaker, **exact quote**, numbers and dates as typed values, time | extraction from transcripts, quote copied verbatim | who said what, exact details ("what did the doctor say about the dose?", "205 or 207?") |
+| **Intentions** | who planned what, by when, **status: done / not done / unknown**, the evidence that settled it | extraction from speech, then a check against later actions and events | intent recall, proving something did **not** happen ("I planned to call my daughter. Did I?") |
+| **Entity index** | every person, object and place ever seen or mentioned, with times | all of the above | premise checking ("the wooden spoon I used": was one ever seen?) |
+
+- **Routing:** the planner (§3.3) first routes by question type: "where…?" → object sightings · "did I…?" → intentions + action log · "how many / already…?" → action log · "what did X say…?" → facts. It then falls back to vector search over raw evidence.
+- **Premise check:** before answering, every entity the question assumes is looked up in the entity index; if it was never seen or mentioned, Remori says so instead of answering.
+- **Evidence links:** every structured record points to the raw events it came from, so answers keep their sources and the caregiver can check them.
+- **Switchable:** the structures can be turned off, which gives the flat-memory baseline for H6.
 
 ## 4. Two tracks, one engine (D38)
 
@@ -246,6 +272,8 @@ Every system answers the **same test questions** from the **same recordings**, w
 | **Video-RAG** | its own pipeline on the full video (public code) | external published baseline |
 | Ablations | Remori minus one rule (face / text / medication / novelty / audio events) | H4 |
 | Small models | Remori with small open models instead of cloud models | H5 |
+| Flat memory | Remori with the structures switched off (vector search over raw evidence only) | H6 |
+| Structure ablations | Remori minus one structure (objects / actions / facts / intentions / entity index) | H6, per concern |
 
 ---
 
@@ -262,7 +290,7 @@ Every system answers the **same test questions** from the **same recordings**, w
 | Storage | MB per recorded hour; fraction of frames never stored |
 | Latency | seconds per question (must fit the 20 s fallback) |
 
-Results are reported **per category**, plus multi-moment vs single-moment and short vs long time gaps.
+Results are reported **per category**, plus multi-moment vs single-moment, short vs long time gaps, and **per memory concern** (object state, counts, time order, premise, who said what, intentions, detail) for H6.
 
 ---
 
@@ -331,7 +359,7 @@ The recognition **threshold is chosen once on the dev sessions** and reported on
 | 2. Related work | egocentric datasets → memory benchmarks (SuperMemory-VQA, MyEgo, EgoLife, EgoMemReason) → long-video retrieval (Video-RAG, AdaVideoRAG, MemVid) → the step they skip: storage-limited memory for patients |
 | 3. Remori | gate, memory, answering, privacy (§3 of this plan) |
 | 4. Benchmark | recording protocol, question design, clinically weighted mix, scoring |
-| 5. Experiments | systems, metrics, main results, ablations, small models, cost; face recognition at component, encounter and memory level (§9) |
+| 5. Experiments | systems, metrics, main results, ablations, small models, structured vs flat memory (H6), cost; face recognition at component, encounter and memory level (§9) |
 | 6. Limitations & ethics | proxy recordings, healthy volunteers, small pool, sensors, consent |
 | 7. Conclusion | |
 
@@ -379,8 +407,8 @@ The recognition **threshold is chosen once on the dev sessions** and reported on
 |---|---|---|
 | **Glasses** (`hardware/`) | gate rules v1 + stage-2 classifier; frame embedding model on the Pi; audio events; record `gate_rule` on kept items | after the research version is validated in replay; **Pi speed check now** |
 | **BLE contract** (§7.1) | a frame-embedding message; `gate_rule` on kept media | contract-first PR before implementation |
-| **Database** (§6) | a frame-embeddings table (patient, time, vector, device); `gate_rule` on media; speaker labels on conversation segments | spec PR before implementation |
-| **Backend** (`backend-ai/`) | Phase 7 with speaker labels; the engine with model choice by config; the answering steps (§3.3) | Phase 7 next, answering in Phase 2 |
+| **Database** (§6) | a frame-embeddings table (patient, time, vector, device); `gate_rule` on media; speaker labels on conversation segments; the five memory-structure tables (D40) | spec PR before implementation |
+| **Backend** (`backend-ai/`) | Phase 7 with speaker labels; the engine with model choice by config; the consolidation job that builds the memory structures (§3.5); the answering steps with routing (§3.3) | Phase 7 next, structures in 7–8, answering in Phase 2 |
 | **Flutter** | nothing new in the UI: Ask (P6) already shows answers + source chips; C6/C7 unchanged; the relay forwards the new BLE message | when the BLE message exists |
 | **ML** (`ml/`) | benchmark, replay harness, baselines, stage-2 training, scoring | Track B, from week 1 |
 
@@ -396,6 +424,7 @@ The recognition **threshold is chosen once on the dev sessions** and reported on
 | Too few questions | ~10–12 plants per session; add sessions in week 4 if under 200 |
 | The gate underperforms | that is still a result: report honestly and analyse per rule (H4) |
 | Product work and research compete for time | Track A owners stay on the product; research changes reach the product only after they work in replay |
+| All five structures don't fit before mid-December | build in patient-value order: intentions → facts → object sightings → action log → entity index; report the ones that are ready, the rest as future work |
 
 ---
 
@@ -406,7 +435,7 @@ The recognition **threshold is chosen once on the dev sessions** and reported on
 | Retention of frame embeddings | same as journal text (§8): kept until the patient or caregiver deletes |
 | Captions of kept photos after the photo expires (30 days) | keep the caption text, delete the image |
 | Week summaries for long-horizon questions | a nightly job building on daily summaries |
-| Object sightings ("where are my keys?") as structured records | after the first paper, from the frame embeddings + review |
+| Suggesting reminders from intentions ("Fatma planned to call the doctor at 5. Add a reminder?") | a separate, later product decision: needs a new alert type and a caregiver action |
 | Who records and acts in the sessions | team + volunteers; name per role in week 1 |
 | Caregiver survey | 10–20 caregivers rate question realism and which failures they see most |
 
@@ -424,3 +453,4 @@ The recognition **threshold is chosen once on the dev sessions** and reported on
 | D37 | Product on cloud APIs; engine models chosen by config; the paper reports cloud and small open models |
 | D38 | Engine in two parts: edge (`ml/edge/`, also on the Pi) and server (`backend-ai/app/ai/`, interfaces + profiles); `ml/replay/` installs both |
 | D39 | Answering: evidence rule with premise check, multi-step retrieval within the 20 s budget |
+| D40 | Structured memory: raw evidence → five structures (objects, actions, facts, intentions, entities) → summaries; routing by question type; switchable for H6 |

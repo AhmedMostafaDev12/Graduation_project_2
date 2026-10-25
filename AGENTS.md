@@ -29,7 +29,7 @@ Remori is a graduation project: AI memory-assistant smart glasses for people liv
    - [`docs/TEAM_WORKFLOW.md`](docs/TEAM_WORKFLOW.md): branches, pull requests, CI, resolving conflicts
    - [UI board](https://claude.ai/artifact/C5jiujr2ASCXQiREpHPCdW): every screen of the app (layout, colors, text, flows), nothing more and nothing less. Exported as plain files (HTML + PNG + images) in [`flutter/design/screens/`](flutter/design/screens/README.md). Endpoints per screen and the Patient Mode rules: [`flutter/AGENTS.md`](flutter/AGENTS.md) §1
    - [`docs/diagrams/`](docs/diagrams/README.md): architecture, ERD, sequences, state machines
-   - [`docs/RESEARCH_PLAN.md`](docs/RESEARCH_PLAN.md): the research paper and experiments (gated memory, benchmark, recording protocol), run in parallel with the build (D32–D39)
+   - [`docs/RESEARCH_PLAN.md`](docs/RESEARCH_PLAN.md): the research paper and experiments (gated memory, benchmark, recording protocol), run in parallel with the build (D32–D40)
    - [`docs/BACKEND_STUDY_GUIDE.md`](docs/BACKEND_STUDY_GUIDE.md): what the backend needs beyond the freeCodeCamp FastAPI course
 
 ---

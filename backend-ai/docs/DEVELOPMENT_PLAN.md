@@ -214,11 +214,12 @@ Build in the order the Flutter screens need them (spec §12: Caregiver Mode firs
 | Step | Details |
 |---|---|
 | 7.0 Model interfaces | `ai/interfaces.py` (one interface per capability), `ai/fakes.py`, `ai/registry.py` with profiles `production` / `small` / `stub` (spec D37, D38, AI_LAYER.md §6). Tests use `stub` |
-| 7.0b Contract PRs | spec §6 (frame-embeddings table, `media.gate_rule`, speaker labels), §7.1 (frame-embedding message, `gate_rule`), §8 (retention), agreed with hardware + Flutter before any ingestion code |
+| 7.0b Contract PRs | spec §6 (frame-embeddings table, `media.gate_rule`, speaker labels, the five memory-structure tables of D40), §7.1 (frame-embedding message, `gate_rule`), §8 (retention), agreed with hardware + Flutter before any ingestion code |
 | 7.1 `ai/clients/stt.py` | STT API client with timeout + `TransientError`, implementing `SpeechToText`; diarization adds speaker labels (D36) |
 | 7.2 Task `transcribe` | audio from S3 → transcript → `conversation_segment` event with `present_person_ids` → **delete the audio** |
 | 7.3 `ai/clients/embeddings.py` + `ai/rag/render.py` | task `embed`: render each event to a sentence and store its embedding |
 | 7.4 Wire it | `uploads/{id}/complete` for audio → enqueue `transcribe` (after commit) |
+| 7.5 Consolidation from speech | `ai/memory/`: after `transcribe`, extract **intentions** and **facts** (exact quotes, typed numbers), and feed the **entity index**; re-check open intentions when new events arrive (spec D40) |
 
 **Done when (M5):** a real recording uploaded from the phone shows up as a transcript in C12 / P4, and the audio is gone from S3.
 
@@ -232,6 +233,7 @@ Build in the order the Flutter screens need them (spec §12: Caregiver Mode firs
 | 8.2 Enrollment | `POST /people` now computes embeddings, rejects photos with zero or several faces (C4 error state), and backfills seeded people |
 | 8.3 Task `review` | blur non-enrolled faces → `ai/clients/vision.py` → keep/discard/tags/OCR → `captured_documents` + retention (spec §7.4, §8) |
 | 8.4 Task `cluster` | unknown encounters → `ai/clustering.py` → caregiver alert at 3 distinct days |
+| 8.5 Consolidation from vision | after `review`: **object sightings/states** and the **action log** from kept frames and frame embeddings; entity index updated (spec D40) |
 
 **Done when (M6):** enrolled people sync to the glasses with real embeddings, and photos and documents are reviewed for real.
 
@@ -241,7 +243,7 @@ Build in the order the Flutter screens need them (spec §12: Caregiver Mode firs
 
 | Step | Details |
 |---|---|
-| 9.1 `ai/rag/retriever.py` + `answer.py` | wire in Abdelrahman's R4 + R5: hybrid retrieval (time window + pgvector) → LLM → `POST /assist` becomes real |
+| 9.1 `ai/rag/retriever.py` + `answer.py` | wire in Abdelrahman's R4 + R5: route by question type to the memory structures first, then hybrid retrieval (time window + pgvector), premise check against the entity index → LLM → `POST /assist` becomes real (spec D39, D40) |
 | 9.2 Task `summaries.generate_due` | uses Abdelrahman's R7 prompt: nightly summaries + patterns per patient timezone → `GET /daily-summary` becomes real |
 | 9.3 FCM | `integrations/fcm.py`: alerts and daily-summary pushes to caregivers |
 
