@@ -57,9 +57,18 @@ def test_unknown_profile_and_capability_fail_clearly():
         choose_providers("stub", {"ocr": "fake"})
 
 
-def test_unimplemented_provider_names_the_capability():
-    with pytest.raises(ProviderNotAvailable, match="'stt' isn't implemented yet"):
+def test_unimplemented_provider_names_the_capability(monkeypatch):
+    monkeypatch.setattr("app.ai.clients.stt.settings.deepgram_api_key", "test-key")
+    with pytest.raises(
+        ProviderNotAvailable, match="'text_embedder' isn't implemented yet"
+    ):
         build("production")
+
+
+def test_provider_without_its_key_fails_clearly(monkeypatch):
+    monkeypatch.setattr("app.ai.clients.stt.settings.deepgram_api_key", None)
+    with pytest.raises(ProviderNotAvailable, match="couldn't start: DEEPGRAM_API_KEY"):
+        build("stub", {"stt": "deepgram-nova-3"})
     # with every capability overridden to fakes, production builds
     fakes_only = {c: registry.PROFILES["stub"][c] for c in registry.CAPABILITIES}
     assert build("production", fakes_only).stt.model_id == "fake-stt"
