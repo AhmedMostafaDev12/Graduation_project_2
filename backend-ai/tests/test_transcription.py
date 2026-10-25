@@ -328,3 +328,103 @@ def test_normalize_boosts_real_audio_and_rejects_garbage():
     wav = transcription_service.normalize(tone)
     assert wav is not None and wav[:4] == b"RIFF"
     assert transcription_service.normalize(b"not audio") is None
+
+
+# ----- phase 7.4: uploads start the transcription; the sweep catches what was missed -----
+
+
+def _complete_audio(client, patient_id, clip_id, phone):
+    return client.post(
+        f"{API}/uploads/{clip_id}/complete",
+        json={
+            "patient_id": patient_id,
+            "kind": "audio",
+            "content_type": "audio/ogg",
+            "started_at": "2026-10-12T10:00:00+03:00",
+            "ended_at": "2026-10-12T10:00:20+03:00",
+        },
+        headers=phone["headers"],
+    )
+
+
+def test_the_phones_audio_upload_ends_up_in_the_journal(client, fake_s3, stt):
+    manager = register_and_login(client)
+    patient = client.post(
+        f"{API}/patients",
+        json={
+            "full_name": "Fatma",
+            "relationship": "son",
+            "consents": ["cloud_processing", "ambient_audio_household"],
+        },
+        headers=manager["headers"],
+    ).json()
+    phone = pair_device(client, manager, patient["id"])
+    base = f"{API}/patients/{patient['id']}"
+
+    clip_id = str(uuid.uuid4())
+    ticket = client.post(
+        f"{base}/uploads",
+        json={"id": clip_id, "kind": "audio", "content_type": "audio/ogg"},
+        headers=phone["headers"],
+    ).json()
+    fake_s3.put_bytes(ticket["key"], b"opus-bytes", "audio/ogg")
+    done = _complete_audio(client, patient["id"], clip_id, phone)
+    # the phone is told what happened at upload time; the work runs after the commit
+    assert done.status_code == 200 and done.json()["status"] == "uploaded"
+
+    journal = client.get(
+        f"{base}/journal", params={"date": "2026-10-12"}, headers=manager["headers"]
+    ).json()
+    talks = [e for e in journal["entries"] if e["event_type"] == "conversation_segment"]
+    assert len(talks) == 1
+    assert talks[0]["transcript_text"] == "ميعاد الدكتور بكره الساعة خمسة"
+    assert talks[0]["rendered_text"]  # 7.3 ran right after 7.2
+    assert ticket["key"] not in fake_s3.objects  # spec D4: the audio is gone
+    assert len(stt.calls) == 1
+
+    # the phone retrying `complete` doesn't transcribe twice
+    again = _complete_audio(client, patient["id"], clip_id, phone)
+    assert again.status_code == 200 and len(stt.calls) == 1
+
+
+def test_backfill_requeues_only_stuck_segments(client, fake_s3, worker_session, stt):
+    _, _, missed, _ = _patient_with_audio(client, fake_s3, worker_session)
+    _, _, fresh, _ = _patient_with_audio(client, fake_s3, worker_session)
+    _, _, given_up, _ = _patient_with_audio(client, fake_s3, worker_session)
+    with worker_session() as db:
+        # the test database is shared and kept between runs: retire other tests' leftover
+        # segments so the sweep only meets this test's three (their audio isn't in fake_s3)
+        db.execute(
+            update(AudioSegment)
+            .where(
+                AudioSegment.id.not_in([missed, fresh, given_up]),
+                AudioSegment.status.in_(("uploaded", "transcribing")),
+            )
+            .values(status="deleted", storage_key=None)
+        )
+        db.execute(
+            update(AudioSegment)
+            .where(AudioSegment.id == missed)
+            .values(created_at=NOW - timedelta(minutes=10))  # queueing failed
+        )
+        db.execute(
+            update(AudioSegment)
+            .where(AudioSegment.id == given_up)
+            .values(
+                status="transcribing",
+                attempts=transcription_tasks.MAX_RETRIES + 1,
+                created_at=NOW - timedelta(hours=2),
+            )
+        )
+        db.commit()
+        stuck = transcription_service.stuck_segment_ids(
+            db, max_attempts=transcription_tasks.MAX_RETRIES
+        )
+        assert missed in stuck
+        assert fresh not in stuck  # just uploaded: its own task is on the way
+        assert given_up not in stuck  # out of retries: retention deletes it
+
+    assert transcription_tasks.backfill.delay().get() >= 1
+    with worker_session() as db:
+        assert db.get(AudioSegment, missed).status == "deleted"  # transcribed + cleaned
+        assert db.get(AudioSegment, fresh).status == "uploaded"

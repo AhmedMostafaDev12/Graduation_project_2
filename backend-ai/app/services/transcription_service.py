@@ -18,9 +18,10 @@ or deleted is not processed again. Never logs transcripts or names (AI_LAYER.md 
 import logging
 import subprocess
 import uuid
+from datetime import UTC, datetime, timedelta
 
 import imageio_ffmpeg
-from sqlalchemy import select
+from sqlalchemy import and_, or_, select
 from sqlalchemy.orm import Session
 
 from app.ai.clients.stt import SpeechToTextError
@@ -195,6 +196,37 @@ def transcribe_segment(db: Session, segment_id: uuid.UUID) -> str:
 
     _delete_audio(db, segment)
     return "transcribed"
+
+
+def stuck_segment_ids(
+    db: Session, max_attempts: int, limit: int = 100
+) -> list[uuid.UUID]:
+    """Segments to queue again: still `uploaded` after 2 minutes (queueing failed), or
+    `transcribing` for over 30 minutes (the task died), within the 7 days before retention
+    deletes untranscribed audio (spec §8)."""
+    now = datetime.now(UTC)
+    return list(
+        db.scalars(
+            select(AudioSegment.id)
+            .where(
+                AudioSegment.storage_key.is_not(None),
+                AudioSegment.created_at > now - timedelta(days=7),
+                or_(
+                    and_(
+                        AudioSegment.status == "uploaded",
+                        AudioSegment.created_at < now - timedelta(minutes=2),
+                    ),
+                    and_(
+                        AudioSegment.status == "transcribing",
+                        AudioSegment.created_at < now - timedelta(minutes=30),
+                        AudioSegment.attempts <= max_attempts,
+                    ),
+                ),
+            )
+            .order_by(AudioSegment.created_at)
+            .limit(limit)
+        )
+    )
 
 
 def mark_failed(db: Session, segment_id: uuid.UUID) -> None:
