@@ -44,7 +44,7 @@ X and Y are measured, not promised. We report them whatever they turn out to be.
 ### 3.1 Memory on the glasses (D33, D34)
 
 ```
-camera 1 fps ──► frame embedding on the glasses (every frame, ~1 KB) ──► kept as memory (D34)
+camera 1 fps ──► frame embedding on the glasses (every frame) ──► one mean vector per scene segment (D34, D41)
      │
      └──► GATE (D33): does this frame deserve to be kept as an image?
             ├─ face rule        a face is present (enrolled person or unknown)
@@ -59,8 +59,9 @@ camera 1 fps ──► frame embedding on the glasses (every frame, ~1 KB) ─�
 microphone ──► speech segments ──► cloud transcription + speaker labels (D36) ──► journal
 ```
 
-- **Why frame embeddings matter:** "Where did I put my glasses?" usually concerns a moment no rule fired on. The embedding of every second lets the answerer find that moment even when its image was never kept.
-- **Privacy by design:** discarded frames never leave the glasses; only a ~1 KB vector does. We measure and report the fraction of frames never stored.
+- **Why frame embeddings matter:** "Where did I put my glasses?" usually concerns a moment no rule fired on. The embeddings let the answerer find that moment even when its image was never kept.
+- **Scene segments (D41):** every frame is embedded on the glasses, but only one mean vector per run of similar frames (cut where the novelty rule fires) is sent and stored: ~2 MB/day instead of ~60 MB/day per patient. The replay harness uses the same segmenting, so the paper measures what the product stores.
+- **Privacy by design:** discarded frames never leave the glasses; only segment vectors do. We measure and report the fraction of frames never stored.
 - **Later (semester 2):** IMU (skip blurry frames, head-still = attention) and an adaptive frame rate. In the first paper, these are Future Work.
 
 ### 3.2 People and privacy (D35)
@@ -432,7 +433,6 @@ The recognition **threshold is chosen once on the dev sessions** and reported on
 
 | Item | Proposal |
 |---|---|
-| Retention of frame embeddings | same as journal text (§8): kept until the patient or caregiver deletes |
 | Captions of kept photos after the photo expires (30 days) | keep the caption text, delete the image |
 | Week summaries for long-horizon questions | a nightly job building on daily summaries |
 | Suggesting reminders from intentions ("Fatma planned to call the doctor at 5. Add a reminder?") | a separate, later product decision: needs a new alert type and a caregiver action |
