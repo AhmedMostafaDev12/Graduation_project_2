@@ -157,6 +157,9 @@ def test_transcribes_into_a_conversation_segment_and_deletes_the_audio(
         assert event.metadata_["present_person_ids"] == [str(ahmed)]
         assert event.metadata_["segments"][0]["speaker"] == "A"
         assert event.metadata_["stt_model"] == "scripted-stt"
+        # 7.3: the new transcript is rendered and embedded right away
+        assert event.rendered_text and "Ahmed" in event.rendered_text
+        assert event.embedding is not None
     assert key not in fake_s3.objects  # spec D4: only the transcript is kept
     # the fake audio isn't decodable, so it was sent as it came, in the patient's language
     assert stt.calls == [(b"opus-bytes", "audio/ogg", "ar")]

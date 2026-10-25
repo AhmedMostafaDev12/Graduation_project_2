@@ -30,7 +30,7 @@ app/ai/
 │   ├── stt.py        #   transcribe(audio) -> Transcript       (Deepgram Nova-3, ar-EG + speaker labels, D36)
 │   ├── llm.py        #   complete(prompt) -> text               (Haiku / 4o-mini class)
 │   ├── vision.py     #   review(image) -> ReviewResult          (keep/discard + tags + OCR, spec D20)
-│   └── embeddings.py #   embed(texts) -> list[vector]           (text-embedding-3-small, 1536-d, spec D15)
+│   └── embeddings.py #   embed(texts) -> list[vector]           (OpenAI text-embedding-3-small, 1536-d, spec D15; built in 7.3)
 ├── inference/
 │   └── face.py       #   embed_face(image) -> vector(512)       (server-side face embedder for enrollment, spec D14; STUB 'stub-0' until Phase 8)
 ├── memory/           # structured memory (§6.4, spec D40): consolidation + the five structures

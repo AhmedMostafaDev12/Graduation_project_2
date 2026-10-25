@@ -59,9 +59,8 @@ def test_unknown_profile_and_capability_fail_clearly():
 
 def test_unimplemented_provider_names_the_capability(monkeypatch):
     monkeypatch.setattr("app.ai.clients.stt.settings.deepgram_api_key", "test-key")
-    with pytest.raises(
-        ProviderNotAvailable, match="'text_embedder' isn't implemented yet"
-    ):
+    monkeypatch.setattr("app.ai.clients.embeddings.settings.openai_api_key", "test-key")
+    with pytest.raises(ProviderNotAvailable, match="'vision' isn't implemented yet"):
         build("production")
 
 
