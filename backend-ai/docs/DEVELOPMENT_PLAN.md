@@ -39,7 +39,7 @@ Abdelrahman builds the RAG pipeline **alongside** Phases 0–8. It needs no back
 
 | Step | Output | Plugs into |
 |---|---|---|
-| R1 Evaluation set | `ml/rag_eval/`: a few synthetic journal days based on the UI board's Fatma data + **50–100 questions** in Egyptian Arabic and English, each with its expected answer and the event IDs that prove it. Includes questions that have **no** answer | measures R4, R5 |
+| R1 Evaluation set | `ml/rag_eval/`: a few synthetic journal days based on the UI board's Fatma data + **50–100 questions** in Egyptian Arabic and English, each with its expected answer and the event IDs that prove it. Includes questions that have **no** answer. This is the quick **development set**; the final measure for product and paper is the recorded research benchmark (RESEARCH_PLAN §6). Both use the same question-record format (RESEARCH_PLAN §6.3) | measures R4, R5 |
 | R2 Event → sentence rendering | `backend-ai/app/ai/rag/render.py`: one template per `event_type` (spec §6), Arabic + English, with unit tests | 7.3 |
 | R3 Time + person understanding | "الصبح", "امبارح", "الأسبوع اللي فات" → a time window in the patient's timezone. "أحمد" / "ابني" → a person | R4 |
 | R4 Hybrid retriever | `rag/retriever.py`: SQL time + person filter first, then pgvector ranking (spec D22). Report retrieval quality on R1 | 9.1 |
@@ -213,7 +213,9 @@ Build in the order the Flutter screens need them (spec §12: Caregiver Mode firs
 
 | Step | Details |
 |---|---|
-| 7.1 `ai/clients/stt.py` | STT API client with timeout + `TransientError` |
+| 7.0 Model interfaces | `ai/interfaces.py` (one interface per capability), `ai/fakes.py`, `ai/registry.py` with profiles `production` / `small` / `stub` (spec D37, D38, AI_LAYER.md §6). Tests use `stub` |
+| 7.0b Contract PRs | spec §6 (frame-embeddings table, `media.gate_rule`, speaker labels), §7.1 (frame-embedding message, `gate_rule`), §8 (retention), agreed with hardware + Flutter before any ingestion code |
+| 7.1 `ai/clients/stt.py` | STT API client with timeout + `TransientError`, implementing `SpeechToText`; diarization adds speaker labels (D36) |
 | 7.2 Task `transcribe` | audio from S3 → transcript → `conversation_segment` event with `present_person_ids` → **delete the audio** |
 | 7.3 `ai/clients/embeddings.py` + `ai/rag/render.py` | task `embed`: render each event to a sentence and store its embedding |
 | 7.4 Wire it | `uploads/{id}/complete` for audio → enqueue `transcribe` (after commit) |

@@ -15,7 +15,9 @@ ml/
 ├── face/            # face pipeline: detection + alignment + preprocessing shared by the Pi and the backend (spec D14),
 │                    # evaluation (FAR/FRR, threshold choice), export of MobileFaceNet w600k_mbf to ONNX/INT8
 ├── intent/          # push-to-talk intent classifier (spec D17): dataset scripts, training, export
-├── capture_gate/    # on-device capture gate: heuristics first, optional MobileNetV3 (spec §3)
+├── capture_gate/    # gate v1 tuning + stage-2 classifier training on the dev set (spec D33)
+├── edge/            # the EDGE ENGINE (D38): gate rules, frame embedder, audio events; light, runs on the Pi
+├── replay/          # research: replay harness + baselines (docs/RESEARCH_PLAN.md)
 ├── rag_eval/        # question/answer evaluation sets for the RAG pipeline
 ├── notebooks/       # experiments
 ├── models/          # EXPORTED artifacts + a model card per model (name, version, input/output, metrics)
@@ -27,4 +29,4 @@ ml/
 2. **Changing an exported model is a lead decision.** Embeddings stored in the database become invalid when the face model changes.
 3. **No personal data in git.** Face photos, voice recordings and transcripts stay out of the repo.
 4. **Open decisions (ask the lead):** Git LFS vs S3 for model files, and how `backend-ai` imports `ml/face` (root `AGENTS.md` §5).
-5. **Research (D32–D39):** the benchmark lives in `rag_eval/`, gate training in `capture_gate/`, and the replay harness + baselines in `replay/`. They use the memory engine from `backend-ai` (installed with `pip install -e ../backend-ai`), never a copy. Plan: [`docs/RESEARCH_PLAN.md`](../docs/RESEARCH_PLAN.md). Recordings stay out of git.
+5. **Research (D32–D39):** the benchmark lives in `rag_eval/`, gate training in `capture_gate/`, the edge engine in `edge/`, and the replay harness + baselines in `replay/`. The harness installs `edge/` and the server engine from `backend-ai` (`pip install -e ../backend-ai`), never a copy. `edge/` stays light (no server dependencies) because it runs on the Pi. Plan: [`docs/RESEARCH_PLAN.md`](../docs/RESEARCH_PLAN.md). Recordings stay out of git.
