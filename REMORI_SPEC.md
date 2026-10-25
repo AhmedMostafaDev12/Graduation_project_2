@@ -767,7 +767,7 @@ Example — idempotent batch:
 
 ### 7.3 Ambient memory pipeline (cloud)
 
-1. `uploads/{id}/complete` for an audio segment → enqueue `transcribe(segment)`.
+1. `uploads/{id}/complete` for an audio segment → enqueue `transcribe(segment)`. If the caregiver's master switch (`memory_capture_enabled`) is off, or the `ambient_audio_household` or `cloud_processing` consent is missing or revoked, the audio is **deleted untranscribed**: nothing reaches the speech-to-text provider (§9).
 2. The worker calls the STT API (language auto-detect, ar/en) and writes a `conversation_segment` event with `transcript_text`, `language`, `metadata.present_person_ids` (enrolled people whose encounters overlap the segment) and `metadata.segments` with speaker labels from diarization (D36).
 3. On success the worker **deletes the S3 audio** and sets `audio_segments.status = deleted` (D4). On failure it retries up to 3 times. Audio still untranscribed after 7 days is deleted regardless.
 4. The event's `rendered_text` (e.g. "09:20–09:24, talking with Ahmed (son): '...'") is embedded for RAG.
