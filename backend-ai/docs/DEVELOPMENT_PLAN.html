@@ -88,7 +88,7 @@ html{scroll-behavior:smooth}
       <li><b>Production as in the course</b> (<a href="https://github.com/Sanjeev-Thiyagarajan/fastapi-course">fastapi-course repo</a>): <b>nginx</b> + <b>certbot</b> (HTTPS) + <b>ufw</b> on the Ubuntu host, <b>gunicorn</b> with 2 uvicorn workers serving the app. The app runs in Docker bound to <code>127.0.0.1:8000</code>. Domain: <code>remori-ai.duckdns.org</code>.</li>
       <li><b>Manual deploy:</b> SSH into EC2 → <code>git pull</code> → <code>docker compose up -d --build</code>. CI stays "PR checks only".</li>
     </ul>
-    <div class="links"><span>Related, in <code>backend-ai/docs/</code>:</span><span>ARCHITECTURE.md</span><span>DATABASE.md</span><span>CELERY_REDIS.md</span><span>AI_LAYER.md</span><span>· spec §6 tables · §7.2 endpoints</span></div>
+    <div class="links"><span>Related, in <code>backend-ai/docs/</code>:</span><span>ARCHITECTURE.md</span><span>DATABASE.md</span><span>CELERY_REDIS.md</span><span>AI_LAYER.md</span><span>MODELS_CHOICE.md</span><span>· spec §6 tables · §7.2 endpoints · </span><span>docs/RESEARCH_PLAN.md</span></div>
   </div>
 </header>
 
@@ -124,7 +124,7 @@ html{scroll-behavior:smooth}
   <div class="scroll"><table class="steps">
     <thead><tr><th></th><th>Step</th><th>Output</th><th>Plugs into</th></tr></thead>
     <tbody>
-    <tr><td class="chk"><input type="checkbox" id="r-1" aria-label="R1 done"></td><td class="name">R1 Evaluation set</td><td class="det"><code>ml/rag_eval/</code>: synthetic journal days based on the UI board's Fatma data + <b>50–100 questions</b> in Egyptian Arabic and English, each with its expected answer and the event IDs that prove it. Includes questions with <b>no</b> answer.</td><td class="mono">R4 R5</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="r-1" aria-label="R1 done"></td><td class="name">R1 Evaluation set</td><td class="det"><code>ml/rag_eval/</code>: synthetic journal days based on the UI board's Fatma data + <b>50–100 questions</b> in Egyptian Arabic and English, each with its expected answer and the event IDs that prove it. Includes questions with <b>no</b> answer. This is the quick <b>development set</b>; the final measure for product and paper is the recorded research benchmark (RESEARCH_PLAN §6), in the same question-record format.</td><td class="mono">R4 R5</td></tr>
     <tr><td class="chk"><input type="checkbox" id="r-2" aria-label="R2 done"></td><td class="name">R2 Event → sentence</td><td class="det"><code>ai/rag/render.py</code>: one template per <code>event_type</code> (spec §6), Arabic + English, with unit tests.</td><td class="mono">7.3</td></tr>
     <tr><td class="chk"><input type="checkbox" id="r-3" aria-label="R3 done"></td><td class="name">R3 Time + person</td><td class="det">"الصبح", "امبارح", "الأسبوع اللي فات" → a time window in the patient's timezone. "أحمد" / "ابني" → a person.</td><td class="mono">R4</td></tr>
     <tr><td class="chk"><input type="checkbox" id="r-4" aria-label="R4 done"></td><td class="name">R4 Hybrid retriever</td><td class="det"><code>ai/rag/retriever.py</code>: SQL time + person filter first, then pgvector ranking (spec D22). Reports retrieval quality on R1.</td><td class="mono">9.1</td></tr>
@@ -269,6 +269,7 @@ html{scroll-behavior:smooth}
     <tr><td class="chk"><input type="checkbox" id="p6-5" aria-label="6.5 done"></td><td class="name">6.5 Tests</td><td class="det">Idempotency (run twice → one result), failure → retry → <code>failed</code>.</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p6-6" aria-label="6.6 done"></td><td class="name">6.6 Thumbnails</td><td class="det"><b>Done.</b> Enrollment previews stay in the request; uploaded photos <b>and videos</b> get theirs from task <code>media.make_thumbnail</code> (queued after the commit), with <code>media.backfill_thumbnails</code> every 10 min as a safety net.</td></tr>
   </tbody></table></div>
+  <div class="done"><b>Status: done, live since 13 Oct 2026</b> (PR #10). Decisions: no Flower; spec-default alert rules (missed medication after the 60-min grace, offline after 30 min, battery ≤ 20%, every linked caregiver once); video previews in the worker (ffmpeg from <code>imageio-ffmpeg</code>); 1 GB swap on the t3.small.</div>
   <div class="done"><b>Done when (M4):</b> workers and Beat run on EC2, and alerts appear in C2 by themselves.</div>
 </section>
 
@@ -277,11 +278,15 @@ html{scroll-behavior:smooth}
   <div class="phase-head"><span class="num">Phase 7</span><h2>Ambient memory pipeline</h2><span class="ms">M5</span><span class="prog" data-prog="p7"></span></div>
   <p class="course">Spec §7.3, AI_LAYER.md.</p>
   <div class="scroll"><table class="steps"><tbody>
-    <tr><td class="chk"><input type="checkbox" id="p7-1" aria-label="7.1 done"></td><td class="name">7.1 STT client</td><td class="det"><code>ai/clients/stt.py</code> with a timeout + <code>TransientError</code>.</td></tr>
-    <tr><td class="chk"><input type="checkbox" id="p7-2" aria-label="7.2 done"></td><td class="name">7.2 Task transcribe</td><td class="det">Audio from S3 → transcript → <code>conversation_segment</code> event with <code>present_person_ids</code> → <b>delete the audio</b>.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p7-0" aria-label="7.0 done"></td><td class="name">7.0 Model interfaces</td><td class="det"><code>ai/interfaces.py</code> (one interface per capability), <code>ai/fakes.py</code>, <code>ai/registry.py</code> with profiles <code>production</code> / <code>small</code> / <code>stub</code> (spec D37, D38, AI_LAYER.md §6). Tests use <code>stub</code>. <b>Done</b> (PR #67).</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p7-0b" aria-label="7.0b done"></td><td class="name">7.0b Contract PRs</td><td class="det">Spec §6 (scene segments + 3 vectors, frame-vector files, <code>media.gate_rule</code>, speaker labels, the five memory-structure tables of D40), §7.1 (<code>scene_segments</code>, <code>frame_vectors_ready</code>, <code>sound_event</code>, <code>gate_rule</code>), §8 (90-day retention), agreed with hardware + Flutter before any ingestion code. <b>Done</b> (PR #69, spec D41).</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p7-1" aria-label="7.1 done"></td><td class="name">7.1 STT client</td><td class="det"><code>ai/clients/stt.py</code> with a timeout + <code>TransientError</code>, implementing <code>SpeechToText</code>; diarization adds speaker labels (D36). <b>Done</b> (PR #71): Deepgram Nova-3 <code>ar-EG</code>, chosen by measurement (MODELS_CHOICE.md §7: WER 32.7% conversational, 4.6% read speech).</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p7-2" aria-label="7.2 done"></td><td class="name">7.2 Task transcribe</td><td class="det">Audio from S3 → <b>volume boost</b> (<code>dynaudnorm</code> + <code>loudnorm</code>, 16 kHz mono; recovers quiet speech) → transcript with speaker-labelled <code>metadata.segments</code> → <code>conversation_segment</code> event with <code>present_person_ids</code> → <b>delete the audio</b>.</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p7-3" aria-label="7.3 done"></td><td class="name">7.3 Task embed</td><td class="det"><code>ai/clients/embeddings.py</code> + <code>ai/rag/render.py</code>: each event rendered to a sentence and embedded.</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p7-4" aria-label="7.4 done"></td><td class="name">7.4 Wire it</td><td class="det"><code>uploads/{id}/complete</code> for audio → enqueue <code>transcribe</code> after commit.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p7-5" aria-label="7.5 done"></td><td class="name">7.5 Consolidation from speech</td><td class="det"><code>ai/memory/</code>: after <code>transcribe</code>, extract <b>intentions</b> and <b>facts</b> (exact quotes, typed numbers) and feed the <b>entity index</b>; re-check open intentions when new events arrive (spec D40).</td></tr>
   </tbody></table></div>
+  <div class="done"><b>Status (25 Oct 2026):</b> 7.0, 7.0b and 7.1 done (PRs #67, #69, #71). <b>Next: 7.2.</b></div>
   <div class="done"><b>Done when (M5):</b> a real recording from the phone shows up as a transcript in C12 / P4, and the audio is gone from S3.</div>
 </section>
 
@@ -293,6 +298,7 @@ html{scroll-behavior:smooth}
     <tr><td class="chk"><input type="checkbox" id="p8-2" aria-label="8.2 done"></td><td class="name">8.2 Enrollment</td><td class="det"><code>POST /people</code> computes embeddings, rejects photos with zero or several faces (C4 error state), and backfills seeded people.</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p8-3" aria-label="8.3 done"></td><td class="name">8.3 Task review</td><td class="det">Blur non-enrolled faces → <code>ai/clients/vision.py</code> → keep / discard / tags / OCR → <code>captured_documents</code> + retention (spec §7.4, §8).</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p8-4" aria-label="8.4 done"></td><td class="name">8.4 Task cluster</td><td class="det">Unknown encounters → <code>ai/clustering.py</code> → caregiver alert at 3 distinct days.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p8-5" aria-label="8.5 done"></td><td class="name">8.5 Consolidation from vision</td><td class="det">After <code>review</code>: <b>object sightings/states</b> and the <b>action log</b> from kept frames and frame vectors; entity index updated (spec D40, D41).</td></tr>
   </tbody></table></div>
   <div class="done"><b>Done when (M6):</b> enrolled people sync to the glasses with real embeddings, and photos and documents are reviewed for real.</div>
 </section>
@@ -301,7 +307,7 @@ html{scroll-behavior:smooth}
 <section class="phase" id="p9" data-phase="p9">
   <div class="phase-head"><span class="num">Phase 9</span><h2>Phase 2 AI: replace the stubs</h2><span class="ms">M7</span><span class="prog" data-prog="p9"></span></div>
   <div class="scroll"><table class="steps"><tbody>
-    <tr><td class="chk"><input type="checkbox" id="p9-1" aria-label="9.1 done"></td><td class="name">9.1 Real /assist</td><td class="det">Wire in Abdelrahman's R4 + R5: <code>ai/rag/retriever.py</code> + <code>answer.py</code>, hybrid retrieval (time window + pgvector) → LLM.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p9-1" aria-label="9.1 done"></td><td class="name">9.1 Real /assist</td><td class="det">Wire in Abdelrahman's R4 + R5: route by question type to the memory structures first, then hybrid retrieval (time window + pgvector) with two-stage visual search (scene vectors, then hourly frame-vector files), premise check against the entity index → LLM (spec D39, D40, D41).</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p9-2" aria-label="9.2 done"></td><td class="name">9.2 Real summaries</td><td class="det">Task <code>summaries.generate_due</code> with Abdelrahman's R7 prompt: nightly summaries + patterns per patient timezone.</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p9-3" aria-label="9.3 done"></td><td class="name">9.3 Push alerts</td><td class="det"><code>integrations/fcm.py</code>: alerts and daily-summary pushes to caregivers.</td></tr>
   </tbody></table></div>
