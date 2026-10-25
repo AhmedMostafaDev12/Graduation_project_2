@@ -69,6 +69,8 @@ Plan phases 0–6 are done and **live at `https://remori-ai.duckdns.org`** (see 
 
 **Phase 5** (PRs #8, #9): every spec §7.2 endpoint except social sign-in, on the real database, with AI stubs (`ai/rag/answer.py`, `ai/inference/face.py`); D27–D29 filled every screen, added ~320 px previews and the smart-review contract. Report: [`docs/REPORT_PHASE_5.md`](docs/REPORT_PHASE_5.md).
 
-**Phase 6** (PR #10): Redis + one Celery worker + one Beat, tasks `alerts.evaluate`, `retention.expire_media`, `media.make_thumbnail`, `media.backfill_thumbnails`. Copy their pattern for new tasks ([`docs/CELERY_REDIS.md`](docs/CELERY_REDIS.md)). **Next: Phase 7**, the ambient memory pipeline. Google/Facebook sign-in (Phase 3 steps 3.0, 3.7–3.9) is postponed.
+**Phase 6** (PR #10): Redis + one Celery worker + one Beat, tasks `alerts.evaluate`, `retention.expire_media`, `media.make_thumbnail`, `media.backfill_thumbnails`. Copy their pattern for new tasks ([`docs/CELERY_REDIS.md`](docs/CELERY_REDIS.md)).
+
+**Phase 7** (in progress): model interfaces + profiles (7.0, PR #67), the memory contract (7.0b, D41), Deepgram speech-to-text (7.1, PR #71, [`docs/MODELS_CHOICE.md`](docs/MODELS_CHOICE.md)), task `transcribe.segment` (7.2). **Next: 7.4**, wiring audio uploads to the task. Google/Facebook sign-in (Phase 3 steps 3.0, 3.7–3.9) is postponed.
 
 Every endpoint you add or change must also be updated in [`../docs/API_CONTRACT.md`](../docs/API_CONTRACT.md) §5–§6.

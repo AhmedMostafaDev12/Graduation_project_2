@@ -11,46 +11,13 @@ own voice or volunteers who agreed: never a patient's real conversation (MODELS_
 
 import argparse
 import mimetypes
-import subprocess
 import time
 from pathlib import Path
 
-import imageio_ffmpeg
-
 from app.ai.clients.stt import DeepgramSpeechToText
+from app.services.transcription_service import normalize
 
 CONTENT_TYPES = {".ogg": "audio/ogg", ".opus": "audio/ogg", ".m4a": "audio/mp4"}
-
-# dynaudnorm lifts quiet stretches (a softer or farther speaker) toward the main voice;
-# loudnorm then evens out the overall level. 16 kHz mono is plenty for speech.
-NORMALIZE_FILTER = "dynaudnorm=f=150:g=15:p=0.9,loudnorm=I=-16:TP=-1.5:LRA=11"
-
-
-def normalize(audio: bytes) -> bytes:
-    """Return the audio as loudness-normalized 16 kHz mono WAV."""
-    result = subprocess.run(
-        [
-            imageio_ffmpeg.get_ffmpeg_exe(),
-            "-hide_banner",
-            "-loglevel",
-            "error",
-            "-i",
-            "pipe:0",
-            "-af",
-            NORMALIZE_FILTER,
-            "-ac",
-            "1",
-            "-ar",
-            "16000",
-            "-f",
-            "wav",
-            "pipe:1",
-        ],
-        input=audio,
-        capture_output=True,
-        check=True,
-    )
-    return result.stdout
 
 
 def main() -> None:
@@ -69,7 +36,9 @@ def main() -> None:
     )
     audio = args.audio.read_bytes()
     if args.normalize:
-        audio, content_type = normalize(audio), "audio/wav"
+        boosted = normalize(audio)
+        if boosted:
+            audio, content_type = boosted, "audio/wav"
 
     started = time.perf_counter()
     result = DeepgramSpeechToText().transcribe(
