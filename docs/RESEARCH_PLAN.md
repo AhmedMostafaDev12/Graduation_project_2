@@ -90,9 +90,10 @@ The **product** uses cloud APIs (reliable now). The **engine chooses its models 
 ## 4. Two tracks, one engine (D38)
 
 ```
-                 ┌──────────── memory engine (backend-ai/app/ai/) ─────────────┐
-                 │ gate rules · frame/scene embeddings · captioner · retriever │
-                 │ answerer · evidence rule — every model chosen by config     │
+                 ┌──── memory engine: edge (ml/edge/) + server (backend-ai) ───┐
+                 │ edge: gate rules · frame embedder · face preprocessing      │
+                 │ server: STT · captioner · retriever · answerer · evidence   │
+                 │ every model chosen by profile (production / small / stub)  │
                  └──────────┬──────────────────────────────────┬───────────────┘
                             │ production config                │ experiment configs
    TRACK A — PRODUCT        │                                  │       TRACK B — RESEARCH
@@ -103,7 +104,9 @@ The **product** uses cloud APIs (reliable now). The **engine chooses its models 
 
 - **Track A does not wait for the research.** Flutter screens and the backend phases continue. Phase 7 (transcription) is needed by **both** tracks, so it stays next on the backend.
 - **Track B does not wait for the glasses.** It runs on recordings made with a head-mounted phone/GoPro (§5), replayed frame by frame through the gate as if they came from the glasses.
-- **One copy of the engine.** It lives in `backend-ai/app/ai/` (AI-using code, per the repo rules). `ml/` installs `backend-ai` as a local editable package (`pip install -e`) for the replay harness and the baselines, so the tested engine and the product engine cannot drift.
+- **One copy of each part of the engine (D38).** The **edge engine** (gate rules, frame embedder, face preprocessing, audio events) is a light package in `ml/edge/` that runs on the Pi and in the replay harness. The **server engine** (speech-to-text, captioner, retriever, answerer, evidence rule) lives in `backend-ai/app/ai/` behind one interface per capability. `ml/replay/` installs both (`pip install -e`), so the tested engine and the product engine cannot drift.
+- **Models by profile (D37).** `AI_PROFILE=production` (cloud, the product), `small` (open models, H5) or `stub` (fakes for tests). Every output records the model that made it, and experiments use their own memory store, never the product database.
+- **Baselines are configurations.** Store-everything, uniform sampling, fixed rules, captions-only, small models and the ablations are the same pipeline with different settings; only Video-RAG is external code.
 - **Where research code lives** (all in `ml/`, per `ml/README.md`):
 
 | Folder | Content |
@@ -111,6 +114,7 @@ The **product** uses cloud APIs (reliable now). The **engine chooses its models 
 | `ml/capture_gate/` | gate rules tuning, stage-2 classifier training on the dev set, export |
 | `ml/rag_eval/` | the benchmark: question records, scripts, scoring code |
 | `ml/face/` | face recognition evaluation (§9.1) and threshold choice |
+| `ml/edge/` (new) | the edge engine: gate rules, frame embedder, audio events, shared with the Pi |
 | `ml/replay/` (new) | replay harness + baseline systems (§7) |
 | `ml/datasets/` | local only (gitignored): recordings never go into git |
 
@@ -418,5 +422,5 @@ The recognition **threshold is chosen once on the dev sessions** and reported on
 | D35 | Unknown faces: raw samples only in the review cluster until reviewed (max 30 days); descriptions everywhere else |
 | D36 | Transcripts: `present_person_ids` + speaker labels (diarization) in the cloud |
 | D37 | Product on cloud APIs; engine models chosen by config; the paper reports cloud and small open models |
-| D38 | Memory engine in `backend-ai/app/ai/`; `ml/` installs `backend-ai` for the replay harness and baselines |
+| D38 | Engine in two parts: edge (`ml/edge/`, also on the Pi) and server (`backend-ai/app/ai/`, interfaces + profiles); `ml/replay/` installs both |
 | D39 | Answering: evidence rule with premise check, multi-step retrieval within the 20 s budget |

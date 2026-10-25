@@ -67,7 +67,7 @@ glasses (hardware/) ──BLE §7.1──> flutter/ (relay + UI) ──REST §7.
 
 | Topic | Question |
 |---|---|
-| ml ↔ backend packaging | How `backend-ai` imports the shared face preprocessing from `ml/` (local package install, copied module, or published wheel). The other direction is decided: `ml/` installs `backend-ai` to use the memory engine (D38) |
+| ml ↔ backend packaging | How `backend-ai` imports the shared face preprocessing from `ml/` (local package install, copied module, or published wheel). The memory engine is decided (D38): edge part in `ml/edge/`, server part in `backend-ai/app/ai/` |
 | Model files in git | Whether exported models (`*.onnx`, `*.tflite`) use Git LFS or are downloaded from S3 at build time |
 | Team assignment | Names per track (spec §11) |
 | Email verification | Whether email + password accounts must verify their email (link sent by AWS SES), or stay unverified |
