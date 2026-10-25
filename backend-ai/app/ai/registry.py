@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 from app.ai import fakes
+from app.ai.clients.embeddings import OpenAITextEmbedder
 from app.ai.clients.stt import DeepgramSpeechToText
 from app.ai.interfaces import (
     LLM,
@@ -59,7 +60,10 @@ PROFILES: dict[str, dict[str, str]] = {
 # the implementations that exist today; real clients are added from Phase 7.1 on
 PROVIDERS: dict[str, dict[str, type]] = {
     "stt": {"fake": fakes.FakeSpeechToText, "deepgram-nova-3": DeepgramSpeechToText},
-    "text_embedder": {"fake": fakes.FakeTextEmbedder},
+    "text_embedder": {
+        "fake": fakes.FakeTextEmbedder,
+        "openai-text-embedding-3-small": OpenAITextEmbedder,
+    },
     "vision": {"fake": fakes.FakeVisionReviewer},
     "captioner": {"fake": fakes.FakeCaptioner},
     "llm": {"fake": fakes.FakeLLM},

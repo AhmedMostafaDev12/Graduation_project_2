@@ -19,6 +19,7 @@ celery_app = Celery(
         "app.workers.tasks.alerts",
         "app.workers.tasks.retention",
         "app.workers.tasks.media",
+        "app.workers.tasks.embedding",
     ],
 )
 
@@ -50,6 +51,7 @@ celery_app.conf.update(
         "alerts.*": {"queue": "default"},
         "retention.*": {"queue": "default"},
         "media.*": {"queue": "cpu"},  # image/video work is CPU-bound
+        "embed.*": {"queue": "ai_io"},  # waits on the embeddings API
     },
 )
 
@@ -66,5 +68,7 @@ celery_app.conf.beat_schedule = {
         "task": "media.backfill_thumbnails",
         "schedule": crontab(minute="*/10"),
     },
+    # events without an embedding yet (phone batches, transcripts, failed tasks), spec §7.3
+    "embed-backfill": {"task": "embed.backfill", "schedule": crontab(minute="*/5")},
     # summaries.generate_due arrives in Phase 9
 }
