@@ -2,6 +2,7 @@
 
 Training, datasets, notebooks, evaluation and model export, plus the trained and exported models themselves.
 **Not here:** anything that *uses* a model to serve a request or a job. That lives in `backend-ai/app/ai/` (see `backend-ai/docs/AI_LAYER.md`) or on the glasses (`hardware/pi`).
+**One exception: `edge/`** (spec D38). It holds the glasses' *decision logic* as a pure library (gate rules, frame embedder, face preprocessing, audio-event labels) with **no device I/O**: no camera, BLE or storage code. The Pi runtime in `hardware/pi/` and the research replay in `replay/` both import it, so the paper tests exactly what the glasses run. The AI track owns it; the hardware team owns the runtime around it.
 Read the root [`AGENTS.md`](../AGENTS.md) first.
 
 Owner: **Ahmed Mostafa** (lead, AI) with the AI/ML track.
