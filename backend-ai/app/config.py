@@ -29,6 +29,17 @@ class Settings(BaseSettings):
     # Celery broker (docs/CELERY_REDIS.md). Compose sets redis://redis:6379/0.
     redis_url: str = "redis://localhost:6379/0"
 
+    # AI models by profile: production | small | stub (docs/AI_LAYER.md §6, spec D37).
+    # Stays "stub" until the real clients exist (Phase 7.1 on).
+    ai_profile: str = "stub"
+    # Optional per-capability overrides, e.g. AI_LLM=fake
+    ai_stt: str | None = None
+    ai_text_embedder: str | None = None
+    ai_vision: str | None = None
+    ai_captioner: str | None = None
+    ai_llm: str | None = None
+    ai_face: str | None = None
+
     @model_validator(mode="after")
     def _real_secret_outside_local(self):
         if self.environment != "local" and self.jwt_secret == LOCAL_JWT_SECRET:
