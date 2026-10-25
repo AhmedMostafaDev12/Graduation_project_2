@@ -44,7 +44,7 @@ X and Y are measured, not promised. We report them whatever they turn out to be.
 ### 3.1 Memory on the glasses (D33, D34)
 
 ```
-camera 1 fps ──► frame embedding on the glasses (every frame) ──► one mean vector per scene segment (D34, D41)
+camera 1 fps ──► frame embedding on the glasses (every frame) ──► segments + 3 vectors (Postgres) · every vector (S3) (D41)
      │
      └──► GATE (D33): does this frame deserve to be kept as an image?
             ├─ face rule        a face is present (enrolled person or unknown)
@@ -60,7 +60,7 @@ microphone ──► speech segments ──► cloud transcription + speaker lab
 ```
 
 - **Why frame embeddings matter:** "Where did I put my glasses?" usually concerns a moment no rule fired on. The embeddings let the answerer find that moment even when its image was never kept.
-- **Scene segments (D41):** every frame is embedded on the glasses, but only one mean vector per run of similar frames (cut where the novelty rule fires) is sent and stored: ~2 MB/day instead of ~60 MB/day per patient. The replay harness uses the same segmenting, so the paper measures what the product stores.
+- **Two-tier frame memory (D41):** every frame is embedded on the glasses. **Tier 1 (Postgres):** scene segments of at most 30 s, each with 3 real frame vectors (first, middle, most different), ~6 MB/day, searched first. **Tier 2 (S3):** every per-frame vector in hourly 8-bit files, ~30 MB/day, re-ranked only inside the minutes tier 1 found. Nothing is thrown away, and the replay harness uses the same two tiers.
 - **Privacy by design:** discarded frames never leave the glasses; only segment vectors do. We measure and report the fraction of frames never stored.
 - **Later (semester 2):** IMU (skip blurry frames, head-still = attention) and an adaptive frame rate. In the first paper, these are Future Work.
 
@@ -275,6 +275,7 @@ Every system answers the **same test questions** from the **same recordings**, w
 | Small models | Remori with small open models instead of cloud models | H5 |
 | Flat memory | Remori with the structures switched off (vector search over raw evidence only) | H6 |
 | Structure ablations | Remori minus one structure (objects / actions / facts / intentions / entity index) | H6, per concern |
+| Frame-memory resolution | tier 1 only (3 representatives) vs one mean per segment vs two-tier (all frames) | retrieval recall vs storage (H1) |
 
 ---
 

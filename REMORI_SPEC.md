@@ -52,7 +52,7 @@ Decisions taken in the 2026-10-03 design session. **P** = product decision by th
 | D38 | **Memory engine packaging (two parts, one copy of each):** the **edge engine** (gate rules, frame embedder, face preprocessing, audio-event classifier) is a light package in `ml/edge/` (plain Python + ONNX, no server dependencies) used by the Pi, the replay harness and the backend's enrollment embedder; the **server engine** (speech-to-text with speaker labels, vision review, captioner, text embeddings, retriever, answerer, evidence rule) lives in `backend-ai/app/ai/` behind one interface per capability, with models chosen by profile (`production` / `small` / `stub`, D37). `ml/replay/` installs both. Experiments never write to the product database. | T |
 | D39 | **Answering with evidence:** free-form answers follow plan → up to 3 hybrid searches (now including frame embeddings) → evidence and premise check → answer with source events, or a kind "I'm not sure" when the evidence doesn't support every part of the question. The whole path fits the 20 s glasses fallback (§7.1). | P |
 | D40 | **Structured memory (three layers).** Layer 1 raw evidence (events, verbatim transcripts with speakers, kept frames, frame embeddings, OCR text); layer 2 **five structures** extracted by a consolidation job, every record linked to its evidence: object sightings/states, an action log (one row per action instance, never merged), facts (speaker + exact quote + typed numbers/dates), intentions (plan, due time, status done / not done / unknown + the evidence that settled it), and an entity index (every person, object, place seen or mentioned); layer 3 day/week summaries, never the only source of an answer. Answering routes by question type to the structures, then falls back to vector search; the premise check queries the entity index. Structures can be switched off for the flat-memory ablation (H6). Tables are specified contract-first in §6 before implementation. Suggesting reminders from intentions is a separate, later decision. | T |
-| D41 | **Memory contract (phase 7.0b) for D33, D34, D36, D40.** (1) The glasses embed every frame but send one vector per **scene segment** (a run of similar frames, cut where the novelty rule fires), as half-precision vectors over the BLE `bulk` channel: ~2 MB/day instead of ~60 MB/day; the replay harness uses the same segmenting. (2) Every kept frame carries `gate_rule`. (3) Non-speech sounds are `sound_detected` events. (4) Transcripts keep speaker-labelled segments in `events.metadata.segments`. (5) Five memory tables: `memory_entities`, `object_sightings`, `memory_actions`, `memory_facts`, `memory_intentions`, each row linked to its evidence and the `model_id` that extracted it. (6) Retention: scene segments 90 days; structures like journal text, deleted with the evidence they came from (§8). | T |
+| D41 | **Memory contract (phase 7.0b) for D33, D34, D36, D40.** (1) **Two-tier frame memory:** the glasses embed every frame. Postgres keeps **scene segments** (a run of similar frames, cut where the novelty rule fires, at most 30 s) with **3 representative frame vectors** each (first, middle, most different; ~6 MB/day). **Every per-frame vector** goes to S3 as **hourly 8-bit files** (~30 MB/day, sent over the Wi-Fi burst and uploaded on Wi-Fi only). Retrieval is two-stage: segments find the candidate minutes, the hourly files re-rank every frame inside them. (2) Every kept frame carries `gate_rule`. (3) Non-speech sounds are `sound_detected` events. (4) Transcripts keep speaker-labelled segments in `events.metadata.segments`. (5) Five memory tables: `memory_entities`, `object_sightings`, `memory_actions`, `memory_facts`, `memory_intentions`, each row linked to its evidence and the `model_id` that extracted it. (6) Retention: segments and frame-vector files 90 days (to confirm); structures like journal text, deleted with the evidence they came from (§8). | T |
 
 ---
 
@@ -396,16 +396,36 @@ captured_documents (
 )
 
 -- ===== Memory (D33, D34, D36, D40, D41) =====
-scene_segments (                       -- one row per run of similar frames (D41), not per frame
+scene_segments (                       -- one row per run of similar frames, at most 30 s (D41)
   id UUID PK,                          -- generated on glasses
   patient_id UUID FK -> users,
   device_id UUID FK -> devices,
   started_at, ended_at TIMESTAMPTZ,
   frame_count INT,
-  embedding HALFVEC(512),              -- mean frame embedding; dimension fixed by the edge model card (D34)
   model_id TEXT,                       -- edge image embedder, e.g. 'mobileclip-s0@1.0'
   kept_media_ids UUID[],               -- frames the gate kept inside this segment
   created_at TIMESTAMPTZ               -- deleted after 90 days (§8)
+)
+
+scene_vectors (                        -- tier 1: 3 real frame vectors per segment, searched first (D41)
+  id UUID PK,
+  segment_id UUID FK -> scene_segments,
+  patient_id UUID FK -> users,
+  captured_at TIMESTAMPTZ,             -- the frame's own second
+  role ENUM('first','middle','most_different'),
+  embedding HALFVEC(512)               -- dimension fixed by the edge model card (D34)
+)
+
+frame_vector_files (                   -- tier 2: EVERY frame's vector, one 8-bit file per hour in S3 (D41)
+  id UUID PK,                          -- generated on glasses
+  patient_id UUID FK -> users,
+  device_id UUID FK -> devices,
+  hour_start TIMESTAMPTZ,
+  frame_count INT,
+  model_id TEXT, dim INT,
+  storage_key TEXT,                    -- private S3 key; the vectors are never stored in Postgres
+  created_at TIMESTAMPTZ,              -- deleted after 90 days (§8)
+  UNIQUE (patient_id, device_id, hour_start)
 )
 
 memory_entities (                      -- entity index: every person, object, place seen or mentioned (D40)
@@ -568,7 +588,8 @@ audit_log (
 | Media | metadata + S3 | pending uploads | bytes until acked |
 | Reminders, logs | ✅ | ✅ scheduler | today's schedule + statuses |
 | Places | ✅ | ✅ (GPS matching) | – |
-| Scene segments (D41) | 90 days | outbox | queue until acked |
+| Scene segments + 3 vectors each (D41) | Postgres, 90 days | outbox | queue until acked |
+| Per-frame vectors, hourly files (D41) | S3, 90 days | upload queue (Wi-Fi only) | queue until acked |
 | Memory structures (D40) | ✅ (built in the cloud) | – | – |
 
 ---
@@ -589,7 +610,7 @@ The link uses LE Secure Connections bonding. **Video** goes over a Wi-Fi burst: 
 // ---------- session ----------
 // G->P on connect
 { "type": "hello", "device_serial": "RMR-0007", "firmware_version": "0.3.1", "protocol_version": 1,
-  "queue": { "events": 12, "audio_segments": 40, "media": 3, "scene_segments": 85 } }
+  "queue": { "events": 12, "audio_segments": 40, "media": 3, "scene_segments": 85, "frame_vector_files": 2 } }
 // P->G right after hello (Pi has no RTC; ESP32 keeps time between syncs)
 { "type": "time_sync", "utc": "2026-10-01T09:00:00Z", "timezone": "Africa/Cairo" }
 // G->P every 60 s
@@ -605,12 +626,18 @@ The link uses LE Secure Connections bonding. **Video** goes over a Wi-Fi burst: 
   "media_ref": "img-458", "gate_rule": "text|medication", "at": "..." }
 { "type": "salient_frame_detected", "id": "uuid", "salience_score": 0.78, "media_ref": "img-459",
   "gate_rule": "novelty|medication|audio_event|classifier", "at": "..." }
-// G->P scene segments (D34, D41): one mean vector per run of similar frames, batched about every 60 s.
-// The vectors are too big for `control`, so they come on `bulk` (fetch with `get`, then `ack` the ids).
+// G->P scene segments (D34, D41): runs of similar frames (at most 30 s), each with 3 real frame vectors
+// (first, middle, most different), batched about every 60 s. Too big for `control`: they come on `bulk`.
 { "type": "scene_segments", "ids": ["uuid", "uuid"], "model_id": "mobileclip-s0@1.0", "dim": 512,
-  "ref": "seg-301", "bytes": 2100 }
+  "ref": "seg-301", "bytes": 6400 }
 // bulk record per segment, little-endian: 16 B uuid · int64 started_at (unix ms) · int64 ended_at ·
-// uint16 frame_count · dim × float16 vector · uint8 n_kept · n_kept × 16 B kept media uuids
+// uint16 frame_count · uint8 n_kept · n_kept × 16 B kept media uuids ·
+// 3 × (uint8 role [0 first, 1 middle, 2 most_different] · int64 captured_at · dim × float16 vector)
+
+// G->P every frame's vector for one hour (D41), fetched over the Wi-Fi burst like video (not BLE)
+{ "type": "frame_vectors_ready", "id": "uuid", "hour_start": "2026-10-01T09:00:00Z", "frame_count": 3412,
+  "model_id": "mobileclip-s0@1.0", "dim": 512, "ref": "fv-0900", "bytes": 1782000 }
+// file layout, little-endian: per frame · int64 captured_at (unix ms) · float32 scale · dim × int8
 
 // ---------- sounds (D33) ----------
 // G->P a non-speech sound the audio-event classifier recognized; also triggers the gate (keep the next frames)
@@ -666,7 +693,7 @@ The link uses LE Secure Connections bonding. **Video** goes over a Wi-Fi burst: 
 
 **Reminder merge rule (phone ↔ glasses ↔ cloud):** the phone and glasses each fire the same `log_id` independently. When states disagree, **`completed` always wins**. Otherwise the state with the latest `at` wins. `missed` is set by whichever side reaches the grace period first, and a later `completed` still overrides it (late confirmation).
 
-**Glasses-side queue limits:** if storage falls below 500 MB, evict in this order: salient frames → document frames → encounter keyframes (event metadata is kept) → oldest audio → oldest scene segments. User-requested clips are never evicted automatically.
+**Glasses-side queue limits:** if storage falls below 500 MB, evict in this order: salient frames → document frames → encounter keyframes (event metadata is kept) → oldest audio → oldest frame-vector files → oldest scene segments. User-requested clips are never evicted automatically.
 
 ### 7.2 Phone ↔ Backend (REST, FastAPI)
 
@@ -730,8 +757,10 @@ Example — idempotent batch:
 // POST /patients/{id}/events:batch
 { "encounters": [ { "id": "uuid", "person_id": "uuid", "started_at": "...", "ended_at": "...", "best_confidence": 0.94, "announced": true } ],
   "events": [ { "id": "uuid", "event_type": "encounter", "encounter_id": "uuid", "occurred_at": "...", "source": "glasses" } ],
-  "scene_segments": [ { "id": "uuid", "started_at": "...", "ended_at": "...", "frame_count": 41,
-                        "model_id": "mobileclip-s0@1.0", "embedding": "base64 float16", "kept_media_ids": ["uuid"] } ] }
+  "scene_segments": [ { "id": "uuid", "started_at": "...", "ended_at": "...", "frame_count": 30,
+                        "model_id": "mobileclip-s0@1.0", "kept_media_ids": ["uuid"],
+                        "vectors": [ { "role": "first", "captured_at": "...", "embedding": "base64 float16" } ] } ] }
+// hourly frame-vector files go through POST /patients/{id}/uploads with kind "frame_vectors" (Wi-Fi only)
 // 200 → { "accepted": ["uuid", ...], "duplicates": ["uuid"], "rejected": ["uuid"] }
 // rejected = points at something this patient doesn't have; the rest of the batch is still stored
 ```
@@ -779,7 +808,8 @@ The on-device gate proposes (`pending_review`). The worker blurs faces that don'
 | Documents, own notable moments (no other people) | `keep_indefinitely` |
 | Discarded media | Deleted immediately |
 | Face embeddings | Deleted with the person (hard delete on caregiver request) |
-| Scene segments (D41) | Deleted after **90 days**; the structures already extracted from them remain |
+| Scene segments and their vectors (D41) | Deleted after **90 days** (to confirm); the structures already extracted from them remain |
+| Per-frame vector files in S3 (D41) | Deleted after **90 days** (to confirm; S3 is cheap, so this is a privacy choice, not a cost one) |
 | Memory structures (D40) | Kept like journal text. Deleting an event or photo also deletes the structure rows whose only evidence it was |
 
 ---
