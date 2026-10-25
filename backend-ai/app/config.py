@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     ai_llm: str | None = None
     ai_face: str | None = None
 
+    # Provider keys (docs/MODELS_CHOICE.md). Only in .env / the server, never in git.
+    deepgram_api_key: str | None = None
+
     @model_validator(mode="after")
     def _real_secret_outside_local(self):
         if self.environment != "local" and self.jwt_secret == LOCAL_JWT_SECRET:

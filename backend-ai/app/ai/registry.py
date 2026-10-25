@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 from app.ai import fakes
+from app.ai.clients.stt import DeepgramSpeechToText
 from app.ai.interfaces import (
     LLM,
     Captioner,
@@ -38,7 +39,7 @@ PROFILES: dict[str, dict[str, str]] = {
         "face": "stub",
     },
     "production": {
-        "stt": "cloud-whisper",
+        "stt": "deepgram-nova-3",
         "text_embedder": "openai-text-embedding-3-small",
         "vision": "cloud-vision",
         "captioner": "cloud-vision",
@@ -57,7 +58,7 @@ PROFILES: dict[str, dict[str, str]] = {
 
 # the implementations that exist today; real clients are added from Phase 7.1 on
 PROVIDERS: dict[str, dict[str, type]] = {
-    "stt": {"fake": fakes.FakeSpeechToText},
+    "stt": {"fake": fakes.FakeSpeechToText, "deepgram-nova-3": DeepgramSpeechToText},
     "text_embedder": {"fake": fakes.FakeTextEmbedder},
     "vision": {"fake": fakes.FakeVisionReviewer},
     "captioner": {"fake": fakes.FakeCaptioner},
@@ -106,7 +107,12 @@ def build(profile: str, overrides: dict[str, str | None] | None = None) -> AIMod
                 f"Available: {sorted(PROVIDERS[capability])}. "
                 "Use AI_PROFILE=stub or override this capability."
             )
-        models[capability] = cls()
+        try:
+            models[capability] = cls()
+        except Exception as exc:  # e.g. a missing API key
+            raise ProviderNotAvailable(
+                f"AI provider {provider!r} for {capability!r} couldn't start: {exc}"
+            ) from exc
     return AIModels(**models)
 
 

@@ -27,7 +27,7 @@ app/ai/
 ├── registry.py       # profiles production / small / stub → get_ai() (§6)
 ├── fakes.py          # deterministic fakes for the stub profile and tests
 ├── clients/          # real providers, one module per capability, each implementing its interface
-│   ├── stt.py        #   transcribe(audio) -> Transcript       (Whisper-large-v3-class API, spec D3)
+│   ├── stt.py        #   transcribe(audio) -> Transcript       (Deepgram Nova-3, ar-EG + speaker labels, D36)
 │   ├── llm.py        #   complete(prompt) -> text               (Haiku / 4o-mini class)
 │   ├── vision.py     #   review(image) -> ReviewResult          (keep/discard + tags + OCR, spec D20)
 │   └── embeddings.py #   embed(texts) -> list[vector]           (text-embedding-3-small, 1536-d, spec D15)
@@ -95,7 +95,7 @@ The vision prompt (Phase 7) must return `ReviewResult` from [`app/ai/review_cont
 ### 6.1 One interface per capability (`app/ai/interfaces.py`)
 | Interface | Method | Production (cloud) | Small (open) |
 |---|---|---|---|
-| `SpeechToText` | `transcribe(audio, content_type, language_hint) -> Transcript` (segments with times and speaker labels) | Whisper-class API + diarization | WhisperX |
+| `SpeechToText` | `transcribe(audio, content_type, language_hint) -> Transcript` (segments with times and speaker labels) | Deepgram Nova-3 (`ar-EG`) + diarization, `clients/stt.py` | WhisperX |
 | `TextEmbedder` | `embed(texts) -> list[vector]` | `text-embedding-3-small` (1536-d, D15) | a multilingual open embedder |
 | `VisionReviewer` | `review(image, language) -> dict` (shaped by `review_contract`) | cloud vision model | Qwen2.5-VL |
 | `Captioner` | `caption(images, transcript, language) -> str` | cloud vision model | small VLM |
