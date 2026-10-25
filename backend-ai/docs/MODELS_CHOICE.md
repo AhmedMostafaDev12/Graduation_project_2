@@ -130,7 +130,7 @@ A 32-second WhatsApp voice note (two people, one voice much quieter; heavily com
 | Capability | Recommended `production` | Recommended `small` | Decided? |
 |---|---|---|---|
 | Speech-to-text | Deepgram Nova-3 `ar-EG` + diarization, volume boosted first | WhisperX (self-hosted) | **decided** (measured, §7); speaker separation still open |
-| LLM | Gemini Flash-Lite / Flash (paid) | Qwen3 via Groq | to confirm |
+| LLM | Gemini Flash (`gemini-3.8-flash`, **paid tier**; `clients/llm.py`, phase 7.5) | Qwen3 via Groq | **decided, implemented** (extraction; quality not measured yet) |
 | Vision | Gemini Flash (paid) | Qwen2.5-VL | to confirm |
 | Text embeddings | `text-embedding-3-small` (`clients/embeddings.py`, phase 7.3) | Qwen3-Embedding | **decided (D15), implemented** |
 

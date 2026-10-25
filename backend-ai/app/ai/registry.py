@@ -16,6 +16,7 @@ from functools import lru_cache
 
 from app.ai import fakes
 from app.ai.clients.embeddings import OpenAITextEmbedder
+from app.ai.clients.llm import GeminiLLM
 from app.ai.clients.stt import DeepgramSpeechToText
 from app.ai.interfaces import (
     LLM,
@@ -44,7 +45,7 @@ PROFILES: dict[str, dict[str, str]] = {
         "text_embedder": "openai-text-embedding-3-small",
         "vision": "cloud-vision",
         "captioner": "cloud-vision",
-        "llm": "cloud-llm",
+        "llm": "gemini-flash",
         "face": "mobilefacenet-onnx",
     },
     "small": {
@@ -66,7 +67,7 @@ PROVIDERS: dict[str, dict[str, type]] = {
     },
     "vision": {"fake": fakes.FakeVisionReviewer},
     "captioner": {"fake": fakes.FakeCaptioner},
-    "llm": {"fake": fakes.FakeLLM},
+    "llm": {"fake": fakes.FakeLLM, "gemini-flash": GeminiLLM},
     "face": {"stub": fakes.StubFaceEmbedder},
 }
 

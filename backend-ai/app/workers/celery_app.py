@@ -21,6 +21,7 @@ celery_app = Celery(
         "app.workers.tasks.media",
         "app.workers.tasks.transcription",
         "app.workers.tasks.embedding",
+        "app.workers.tasks.memory",
     ],
 )
 
@@ -54,6 +55,7 @@ celery_app.conf.update(
         "media.*": {"queue": "cpu"},  # image/video work is CPU-bound
         "transcribe.*": {"queue": "ai_io"},  # waits on the speech-to-text API
         "embed.*": {"queue": "ai_io"},  # waits on the embeddings API
+        "memory.*": {"queue": "ai_io"},  # waits on the LLM API
     },
 )
 
@@ -77,5 +79,15 @@ celery_app.conf.beat_schedule = {
     },
     # events without an embedding yet (phone batches, transcripts, failed tasks), spec §7.3
     "embed-backfill": {"task": "embed.backfill", "schedule": crontab(minute="*/5")},
+    # transcripts not consolidated yet into facts and intentions, spec §7.3 step 5
+    "memory-backfill": {
+        "task": "memory.backfill",
+        "schedule": crontab(minute="3-59/10"),
+    },
+    # open intentions past their window become unknown (spec D40)
+    "memory-expire-intentions": {
+        "task": "memory.expire_intentions",
+        "schedule": crontab(minute=17),
+    },
     # summaries.generate_due arrives in Phase 9
 }
