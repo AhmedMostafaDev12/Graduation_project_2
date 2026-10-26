@@ -13,7 +13,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 FACE_DIM = 512  # MobileFaceNet w600k_mbf (spec D14)
-TEXT_DIM = 1536  # text-embedding-3-small (spec D15)
+TEXT_DIM = 1024  # Voyage voyage-4 (spec D15)
 
 
 def pk() -> Mapped[uuid.UUID]:

@@ -15,7 +15,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 from app.ai import fakes
-from app.ai.clients.embeddings import OpenAITextEmbedder
+from app.ai.clients.embeddings import OpenAITextEmbedder, VoyageTextEmbedder
 from app.ai.clients.llm import GeminiLLM
 from app.ai.clients.stt import DeepgramSpeechToText
 from app.ai.interfaces import (
@@ -42,7 +42,7 @@ PROFILES: dict[str, dict[str, str]] = {
     },
     "production": {
         "stt": "deepgram-nova-3",
-        "text_embedder": "openai-text-embedding-3-small",
+        "text_embedder": "voyage-4",
         "vision": "cloud-vision",
         "captioner": "cloud-vision",
         "llm": "gemini-flash",
@@ -63,6 +63,7 @@ PROVIDERS: dict[str, dict[str, type]] = {
     "stt": {"fake": fakes.FakeSpeechToText, "deepgram-nova-3": DeepgramSpeechToText},
     "text_embedder": {
         "fake": fakes.FakeTextEmbedder,
+        "voyage-4": VoyageTextEmbedder,
         "openai-text-embedding-3-small": OpenAITextEmbedder,
     },
     "vision": {"fake": fakes.FakeVisionReviewer},

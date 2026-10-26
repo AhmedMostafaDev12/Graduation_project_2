@@ -30,7 +30,7 @@ app/ai/
 │   ├── stt.py        #   transcribe(audio) -> Transcript       (Deepgram Nova-3, ar-EG + speaker labels, D36)
 │   ├── llm.py        #   complete(messages, json_schema) -> text (Gemini Flash, paid tier; built in 7.5)
 │   ├── vision.py     #   review(image) -> ReviewResult          (keep/discard + tags + OCR, spec D20)
-│   └── embeddings.py #   embed(texts) -> list[vector]           (OpenAI text-embedding-3-small, 1536-d, spec D15; built in 7.3)
+│   └── embeddings.py #   embed(texts) -> list[vector]           (Voyage voyage-4, 1024-d, spec D15; built in 7.3, Voyage since 0006)
 ├── inference/
 │   └── face.py       #   embed_face(image) -> vector(512)       (server-side face embedder for enrollment, spec D14; STUB 'stub-0' until Phase 8)
 ├── memory/           # structured memory (§6.4, spec D40): consolidation + the five structures
@@ -53,7 +53,7 @@ app/ai/
 4. **Local models load once per process.** API: FastAPI `lifespan`. Workers: Celery `worker_process_init`. Never load a model inside a request or a task.
 5. **Server face embeddings stay compatible with the edge** (spec D14). Use the face model version and preprocessing recorded in the spec. If the edge owners change them, the server follows; the backend never changes them on its own.
 6. **Prompts are files, not strings in code.** Change a prompt by adding a new version (`.v2.txt`), never by editing the old one in place.
-7. **Vector dimensions are fixed by the model:** face 512, text 1536. Changing a model means re-embedding everything, so it's a lead decision.
+7. **Vector dimensions are fixed by the model:** face 512, text 1024. Changing a model means re-embedding everything, so it's a lead decision.
 8. **Privacy:** blur non-enrolled faces before any vision call (spec §7.4). Never log prompts that contain transcripts or names. Raw audio is deleted after transcription (spec D4).
 9. **Tests never call real AI APIs.** Mock them with `respx` and keep a few recorded example responses as fixtures.
 
@@ -98,7 +98,7 @@ The vision prompt (Phase 7) must return `ReviewResult` from [`app/ai/review_cont
 | Interface | Method | Production (cloud) | Small (open) |
 |---|---|---|---|
 | `SpeechToText` | `transcribe(audio, content_type, language_hint) -> Transcript` (segments with times and speaker labels) | Deepgram Nova-3 (`ar-EG`) + diarization, `clients/stt.py` | WhisperX |
-| `TextEmbedder` | `embed(texts) -> list[vector]` | `text-embedding-3-small` (1536-d, D15) | a multilingual open embedder |
+| `TextEmbedder` | `embed(texts) -> list[vector]` | Voyage `voyage-4` (1024-d, D15) | a multilingual open embedder |
 | `VisionReviewer` | `review(image, language) -> dict` (shaped by `review_contract`) | cloud vision model | Qwen2.5-VL |
 | `Captioner` | `caption(images, transcript, language) -> str` | cloud vision model | small VLM |
 | `LLM` | `complete(messages, json_schema=None) -> str` | Haiku / 4o-mini class | Qwen / Gemma via a local server |

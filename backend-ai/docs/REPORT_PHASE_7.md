@@ -2,7 +2,7 @@
 
 What was built in Phase 7, the architecture behind it, every decision, every bug found and fixed, the measurements, how we worked, and how to take it live. Companion to [REPORT_PHASE_0_1.md](REPORT_PHASE_0_1.md), [REPORT_PHASE_2.md](REPORT_PHASE_2.md) and [REPORT_PHASE_5.md](REPORT_PHASE_5.md).
 
-**Status (25 Oct 2026):** Phase 7 is complete in code. A recording uploaded by the patient's phone becomes a speaker-labelled transcript in the journal, gets a searchable sentence and embedding, has its facts and plans extracted, and its audio is deleted. **229 tests pass**, ruff is clean, `alembic check` is clean (migration `0005`). Work merged in **PRs #65–#75** plus the 7.5 PR. **Not live yet:** the server still runs the `stub` profile until the provider keys are set (§11).
+**Status (26 Oct 2026):** Phase 7 is complete in code. A recording uploaded by the patient's phone becomes a speaker-labelled transcript in the journal, gets a searchable sentence and embedding, has its facts and plans extracted, and its audio is deleted. **236 tests pass**, ruff is clean, `alembic check` is clean (migration `0006`). Work merged in **PRs #65–#77**, plus the Voyage switch (embeddings 1024-d). **Not live yet:** the server still runs the `stub` profile until the provider keys are set (§11).
 
 ---
 
@@ -23,7 +23,7 @@ flowchart LR
     end
     subgraph AI["Cloud AI (paid tiers)"]
         dg["Deepgram Nova-3 ar-EG<br/>speech-to-text + speakers"]
-        oa["OpenAI text-embedding-3-small"]
+        oa["Voyage voyage-4 (1024-d)"]
         gm["Gemini Flash<br/>facts + intentions"]
     end
     db[("Supabase Postgres<br/>events · memory_* tables")]
@@ -77,7 +77,8 @@ Before Phase 7, the backend stored what the app sent but understood none of it. 
 | — | Speech-to-text provider | **Deepgram Nova-3 `ar-EG`**, measured (§8) | Best words on every test, fastest |
 | — | Quiet voices | **Boost the volume** before transcribing (`dynaudnorm` + `loudnorm`) | Recovered ~20 % more speech on our recording |
 | — | Consent gate | Without master switch + household audio + cloud consents, audio is **deleted untranscribed** (spec §7.3) | Nothing reaches a provider without permission |
-| — | Embeddings | OpenAI `text-embedding-3-small`, 1536-d (D15) | Cheap, multilingual, already in the schema |
+| — | Embeddings | Voyage `voyage-4`, 1024-d (D15 changed from OpenAI 1536-d; migration 0006) | Free allowance, multilingual; OpenAI has no free tier |
+| — | LLM measured | Gemini Flash beats Qwen3.8 and GPT-OSS on our extraction test (MODELS_CHOICE §7.5) | Every plan found, every holder right |
 | — | LLM | **Gemini Flash, paid tier** (7.5) | Strong Arabic, JSON-schema output; the free tier may use prompts, which are patients' conversations |
 | — | 7.5 scope | Only the tables 7.5 fills: `memory_entities`, `memory_facts`, `memory_intentions` | Objects and actions come with vision (8.5), scene segments with glasses ingestion |
 
@@ -99,7 +100,7 @@ flowchart TB
 | Capability | Interface | `production` | `stub` (tests, local) |
 |---|---|---|---|
 | `stt` | `transcribe(audio, content_type, language_hint) → Transcript` | Deepgram Nova-3 `ar-EG` + diarization | fixed Arabic sentence |
-| `text_embedder` | `embed(texts) → vectors` | OpenAI `text-embedding-3-small` | hash-seeded unit vectors |
+| `text_embedder` | `embed(texts) → vectors` | Voyage `voyage-4` (1024-d) | hash-seeded unit vectors |
 | `llm` | `complete(messages, json_schema) → text` | Gemini Flash (`gemini-3.8-flash`) | `{}` / "fake answer" |
 | `vision`, `captioner` | review / caption | Phase 8 | fakes |
 | `face` | `embed(image) → 512-d` | MobileFaceNet (Phase 8) | the enrollment stub |
@@ -323,9 +324,9 @@ Every service test runs against a local Postgres with pgvector (`docker-compose.
 ## 11. Going live (your actions)
 
 1. **Keys** (never in chat or git): in `backend-ai/.env` locally and in the server's env file:
-   `DEEPGRAM_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY` (Google AI Studio, **billing enabled** so the paid terms apply).
-2. **Models:** either `AI_PROFILE=production` with `AI_VISION=fake`, `AI_CAPTIONER=fake`, `AI_FACE=stub` (Phase 8 isn't built), or keep `stub` and set `AI_STT=deepgram-nova-3`, `AI_TEXT_EMBEDDER=openai-text-embedding-3-small`, `AI_LLM=gemini-flash`.
-3. **Migrate Supabase** to `0005` (`alembic upgrade head` as `postgres`). It's additive: the running code keeps working.
+   `DEEPGRAM_API_KEY`, `VOYAGE_API_KEY` (**opt out of training** in the Voyage dashboard), `GEMINI_API_KEY` (paid key, so Google's paid terms apply).
+2. **Models:** either `AI_PROFILE=production` with `AI_VISION=fake`, `AI_CAPTIONER=fake`, `AI_FACE=stub` (Phase 8 isn't built), or keep `stub` and set `AI_STT=deepgram-nova-3`, `AI_TEXT_EMBEDDER=voyage-4`, `AI_LLM=gemini-flash`.
+3. **Migrate Supabase** to `0006` (`alembic upgrade head` as `postgres`). `0005` adds tables; `0006` resizes the text vectors to 1024 and clears the old ones, so deploy the new code right after it.
 4. **Redeploy** `api`, `worker` and `beat` (all three read the env; Beat has the new schedule).
 5. **Check:** upload a short recording from the test patient (with all consents), then within a minute the journal shows the transcript, and `memory_facts` / `memory_intentions` have rows linked to that event.
 

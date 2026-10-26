@@ -43,6 +43,7 @@ class Settings(BaseSettings):
     # Provider keys (docs/MODELS_CHOICE.md). Only in .env / the server, never in git.
     deepgram_api_key: str | None = None
     openai_api_key: str | None = None
+    voyage_api_key: str | None = None
     gemini_api_key: str | None = None
 
     @model_validator(mode="after")

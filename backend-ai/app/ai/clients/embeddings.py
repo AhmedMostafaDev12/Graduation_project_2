@@ -1,8 +1,16 @@
-"""Text embeddings: OpenAI text-embedding-3-small, 1536-d (spec D15, docs/MODELS_CHOICE.md §5).
+"""Text embeddings: Voyage `voyage-4`, 1024-d (spec D15, docs/MODELS_CHOICE.md §5).
 
 Implements the `TextEmbedder` interface (app/ai/interfaces.py). One request embeds a batch of
-sentences. Temporary failures (timeout, 429, 5xx) raise TransientError, which Celery retries.
-Never log the texts (AI_LAYER.md rule 8).
+sentences. Two providers, both asked for TEXT_DIM dimensions so they fit the same columns:
+
+- `VoyageTextEmbedder` (production): free allowance of 200M tokens, data not used for
+  training once opted out in the Voyage dashboard. Sentences are embedded as "document";
+  questions (Phase 9, /assist) will be embedded as "query".
+- `OpenAITextEmbedder`: `text-embedding-3-small` shortened to TEXT_DIM, kept as an alternative.
+
+Vectors from different models can't be compared: changing provider means re-embedding
+everything. Temporary failures (timeout, 429, 5xx) raise TransientError, which Celery
+retries. Never log the texts (AI_LAYER.md rule 8).
 """
 
 import httpx
@@ -11,8 +19,8 @@ from app.config import settings
 from app.errors import TransientError
 from app.models import TEXT_DIM
 
+VOYAGE_EMBEDDINGS_URL = "https://api.voyageai.com/v1/embeddings"
 OPENAI_EMBEDDINGS_URL = "https://api.openai.com/v1/embeddings"
-MODEL = "text-embedding-3-small"
 MAX_BATCH = 100  # inputs per request; the service sends at most this many
 
 
@@ -20,45 +28,106 @@ class EmbeddingError(Exception):
     """A permanent failure (bad key, bad request): not retried."""
 
 
-class OpenAITextEmbedder:
-    model_id = "openai-text-embedding-3-small"
+def _key(value: str | None, variable: str) -> str:
+    if not value:
+        raise EmbeddingError(
+            f"{variable} is not set (backend-ai/.env locally, the server's env file in production)"
+        )
+    return value
+
+
+def _post(
+    provider: str, url: str, api_key: str, body: dict, count: int, timeout_s: float
+) -> list[list[float]]:
+    """One embeddings request (both providers use the same response shape)."""
+    try:
+        response = httpx.post(
+            url,
+            headers={"Authorization": f"Bearer {api_key}"},
+            json=body,
+            timeout=timeout_s,
+        )
+    except (httpx.TimeoutException, httpx.TransportError) as exc:
+        raise TransientError(f"{provider} unreachable: {type(exc).__name__}") from exc
+
+    if response.status_code == 429 or response.status_code >= 500:
+        raise TransientError(f"{provider} returned {response.status_code}")
+    if response.status_code >= 400:
+        # the body is the provider's error message, never our texts
+        raise EmbeddingError(
+            f"{provider} rejected the request ({response.status_code}): {response.text[:200]}"
+        )
+
+    data = sorted(response.json()["data"], key=lambda item: item["index"])
+    vectors = [item["embedding"] for item in data]
+    if len(vectors) != count or any(len(v) != TEXT_DIM for v in vectors):
+        raise EmbeddingError(
+            f"{provider} returned an unexpected number or size of vectors"
+        )
+    return vectors
+
+
+def _check(texts: list[str]) -> None:
+    if len(texts) > MAX_BATCH:
+        raise EmbeddingError(f"at most {MAX_BATCH} texts per call")
+
+
+class VoyageTextEmbedder:
+    model_id = "voyage-4"
     dim = TEXT_DIM
 
     def __init__(self, api_key: str | None = None, timeout_s: float = 30.0):
-        self.api_key = api_key if api_key is not None else settings.openai_api_key
-        if not self.api_key:
-            raise EmbeddingError(
-                "OPENAI_API_KEY is not set (backend-ai/.env locally, the server's env file in production)"
-            )
+        self.api_key = _key(
+            api_key if api_key is not None else settings.voyage_api_key,
+            "VOYAGE_API_KEY",
+        )
         self.timeout_s = timeout_s
 
     def embed(self, texts: list[str]) -> list[list[float]]:
         if not texts:
             return []
-        if len(texts) > MAX_BATCH:
-            raise EmbeddingError(f"at most {MAX_BATCH} texts per call")
-        try:
-            response = httpx.post(
-                OPENAI_EMBEDDINGS_URL,
-                headers={"Authorization": f"Bearer {self.api_key}"},
-                json={"model": MODEL, "input": texts},
-                timeout=self.timeout_s,
-            )
-        except (httpx.TimeoutException, httpx.TransportError) as exc:
-            raise TransientError(f"OpenAI unreachable: {type(exc).__name__}") from exc
+        _check(texts)
+        body = {
+            "model": self.model_id,
+            "input": texts,
+            "input_type": "document",
+            "output_dimension": self.dim,
+        }
+        return _post(
+            "Voyage",
+            VOYAGE_EMBEDDINGS_URL,
+            self.api_key,
+            body,
+            len(texts),
+            self.timeout_s,
+        )
 
-        if response.status_code == 429 or response.status_code >= 500:
-            raise TransientError(f"OpenAI returned {response.status_code}")
-        if response.status_code >= 400:
-            # the body is OpenAI's error message, never our texts
-            raise EmbeddingError(
-                f"OpenAI rejected the request ({response.status_code}): {response.text[:200]}"
-            )
 
-        data = sorted(response.json()["data"], key=lambda item: item["index"])
-        vectors = [item["embedding"] for item in data]
-        if len(vectors) != len(texts) or any(len(v) != self.dim for v in vectors):
-            raise EmbeddingError(
-                "OpenAI returned an unexpected number or size of vectors"
-            )
-        return vectors
+class OpenAITextEmbedder:
+    model_id = "openai-text-embedding-3-small"
+    dim = TEXT_DIM
+
+    def __init__(self, api_key: str | None = None, timeout_s: float = 30.0):
+        self.api_key = _key(
+            api_key if api_key is not None else settings.openai_api_key,
+            "OPENAI_API_KEY",
+        )
+        self.timeout_s = timeout_s
+
+    def embed(self, texts: list[str]) -> list[list[float]]:
+        if not texts:
+            return []
+        _check(texts)
+        body = {
+            "model": "text-embedding-3-small",
+            "input": texts,
+            "dimensions": self.dim,
+        }
+        return _post(
+            "OpenAI",
+            OPENAI_EMBEDDINGS_URL,
+            self.api_key,
+            body,
+            len(texts),
+            self.timeout_s,
+        )

@@ -55,7 +55,7 @@ As in the course, plus these points:
 | Sync columns | `updated_at` + `deleted_at` (soft delete) on every table the phone syncs |
 | Enums | Postgres ENUM, lowercase snake_case values exactly as spec §6 |
 | Flexible fields | `JSONB` only where the spec says so (`metadata`, `ai_tags`, `extracted_fields`, `patterns`) |
-| Vectors | `VECTOR(512)` faces, `VECTOR(1536)` text, HNSW index with cosine distance |
+| Vectors | `VECTOR(512)` faces, `VECTOR(1024)` text (Voyage, D15; migration 0006), HNSW index with cosine distance |
 | Names | snake_case, plural table names, as spec §6 |
 
 ---
