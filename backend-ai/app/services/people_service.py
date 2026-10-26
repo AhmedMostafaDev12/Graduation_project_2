@@ -2,6 +2,10 @@
 
 Enrollment photos live in S3 under patients/{patient}/people/{person}/; their embeddings
 in face_embeddings. The glasses get both name and embeddings through /sync.
+
+Every photo goes through the configured face pipeline (phase 8.2): a photo with no face, or
+with more than one person, is refused per photo (C4: "Photo 3: no face found"). Faces much
+smaller than the main one (a poster, a TV in the background) don't count.
 """
 
 import uuid
@@ -12,6 +16,9 @@ from sqlalchemy import delete, func, or_, select, update
 from sqlalchemy.orm import Session
 
 from app.ai.inference import face
+from app.ai.inference.face_onnx import FaceImageError
+from app.ai.interfaces import Face
+from app.ai.registry import get_ai
 from app.errors import Conflict, InvalidInput, NotFound
 from app.integrations import s3
 from app.models import (
@@ -39,6 +46,8 @@ from app.services import media_service, thumbnail_service
 MAX_PHOTOS_PER_REQUEST = 5
 MAX_EMBEDDINGS_PER_PERSON = 20
 MAX_PHOTO_BYTES = 4 * 1024 * 1024
+# a face narrower than this share of the widest one is background (poster, TV, passer-by)
+BACKGROUND_FACE_RATIO = 0.25
 
 
 def _photo_prefix(person: EnrolledPerson) -> str:
@@ -59,8 +68,33 @@ def person_out(db: Session, person: EnrolledPerson) -> PersonOut:
     return out
 
 
-def _read_photos(photos: list[UploadFile]) -> list[tuple[bytes, str]]:
-    """Validate before touching S3 or the database: 1-5 JPEG/PNG files, 4 MB each."""
+def main_faces(found: list[Face]) -> list[Face]:
+    """The faces that matter in an enrollment photo: background faces are ignored."""
+    if not found:
+        return []
+    widest = max(f.box[2] - f.box[0] for f in found)
+    return [f for f in found if f.box[2] - f.box[0] >= BACKGROUND_FACE_RATIO * widest]
+
+
+def _face_problem(data: bytes) -> tuple[str, str] | list[float]:
+    """The photo's embedding, or (code, message) when it can't be used for enrollment."""
+    try:
+        faces = main_faces(get_ai().face.faces(data))
+    except FaceImageError:
+        return ("UNSUPPORTED_PHOTO", "Must be a JPEG or PNG photo.")
+    if not faces:
+        return ("NO_FACE", "No face found. Please retake it.")
+    if len(faces) > 1:
+        return (
+            "MULTIPLE_FACES",
+            "More than one person. Use a photo of this person alone.",
+        )
+    return faces[0].embedding
+
+
+def _read_photos(photos: list[UploadFile]) -> list[tuple[bytes, str, list[float]]]:
+    """Validate before touching S3 or the database: 1-5 JPEG/PNG files, 4 MB each, each
+    with exactly one face. Returns (bytes, extension, face embedding) per photo."""
     if not 1 <= len(photos) <= MAX_PHOTOS_PER_REQUEST:
         raise InvalidInput(
             f"Send 1 to {MAX_PHOTOS_PER_REQUEST} photos.", code="PHOTO_COUNT"
@@ -78,8 +112,12 @@ def _read_photos(photos: list[UploadFile]) -> list[tuple[bytes, str]]:
                 ("UNSUPPORTED_PHOTO", field, "Must be a JPEG or PNG photo.")
             )
         else:
-            ext = "png" if data.startswith(face.PNG_MAGIC) else "jpg"
-            result.append((data, ext))
+            checked = _face_problem(data)
+            if isinstance(checked, tuple):
+                problems.append((checked[0], field, checked[1]))
+            else:
+                ext = "png" if data.startswith(face.PNG_MAGIC) else "jpg"
+                result.append((data, ext, checked))
     if problems:
         codes = {code for code, _, _ in problems}
         raise InvalidInput(
@@ -91,16 +129,17 @@ def _read_photos(photos: list[UploadFile]) -> list[tuple[bytes, str]]:
 
 
 def _store_photos(
-    db: Session, person: EnrolledPerson, photos: list[tuple[bytes, str]]
+    db: Session, person: EnrolledPerson, photos: list[tuple[bytes, str, list[float]]]
 ) -> None:
-    for data, ext in photos:
+    model_version = get_ai().face.model_id
+    for data, ext, embedding in photos:
         key = f"{_photo_prefix(person)}{uuid.uuid4()}.{ext}"
         s3.put_bytes(key, data, "image/png" if ext == "png" else "image/jpeg")
         db.add(
             FaceEmbedding(
                 person_id=person.id,
-                embedding=face.embed_face(data),
-                model_version=face.MODEL_VERSION,
+                embedding=embedding,
+                model_version=model_version,
                 storage_key=key,
                 thumbnail_key=thumbnail_service.create(key, data),
             )
@@ -442,3 +481,50 @@ def list_people(db: Session, patient_id: uuid.UUID, status: str) -> list[PersonO
         )
         for person in people
     ]
+
+
+def reembed_stub_photos(db: Session) -> dict:
+    """Re-embed enrollment photos stored while the server ran the stub (phase 8.2).
+
+    A photo with exactly one main face gets the real embedding and model version, and its
+    person is touched so /sync sends it to the glasses. Photos with no face or several
+    stay as they are and are reported by person id, so the caregiver can retake them.
+    Does nothing while the face model is still the stub. Idempotent.
+    """
+    embedder = get_ai().face
+    if embedder.model_id == face.MODEL_VERSION:
+        return {"skipped": "the face model is still the stub"}
+    rows = list(
+        db.scalars(
+            select(FaceEmbedding)
+            .where(
+                FaceEmbedding.model_version == face.MODEL_VERSION,
+                FaceEmbedding.storage_key.is_not(None),
+            )
+            .order_by(FaceEmbedding.created_at)
+        )
+    )  # all of them: at most 20 photos per enrolled person
+    updated, unusable = 0, set()
+    for row in rows:
+        data = (
+            s3.get_bytes(row.storage_key, MAX_PHOTO_BYTES)
+            if s3.exists(row.storage_key)
+            else None
+        )
+        try:
+            found = main_faces(embedder.faces(data)) if data else []
+        except FaceImageError:
+            found = []
+        if len(found) != 1:
+            unusable.add(str(row.person_id))
+            continue
+        row.embedding = found[0].embedding
+        row.model_version = embedder.model_id
+        db.execute(
+            update(EnrolledPerson)
+            .where(EnrolledPerson.id == row.person_id)
+            .values(updated_at=func.now())
+        )
+        db.commit()  # per photo: a later failure keeps the work already done
+        updated += 1
+    return {"updated": updated, "people_to_retake": sorted(unusable)}
