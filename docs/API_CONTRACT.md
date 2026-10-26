@@ -112,7 +112,7 @@ Validation errors add the fields that failed:
 | 409 | `UPLOAD_MISSING` | `complete` was called before the file reached S3 | retry the PUT, then `complete` |
 | 409 | `ID_IN_USE` | a client-generated id already belongs to another patient | generate a new id |
 | 422 | `VALIDATION_ERROR` | a field is missing or wrong; see `details` | highlight the fields |
-| 422 | `CONSENT_REQUIRED` · `PHOTO_COUNT` · `PHOTO_TOO_LARGE` · `UNSUPPORTED_PHOTO` · `PHOTOS_INVALID` | enrollment: no consent, not 1–5 photos, a photo over 4 MB, not a JPEG/PNG Pillow can open (`PHOTOS_INVALID` = several kinds at once). `details` lists **every** bad photo as `body.photos.<index>` (0-based) | outline those photo slots (C4) |
+| 422 | `CONSENT_REQUIRED` · `PHOTO_COUNT` · `PHOTO_TOO_LARGE` · `UNSUPPORTED_PHOTO` · `NO_FACE` · `MULTIPLE_FACES` · `PHOTOS_INVALID` | enrollment and adding photos: no consent, not 1–5 photos, a photo over 4 MB, not a JPEG/PNG Pillow can open, **no face found**, **more than one person** (small background faces don't count; phase 8.2) (`PHOTOS_INVALID` = several kinds at once). `details` lists **every** bad photo as `body.photos.<index>` (0-based) | outline those photo slots (C4) |
 | 503 | `DATABASE_UNAVAILABLE` | the server can't reach the database | "Try again in a moment" |
 | 503 | `STORAGE_UNAVAILABLE` | the server can't reach S3 | "Try again in a moment" |
 

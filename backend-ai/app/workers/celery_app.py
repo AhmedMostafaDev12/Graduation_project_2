@@ -22,6 +22,7 @@ celery_app = Celery(
         "app.workers.tasks.transcription",
         "app.workers.tasks.embedding",
         "app.workers.tasks.memory",
+        "app.workers.tasks.faces",
     ],
 )
 
@@ -56,6 +57,7 @@ celery_app.conf.update(
         "transcribe.*": {"queue": "ai_io"},  # waits on the speech-to-text API
         "embed.*": {"queue": "ai_io"},  # waits on the embeddings API
         "memory.*": {"queue": "ai_io"},  # waits on the LLM API
+        "faces.*": {"queue": "cpu"},  # face models run on the CPU
     },
 )
 
