@@ -23,6 +23,7 @@ celery_app = Celery(
         "app.workers.tasks.embedding",
         "app.workers.tasks.memory",
         "app.workers.tasks.faces",
+        "app.workers.tasks.review",
     ],
 )
 
@@ -58,6 +59,7 @@ celery_app.conf.update(
         "embed.*": {"queue": "ai_io"},  # waits on the embeddings API
         "memory.*": {"queue": "ai_io"},  # waits on the LLM API
         "faces.*": {"queue": "cpu"},  # face models run on the CPU
+        "review.*": {"queue": "ai_io"},  # waits on the vision API
     },
 )
 
@@ -87,6 +89,11 @@ celery_app.conf.beat_schedule = {
         "schedule": crontab(minute="3-59/10"),
     },
     # open intentions past their window become unknown (spec D40)
+    # photos the glasses proposed whose review was never queued or died, spec §7.4
+    "review-backfill": {
+        "task": "review.backfill",
+        "schedule": crontab(minute="5-59/10"),
+    },
     "memory-expire-intentions": {
         "task": "memory.expire_intentions",
         "schedule": crontab(minute=17),

@@ -7,7 +7,8 @@ Anything important that fits no category is kept as "other" with the model's own
 The model's answer is never rejected for an unexpected category or key: `normalize_*`
 coerces it, and keeps an unknown category in `raw_category` for the lead to review.
 
-Phase 7's review task calls these; the API's display code reads the stored result.
+The review task (phase 8.3, services/review_service.py) calls these; the API's display code
+reads the stored result.
 """
 
 import re
@@ -65,6 +66,24 @@ class DocumentResult(BaseModel):
     )
 
 
+class SeenObject(BaseModel):
+    """An object in the photo and its state (spec §7.4 item 7, D40: object sightings)."""
+
+    name: str = Field(max_length=80)
+    state: str | None = Field(
+        default=None, max_length=80
+    )  # "on", "open", "in the drawer"
+
+
+class SeenAction(BaseModel):
+    """Something being done in the photo (spec §7.4 item 7, D40: action log)."""
+
+    verb: str = Field(max_length=60)  # normalized: "take_medication", "turn_off"
+    object: str | None = Field(default=None, max_length=80)
+    quantity: float | None = None
+    unit: str | None = Field(default=None, max_length=30)
+
+
 class ReviewResult(BaseModel):
     keep: bool
     category: str = Field(
@@ -74,6 +93,10 @@ class ReviewResult(BaseModel):
     reason: str | None = Field(default=None, max_length=300)
     contains_other_people: bool | None = None
     document: DocumentResult | None = None
+    # memory fields (D40, D41): kept for the vision consolidation (phase 8.5)
+    room: str | None = Field(default=None, max_length=60)
+    objects: list[SeenObject] = Field(default_factory=list, max_length=20)
+    actions: list[SeenAction] = Field(default_factory=list, max_length=10)
 
 
 # ----- normalizing what is stored -----
