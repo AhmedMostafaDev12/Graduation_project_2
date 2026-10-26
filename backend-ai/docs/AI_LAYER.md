@@ -28,18 +28,19 @@ app/ai/
 ├── fakes.py          # deterministic fakes for the stub profile and tests
 ├── clients/          # real providers, one module per capability, each implementing its interface
 │   ├── stt.py        #   transcribe(audio) -> Transcript       (Deepgram Nova-3, ar-EG + speaker labels, D36)
-│   ├── llm.py        #   complete(prompt) -> text               (Haiku / 4o-mini class)
+│   ├── llm.py        #   complete(messages, json_schema) -> text (Gemini Flash, paid tier; built in 7.5)
 │   ├── vision.py     #   review(image) -> ReviewResult          (keep/discard + tags + OCR, spec D20)
 │   └── embeddings.py #   embed(texts) -> list[vector]           (OpenAI text-embedding-3-small, 1536-d, spec D15; built in 7.3)
 ├── inference/
 │   └── face.py       #   embed_face(image) -> vector(512)       (server-side face embedder for enrollment, spec D14; STUB 'stub-0' until Phase 8)
 ├── memory/           # structured memory (§6.4, spec D40): consolidation + the five structures
+│   └── extract.py    #   facts, intentions, entities from a transcript: prompts, schemas, validation (7.5)
 ├── rag/
 │   ├── render.py     #   event -> one sentence ("09:20 talked with Ahmed (son): ...")
 │   ├── retriever.py  #   SQL time window + person filter, then pgvector ranking (spec D22)
 │   └── answer.py     #   build prompt from top-k events, call llm, return answer + source_event_ids (STUB: fixed answer until 9.1)
 ├── clustering.py     #   assign an unknown embedding to the nearest cluster (spec D23)
-└── prompts/          #   *.txt templates, versioned (e.g. assist_answer.v1.txt)
+└── prompts/          #   *.txt templates, versioned (memory_extract.v1.txt, memory_settle.v1.txt)
 ```
 
 ---
@@ -81,6 +82,7 @@ The vision prompt (Phase 7) must return `ReviewResult` from [`app/ai/review_cont
 | Transcribe speech segments (§7.3) | `clients/stt.py` | task `transcribe` (queue `ai_io`) |
 | Smart review + OCR (§7.4) | `clients/vision.py`, output shape in `review_contract.py` | task `review` (queue `ai_io`) |
 | Embed events for RAG | `rag/render.py` + `clients/embeddings.py` | task `embed` (queue `ai_io`) |
+| Facts + intentions from speech (D40) | `memory/extract.py` + `clients/llm.py` | task `memory.consolidate` (queue `ai_io`) |
 | Answer a question (`/assist`) | `rag/retriever.py` + `rag/answer.py` + `clients/llm.py` | request (user waiting) |
 | Daily summary (Phase 2) | `clients/llm.py` | Beat → task `summaries` |
 | Enrollment face embedding | `inference/face.py` | request |

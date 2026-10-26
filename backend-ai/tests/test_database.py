@@ -9,7 +9,7 @@ import pytest
 from sqlalchemy import create_engine, text
 
 BACKEND = Path(__file__).resolve().parents[1]
-EXPECTED_TABLES = 22
+EXPECTED_TABLES = 25  # 22 + memory_entities, memory_facts, memory_intentions (0005)
 
 
 def _run(args: list[str], database_url: str) -> subprocess.CompletedProcess:

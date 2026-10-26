@@ -71,6 +71,6 @@ Plan phases 0–6 are done and **live at `https://remori-ai.duckdns.org`** (see 
 
 **Phase 6** (PR #10): Redis + one Celery worker + one Beat, tasks `alerts.evaluate`, `retention.expire_media`, `media.make_thumbnail`, `media.backfill_thumbnails`. Copy their pattern for new tasks ([`docs/CELERY_REDIS.md`](docs/CELERY_REDIS.md)).
 
-**Phase 7** (in progress): model interfaces + profiles (7.0, PR #67), the memory contract (7.0b, D41), Deepgram speech-to-text (7.1, PR #71, [`docs/MODELS_CHOICE.md`](docs/MODELS_CHOICE.md)), task `transcribe.segment` (7.2), events rendered + embedded by `embed.events` / `embed.backfill` (7.3), audio uploads start the transcription + `transcribe.backfill` (7.4). **Next: 7.5**, intentions and facts from speech. Google/Facebook sign-in (Phase 3 steps 3.0, 3.7–3.9) is postponed.
+**Phase 7** (in progress): model interfaces + profiles (7.0, PR #67), the memory contract (7.0b, D41), Deepgram speech-to-text (7.1, PR #71, [`docs/MODELS_CHOICE.md`](docs/MODELS_CHOICE.md)), task `transcribe.segment` (7.2), events rendered + embedded by `embed.events` / `embed.backfill` (7.3), audio uploads start the transcription + `transcribe.backfill` (7.4), facts + intentions + entity index from speech with Gemini Flash (7.5, `memory.*` tasks). Write-up: [`docs/REPORT_PHASE_7.md`](docs/REPORT_PHASE_7.md). **Next:** deploy with the provider keys, then Phase 8. Google/Facebook sign-in (Phase 3 steps 3.0, 3.7–3.9) is postponed.
 
 Every endpoint you add or change must also be updated in [`../docs/API_CONTRACT.md`](../docs/API_CONTRACT.md) §5–§6.

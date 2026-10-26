@@ -20,6 +20,7 @@ from app.models.accounts import (
 from app.models.activity import CaregiverAlert, DailySummary, MindGameSession
 from app.models.journal import AudioSegment, Event
 from app.models.media import CapturedDocument, MediaAsset
+from app.models.memory import MemoryEntity, MemoryFact, MemoryIntention
 from app.models.people import (
     Encounter,
     EnrolledPerson,
@@ -47,6 +48,9 @@ __all__ = [
     "Event",
     "FaceEmbedding",
     "MediaAsset",
+    "MemoryEntity",
+    "MemoryFact",
+    "MemoryIntention",
     "MindGameSession",
     "PatientProfile",
     "Place",

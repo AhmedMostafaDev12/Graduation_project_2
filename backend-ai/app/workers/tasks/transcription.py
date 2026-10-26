@@ -1,6 +1,7 @@
 """Ambient memory: transcribe one audio segment (queue `ai_io`, phases 7.2 + 7.4, spec §7.3).
 
-transcribe.segment: queued by uploads/{id}/complete for audio, after its commit (7.4).
+transcribe.segment: queued by uploads/{id}/complete for audio, after its commit (7.4); once
+the transcript is written it queues embed.events (7.3) and memory.consolidate (7.5).
 transcribe.backfill: every 10 minutes (Beat), re-queues segments whose queueing failed (Redis
 down at upload time) or whose task died mid-way, until retention removes them at 7 days.
 The work is in services/transcription_service.py; tasks only add the lock and the retries.
@@ -17,6 +18,7 @@ from app.workers import db, locks
 from app.workers.celery_app import celery_app
 from app.workers.retry import RETRYABLE
 from app.workers.tasks.embedding import embed_events
+from app.workers.tasks.memory import consolidate
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +52,7 @@ def transcribe_segment(self, segment_id: str) -> str | None:
                     transcription_service.mark_failed(session, uuid.UUID(segment_id))
             raise
         if result == "transcribed":
-            _enqueue_embedding(uuid.UUID(segment_id))
+            _enqueue_follow_ups(uuid.UUID(segment_id))
         return result
 
 
@@ -65,10 +67,13 @@ def backfill() -> int:
     return len(ids)
 
 
-def _enqueue_embedding(segment_id: uuid.UUID) -> None:
-    """Embed the new transcript now (phase 7.3). Never fails the transcription: if Redis is
-    down, the embed.backfill sweep picks the event up within 5 minutes."""
-    try:
-        embed_events.delay([str(transcription_service.event_id_for(segment_id))])
-    except (KombuOperationalError, RedisError):  # broker unavailable
-        logger.warning("could not queue the embedding of segment %s", segment_id)
+def _enqueue_follow_ups(segment_id: uuid.UUID) -> None:
+    """Embed the new transcript (phase 7.3) and consolidate it into facts and intentions
+    (phase 7.5). Never fails the transcription: if Redis is down, the embed.backfill and
+    memory.backfill sweeps pick the event up within 10 minutes."""
+    event_id = str(transcription_service.event_id_for(segment_id))
+    for task, args in ((embed_events, [[event_id]]), (consolidate, [event_id])):
+        try:
+            task.apply_async(args)
+        except (KombuOperationalError, RedisError):  # broker unavailable
+            logger.warning("could not queue %s for segment %s", task.name, segment_id)
