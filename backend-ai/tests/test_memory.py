@@ -206,6 +206,25 @@ def test_quotes_must_be_verbatim_and_values_typed():
     ]
 
 
+def test_repeated_items_are_kept_once():
+    # seen with Qwen3.8 on Groq: one intention returned 26 times in a loop
+    plan = {
+        "holder": "patient",
+        "description": "call Ahmed",
+        "segment_index": 2,
+        "quote": "هكلم أحمد بكره الصبح",
+    }
+    fact = {
+        "segment_index": 0,
+        "quote": "ميعاد الدكتور سمير",
+        "values": [],
+        "about": [],
+    }
+    raw = json.dumps({"facts": [fact] * 3, "intentions": [plan] * 26, "entities": []})
+    found = extract.parse_extraction(raw, SEGMENTS, CAIRO)
+    assert len(found.facts) == 1 and len(found.intentions) == 1
+
+
 def test_a_non_json_answer_is_a_permanent_failure():
     with pytest.raises(extract.ExtractionError):
         extract.parse_extraction("I could not find anything.", SEGMENTS, CAIRO)

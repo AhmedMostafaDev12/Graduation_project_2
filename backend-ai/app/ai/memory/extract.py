@@ -314,14 +314,18 @@ def parse_extraction(raw: str, segments: list[Segment], tz: tzinfo) -> Extractio
     data = _load(raw)
     entities: dict[EntityRef, None] = {}  # ordered and unique
 
+    # a model can loop and repeat one item many times: keep one per (segment, quote)
+    seen: set[tuple[str, int, str]] = set()
+
     facts = []
     for item in _items(data, "facts"):
         if not isinstance(item, dict):
             continue
         found = verbatim(item.get("quote"), segments, item.get("segment_index"))
-        if found is None:
+        if found is None or ("fact", found[0].index, found[1]) in seen:
             continue
         segment, quote = found
+        seen.add(("fact", segment.index, quote))
         about = [e for e in map(_entity, item.get("about") or []) if e]
         entities.update(dict.fromkeys(about))
         speaker = item.get("speaker_is_patient")
@@ -345,6 +349,9 @@ def parse_extraction(raw: str, segments: list[Segment], tz: tzinfo) -> Extractio
         description = _squash(str(item.get("description") or ""))
         if found is None or not description:
             continue
+        if ("intention", found[0].index, found[1]) in seen:
+            continue
+        seen.add(("intention", found[0].index, found[1]))
         due_at = local_to_utc(item.get("due_at"), tz)
         due_until = local_to_utc(item.get("due_until"), tz)
         if due_at and due_until and due_until < due_at:
