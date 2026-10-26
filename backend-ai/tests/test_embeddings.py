@@ -1,8 +1,9 @@
 """Phase 7.3: journal events → sentence (track R2 renderer) + embedding (spec §7.3 step 4, D15).
 
-OpenAI is mocked with respx and the service uses the stub profile's fake embedder: tests never
+Voyage and OpenAI are mocked with respx and the service uses the stub profile's fake embedder: tests never
 call a real AI API (AI_LAYER.md rule 9)."""
 
+import json
 import uuid
 from datetime import UTC, datetime, timedelta
 
@@ -13,8 +14,10 @@ from sqlalchemy import update
 
 from app.ai.clients.embeddings import (
     OPENAI_EMBEDDINGS_URL,
+    VOYAGE_EMBEDDINGS_URL,
     EmbeddingError,
     OpenAITextEmbedder,
+    VoyageTextEmbedder,
 )
 from app.errors import TransientError
 from app.models import TEXT_DIM, EnrolledPerson, Event, Reminder, ReminderLog
@@ -25,7 +28,7 @@ from tests.conftest import create_patient, register_and_login
 NOW = datetime(2026, 10, 1, 6, 20, tzinfo=UTC)  # 09:20 in Cairo (summer time, UTC+3)
 
 
-# ----- the OpenAI client -----
+# ----- the embedding clients -----
 
 
 def _openai_reply(n, dim=TEXT_DIM):
@@ -46,7 +49,55 @@ def test_openai_embeds_a_batch_in_order():
     assert [v[0] for v in vectors] == [0.0, 1.0] and len(vectors[0]) == TEXT_DIM
     request = route.calls.last.request
     assert request.headers["Authorization"] == "Bearer test-key"
-    assert b'"model":"text-embedding-3-small"' in request.content.replace(b" ", b"")
+    body = json.loads(request.content)
+    assert body["model"] == "text-embedding-3-small"
+    assert body["dimensions"] == TEXT_DIM  # shortened to fit the same columns
+
+
+@respx.mock
+def test_voyage_embeds_documents_at_our_size():
+    route = respx.post(VOYAGE_EMBEDDINGS_URL).mock(
+        return_value=httpx.Response(200, json=_openai_reply(2))
+    )
+    vectors = VoyageTextEmbedder(api_key="test-key").embed(["أ", "b"])
+    assert [v[0] for v in vectors] == [0.0, 1.0] and len(vectors[0]) == TEXT_DIM
+    request = route.calls.last.request
+    assert request.headers["Authorization"] == "Bearer test-key"
+    body = json.loads(request.content)
+    assert body == {
+        "model": "voyage-4",
+        "input": ["أ", "b"],
+        "input_type": "document",
+        "output_dimension": TEXT_DIM,
+    }
+
+
+@pytest.mark.parametrize("status", [429, 500, 503])
+@respx.mock
+def test_voyage_rate_limits_and_server_errors_are_retried(status):
+    respx.post(VOYAGE_EMBEDDINGS_URL).mock(return_value=httpx.Response(status))
+    with pytest.raises(TransientError):
+        VoyageTextEmbedder(api_key="k").embed(["a"])
+
+
+@respx.mock
+def test_voyage_bad_key_or_wrong_size_is_not_retried():
+    respx.post(VOYAGE_EMBEDDINGS_URL).mock(
+        return_value=httpx.Response(401, json={"detail": "bad key"})
+    )
+    with pytest.raises(EmbeddingError, match="Voyage rejected"):
+        VoyageTextEmbedder(api_key="k").embed(["a"])
+    respx.post(VOYAGE_EMBEDDINGS_URL).mock(
+        return_value=httpx.Response(200, json=_openai_reply(1, dim=1536))
+    )
+    with pytest.raises(EmbeddingError, match="unexpected"):
+        VoyageTextEmbedder(api_key="k").embed(["a"])
+
+
+def test_voyage_needs_a_key_and_skips_empty_input():
+    with pytest.raises(EmbeddingError, match="VOYAGE_API_KEY"):
+        VoyageTextEmbedder(api_key="")
+    assert VoyageTextEmbedder(api_key="k").embed([]) == []
 
 
 @pytest.mark.parametrize("status", [429, 500, 503])

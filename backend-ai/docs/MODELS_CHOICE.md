@@ -62,13 +62,14 @@ The hardest capability: **Egyptian Arabic is weak almost everywhere.** On real c
 
 | Model | Price per 1M tokens | Free | Notes |
 |---|---|---|---|
-| **OpenAI `text-embedding-3-small`** (current choice, D15) | $0.02 ($0.01 batch) | limited | multilingual; about **$0.001 per patient per day** at our volume |
+| **Voyage `voyage-4`** (current choice, D15) | $0.06 after the allowance | **200M tokens** once per account | multilingual; 256 / 512 / **1024** / 2048 dimensions; separate document and query modes; **uses data for training unless you opt out** in the dashboard |
+| OpenAI `text-embedding-3-small` | $0.02 ($0.01 batch) | none (prepaid, minimum $5) | multilingual; can be shortened to 1024 dimensions, so it fits the same columns (kept as an alternative) |
 | Gemini embedding | $0.15 | ~1,500 requests/day | up to 3,072 dimensions |
 | Jina Embeddings v3 | $0.02 | 10M tokens/month | multilingual |
 | Cohere embed-v4 | $0.12 | trial | 100+ languages |
 | Qwen3-Embedding-8B | free to self-host | — | #1 on the multilingual MTEB leaderboard; candidate for the `small` profile |
 
-**Recommendation:** keep D15 (`text-embedding-3-small`). It is cheap enough that no free tier is needed, and changing it means re-embedding everything (a lead decision).
+**Decision (26 Oct 2026):** Voyage `voyage-4` at **1024 dimensions** (D15 changed). OpenAI has no free tier and a Google billing account needs a $30 minimum; Voyage's 200M free tokens cover roughly 8,000 patient-days (about 25k tokens per patient per day). 1024 and not 2048 because pgvector's HNSW index stops at 2,000 dimensions. Measured once: 1024-d unit vectors, ~1.3 s for a small batch. **Before real data:** opt out of training in the Voyage dashboard.
 
 ---
 
@@ -162,7 +163,7 @@ A 32-second WhatsApp voice note (two people, one voice much quieter; heavily com
 | Speech-to-text | Deepgram Nova-3 `ar-EG` + diarization, volume boosted first | WhisperX (self-hosted) | **decided** (measured, §7); speaker separation still open |
 | LLM | Gemini Flash (`gemini-3.8-flash`, **paid tier**; `clients/llm.py`, phase 7.5) | Qwen3.8-27B via Groq | **decided for consolidation** (measured, §7.5); `/assist` open (Phase 9) |
 | Vision | Gemini Flash (paid) | Qwen2.5-VL | to confirm |
-| Text embeddings | `text-embedding-3-small` (`clients/embeddings.py`, phase 7.3) | Qwen3-Embedding | **decided (D15), implemented** |
+| Text embeddings | Voyage `voyage-4`, 1024-d (`clients/embeddings.py`, migration 0006) | Qwen3-Embedding | **decided (D15, changed 26 Oct), implemented** |
 
 Keys go in `backend-ai/.env` locally and in the server's environment, **never in git**.
 

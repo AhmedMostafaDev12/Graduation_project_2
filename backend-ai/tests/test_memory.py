@@ -19,6 +19,7 @@ from app.ai.memory import extract
 from app.ai.registry import ProviderNotAvailable, build
 from app.errors import TransientError
 from app.models import (
+    TEXT_DIM,
     ConsentRecord,
     EnrolledPerson,
     Event,
@@ -413,7 +414,7 @@ def test_a_conversation_becomes_facts_intentions_and_entities(
             entities["ahmed"].person_id == ahmed
         )  # "Ahmed" → the enrolled "Ahmed Mostafa"
         assert fact.about_entity_ids == [entities["الدكتور"].id]
-        assert all(len(e.name_embedding) == 1536 for e in entities.values())
+        assert all(len(e.name_embedding) == TEXT_DIM for e in entities.values())
         assert db.get(Event, event_id).metadata_["memory"] == {
             "status": "done",
             "model": "scripted-llm/memory_extract.v1",

@@ -26,7 +26,7 @@ Decisions taken in the 2026-10-03 design session. **P** = product decision by th
 | D12 | **AR overlay is a trial / stretch goal.** Voice is the guaranteed channel. | P |
 | D13 | **Encounters, not per-frame recognitions.** Announce once per encounter, with a 10-min per-person cooldown (configurable). One keyframe per encounter. | T |
 | D14 | **Face model pinned:** MobileFaceNet (InsightFace `w600k_mbf`, 512-d, INT8 on device). Multiple embeddings per person. One shared, versioned face pipeline used by both glasses and backend. | T |
-| D15 | **Text embeddings:** OpenAI `text-embedding-3-small` (1536-d, multilingual). Changing it means re-embedding everything. | T |
+| D15 | **Text embeddings:** Voyage `voyage-4` (1024-d, multilingual; changed from OpenAI `text-embedding-3-small` on 26 Oct 2026: free allowance, opted out of training). Sentences are embedded as documents, questions as queries. Changing it means re-embedding everything. | T |
 | D16 | **TTS:** Piper (Arabic + English voices) on the Pi. The LLM is asked to output **diacritized** Arabic. espeak-ng is a fallback only. | T |
 | D17 | **Fixed intents:** a small on-device intent classifier (log-mel + small CNN), run only on the push-to-talk utterance. Trained on team-recorded Egyptian Arabic + English samples. | T |
 | D18 | **Transfer:** BLE carries JSON control, keyframes and Opus audio. **Video** goes over an on-demand Wi-Fi burst (Pi soft-AP, phone joins via `WifiNetworkSpecifier`). To be validated in the hardware spike. | T |
@@ -128,7 +128,7 @@ Remori helps a person living with Alzheimer's recognize the people around them, 
 | Cloud STT | Whisper-large-v3-class API (D3) |
 | Vision review + OCR | Vision-capable LLM API, single call (D20) |
 | LLM | Low-cost tier (Haiku / 4o-mini class) for RAG + summaries |
-| Text embeddings | `text-embedding-3-small`, 1536-d (D15) |
+| Text embeddings | Voyage `voyage-4`, 1024-d (D15) |
 | Backend | Python 3.12, FastAPI, Pydantic v2 + pydantic-settings, SQLAlchemy 2.0 (typed `Mapped[]` style) + Alembic, PyJWT, pwdlib, httpx |
 | Jobs | Celery + Redis broker, Celery Beat (cron), Flower (monitoring) (D19) |
 | Backend testing | pytest, pytest-asyncio, respx (mock external AI APIs) |
@@ -347,7 +347,7 @@ events (
   transcript_text TEXT NULLABLE,       -- conversation_segment / voice_query
   language ENUM('ar','en','mixed') NULLABLE,
   rendered_text TEXT NULLABLE,         -- one-sentence rendering for RAG (D22)
-  embedding VECTOR(1536) NULLABLE,     -- of rendered_text (D15)
+  embedding VECTOR(1024) NULLABLE,     -- of rendered_text (D15)
   metadata JSONB,                      -- e.g. {"present_person_ids":[...], "place_id": "..."}
                                        -- conversation_segment: "segments":[{"start_s","end_s","speaker":"A","text"}] (D36)
                                        -- sound_detected: {"label":"doorbell","score":0.91}
@@ -436,7 +436,7 @@ memory_entities (                      -- entity index: every person, object, pl
   aliases TEXT[],
   person_id UUID FK -> enrolled_people NULLABLE,
   place_id UUID FK -> places NULLABLE,
-  name_embedding VECTOR(1536) NULLABLE,-- matches "my glasses" to "النضارة" (D15)
+  name_embedding VECTOR(1024) NULLABLE,-- matches "my glasses" to "النضارة" (D15)
   first_seen_at, last_seen_at TIMESTAMPTZ,
   mention_count INT,
   updated_at, deleted_at TIMESTAMPTZ,
