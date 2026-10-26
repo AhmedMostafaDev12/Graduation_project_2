@@ -86,7 +86,7 @@ Realistically **under $10 a month** until the credits run out.
 
 ---
 
-## 7. Measured results: speech-to-text on Egyptian Arabic (October 2026)
+## 7. Measured results on Egyptian Arabic (October 2026): speech-to-text (7.1–7.4), LLM extraction (7.5)
 
 ### 7.1 Public datasets (WER / CER)
 **What:** 40 clips with human-written transcripts, 20 from each dataset, spread across the split. Each clip transcribed with the provider's Arabic setting; both texts normalized the same way (diacritics, tatweel and punctuation removed; alef / ya / ta marbuta / hamza seats unified) so spelling variants don't count as errors.
@@ -125,12 +125,42 @@ A 32-second WhatsApp voice note (two people, one voice much quieter; heavily com
 - The AssemblyAI numbers came from a temporary client that wasn't kept, so the script reproduces only the Deepgram numbers.
 - Speaker separation wasn't measured on the datasets (their clips are single-speaker).
 
+### 7.5 LLM extraction: facts, intentions, settlements (phase 7.5)
+**What:** 15 synthetic conversations (5 scenarios × 3 days: 10 Egyptian Arabic, 4 mixed, 1 English; fictional people), written by ChatGPT with gold labels: 44 facts, 23 intentions, 11 settlements (7 done, 4 not done), 106 entities and 56 traps that must not be extracted. Each model ran the **backend's real prompts and validation** (`memory_extract.v1`, `memory_settle.v1`, `app/ai/memory/extract.py`). Settlements were asked against the gold open plans, so they're scored on their own.
+**Script:** [`ml/rag_eval/extraction_eval.py`](../../ml/rag_eval/extraction_eval.py), test set [`ml/rag_eval/data/extraction_testset.json`](../../ml/rag_eval/data/extraction_testset.json).
+
+| | **Gemini Flash** (`gemini-3.8-flash`, paid) | Qwen3.8-27B (Groq) | GPT-OSS-120B (Groq) |
+|---|---|---|---|
+| Facts F1 | **84 %** (precision 92 %) | 79 % | 73 % |
+| Typed values F1 | 66 % | **72 %** | 63 % |
+| Intentions F1 | **94 %** (recall 100 %) | 85 % | 87 % |
+| Holder right (patient / other) | **100 %** | 95 % | 75 % |
+| Due time exact (date right) | **79 %** (89 %) | 78 % (94 %) | 56 % (94 %) |
+| Settlements F1 | **69 %** | 63 % | 67 % |
+| Entities F1 (loose: names vary) | **55 %** | 31 % | 45 % |
+| Answers thrown away by validation | **0 %** | 28 % (one intention repeated 26 times) | 3 % |
+| Time per call | 16.9 s | **1.3 s** | 4.2 s |
+
+*A fact or intention counts as found when it's in the same segment and one quote contains the other or they share half their words.*
+
+**Reading the numbers:**
+- Gemini is best where a mistake would mislead the patient: every plan found, every holder right, fewest invented facts.
+- Qwen is close, free and 13× faster, but unstable: one answer looped (the validation now keeps each item once), and two runs differed by 7 points on facts.
+- GPT-OSS often gets the holder and the exact time wrong.
+- Gemini's 17 s per call doesn't matter for consolidation (a background task); it would for `/assist`, where D39 allows 20 s for the whole answer.
+
+**Decisions:**
+1. **Consolidation (7.5): Gemini Flash, paid tier.** The same key serves vision in Phase 8.
+2. **Answering (`/assist`, Phase 9): open.** Speed matters there; Groq Qwen is the candidate to measure then.
+
+**Caveats:** 15 conversations, gold labels written by a model (some "wrong" answers are defensible plans the labels missed), one run per model. Enough to choose a model, not a research result.
+
 ## 8. Status
 
 | Capability | Recommended `production` | Recommended `small` | Decided? |
 |---|---|---|---|
 | Speech-to-text | Deepgram Nova-3 `ar-EG` + diarization, volume boosted first | WhisperX (self-hosted) | **decided** (measured, §7); speaker separation still open |
-| LLM | Gemini Flash (`gemini-3.8-flash`, **paid tier**; `clients/llm.py`, phase 7.5) | Qwen3 via Groq | **decided, implemented** (extraction; quality not measured yet) |
+| LLM | Gemini Flash (`gemini-3.8-flash`, **paid tier**; `clients/llm.py`, phase 7.5) | Qwen3.8-27B via Groq | **decided for consolidation** (measured, §7.5); `/assist` open (Phase 9) |
 | Vision | Gemini Flash (paid) | Qwen2.5-VL | to confirm |
 | Text embeddings | `text-embedding-3-small` (`clients/embeddings.py`, phase 7.3) | Qwen3-Embedding | **decided (D15), implemented** |
 

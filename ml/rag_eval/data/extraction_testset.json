@@ -1,0 +1,2682 @@
+{
+  "scenarios": [
+    {
+      "id": "S1",
+      "title": "Medication details, corrected appointment, and doctor-call follow-up",
+      "conversations": [
+        {
+          "id": "S1-C1",
+          "local_datetime": "2026-11-02T10:30",
+          "language": "ar",
+          "speakers": {
+            "A": "Fatma (patient)",
+            "B": "Ahmed (son)"
+          },
+          "segments": [
+            {
+              "index": 0,
+              "speaker": "A",
+              "text": "يا أحمد، علبة الدوا فين؟ أنا كنت حطاها جنب النضارة امبارح."
+            },
+            {
+              "index": 1,
+              "speaker": "B",
+              "text": "حطيتها في الدرج اللي جنب السرير يا ماما، والنضارة فوق الكومودينو."
+            },
+            {
+              "index": 2,
+              "speaker": "A",
+              "text": "طب الدكتور سمير قال آخد نص حباية ولا حباية كاملة؟"
+            },
+            {
+              "index": 3,
+              "speaker": "B",
+              "text": "الروشتة مكتوب فيها 5 مجم، نص حباية بالليل. مش حباية كاملة."
+            },
+            {
+              "index": 4,
+              "speaker": "A",
+              "text": "وأنا فاكرة إن ميعادي الخميس الساعة خمسة."
+            },
+            {
+              "index": 5,
+              "speaker": "B",
+              "text": "لا يا ماما، التصحيح إن ميعاد العيادة يوم الخميس ٥ نوفمبر الساعة ٤ العصر، مش خمسة. هكلم الدكتور سمير بكره الصبح أتأكد من التحاليل."
+            },
+            {
+              "index": 6,
+              "speaker": "A",
+              "text": "طيب، هكلم الدكتور بكره أنا كمان، عشان أسأله عن الدوا."
+            },
+            {
+              "index": 7,
+              "speaker": "B",
+              "text": "ماشي، بس أنا كمان هكلمه. التلفزيون بيقول إن الجو هيبقى برد، بس ده مش معناه إننا نغير الجرعة."
+            }
+          ],
+          "gold": {
+            "facts": [
+              {
+                "segment_index": 1,
+                "quote": "حطيتها في الدرج اللي جنب السرير يا ماما، والنضارة فوق الكومودينو.",
+                "speaker_is_patient": false,
+                "values": [],
+                "about": [
+                  {
+                    "kind": "object",
+                    "name": "علبة الدوا"
+                  },
+                  {
+                    "kind": "object",
+                    "name": "النضارة"
+                  }
+                ]
+              },
+              {
+                "segment_index": 3,
+                "quote": "الروشتة مكتوب فيها 5 مجم، نص حباية بالليل. مش حباية كاملة.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "number",
+                    "value": 5,
+                    "unit": "mg",
+                    "text": "5 مجم"
+                  },
+                  {
+                    "kind": "dose",
+                    "value": 0.5,
+                    "unit": "pill",
+                    "text": "نص حباية"
+                  },
+                  {
+                    "kind": "time",
+                    "value": "19:00",
+                    "unit": null,
+                    "text": "بالليل"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "دكتور سمير"
+                  },
+                  {
+                    "kind": "object",
+                    "name": "علبة الدوا"
+                  }
+                ]
+              },
+              {
+                "segment_index": 5,
+                "quote": "التصحيح إن ميعاد العيادة يوم الخميس ٥ نوفمبر الساعة ٤ العصر، مش خمسة.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "date",
+                    "value": "2026-11-05",
+                    "unit": null,
+                    "text": "٥ نوفمبر"
+                  },
+                  {
+                    "kind": "time",
+                    "value": "16:00",
+                    "unit": null,
+                    "text": "الساعة ٤ العصر"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "دكتور سمير"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "العيادة"
+                  }
+                ]
+              }
+            ],
+            "intentions": [
+              {
+                "holder": "other",
+                "description": "call Dr. Samir to confirm the test results",
+                "segment_index": 5,
+                "quote": "هكلم الدكتور سمير بكره الصبح أتأكد من التحاليل.",
+                "due_at": "2026-11-03T09:00",
+                "due_until": null
+              },
+              {
+                "holder": "patient",
+                "description": "call Dr. Samir to ask about the medication",
+                "segment_index": 6,
+                "quote": "هكلم الدكتور بكره أنا كمان، عشان أسأله عن الدوا.",
+                "due_at": "2026-11-03T12:00",
+                "due_until": null
+              }
+            ],
+            "entities": [
+              {
+                "kind": "person",
+                "name": "أحمد"
+              },
+              {
+                "kind": "person",
+                "name": "دكتور سمير"
+              },
+              {
+                "kind": "object",
+                "name": "علبة الدوا"
+              },
+              {
+                "kind": "object",
+                "name": "النضارة"
+              },
+              {
+                "kind": "object",
+                "name": "الروشتة"
+              },
+              {
+                "kind": "place",
+                "name": "العيادة"
+              },
+              {
+                "kind": "place",
+                "name": "البيت"
+              }
+            ],
+            "settles": [],
+            "traps": [
+              "The patient's initial recollection of 5 PM in segment 4 is corrected by segment 5; retain only the confirmed appointment at 16:00.",
+              "The patient's question about the pill in segment 2 is not a medication fact.",
+              "The television weather statement is background information, not a personal fact or intention.",
+              "The two doctor calls are separate intentions because they have different holders and purposes."
+            ]
+          }
+        },
+        {
+          "id": "S1-C2",
+          "local_datetime": "2026-11-03T12:15",
+          "language": "ar",
+          "speakers": {
+            "A": "Ahmed (son)",
+            "B": "Fatma (patient)"
+          },
+          "segments": [
+            {
+              "index": 0,
+              "speaker": "A",
+              "text": "صباح الخير يا ماما، أنا كلمت الدكتور سمير الصبح."
+            },
+            {
+              "index": 1,
+              "speaker": "B",
+              "text": "كلمته؟ أنا كنت عايزة أكلمه النهارده. هو قال إيه؟"
+            },
+            {
+              "index": 2,
+              "speaker": "A",
+              "text": "أكد إن ميعادك الخميس الساعة أربعة العصر، ونتيجة التحليل كويسة."
+            },
+            {
+              "index": 3,
+              "speaker": "B",
+              "text": "طب أنا كلمته ولا لسه؟ مش فاكرة."
+            },
+            {
+              "index": 4,
+              "speaker": "A",
+              "text": "إنتِ لسه ما كلمتيهوش يا ماما، أنا اللي كلمته. متنسيش تكلمي الدكتور لو عندك سؤال عن الدوا."
+            },
+            {
+              "index": 5,
+              "speaker": "B",
+              "text": "حاضر، هكلمه بعد الضهر لو افتكرت السؤال."
+            },
+            {
+              "index": 6,
+              "speaker": "A",
+              "text": "أنا هعدي على الصيدلية كمان ساعتين أجيب علبة الدوا الجديدة."
+            }
+          ],
+          "gold": {
+            "facts": [
+              {
+                "segment_index": 0,
+                "quote": "أنا كلمت الدكتور سمير الصبح.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "time",
+                    "value": "09:00",
+                    "unit": null,
+                    "text": "الصبح"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "دكتور سمير"
+                  }
+                ]
+              },
+              {
+                "segment_index": 2,
+                "quote": "أكد إن ميعادك الخميس الساعة أربعة العصر، ونتيجة التحليل كويسة.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "date",
+                    "value": "2026-11-05",
+                    "unit": null,
+                    "text": "الخميس"
+                  },
+                  {
+                    "kind": "time",
+                    "value": "16:00",
+                    "unit": null,
+                    "text": "الساعة أربعة العصر"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "دكتور سمير"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "العيادة"
+                  }
+                ]
+              },
+              {
+                "segment_index": 2,
+                "quote": "ونتيجة التحليل كويسة.",
+                "speaker_is_patient": false,
+                "values": [],
+                "about": [
+                  {
+                    "kind": "object",
+                    "name": "نتيجة التحليل"
+                  }
+                ]
+              }
+            ],
+            "intentions": [
+              {
+                "holder": "patient",
+                "description": "call Dr. Samir about a medication question",
+                "segment_index": 5,
+                "quote": "هكلمه بعد الضهر لو افتكرت السؤال.",
+                "due_at": "2026-11-03T14:00",
+                "due_until": null
+              },
+              {
+                "holder": "other",
+                "description": "buy a new medication box from the pharmacy",
+                "segment_index": 6,
+                "quote": "أنا هعدي على الصيدلية كمان ساعتين أجيب علبة الدوا الجديدة.",
+                "due_at": "2026-11-03T14:15",
+                "due_until": null
+              }
+            ],
+            "entities": [
+              {
+                "kind": "person",
+                "name": "أحمد"
+              },
+              {
+                "kind": "person",
+                "name": "دكتور سمير"
+              },
+              {
+                "kind": "object",
+                "name": "نتيجة التحليل"
+              },
+              {
+                "kind": "object",
+                "name": "علبة الدوا"
+              },
+              {
+                "kind": "place",
+                "name": "العيادة"
+              },
+              {
+                "kind": "place",
+                "name": "الصيدلية"
+              }
+            ],
+            "settles": [
+              {
+                "intention_from": "S1-C1",
+                "description": "call Dr. Samir to confirm the test results",
+                "status": "done",
+                "segment_index": 0,
+                "quote": "أنا كلمت الدكتور سمير الصبح."
+              }
+            ],
+            "traps": [
+              "The patient's repeated question in segment 3 does not establish that she called the doctor.",
+              "The reminder in segment 4 repeats the patient's earlier intention; it does not settle it.",
+              "The conditional plan to call after noon remains an intention, not evidence that the call occurred.",
+              "The result is described as good, but no numerical test value is supplied."
+            ]
+          }
+        },
+        {
+          "id": "S1-C3",
+          "local_datetime": "2026-11-05T18:30",
+          "language": "mixed",
+          "speakers": {
+            "A": "Fatma (patient)",
+            "B": "Sara (daughter)"
+          },
+          "segments": [
+            {
+              "index": 0,
+              "speaker": "A",
+              "text": "يا سارة، أنا روحت العيادة النهارده ولا كان الميعاد بكرة؟"
+            },
+            {
+              "index": 1,
+              "speaker": "B",
+              "text": "رحنا النهارده يا ماما، الخميس 5 November، الساعة أربعة. وأنا كنت معاكي."
+            },
+            {
+              "index": 2,
+              "speaker": "A",
+              "text": "آه صح، والدكتور قال أجيب الدوا بكام؟"
+            },
+            {
+              "index": 3,
+              "speaker": "B",
+              "text": "العلبة بـ 250 جنيه، وعم حسن قال السعر ثابت الأسبوع ده."
+            },
+            {
+              "index": 4,
+              "speaker": "A",
+              "text": "أنا كلمت الدكتور سمير امبارح؟"
+            },
+            {
+              "index": 5,
+              "speaker": "B",
+              "text": "لا، إنتِ ما كلمتيهوش. أحمد هو اللي كلمه يوم التلات."
+            },
+            {
+              "index": 6,
+              "speaker": "A",
+              "text": "نفسي أروح البحر يوم، بس مش النهارده."
+            },
+            {
+              "index": 7,
+              "speaker": "B",
+              "text": "Okay, let's put the next appointment in the calendar so we don't mix up the dates."
+            }
+          ],
+          "gold": {
+            "facts": [
+              {
+                "segment_index": 1,
+                "quote": "رحنا النهارده يا ماما، الخميس 5 November، الساعة أربعة.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "date",
+                    "value": "2026-11-05",
+                    "unit": null,
+                    "text": "5 November"
+                  },
+                  {
+                    "kind": "time",
+                    "value": "16:00",
+                    "unit": null,
+                    "text": "الساعة أربعة"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "دكتور سمير"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "العيادة"
+                  }
+                ]
+              },
+              {
+                "segment_index": 3,
+                "quote": "العلبة بـ 250 جنيه، وعم حسن قال السعر ثابت الأسبوع ده.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "money",
+                    "value": 250,
+                    "unit": "EGP",
+                    "text": "250 جنيه"
+                  },
+                  {
+                    "kind": "date",
+                    "value": "2026-11-02",
+                    "unit": null,
+                    "text": "الأسبوع ده"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "object",
+                    "name": "علبة الدوا"
+                  },
+                  {
+                    "kind": "person",
+                    "name": "عم حسن"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "الصيدلية"
+                  }
+                ]
+              },
+              {
+                "segment_index": 5,
+                "quote": "أحمد هو اللي كلمه يوم التلات.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "date",
+                    "value": "2026-11-03",
+                    "unit": null,
+                    "text": "يوم التلات"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "أحمد"
+                  },
+                  {
+                    "kind": "person",
+                    "name": "دكتور سمير"
+                  }
+                ]
+              }
+            ],
+            "intentions": [],
+            "entities": [
+              {
+                "kind": "person",
+                "name": "سارة"
+              },
+              {
+                "kind": "person",
+                "name": "أحمد"
+              },
+              {
+                "kind": "person",
+                "name": "دكتور سمير"
+              },
+              {
+                "kind": "person",
+                "name": "عم حسن"
+              },
+              {
+                "kind": "object",
+                "name": "علبة الدوا"
+              },
+              {
+                "kind": "place",
+                "name": "العيادة"
+              },
+              {
+                "kind": "place",
+                "name": "الصيدلية"
+              },
+              {
+                "kind": "place",
+                "name": "البحر"
+              }
+            ],
+            "settles": [
+              {
+                "intention_from": "S1-C1",
+                "description": "call Dr. Samir to ask about the medication",
+                "status": "not_done",
+                "segment_index": 5,
+                "quote": "لا، إنتِ ما كلمتيهوش."
+              }
+            ],
+            "traps": [
+              "The patient's question about whether she visited the clinic is not a new intention.",
+              "The patient's question about calling the doctor is not proof of a call.",
+              "Wanting to go to the sea is a wish without a concrete plan.",
+              "The phrase 'الأسبوع ده' refers to the current week, not a precise appointment date."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Keys, wallet, phone number, and a family visit that is completed",
+      "conversations": [
+        {
+          "id": "S2-C1",
+          "local_datetime": "2026-11-02T16:00",
+          "language": "ar",
+          "speakers": {
+            "A": "Sara (daughter)",
+            "B": "Fatma (patient)",
+            "C": "Ahmed (son)"
+          },
+          "segments": [
+            {
+              "index": 0,
+              "speaker": "A",
+              "text": "يا ماما، المفاتيح في طبق صغير عند باب الشقة، مش في شنطتك."
+            },
+            {
+              "index": 1,
+              "speaker": "B",
+              "text": "طب والمحفظة؟ أنا كنت حطاها جنب التليفون."
+            },
+            {
+              "index": 2,
+              "speaker": "C",
+              "text": "المحفظة على الترابيزة في الصالة، والتليفون على الشاحن جنب الكنبة."
+            },
+            {
+              "index": 3,
+              "speaker": "B",
+              "text": "يا سارة، رقمك كان 01012345678 ولا 01012345687؟"
+            },
+            {
+              "index": 4,
+              "speaker": "A",
+              "text": "رقمي 01012345678 يا ماما، آخر رقم 8 مش 7."
+            },
+            {
+              "index": 5,
+              "speaker": "A",
+              "text": "هعدي عليكي الخميس بعد الضهر، ونروح نجيب شوية حاجات من الصيدلية."
+            },
+            {
+              "index": 6,
+              "speaker": "B",
+              "text": "تمام، هجهز المفاتيح والمحفظة قبل ما تيجي."
+            },
+            {
+              "index": 7,
+              "speaker": "C",
+              "text": "كنت حكيتلكوا قبل كده عن رحلة المدرسة بتاعة يوسف، بس لسه مش عارفين ميعادها."
+            }
+          ],
+          "gold": {
+            "facts": [
+              {
+                "segment_index": 0,
+                "quote": "المفاتيح في طبق صغير عند باب الشقة، مش في شنطتك.",
+                "speaker_is_patient": false,
+                "values": [],
+                "about": [
+                  {
+                    "kind": "object",
+                    "name": "المفاتيح"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "البيت"
+                  }
+                ]
+              },
+              {
+                "segment_index": 2,
+                "quote": "المحفظة على الترابيزة في الصالة، والتليفون على الشاحن جنب الكنبة.",
+                "speaker_is_patient": false,
+                "values": [],
+                "about": [
+                  {
+                    "kind": "object",
+                    "name": "المحفظة"
+                  },
+                  {
+                    "kind": "object",
+                    "name": "التليفون"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "البيت"
+                  }
+                ]
+              },
+              {
+                "segment_index": 4,
+                "quote": "رقمي 01012345678 يا ماما، آخر رقم 8 مش 7.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "number",
+                    "value": 1012345678,
+                    "unit": null,
+                    "text": "01012345678"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "سارة"
+                  }
+                ]
+              }
+            ],
+            "intentions": [
+              {
+                "holder": "other",
+                "description": "visit Fatma and go to the pharmacy",
+                "segment_index": 5,
+                "quote": "هعدي عليكي الخميس بعد الضهر، ونروح نجيب شوية حاجات من الصيدلية.",
+                "due_at": "2026-11-05T14:00",
+                "due_until": null
+              },
+              {
+                "holder": "patient",
+                "description": "prepare the keys and wallet before Sara arrives",
+                "segment_index": 6,
+                "quote": "هجهز المفاتيح والمحفظة قبل ما تيجي.",
+                "due_at": "2026-11-05T12:00",
+                "due_until": "2026-11-05T23:59"
+              }
+            ],
+            "entities": [
+              {
+                "kind": "person",
+                "name": "سارة"
+              },
+              {
+                "kind": "person",
+                "name": "أحمد"
+              },
+              {
+                "kind": "person",
+                "name": "يوسف"
+              },
+              {
+                "kind": "object",
+                "name": "المفاتيح"
+              },
+              {
+                "kind": "object",
+                "name": "المحفظة"
+              },
+              {
+                "kind": "object",
+                "name": "التليفون"
+              },
+              {
+                "kind": "place",
+                "name": "البيت"
+              },
+              {
+                "kind": "place",
+                "name": "الصيدلية"
+              }
+            ],
+            "settles": [],
+            "traps": [
+              "The first phone number offered by the patient is a question, not a confirmed fact; retain the corrected number only.",
+              "The school trip is a past discussion and an unresolved possibility, not a current plan.",
+              "The keys and wallet preparation is the patient's own plan, separate from Sara's visit."
+            ]
+          }
+        },
+        {
+          "id": "S2-C2",
+          "local_datetime": "2026-11-04T19:00",
+          "language": "ar",
+          "speakers": {
+            "A": "Fatma (patient)",
+            "B": "Sara (daughter)"
+          },
+          "segments": [
+            {
+              "index": 0,
+              "speaker": "A",
+              "text": "يا سارة، إنتِ جاية بكرة ولا الخميس؟"
+            },
+            {
+              "index": 1,
+              "speaker": "B",
+              "text": "الخميس يا ماما، بكرة الأربعاء. أنا لسه جاية بكرة أقولك عشان ما تنسيش."
+            },
+            {
+              "index": 2,
+              "speaker": "A",
+              "text": "طيب المفاتيح فين؟"
+            },
+            {
+              "index": 3,
+              "speaker": "B",
+              "text": "في الطبق عند الباب زي ما اتفقنا، والمحفظة على ترابيزة الصالة."
+            },
+            {
+              "index": 4,
+              "speaker": "A",
+              "text": "هجهزهم قبل الجمعة، عشان ما نتأخرش."
+            },
+            {
+              "index": 5,
+              "speaker": "B",
+              "text": "تمام، وأنا هجيبلك علبة بسكوت وأنا جاية."
+            },
+            {
+              "index": 6,
+              "speaker": "A",
+              "text": "نفسي يوسف ييجي يلعب شطرنج معايا، بس مش عارفة عنده وقت ولا لأ."
+            }
+          ],
+          "gold": {
+            "facts": [
+              {
+                "segment_index": 1,
+                "quote": "الخميس يا ماما، بكرة الأربعاء.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "date",
+                    "value": "2026-11-05",
+                    "unit": null,
+                    "text": "الخميس"
+                  },
+                  {
+                    "kind": "date",
+                    "value": "2026-11-04",
+                    "unit": null,
+                    "text": "الأربعاء"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "سارة"
+                  }
+                ]
+              },
+              {
+                "segment_index": 3,
+                "quote": "في الطبق عند الباب زي ما اتفقنا، والمحفظة على ترابيزة الصالة.",
+                "speaker_is_patient": false,
+                "values": [],
+                "about": [
+                  {
+                    "kind": "object",
+                    "name": "المفاتيح"
+                  },
+                  {
+                    "kind": "object",
+                    "name": "المحفظة"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "البيت"
+                  }
+                ]
+              }
+            ],
+            "intentions": [
+              {
+                "holder": "patient",
+                "description": "prepare the keys and wallet before Friday",
+                "segment_index": 4,
+                "quote": "هجهزهم قبل الجمعة، عشان ما نتأخرش.",
+                "due_at": null,
+                "due_until": "2026-11-06T23:59"
+              },
+              {
+                "holder": "other",
+                "description": "bring biscuits when visiting Fatma",
+                "segment_index": 5,
+                "quote": "وأنا هجيبلك علبة بسكوت وأنا جاية.",
+                "due_at": "2026-11-05T14:00",
+                "due_until": null
+              }
+            ],
+            "entities": [
+              {
+                "kind": "person",
+                "name": "سارة"
+              },
+              {
+                "kind": "person",
+                "name": "يوسف"
+              },
+              {
+                "kind": "object",
+                "name": "المفاتيح"
+              },
+              {
+                "kind": "object",
+                "name": "المحفظة"
+              },
+              {
+                "kind": "object",
+                "name": "علبة البسكوت"
+              },
+              {
+                "kind": "place",
+                "name": "البيت"
+              }
+            ],
+            "settles": [],
+            "traps": [
+              "The question about whether Sara is coming tomorrow is not a new intention.",
+              "Sara's reminder that she is still coming on Thursday repeats the existing visit plan and does not settle it.",
+              "The patient's wish for Youssef to play chess is not a concrete plan."
+            ]
+          }
+        },
+        {
+          "id": "S2-C3",
+          "local_datetime": "2026-11-05T16:30",
+          "language": "mixed",
+          "speakers": {
+            "A": "Sara (daughter)",
+            "B": "Fatma (patient)"
+          },
+          "segments": [
+            {
+              "index": 0,
+              "speaker": "A",
+              "text": "أنا وصلت يا ماما، جبتلك biscuits زي ما وعدتك."
+            },
+            {
+              "index": 1,
+              "speaker": "B",
+              "text": "أهو أنا مجهزة المفاتيح والمحفظة، حطاهم جنب الباب."
+            },
+            {
+              "index": 2,
+              "speaker": "A",
+              "text": "ممتاز، نزلنا الصيدلية واشترينا الحاجات اللي ناقصاكي."
+            },
+            {
+              "index": 3,
+              "speaker": "B",
+              "text": "طب أنا كلمت عم حسن أسأله عن السعر؟"
+            },
+            {
+              "index": 4,
+              "speaker": "A",
+              "text": "لا، أنا سألت عم حسن في الصيدلية، والعلبة بـ 250 جنيه."
+            },
+            {
+              "index": 5,
+              "speaker": "B",
+              "text": "الحمد لله. كنت فاكرة إن يوسف هييجي النهارده."
+            },
+            {
+              "index": 6,
+              "speaker": "A",
+              "text": "يوسف عنده تمرين النهارده، وهييجي عندك السبت الساعة ١١ الصبح."
+            }
+          ],
+          "gold": {
+            "facts": [
+              {
+                "segment_index": 1,
+                "quote": "أهو أنا مجهزة المفاتيح والمحفظة، حطاهم جنب الباب.",
+                "speaker_is_patient": true,
+                "values": [],
+                "about": [
+                  {
+                    "kind": "object",
+                    "name": "المفاتيح"
+                  },
+                  {
+                    "kind": "object",
+                    "name": "المحفظة"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "البيت"
+                  }
+                ]
+              },
+              {
+                "segment_index": 4,
+                "quote": "لا، أنا سألت عم حسن في الصيدلية، والعلبة بـ 250 جنيه.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "money",
+                    "value": 250,
+                    "unit": "EGP",
+                    "text": "250 جنيه"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "عم حسن"
+                  },
+                  {
+                    "kind": "object",
+                    "name": "علبة الدوا"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "الصيدلية"
+                  }
+                ]
+              },
+              {
+                "segment_index": 6,
+                "quote": "يوسف عنده تمرين النهارده، وهييجي عندك السبت الساعة ١١ الصبح.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "date",
+                    "value": "2026-11-07",
+                    "unit": null,
+                    "text": "السبت"
+                  },
+                  {
+                    "kind": "time",
+                    "value": "11:00",
+                    "unit": null,
+                    "text": "الساعة ١١ الصبح"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "يوسف"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "البيت"
+                  }
+                ]
+              }
+            ],
+            "intentions": [
+              {
+                "holder": "other",
+                "description": "Youssef visits Fatma",
+                "segment_index": 6,
+                "quote": "وهييجي عندك السبت الساعة ١١ الصبح.",
+                "due_at": "2026-11-07T11:00",
+                "due_until": null
+              }
+            ],
+            "entities": [
+              {
+                "kind": "person",
+                "name": "سارة"
+              },
+              {
+                "kind": "person",
+                "name": "يوسف"
+              },
+              {
+                "kind": "person",
+                "name": "عم حسن"
+              },
+              {
+                "kind": "object",
+                "name": "المفاتيح"
+              },
+              {
+                "kind": "object",
+                "name": "المحفظة"
+              },
+              {
+                "kind": "object",
+                "name": "علبة الدوا"
+              },
+              {
+                "kind": "place",
+                "name": "الصيدلية"
+              },
+              {
+                "kind": "place",
+                "name": "البيت"
+              }
+            ],
+            "settles": [
+              {
+                "intention_from": "S2-C1",
+                "description": "visit Fatma and go to the pharmacy",
+                "status": "done",
+                "segment_index": 2,
+                "quote": "نزلنا الصيدلية واشترينا الحاجات اللي ناقصاكي."
+              },
+              {
+                "intention_from": "S2-C1",
+                "description": "prepare the keys and wallet before Sara arrives",
+                "status": "done",
+                "segment_index": 1,
+                "quote": "أهو أنا مجهزة المفاتيح والمحفظة، حطاهم جنب الباب."
+              }
+            ],
+            "traps": [
+              "The patient's question about calling Hassan is not evidence that she made the call.",
+              "The purchase price is stated by Sara, not Fatma.",
+              "Youssef's visit on Saturday is a future plan, not a completed visit.",
+              "The patient's recollection that Youssef might come today is not a confirmed visit."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Gas-stove safety, a cancelled clinic visit, and an uncompleted errand",
+      "conversations": [
+        {
+          "id": "S3-C1",
+          "local_datetime": "2026-11-03T08:30",
+          "language": "ar",
+          "speakers": {
+            "A": "Fatma (patient)",
+            "B": "Umm Mohamed (neighbour)"
+          },
+          "segments": [
+            {
+              "index": 0,
+              "speaker": "A",
+              "text": "يا أم محمد، أنا قفلت البوتاجاز بعد ما عملت الشاي، صح؟"
+            },
+            {
+              "index": 1,
+              "speaker": "B",
+              "text": "أيوه، أنا شوفتك قفلتيه، ومفيش نار دلوقتي."
+            },
+            {
+              "index": 2,
+              "speaker": "A",
+              "text": "أنا حطيت المفاتيح فين؟"
+            },
+            {
+              "index": 3,
+              "speaker": "B",
+              "text": "المفاتيح في جيب الجلابية الزرقا، والنضارة على الترابيزة."
+            },
+            {
+              "index": 4,
+              "speaker": "A",
+              "text": "هروح الصيدلية بعد بكره أجيب الدوا، لو ما نسيتش."
+            },
+            {
+              "index": 5,
+              "speaker": "B",
+              "text": "أنا هعدي عليكي الخميس بالليل أطمن عليكي، ولو محتاجة حاجة كلميني."
+            },
+            {
+              "index": 6,
+              "speaker": "A",
+              "text": "كان زماني روحت السوق امبارح، بس المطر وقفني."
+            }
+          ],
+          "gold": {
+            "facts": [
+              {
+                "segment_index": 1,
+                "quote": "أيوه، أنا شوفتك قفلتيه، ومفيش نار دلوقتي.",
+                "speaker_is_patient": false,
+                "values": [],
+                "about": [
+                  {
+                    "kind": "object",
+                    "name": "البوتاجاز"
+                  }
+                ]
+              },
+              {
+                "segment_index": 3,
+                "quote": "المفاتيح في جيب الجلابية الزرقا، والنضارة على الترابيزة.",
+                "speaker_is_patient": false,
+                "values": [],
+                "about": [
+                  {
+                    "kind": "object",
+                    "name": "المفاتيح"
+                  },
+                  {
+                    "kind": "object",
+                    "name": "النضارة"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "البيت"
+                  }
+                ]
+              }
+            ],
+            "intentions": [
+              {
+                "holder": "patient",
+                "description": "go to the pharmacy to get medication",
+                "segment_index": 4,
+                "quote": "هروح الصيدلية بعد بكره أجيب الدوا، لو ما نسيتش.",
+                "due_at": "2026-11-05T12:00",
+                "due_until": null
+              },
+              {
+                "holder": "other",
+                "description": "visit Fatma to check on her",
+                "segment_index": 5,
+                "quote": "أنا هعدي عليكي الخميس بالليل أطمن عليكي، ولو محتاجة حاجة كلميني.",
+                "due_at": "2026-11-05T19:00",
+                "due_until": null
+              }
+            ],
+            "entities": [
+              {
+                "kind": "person",
+                "name": "أم محمد"
+              },
+              {
+                "kind": "object",
+                "name": "البوتاجاز"
+              },
+              {
+                "kind": "object",
+                "name": "المفاتيح"
+              },
+              {
+                "kind": "object",
+                "name": "النضارة"
+              },
+              {
+                "kind": "place",
+                "name": "البيت"
+              },
+              {
+                "kind": "place",
+                "name": "الصيدلية"
+              }
+            ],
+            "settles": [],
+            "traps": [
+              "The question about whether the stove was turned off is not itself a fact; the neighbour's confirmation is the evidence.",
+              "The patient's past account about the market and rain is a story, not a current intention.",
+              "The conditional wording about possibly forgetting the pharmacy errand does not cancel the stated plan."
+            ]
+          }
+        },
+        {
+          "id": "S3-C2",
+          "local_datetime": "2026-11-05T20:15",
+          "language": "ar",
+          "speakers": {
+            "A": "Fatma (patient)",
+            "B": "Ahmed (son)"
+          },
+          "segments": [
+            {
+              "index": 0,
+              "speaker": "A",
+              "text": "يا أحمد، أم محمد عدت عليا النهارده؟"
+            },
+            {
+              "index": 1,
+              "speaker": "B",
+              "text": "أيوه يا ماما، عدت الساعة سبعة بالليل وقعدت معاكي شوية."
+            },
+            {
+              "index": 2,
+              "speaker": "A",
+              "text": "أنا روحت الصيدلية النهارده؟"
+            },
+            {
+              "index": 3,
+              "speaker": "B",
+              "text": "لأ، ملحقتيش تروحي الصيدلية النهارده، وأنا كمان ما قدرتش أروح."
+            },
+            {
+              "index": 4,
+              "speaker": "A",
+              "text": "طيب، هروح بكرة الصبح أجيب الدوا."
+            },
+            {
+              "index": 5,
+              "speaker": "B",
+              "text": "استني يا ماما، الدكتور سمير اتصل وقال إن ميعاد العيادة اتلغى، وهيحددوا ميعاد جديد الأسبوع الجاي."
+            },
+            {
+              "index": 6,
+              "speaker": "A",
+              "text": "طب أعمل إيه بالبروتاجاز؟"
+            },
+            {
+              "index": 7,
+              "speaker": "B",
+              "text": "البوتاجاز مقفول دلوقتي، وأنا هراجع عليه قبل ما أمشي."
+            }
+          ],
+          "gold": {
+            "facts": [
+              {
+                "segment_index": 1,
+                "quote": "عدت الساعة سبعة بالليل وقعدت معاكي شوية.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "time",
+                    "value": "19:00",
+                    "unit": null,
+                    "text": "الساعة سبعة بالليل"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "أم محمد"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "البيت"
+                  }
+                ]
+              },
+              {
+                "segment_index": 5,
+                "quote": "الدكتور سمير اتصل وقال إن ميعاد العيادة اتلغى، وهيحددوا ميعاد جديد الأسبوع الجاي.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "date",
+                    "value": "2026-11-09",
+                    "unit": null,
+                    "text": "الأسبوع الجاي"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "دكتور سمير"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "العيادة"
+                  }
+                ]
+              },
+              {
+                "segment_index": 7,
+                "quote": "البوتاجاز مقفول دلوقتي، وأنا هراجع عليه قبل ما أمشي.",
+                "speaker_is_patient": false,
+                "values": [],
+                "about": [
+                  {
+                    "kind": "object",
+                    "name": "البوتاجاز"
+                  }
+                ]
+              }
+            ],
+            "intentions": [
+              {
+                "holder": "patient",
+                "description": "go to the pharmacy to get medication",
+                "segment_index": 4,
+                "quote": "هروح بكرة الصبح أجيب الدوا.",
+                "due_at": "2026-11-06T09:00",
+                "due_until": null
+              },
+              {
+                "holder": "other",
+                "description": "check that the gas stove is off before leaving",
+                "segment_index": 7,
+                "quote": "وأنا هراجع عليه قبل ما أمشي.",
+                "due_at": null,
+                "due_until": null
+              }
+            ],
+            "entities": [
+              {
+                "kind": "person",
+                "name": "أم محمد"
+              },
+              {
+                "kind": "person",
+                "name": "أحمد"
+              },
+              {
+                "kind": "person",
+                "name": "دكتور سمير"
+              },
+              {
+                "kind": "object",
+                "name": "البوتاجاز"
+              },
+              {
+                "kind": "object",
+                "name": "علبة الدوا"
+              },
+              {
+                "kind": "place",
+                "name": "البيت"
+              },
+              {
+                "kind": "place",
+                "name": "الصيدلية"
+              },
+              {
+                "kind": "place",
+                "name": "العيادة"
+              }
+            ],
+            "settles": [
+              {
+                "intention_from": "S3-C1",
+                "description": "visit Fatma to check on her",
+                "status": "done",
+                "segment_index": 1,
+                "quote": "أيوه يا ماما، عدت الساعة سبعة بالليل وقعدت معاكي شوية."
+              },
+              {
+                "intention_from": "S3-C1",
+                "description": "go to the pharmacy to get medication",
+                "status": "not_done",
+                "segment_index": 3,
+                "quote": "ملحقتيش تروحي الصيدلية النهارده"
+              }
+            ],
+            "traps": [
+              "The patient's question about whether the neighbour visited is not itself evidence; Ahmed's answer supplies the fact.",
+              "The clinic appointment cancellation is a settled change to the appointment, not proof that a new appointment has already been booked.",
+              "The pharmacy plan for Friday morning is a new intention after the earlier errand was not completed.",
+              "The patient's misspelling of البوتاجاز in segment 6 is part of a question, not a new object entity."
+            ]
+          }
+        },
+        {
+          "id": "S3-C3",
+          "local_datetime": "2026-11-06T10:30",
+          "language": "en",
+          "speakers": {
+            "A": "Ahmed (son)",
+            "B": "Fatma (patient)"
+          },
+          "segments": [
+            {
+              "index": 0,
+              "speaker": "A",
+              "text": "Mom, I went to the pharmacy this morning and brought your medication."
+            },
+            {
+              "index": 1,
+              "speaker": "B",
+              "text": "Oh, good. I thought I was supposed to go today."
+            },
+            {
+              "index": 2,
+              "speaker": "A",
+              "text": "You did not go yesterday, but you do not need to go now because the medicine is here."
+            },
+            {
+              "index": 3,
+              "speaker": "B",
+              "text": "Did Dr. Samir cancel my appointment or was it tomorrow?"
+            },
+            {
+              "index": 4,
+              "speaker": "A",
+              "text": "He cancelled it on Thursday. His clinic will contact us next week with a new date."
+            },
+            {
+              "index": 5,
+              "speaker": "B",
+              "text": "I would love to visit the sea someday."
+            },
+            {
+              "index": 6,
+              "speaker": "A",
+              "text": "I will check the gas stove before I leave for work."
+            }
+          ],
+          "gold": {
+            "facts": [
+              {
+                "segment_index": 0,
+                "quote": "I went to the pharmacy this morning and brought your medication.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "time",
+                    "value": "09:00",
+                    "unit": null,
+                    "text": "this morning"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "object",
+                    "name": "علبة الدوا"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "الصيدلية"
+                  }
+                ]
+              },
+              {
+                "segment_index": 4,
+                "quote": "He cancelled it on Thursday. His clinic will contact us next week with a new date.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "date",
+                    "value": "2026-11-05",
+                    "unit": null,
+                    "text": "Thursday"
+                  },
+                  {
+                    "kind": "date",
+                    "value": "2026-11-09",
+                    "unit": null,
+                    "text": "next week"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "دكتور سمير"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "العيادة"
+                  }
+                ]
+              }
+            ],
+            "intentions": [
+              {
+                "holder": "other",
+                "description": "check the gas stove before leaving for work",
+                "segment_index": 6,
+                "quote": "I will check the gas stove before I leave for work.",
+                "due_at": null,
+                "due_until": null
+              }
+            ],
+            "entities": [
+              {
+                "kind": "person",
+                "name": "أحمد"
+              },
+              {
+                "kind": "person",
+                "name": "دكتور سمير"
+              },
+              {
+                "kind": "object",
+                "name": "علبة الدوا"
+              },
+              {
+                "kind": "object",
+                "name": "البوتاجاز"
+              },
+              {
+                "kind": "place",
+                "name": "الصيدلية"
+              },
+              {
+                "kind": "place",
+                "name": "العيادة"
+              },
+              {
+                "kind": "place",
+                "name": "البحر"
+              }
+            ],
+            "settles": [
+              {
+                "intention_from": "S3-C2",
+                "description": "go to the pharmacy to get medication",
+                "status": "done",
+                "segment_index": 0,
+                "quote": "I went to the pharmacy this morning and brought your medication."
+              }
+            ],
+            "traps": [
+              "The patient's question about the cancelled appointment is not a new plan.",
+              "The wish to visit the sea someday is not an intention because it lacks a concrete plan.",
+              "The new clinic appointment is not yet scheduled; next week is only the expected period for contact.",
+              "The stove check is a future action, not a fact that the stove has already been checked."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Sara's Heliopolis flat, mosque visit, and repeated but unresolved doctor call",
+      "conversations": [
+        {
+          "id": "S4-C1",
+          "local_datetime": "2026-11-02T18:00",
+          "language": "ar",
+          "speakers": {
+            "A": "Fatma (patient)",
+            "B": "Sara (daughter)"
+          },
+          "segments": [
+            {
+              "index": 0,
+              "speaker": "A",
+              "text": "يا سارة، إنتِ ساكنة فين دلوقتي؟"
+            },
+            {
+              "index": 1,
+              "speaker": "B",
+              "text": "في شقتي في مصر الجديدة يا ماما، جنب شارع الحجاز."
+            },
+            {
+              "index": 2,
+              "speaker": "A",
+              "text": "أنا فاكرة إنك في مدينة نصر."
+            },
+            {
+              "index": 3,
+              "speaker": "B",
+              "text": "لأ، نقلت شقتي لمصر الجديدة من شهرين. وعندي زيارة للدكتور سمير يوم الأربعاء الساعة ١٢ الضهر."
+            },
+            {
+              "index": 4,
+              "speaker": "A",
+              "text": "أنا هكلم الدكتور بكره عشان أسأله عن ميعاد الكشف بتاعي."
+            },
+            {
+              "index": 5,
+              "speaker": "B",
+              "text": "وأنا هعدي عليكي الخميس قبل المغرب، وبعدها ممكن نروح المسجد سوا."
+            },
+            {
+              "index": 6,
+              "speaker": "A",
+              "text": "المفاتيح في درج التسريحة، والنضارة فوق الكرسي."
+            }
+          ],
+          "gold": {
+            "facts": [
+              {
+                "segment_index": 1,
+                "quote": "في شقتي في مصر الجديدة يا ماما، جنب شارع الحجاز.",
+                "speaker_is_patient": false,
+                "values": [],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "سارة"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "شقة سارة"
+                  }
+                ]
+              },
+              {
+                "segment_index": 3,
+                "quote": "نقلت شقتي لمصر الجديدة من شهرين.",
+                "speaker_is_patient": false,
+                "values": [],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "سارة"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "شقة سارة"
+                  }
+                ]
+              },
+              {
+                "segment_index": 3,
+                "quote": "وعندي زيارة للدكتور سمير يوم الأربعاء الساعة ١٢ الضهر.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "date",
+                    "value": "2026-11-04",
+                    "unit": null,
+                    "text": "يوم الأربعاء"
+                  },
+                  {
+                    "kind": "time",
+                    "value": "12:00",
+                    "unit": null,
+                    "text": "الساعة ١٢ الضهر"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "دكتور سمير"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "العيادة"
+                  }
+                ]
+              },
+              {
+                "segment_index": 6,
+                "quote": "المفاتيح في درج التسريحة، والنضارة فوق الكرسي.",
+                "speaker_is_patient": true,
+                "values": [],
+                "about": [
+                  {
+                    "kind": "object",
+                    "name": "المفاتيح"
+                  },
+                  {
+                    "kind": "object",
+                    "name": "النضارة"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "البيت"
+                  }
+                ]
+              }
+            ],
+            "intentions": [
+              {
+                "holder": "patient",
+                "description": "call Dr. Samir to ask about her appointment",
+                "segment_index": 4,
+                "quote": "أنا هكلم الدكتور بكره عشان أسأله عن ميعاد الكشف بتاعي.",
+                "due_at": "2026-11-03T12:00",
+                "due_until": null
+              },
+              {
+                "holder": "other",
+                "description": "visit Fatma and possibly go to the mosque together",
+                "segment_index": 5,
+                "quote": "وأنا هعدي عليكي الخميس قبل المغرب، وبعدها ممكن نروح المسجد سوا.",
+                "due_at": "2026-11-05T17:00",
+                "due_until": null
+              }
+            ],
+            "entities": [
+              {
+                "kind": "person",
+                "name": "سارة"
+              },
+              {
+                "kind": "person",
+                "name": "دكتور سمير"
+              },
+              {
+                "kind": "object",
+                "name": "المفاتيح"
+              },
+              {
+                "kind": "object",
+                "name": "النضارة"
+              },
+              {
+                "kind": "place",
+                "name": "شقة سارة"
+              },
+              {
+                "kind": "place",
+                "name": "البيت"
+              },
+              {
+                "kind": "place",
+                "name": "العيادة"
+              },
+              {
+                "kind": "place",
+                "name": "المسجد"
+              }
+            ],
+            "settles": [],
+            "traps": [
+              "The patient's recollection that Sara lives in Nasr City is outdated and corrected by Sara's current address.",
+              "Sara's own clinic visit is a fact about her schedule, not a plan to accompany Fatma.",
+              "The possible mosque visit is tentative and depends on the earlier visit; it should not be labelled as a definite standalone booking.",
+              "The patient's question in segment 0 is not an entity or intention."
+            ]
+          }
+        },
+        {
+          "id": "S4-C2",
+          "local_datetime": "2026-11-04T13:00",
+          "language": "mixed",
+          "speakers": {
+            "A": "Sara (daughter)",
+            "B": "Fatma (patient)"
+          },
+          "segments": [
+            {
+              "index": 0,
+              "speaker": "A",
+              "text": "يا ماما، خلصت زيارة الدكتور النهارده الساعة 12، وكل حاجة كانت okay."
+            },
+            {
+              "index": 1,
+              "speaker": "B",
+              "text": "إنتِ كنتِ عند الدكتور النهارده؟ أنا فاكرة إنك رايحة بكرة."
+            },
+            {
+              "index": 2,
+              "speaker": "A",
+              "text": "أيوه، النهارده الأربعاء 4 نوفمبر، مش الخميس."
+            },
+            {
+              "index": 3,
+              "speaker": "B",
+              "text": "طب أنا كلمت الدكتور سمير امبارح زي ما قلت؟"
+            },
+            {
+              "index": 4,
+              "speaker": "A",
+              "text": "متنسيش تكلمي الدكتور سمير عشان تسأليه عن ميعادك."
+            },
+            {
+              "index": 5,
+              "speaker": "B",
+              "text": "حاضر، هكلمه لما أحمد يرجع بالليل."
+            },
+            {
+              "index": 6,
+              "speaker": "A",
+              "text": "أنا هزورك بكرة قبل الجمعة، ونقدر نروح المسجد لو حبيتي."
+            }
+          ],
+          "gold": {
+            "facts": [
+              {
+                "segment_index": 0,
+                "quote": "خلصت زيارة الدكتور النهارده الساعة 12، وكل حاجة كانت okay.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "date",
+                    "value": "2026-11-04",
+                    "unit": null,
+                    "text": "النهارده"
+                  },
+                  {
+                    "kind": "time",
+                    "value": "12:00",
+                    "unit": null,
+                    "text": "الساعة 12"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "دكتور سمير"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "العيادة"
+                  }
+                ]
+              },
+              {
+                "segment_index": 2,
+                "quote": "أيوه، النهارده الأربعاء 4 نوفمبر، مش الخميس.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "date",
+                    "value": "2026-11-04",
+                    "unit": null,
+                    "text": "4 نوفمبر"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "سارة"
+                  }
+                ]
+              }
+            ],
+            "intentions": [
+              {
+                "holder": "patient",
+                "description": "call Dr. Samir about her appointment",
+                "segment_index": 5,
+                "quote": "حاضر، هكلمه لما أحمد يرجع بالليل.",
+                "due_at": "2026-11-04T19:00",
+                "due_until": null
+              },
+              {
+                "holder": "other",
+                "description": "visit Fatma and possibly go to the mosque",
+                "segment_index": 6,
+                "quote": "أنا هزورك بكرة قبل الجمعة، ونقدر نروح المسجد لو حبيتي.",
+                "due_at": "2026-11-05T12:00",
+                "due_until": "2026-11-06T23:59"
+              }
+            ],
+            "entities": [
+              {
+                "kind": "person",
+                "name": "سارة"
+              },
+              {
+                "kind": "أحمد",
+                "name": "أحمد"
+              },
+              {
+                "kind": "دكتور سمير",
+                "name": "دكتور سمير"
+              },
+              {
+                "kind": "place",
+                "name": "العيادة"
+              },
+              {
+                "kind": "place",
+                "name": "المسجد"
+              }
+            ],
+            "settles": [],
+            "traps": [
+              "The patient's question about whether she called the doctor does not prove that she did.",
+              "The reminder in segment 4 repeats the intention from S4-C1 but does not settle it.",
+              "Sara's visit on Thursday is a plan, not a completed visit.",
+              "The phrase 'قبل الجمعة' is a deadline window, not an exact appointment time."
+            ]
+          }
+        },
+        {
+          "id": "S4-C3",
+          "local_datetime": "2026-11-06T20:00",
+          "language": "ar",
+          "speakers": {
+            "A": "Fatma (patient)",
+            "B": "Ahmed (son)"
+          },
+          "segments": [
+            {
+              "index": 0,
+              "speaker": "A",
+              "text": "يا أحمد، سارة جتلي امبارح ولا أنا بحلم؟"
+            },
+            {
+              "index": 1,
+              "speaker": "B",
+              "text": "أيوه يا ماما، سارة عدت عليكي الخميس قبل المغرب."
+            },
+            {
+              "index": 2,
+              "speaker": "A",
+              "text": "ورحنا المسجد؟"
+            },
+            {
+              "index": 3,
+              "speaker": "B",
+              "text": "لأ، ما روحتوش المسجد، قعدتوا في البيت وشربتوا شاي."
+            },
+            {
+              "index": 4,
+              "speaker": "A",
+              "text": "أنا كلمت الدكتور سمير ولا نسيت؟"
+            },
+            {
+              "index": 5,
+              "speaker": "B",
+              "text": "ما كلمتيهوش لحد دلوقتي يا ماما، وأنا كمان ما كلمتوش."
+            },
+            {
+              "index": 6,
+              "speaker": "A",
+              "text": "طيب، هكلمه بكرة الصبح."
+            }
+          ],
+          "gold": {
+            "facts": [
+              {
+                "segment_index": 1,
+                "quote": "أيوه يا ماما، سارة عدت عليكي الخميس قبل المغرب.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "date",
+                    "value": "2026-11-05",
+                    "unit": null,
+                    "text": "الخميس"
+                  },
+                  {
+                    "kind": "time",
+                    "value": "17:00",
+                    "unit": null,
+                    "text": "قبل المغرب"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "سارة"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "البيت"
+                  }
+                ]
+              },
+              {
+                "segment_index": 3,
+                "quote": "لأ، ما روحتوش المسجد، قعدتوا في البيت وشربتوا شاي.",
+                "speaker_is_patient": false,
+                "values": [],
+                "about": [
+                  {
+                    "kind": "place",
+                    "name": "المسجد"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "البيت"
+                  }
+                ]
+              }
+            ],
+            "intentions": [
+              {
+                "holder": "patient",
+                "description": "call Dr. Samir",
+                "segment_index": 6,
+                "quote": "طيب، هكلمه بكرة الصبح.",
+                "due_at": "2026-11-07T09:00",
+                "due_until": null
+              }
+            ],
+            "entities": [
+              {
+                "kind": "person",
+                "name": "سارة"
+              },
+              {
+                "kind": "person",
+                "name": "أحمد"
+              },
+              {
+                "kind": "person",
+                "name": "دكتور سمير"
+              },
+              {
+                "kind": "place",
+                "name": "المسجد"
+              },
+              {
+                "kind": "place",
+                "name": "البيت"
+              }
+            ],
+            "settles": [
+              {
+                "intention_from": "S4-C1",
+                "description": "call Dr. Samir to ask about her appointment",
+                "status": "not_done",
+                "segment_index": 5,
+                "quote": "ما كلمتيهوش لحد دلوقتي يا ماما"
+              },
+              {
+                "intention_from": "S4-C2",
+                "description": "visit Fatma and possibly go to the mosque",
+                "status": "not_done",
+                "segment_index": 3,
+                "quote": "لأ، ما روحتوش المسجد"
+              }
+            ],
+            "traps": [
+              "The patient's question about whether Sara visited is not a new plan.",
+              "The visit happened, but the possible mosque outing did not; do not mark the whole visit plan as not done.",
+              "The patient's new plan to call the doctor tomorrow morning remains open and is not settled in this conversation."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Family news, cash, medicine after meals, and an open plan",
+      "conversations": [
+        {
+          "id": "S5-C1",
+          "local_datetime": "2026-11-03T14:30",
+          "language": "ar",
+          "speakers": {
+            "A": "Ahmed (son)",
+            "B": "Fatma (patient)"
+          },
+          "segments": [
+            {
+              "index": 0,
+              "speaker": "A",
+              "text": "يا ماما، يوسف جاب 95 في امتحان الحساب النهارده."
+            },
+            {
+              "index": 1,
+              "speaker": "B",
+              "text": "برافو عليه! هو عنده عشر سنين دلوقتي، صح؟"
+            },
+            {
+              "index": 2,
+              "speaker": "A",
+              "text": "أيوه، عنده 10 سنين. وبالمناسبة، الدكتور قال حبايتين بعد الأكل من الدوا ده."
+            },
+            {
+              "index": 3,
+              "speaker": "B",
+              "text": "حبايتين ولا نص حباية؟ أنا مش فاكرة."
+            },
+            {
+              "index": 4,
+              "speaker": "A",
+              "text": "حبايتين بعد الأكل، زي ما مكتوب في الورقة دي. الجرعة دي غير الدوا اللي بالليل."
+            },
+            {
+              "index": 5,
+              "speaker": "B",
+              "text": "أنا هدي عم سيد 200 جنيه بكرة عشان يجيبلي عيش وحاجات من السوبرماركت."
+            },
+            {
+              "index": 6,
+              "speaker": "A",
+              "text": "ماشي، وأنا هزورك يوم الجمعة الساعة ٦ المغرب."
+            },
+            {
+              "index": 7,
+              "speaker": "B",
+              "text": "نفسي أعمل كحك العيد، بس العيد لسه بعيد."
+            }
+          ],
+          "gold": {
+            "facts": [
+              {
+                "segment_index": 0,
+                "quote": "يوسف جاب 95 في امتحان الحساب النهارده.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "number",
+                    "value": 95,
+                    "unit": null,
+                    "text": "95"
+                  },
+                  {
+                    "kind": "date",
+                    "value": "2026-11-03",
+                    "unit": null,
+                    "text": "النهارده"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "يوسف"
+                  }
+                ]
+              },
+              {
+                "segment_index": 2,
+                "quote": "أيوه، عنده 10 سنين.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "number",
+                    "value": 10,
+                    "unit": "year",
+                    "text": "10 سنين"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "يوسف"
+                  }
+                ]
+              },
+              {
+                "segment_index": 4,
+                "quote": "حبايتين بعد الأكل، زي ما مكتوب في الورقة دي.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "dose",
+                    "value": 2,
+                    "unit": "pill",
+                    "text": "حبايتين"
+                  },
+                  {
+                    "kind": "time",
+                    "value": "14:00",
+                    "unit": null,
+                    "text": "بعد الأكل"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "object",
+                    "name": "الروشتة"
+                  },
+                  {
+                    "kind": "object",
+                    "name": "علبة الدوا"
+                  }
+                ]
+              }
+            ],
+            "intentions": [
+              {
+                "holder": "patient",
+                "description": "give Sayed 200 EGP to buy bread and groceries",
+                "segment_index": 5,
+                "quote": "أنا هدي عم سيد 200 جنيه بكرة عشان يجيبلي عيش وحاجات من السوبرماركت.",
+                "due_at": "2026-11-04T12:00",
+                "due_until": null
+              },
+              {
+                "holder": "other",
+                "description": "visit Fatma",
+                "segment_index": 6,
+                "quote": "وأنا هزورك يوم الجمعة الساعة ٦ المغرب.",
+                "due_at": "2026-11-06T18:00",
+                "due_until": null
+              }
+            ],
+            "entities": [
+              {
+                "kind": "person",
+                "name": "أحمد"
+              },
+              {
+                "kind": "person",
+                "name": "يوسف"
+              },
+              {
+                "kind": "person",
+                "name": "عم سيد"
+              },
+              {
+                "kind": "object",
+                "name": "علبة الدوا"
+              },
+              {
+                "kind": "object",
+                "name": "الروشتة"
+              },
+              {
+                "kind": "place",
+                "name": "السوبرماركت"
+              },
+              {
+                "kind": "place",
+                "name": "البيت"
+              }
+            ],
+            "settles": [],
+            "traps": [
+              "The patient's question in segment 3 is not a medication fact; segment 4 confirms the correct dose.",
+              "The wish to make Eid cookies is not a concrete plan.",
+              "The grade and age are facts about Youssef, not about Fatma.",
+              "The plan to give Sayed money is an intention; it is not evidence that the money has already been handed over."
+            ]
+          }
+        },
+        {
+          "id": "S5-C2",
+          "local_datetime": "2026-11-04T13:00",
+          "language": "ar",
+          "speakers": {
+            "A": "Fatma (patient)",
+            "B": "Sayed (doorman)"
+          },
+          "segments": [
+            {
+              "index": 0,
+              "speaker": "A",
+              "text": "يا عم سيد، أنا كنت اديتك 200 جنيه امبارح عشان تجيب الحاجات؟"
+            },
+            {
+              "index": 1,
+              "speaker": "B",
+              "text": "لأ يا حاجة فاطمة، لسه ما خدتش الفلوس منك. إنتِ قلتي هتديهالي النهارده."
+            },
+            {
+              "index": 2,
+              "speaker": "A",
+              "text": "آه صح، اتفضل 200 جنيه، هاتلي عيش ولبن."
+            },
+            {
+              "index": 3,
+              "speaker": "B",
+              "text": "حاضر، هجيبهم قبل الساعة تلاتة الضهر."
+            },
+            {
+              "index": 4,
+              "speaker": "A",
+              "text": "والنضارة كانت فين؟"
+            },
+            {
+              "index": 5,
+              "speaker": "B",
+              "text": "فوق التلاجة في المطبخ، بس خلي بالك تبعديها عن البوتاجاز."
+            },
+            {
+              "index": 6,
+              "speaker": "A",
+              "text": "أحمد قال هيزورني الجمعة الساعة ستة، صح؟"
+            },
+            {
+              "index": 7,
+              "speaker": "B",
+              "text": "أيوه، قال لي كده وهو نازل الصبح."
+            }
+          ],
+          "gold": {
+            "facts": [
+              {
+                "segment_index": 1,
+                "quote": "لأ يا حاجة فاطمة، لسه ما خدتش الفلوس منك. إنتِ قلتي هتديهالي النهارده.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "date",
+                    "value": "2026-11-04",
+                    "unit": null,
+                    "text": "النهارده"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "عم سيد"
+                  }
+                ]
+              },
+              {
+                "segment_index": 2,
+                "quote": "اتفضل 200 جنيه، هاتلي عيش ولبن.",
+                "speaker_is_patient": true,
+                "values": [
+                  {
+                    "kind": "money",
+                    "value": 200,
+                    "unit": "EGP",
+                    "text": "200 جنيه"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "عم سيد"
+                  }
+                ]
+              },
+              {
+                "segment_index": 3,
+                "quote": "هجيبهم قبل الساعة تلاتة الضهر.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "time",
+                    "value": "15:00",
+                    "unit": null,
+                    "text": "الساعة تلاتة الضهر"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "عم سيد"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "السوبرماركت"
+                  }
+                ]
+              },
+              {
+                "segment_index": 5,
+                "quote": "فوق التلاجة في المطبخ، بس خلي بالك تبعديها عن البوتاجاز.",
+                "speaker_is_patient": false,
+                "values": [],
+                "about": [
+                  {
+                    "kind": "object",
+                    "name": "النضارة"
+                  },
+                  {
+                    "kind": "object",
+                    "name": "البوتاجاز"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "البيت"
+                  }
+                ]
+              },
+              {
+                "segment_index": 7,
+                "quote": "أيوه، قال لي كده وهو نازل الصبح.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "time",
+                    "value": "09:00",
+                    "unit": null,
+                    "text": "الصبح"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "أحمد"
+                  }
+                ]
+              }
+            ],
+            "intentions": [
+              {
+                "holder": "other",
+                "description": "buy bread and milk for Fatma",
+                "segment_index": 3,
+                "quote": "هجيبهم قبل الساعة تلاتة الضهر.",
+                "due_at": null,
+                "due_until": "2026-11-04T15:00"
+              }
+            ],
+            "entities": [
+              {
+                "kind": "person",
+                "name": "عم سيد"
+              },
+              {
+                "kind": "person",
+                "name": "أحمد"
+              },
+              {
+                "kind": "object",
+                "name": "النضارة"
+              },
+              {
+                "kind": "object",
+                "name": "البوتاجاز"
+              },
+              {
+                "kind": "place",
+                "name": "البيت"
+              },
+              {
+                "kind": "place",
+                "name": "السوبرماركت"
+              }
+            ],
+            "settles": [
+              {
+                "intention_from": "S5-C1",
+                "description": "give Sayed 200 EGP to buy bread and groceries",
+                "status": "done",
+                "segment_index": 2,
+                "quote": "اتفضل 200 جنيه، هاتلي عيش ولبن."
+              }
+            ],
+            "traps": [
+              "The patient's question in segment 0 is not evidence that she paid Sayed yesterday.",
+              "Sayed's plan to buy groceries remains open until a later conversation confirms the shopping was completed.",
+              "The question about Ahmed's visit is not a new intention; the answer confirms the already stated Friday visit.",
+              "The glasses being on top of the refrigerator is a location fact, not evidence that they should be used near the stove."
+            ]
+          }
+        },
+        {
+          "id": "S5-C3",
+          "local_datetime": "2026-11-06T19:30",
+          "language": "mixed",
+          "speakers": {
+            "A": "Fatma (patient)",
+            "B": "Ahmed (son)",
+            "C": "Sara (daughter)"
+          },
+          "segments": [
+            {
+              "index": 0,
+              "speaker": "A",
+              "text": "يا أحمد، عم سيد جاب العيش واللبن ولا لسه؟"
+            },
+            {
+              "index": 1,
+              "speaker": "B",
+              "text": "أيوه يا ماما، جابهم امبارح قبل الساعة تلاتة، وأنا شفتهم في المطبخ."
+            },
+            {
+              "index": 2,
+              "speaker": "C",
+              "text": "Happy birthday, Youssef! جبتله كارت عليه رقم 10."
+            },
+            {
+              "index": 3,
+              "speaker": "A",
+              "text": "أنا كنت اديت عم سيد الفلوس النهارده؟"
+            },
+            {
+              "index": 4,
+              "speaker": "B",
+              "text": "إنتِ اديتيه 200 جنيه يوم الأربعاء، وهو جاب العيش واللبن بعدها."
+            },
+            {
+              "index": 5,
+              "speaker": "A",
+              "text": "طيب، علبة الدوا فين؟"
+            },
+            {
+              "index": 6,
+              "speaker": "C",
+              "text": "في الدرج اللي جنب السرير، والنضارة على الترابيزة في الصالة."
+            },
+            {
+              "index": 7,
+              "speaker": "A",
+              "text": "هكلم الدكتور سمير الأسبوع الجاي أسأله عن الجرعة، بس مش محددة يوم."
+            },
+            {
+              "index": 8,
+              "speaker": "B",
+              "text": "تمام، خلينا نكتبها في النوتس عشان نفتكر."
+            }
+          ],
+          "gold": {
+            "facts": [
+              {
+                "segment_index": 1,
+                "quote": "جابهم امبارح قبل الساعة تلاتة، وأنا شفتهم في المطبخ.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "date",
+                    "value": "2026-11-05",
+                    "unit": null,
+                    "text": "امبارح"
+                  },
+                  {
+                    "kind": "time",
+                    "value": "15:00",
+                    "unit": null,
+                    "text": "قبل الساعة تلاتة"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "عم سيد"
+                  },
+                  {
+                    "kind": "object",
+                    "name": "العيش"
+                  },
+                  {
+                    "kind": "object",
+                    "name": "اللبن"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "البيت"
+                  }
+                ]
+              },
+              {
+                "segment_index": 2,
+                "quote": "جبتله كارت عليه رقم 10.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "number",
+                    "value": 10,
+                    "unit": null,
+                    "text": "10"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "يوسف"
+                  },
+                  {
+                    "kind": "object",
+                    "name": "كارت عيد الميلاد"
+                  }
+                ]
+              },
+              {
+                "segment_index": 4,
+                "quote": "إنتِ اديتيه 200 جنيه يوم الأربعاء، وهو جاب العيش واللبن بعدها.",
+                "speaker_is_patient": false,
+                "values": [
+                  {
+                    "kind": "money",
+                    "value": 200,
+                    "unit": "EGP",
+                    "text": "200 جنيه"
+                  },
+                  {
+                    "kind": "date",
+                    "value": "2026-11-04",
+                    "unit": null,
+                    "text": "يوم الأربعاء"
+                  }
+                ],
+                "about": [
+                  {
+                    "kind": "person",
+                    "name": "عم سيد"
+                  },
+                  {
+                    "kind": "object",
+                    "name": "العيش"
+                  },
+                  {
+                    "kind": "object",
+                    "name": "اللبن"
+                  }
+                ]
+              },
+              {
+                "segment_index": 6,
+                "quote": "في الدرج اللي جنب السرير، والنضارة على الترابيزة في الصالة.",
+                "speaker_is_patient": false,
+                "values": [],
+                "about": [
+                  {
+                    "kind": "object",
+                    "name": "علبة الدوا"
+                  },
+                  {
+                    "kind": "object",
+                    "name": "النضارة"
+                  },
+                  {
+                    "kind": "place",
+                    "name": "البيت"
+                  }
+                ]
+              }
+            ],
+            "intentions": [
+              {
+                "holder": "patient",
+                "description": "call Dr. Samir next week to ask about the medication dose",
+                "segment_index": 7,
+                "quote": "هكلم الدكتور سمير الأسبوع الجاي أسأله عن الجرعة، بس مش محددة يوم.",
+                "due_at": "2026-11-09T12:00",
+                "due_until": null
+              }
+            ],
+            "entities": [
+              {
+                "kind": "person",
+                "name": "أحمد"
+              },
+              {
+                "kind": "person",
+                "name": "سارة"
+              },
+              {
+                "kind": "person",
+                "name": "يوسف"
+              },
+              {
+                "kind": "person",
+                "name": "عم سيد"
+              },
+              {
+                "kind": "person",
+                "name": "دكتور سمير"
+              },
+              {
+                "kind": "object",
+                "name": "علبة الدوا"
+              },
+              {
+                "kind": "object",
+                "name": "النضارة"
+              },
+              {
+                "kind": "object",
+                "name": "العيش"
+              },
+              {
+                "kind": "object",
+                "name": "اللبن"
+              },
+              {
+                "kind": "object",
+                "name": "كارت عيد الميلاد"
+              },
+              {
+                "kind": "place",
+                "name": "البيت"
+              }
+            ],
+            "settles": [
+              {
+                "intention_from": "S5-C2",
+                "description": "buy bread and milk for Fatma",
+                "status": "done",
+                "segment_index": 1,
+                "quote": "أيوه يا ماما، جابهم امبارح قبل الساعة تلاتة، وأنا شفتهم في المطبخ."
+              }
+            ],
+            "traps": [
+              "The patient's question about whether Sayed brought the groceries is not itself evidence; Ahmed's answer confirms completion.",
+              "The patient's question about whether she paid Sayed today is not a new money transaction.",
+              "The birthday greeting is small talk, but the card and its number are concrete information about Youssef's birthday card.",
+              "The doctor's call is a new open intention with no specific day or time; writing it in the notes is not proof that the call happened."
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
