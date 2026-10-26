@@ -18,6 +18,7 @@ from app.ai import fakes
 from app.ai.clients.embeddings import OpenAITextEmbedder, VoyageTextEmbedder
 from app.ai.clients.llm import GeminiLLM
 from app.ai.clients.stt import DeepgramSpeechToText
+from app.ai.inference.face_onnx import OnnxFaceEmbedder
 from app.ai.interfaces import (
     LLM,
     Captioner,
@@ -69,7 +70,7 @@ PROVIDERS: dict[str, dict[str, type]] = {
     "vision": {"fake": fakes.FakeVisionReviewer},
     "captioner": {"fake": fakes.FakeCaptioner},
     "llm": {"fake": fakes.FakeLLM, "gemini-flash": GeminiLLM},
-    "face": {"stub": fakes.StubFaceEmbedder},
+    "face": {"stub": fakes.StubFaceEmbedder, "mobilefacenet-onnx": OnnxFaceEmbedder},
 }
 
 

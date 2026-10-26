@@ -10,7 +10,7 @@ import math
 import random
 
 from app.ai.inference import face
-from app.ai.interfaces import Transcript, TranscriptSegment
+from app.ai.interfaces import Face, Transcript, TranscriptSegment
 from app.ai.review_contract import ReviewResult
 from app.models import FACE_DIM, TEXT_DIM
 
@@ -78,6 +78,10 @@ class StubFaceEmbedder:
 
     model_id = face.MODEL_VERSION
     dim = FACE_DIM
+
+    def faces(self, image: bytes) -> list[Face]:
+        # one "face" covering the whole photo: no detection in the stub
+        return [Face((0.0, 0.0, 1.0, 1.0), 1.0, (), face.embed_face(image))]
 
     def embed_face(self, image: bytes) -> list[float]:
         return face.embed_face(image)

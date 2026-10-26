@@ -23,6 +23,14 @@ class TranscriptSegment:
 
 
 @dataclass(frozen=True)
+class Face:
+    box: tuple[float, float, float, float]  # x1, y1, x2, y2 in the photo's pixels
+    score: float  # detector confidence
+    landmarks: tuple[tuple[float, float], ...]  # 5 points: eyes, nose, mouth corners
+    embedding: list[float]  # unit length, FACE_DIM
+
+
+@dataclass(frozen=True)
 class Transcript:
     text: str
     language: str  # "ar" | "en" | "mixed"
@@ -69,4 +77,10 @@ class FaceEmbedder(Protocol):
     model_id: str
     dim: int
 
-    def embed_face(self, image: bytes) -> list[float]: ...
+    def faces(self, image: bytes) -> list[Face]:
+        """Every face in the photo, most confident first, each embedded (8.2, 8.3)."""
+        ...
+
+    def embed_face(self, image: bytes) -> list[float]:
+        """The embedding of the most confident face."""
+        ...

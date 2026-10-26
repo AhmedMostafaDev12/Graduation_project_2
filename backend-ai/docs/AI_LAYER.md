@@ -32,7 +32,8 @@ app/ai/
 │   ├── vision.py     #   review(image) -> ReviewResult          (keep/discard + tags + OCR, spec D20)
 │   └── embeddings.py #   embed(texts) -> list[vector]           (Voyage voyage-4, 1024-d, spec D15; built in 7.3, Voyage since 0006)
 ├── inference/
-│   └── face.py       #   embed_face(image) -> vector(512)       (server-side face embedder for enrollment, spec D14; STUB 'stub-0' until Phase 8)
+│   ├── face.py       #   enrollment stub 'stub-0' (until 8.2 switches enrollment) + the glasses' wire format
+│   └── face_onnx.py  #   faces(image) -> [Face(box, landmarks, vector(512))]  (SCRFD + w600k_mbf, spec D14; built in 8.1)
 ├── memory/           # structured memory (§6.4, spec D40): consolidation + the five structures
 │   └── extract.py    #   facts, intentions, entities from a transcript: prompts, schemas, validation (7.5)
 ├── rag/
@@ -85,7 +86,7 @@ The vision prompt (Phase 7) must return `ReviewResult` from [`app/ai/review_cont
 | Facts + intentions from speech (D40) | `memory/extract.py` + `clients/llm.py` | task `memory.consolidate` (queue `ai_io`) |
 | Answer a question (`/assist`) | `rag/retriever.py` + `rag/answer.py` + `clients/llm.py` | request (user waiting) |
 | Daily summary (Phase 2) | `clients/llm.py` | Beat → task `summaries` |
-| Enrollment face embedding | `inference/face.py` | request |
+| Enrollment face embedding | `inference/face_onnx.py` (stub until 8.2) | request |
 | Unknown-face clustering | `clustering.py` | task `cluster` (queue `cpu`) |
 
 ---
@@ -102,7 +103,7 @@ The vision prompt (Phase 7) must return `ReviewResult` from [`app/ai/review_cont
 | `VisionReviewer` | `review(image, language) -> dict` (shaped by `review_contract`) | cloud vision model | Qwen2.5-VL |
 | `Captioner` | `caption(images, transcript, language) -> str` | cloud vision model | small VLM |
 | `LLM` | `complete(messages, json_schema=None) -> str` | Haiku / 4o-mini class | Qwen / Gemma via a local server |
-| `FaceEmbedder` | `embed_face(image) -> vector(512)` | MobileFaceNet ONNX (D14) | same |
+| `FaceEmbedder` | `faces(image) -> [Face]` (box, 5 landmarks, 512-d vector), `embed_face(image)` | InsightFace SCRFD + `w600k_mbf` ONNX (D14), `inference/face_onnx.py` | same |
 
 Every implementation exposes `model_id`, and anything it produces is stored with that id (for example, which model embedded an event).
 

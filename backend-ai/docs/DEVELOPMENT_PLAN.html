@@ -294,13 +294,14 @@ html{scroll-behavior:smooth}
 <section class="phase" id="p8" data-phase="p8">
   <div class="phase-head"><span class="num">Phase 8</span><h2>Media AI + face enrollment</h2><span class="ms">M6</span><span class="prog" data-prog="p8"></span></div>
   <div class="scroll"><table class="steps"><tbody>
-    <tr><td class="chk"><input type="checkbox" id="p8-1" aria-label="8.1 done"></td><td class="name">8.1 Face embedder</td><td class="det"><code>ai/inference/face.py</code>: the server-side face model (model file inside backend-ai, compatible with the edge per spec D14). Loaded once per process.</td></tr>
+    <tr><td class="chk"><input type="checkbox" id="p8-1" aria-label="8.1 done"></td><td class="name">8.1 Face embedder</td><td class="det"><code>ai/inference/face.py</code>: the server-side face model (model file inside backend-ai, compatible with the edge per spec D14). Loaded once per process. <b>Done:</b> <code>ai/inference/face_onnx.py</code>: InsightFace <code>buffalo_s</code> (SCRFD <code>det_500m</code> detector + <code>w600k_mbf</code>), numpy + Pillow only; matches InsightFace's reference code (cosine 0.9991). Files downloaded and SHA-256-checked at image build (<code>scripts/download_face_models.py</code>), loaded once per process; provider <code>mobilefacenet-onnx</code>. Research-only license (fine for the project).</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p8-2" aria-label="8.2 done"></td><td class="name">8.2 Enrollment</td><td class="det"><code>POST /people</code> computes embeddings, rejects photos with zero or several faces (C4 error state), and backfills seeded people.</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p8-3" aria-label="8.3 done"></td><td class="name">8.3 Task review</td><td class="det">Blur non-enrolled faces → <code>ai/clients/vision.py</code> → keep / discard / tags / OCR → <code>captured_documents</code> + retention (spec §7.4, §8).</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p8-4" aria-label="8.4 done"></td><td class="name">8.4 Task cluster</td><td class="det">Unknown encounters → <code>ai/clustering.py</code> → caregiver alert at 3 distinct days.</td></tr>
     <tr><td class="chk"><input type="checkbox" id="p8-5" aria-label="8.5 done"></td><td class="name">8.5 Consolidation from vision</td><td class="det">After <code>review</code>: <b>object sightings/states</b> and the <b>action log</b> from kept frames and frame vectors; entity index updated (spec D40, D41).</td></tr>
   </tbody></table></div>
   <div class="done"><b>Done when (M6):</b> enrolled people sync to the glasses with real embeddings, and photos and documents are reviewed for real.</div>
+  <div class="done"><b>Status (26 Oct 2026):</b> 8.1 done (the server face pipeline). Decided: face model files downloaded at image build from InsightFace's release (checked by SHA-256), onnxruntime as the only new library, Gemini Flash (paid) for photo review. <b>Next: 8.2</b> (real enrollment).</div>
 </section>
 
 <!-- Phase 9 -->
@@ -332,7 +333,6 @@ html{scroll-behavior:smooth}
     <thead><tr><th>When</th><th>Question</th></tr></thead>
     <tbody>
       <tr><td class="mono">Phase 0</td><td>EC2 instance size, and whether to resize or add swap before Phase 6</td></tr>
-      <tr><td class="mono">Phase 8</td><td>How the server's face model file gets onto EC2 (in the image, or downloaded from S3 at startup)</td></tr>
       <tr><td class="mono">Phase 4+</td><td>When to automate deploys (currently manual by choice)</td></tr>
       <tr><td class="mono">R, before start</td><td>Which LLM provider Abdelrahman uses for experiments, and a monthly spending cap</td></tr>
       <tr><td class="mono">R3</td><td>Time parsing: hand-written rules for Egyptian Arabic time phrases, or LLM extraction</td></tr>
