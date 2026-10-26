@@ -53,6 +53,7 @@ Decisions taken in the 2026-10-03 design session. **P** = product decision by th
 | D39 | **Answering with evidence:** free-form answers follow plan → up to 3 hybrid searches (now including frame embeddings) → evidence and premise check → answer with source events, or a kind "I'm not sure" when the evidence doesn't support every part of the question. The whole path fits the 20 s glasses fallback (§7.1). | P |
 | D40 | **Structured memory (three layers).** Layer 1 raw evidence (events, verbatim transcripts with speakers, kept frames, frame embeddings, OCR text); layer 2 **five structures** extracted by a consolidation job, every record linked to its evidence: object sightings/states, an action log (one row per action instance, never merged), facts (speaker + exact quote + typed numbers/dates), intentions (plan, due time, status done / not done / unknown + the evidence that settled it), and an entity index (every person, object, place seen or mentioned); layer 3 day/week summaries, never the only source of an answer. Answering routes by question type to the structures, then falls back to vector search; the premise check queries the entity index. Structures can be switched off for the flat-memory ablation (H6). Tables are specified contract-first in §6 before implementation. Suggesting reminders from intentions is a separate, later decision. | T |
 | D41 | **Memory contract (phase 7.0b) for D33, D34, D36, D40.** (1) **Two-tier frame memory:** the glasses embed every frame. Postgres keeps **scene segments** (a run of similar frames, cut where the novelty rule fires, at most 30 s) with **3 representative frame vectors** each (first, middle, most different; ~6 MB/day). **Every per-frame vector** goes to S3 as **hourly 8-bit files** (~30 MB/day, sent over the Wi-Fi burst and uploaded on Wi-Fi only). Retrieval is two-stage: segments find the candidate minutes, the hourly files re-rank every frame inside them. (2) Every kept frame carries `gate_rule`. (3) Non-speech sounds are `sound_detected` events. (4) Transcripts keep speaker-labelled segments in `events.metadata.segments`. (5) Five memory tables: `memory_entities`, `object_sightings`, `memory_actions`, `memory_facts`, `memory_intentions`, each row linked to its evidence and the `model_id` that extracted it. (6) Retention: segments and frame-vector files 90 days; structures like journal text, deleted with the evidence they came from (§8). | T |
+| D42 | **Capture gate additions (26 Oct 2026), extends D33.** (1) **Important-object rule:** a small YOLO-class detector, trained by the ml team on our own labelled glasses-view footage, for **keys, glasses, wallet, phone, pill box, stove**. It runs on **every** 1 fps frame on the Pi; if the hardware spike shows it doesn't fit next to the face models and the frame embedder, the input resolution is lowered, not the frame rate. Kept frames record `gate_rule = 'important_object'`. The detector's license is reviewed before choosing it (Ultralytics YOLO is AGPL-3.0; YOLOX-Nano and NanoDet are Apache 2.0). (2) **Look-back buffer:** the Pi keeps the last 30 s of frames in RAM. When any rule fires, it also keeps the **3–5 most different** of those frames (farthest apart by frame embedding, D34; fewer when the buffer is nearly static), with `gate_rule = 'lookback'` and the id of the trigger. Frames no rule claims leave the buffer and are dropped, as before. Why: the moment worth remembering (keys put down) often comes seconds before the trigger (the door click). | T |
 
 ---
 
@@ -120,7 +121,7 @@ Remori helps a person living with Alzheimer's recognize the people around them, 
 | On-device inference | TFLite / ONNX Runtime, INT8 |
 | Face detection | Ultra-Light-Fast-Generic-Face-Detector |
 | Face embedding | MobileFaceNet, InsightFace `w600k_mbf`, 512-d (D14) |
-| Capture gate | Gate v1 (D33): face · text · medication · novelty rules + stage-2 classifier + audio events; every frame also gets an on-device embedding (D34) |
+| Capture gate | Gate v1 (D33): face · text · medication · novelty rules + stage-2 classifier + audio events; important-object detector + 30 s look-back buffer (D42); every frame also gets an on-device embedding (D34) |
 | VAD | Silero VAD |
 | Intent classifier | Small log-mel CNN, push-to-talk utterance only (D17) |
 | Audio codec | Opus, 16 kbps mono |
@@ -374,7 +375,7 @@ media_assets (
   storage_key TEXT,                    -- private S3 key, never a public URL
   thumbnail_key TEXT NULLABLE,         -- ~320 px JPEG preview, NULL for videos (D28)
   trigger ENUM('encounter_keyframe','document_signal','salient_frame','user_requested'),
-  gate_rule ENUM('face','text','medication','novelty','audio_event','classifier','user_requested') NULLABLE, -- which gate rule kept it (D33)
+  gate_rule ENUM('face','text','medication','novelty','audio_event','classifier','important_object','lookback','user_requested') NULLABLE, -- which gate rule kept it (D33, D42)
   status ENUM('pending_review','confirmed','discarded'),
   ai_tags JSONB NULLABLE,              -- {category, tags[], reason, raw_category?} (D29)
   contains_other_people BOOLEAN NULLABLE,
@@ -625,7 +626,9 @@ The link uses LE Secure Connections bonding. **Video** goes over a Wi-Fi burst: 
 { "type": "document_detected", "id": "uuid", "suspected_type": "receipt|bill|medication_label|other",
   "media_ref": "img-458", "gate_rule": "text|medication", "at": "..." }
 { "type": "salient_frame_detected", "id": "uuid", "salience_score": 0.78, "media_ref": "img-459",
-  "gate_rule": "novelty|medication|audio_event|classifier", "at": "..." }
+  "gate_rule": "novelty|medication|audio_event|classifier|important_object|lookback", "at": "...",
+  "trigger_id": "uuid-or-null" }   // lookback only (D42): the id of the message whose rule fired;
+                                   // `at` is when this earlier frame was seen. The phone files it under the trigger's event
 // G->P scene segments (D34, D41): runs of similar frames (at most 30 s), each with 3 real frame vectors
 // (first, middle, most different), batched about every 60 s. Too big for `control`: they come on `bulk`.
 { "type": "scene_segments", "ids": ["uuid", "uuid"], "model_id": "mobileclip-s0@1.0", "dim": 512,
@@ -875,7 +878,7 @@ Ambient listening is the core feature, so it has to be defensible. Egyptian law 
 
 ## 12. Build order
 
-0. **Hardware spike (week 1, parallel):** Pi Zero 2W at 1 fps with detector + MobileFaceNet (FPS, RAM, °C, mA). Real BLE throughput Pi→Android with a 50 KB JPEG and Opus audio. Wi-Fi burst via `WifiNetworkSpecifier`. I²S mic + speaker + Piper Arabic. **The results may revise D7/D18.**
+0. **Hardware spike (week 1, parallel):** Pi Zero 2W at 1 fps with detector + MobileFaceNet + the important-object detector and the 30 s look-back buffer (D42), all on every frame (FPS, RAM, °C, mA). Real BLE throughput Pi→Android with a 50 KB JPEG and Opus audio. Wi-Fi burst via `WifiNetworkSpecifier`. I²S mic + speaker + Piper Arabic. **The results may revise D7/D18.**
 1. Scaffold the monorepo (§5). ✅ `backend&AI` renamed to `backend-ai`, CI added, `AGENTS.md` files written.
 2. `backend-ai`: schema (§6) via Alembic, FastAPI skeleton, auth + patient-link authorization. ✅ Done (email + password; API live since 12 Oct 2026).
 3. `backend-ai`: people/enrollment (shared face pipeline), events batch, reminders, places, delta sync.
