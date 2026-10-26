@@ -231,13 +231,15 @@ Build in the order the Flutter screens need them (spec §12: Caregiver Mode firs
 
 | Step | Details |
 |---|---|
-| 8.1 `ai/inference/face.py` | the server-side face embedder (model file inside backend-ai, per spec D14 compatibility with the edge). Loaded once per process |
+| 8.1 `ai/inference/face.py` | the server-side face embedder (model file inside backend-ai, per spec D14 compatibility with the edge). Loaded once per process. **Done:** `ai/inference/face_onnx.py`: InsightFace `buffalo_s` (SCRFD `det_500m` detector + `w600k_mbf`), numpy + Pillow only; matches InsightFace's reference code (cosine 0.9991). Files downloaded and SHA-256-checked at image build (`scripts/download_face_models.py`), loaded once per process; provider `mobilefacenet-onnx`. Research-only license (fine for the project) |
 | 8.2 Enrollment | `POST /people` now computes embeddings, rejects photos with zero or several faces (C4 error state), and backfills seeded people |
 | 8.3 Task `review` | blur non-enrolled faces → `ai/clients/vision.py` → keep/discard/tags/OCR → `captured_documents` + retention (spec §7.4, §8) |
 | 8.4 Task `cluster` | unknown encounters → `ai/clustering.py` → caregiver alert at 3 distinct days |
 | 8.5 Consolidation from vision | after `review`: **object sightings/states** and the **action log** from kept frames and frame embeddings; entity index updated (spec D40) |
 
 **Done when (M6):** enrolled people sync to the glasses with real embeddings, and photos and documents are reviewed for real.
+
+**Status (26 Oct 2026):** 8.1 done (the server face pipeline). Decided: face model files downloaded at image build from InsightFace's release (checked by SHA-256), onnxruntime as the only new library, Gemini Flash (paid) for photo review. **Next: 8.2** (real enrollment).
 
 ---
 
@@ -268,7 +270,6 @@ Build in the order the Flutter screens need them (spec §12: Caregiver Mode firs
 | When | Question |
 |---|---|
 | Phase 0 | EC2 instance size, and whether to resize or add swap before Phase 6 |
-| Phase 8 | How the server's face model file gets onto EC2 (in the image, or downloaded from S3 at startup) |
 | Phase 4+ | When to automate deploys (currently manual by choice) |
 | R, before start | Which LLM provider Abdelrahman uses for experiments, and a monthly spending cap |
 | R3 | Time parsing: hand-written rules for Egyptian Arabic time phrases, or LLM extraction |

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -44,6 +46,10 @@ class Settings(BaseSettings):
     deepgram_api_key: str | None = None
     openai_api_key: str | None = None
     voyage_api_key: str | None = None
+
+    # Face model files (spec D14): downloaded at image build by scripts/download_face_models.py.
+    # Locally: backend-ai/models (gitignored). Docker: /code/models.
+    face_models_dir: str = str(Path(__file__).resolve().parents[1] / "models")
     gemini_api_key: str | None = None
 
     @model_validator(mode="after")
