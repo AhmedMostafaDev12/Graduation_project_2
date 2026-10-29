@@ -18,6 +18,7 @@ from app.ai import fakes
 from app.ai.clients.embeddings import OpenAITextEmbedder, VoyageTextEmbedder
 from app.ai.clients.llm import GeminiLLM
 from app.ai.clients.stt import DeepgramSpeechToText
+from app.ai.clients.vision import GeminiVisionReviewer
 from app.ai.inference.face_onnx import OnnxFaceEmbedder
 from app.ai.interfaces import (
     LLM,
@@ -44,7 +45,7 @@ PROFILES: dict[str, dict[str, str]] = {
     "production": {
         "stt": "deepgram-nova-3",
         "text_embedder": "voyage-4",
-        "vision": "cloud-vision",
+        "vision": "gemini-flash",
         "captioner": "cloud-vision",
         "llm": "gemini-flash",
         "face": "mobilefacenet-onnx",
@@ -67,7 +68,7 @@ PROVIDERS: dict[str, dict[str, type]] = {
         "voyage-4": VoyageTextEmbedder,
         "openai-text-embedding-3-small": OpenAITextEmbedder,
     },
-    "vision": {"fake": fakes.FakeVisionReviewer},
+    "vision": {"fake": fakes.FakeVisionReviewer, "gemini-flash": GeminiVisionReviewer},
     "captioner": {"fake": fakes.FakeCaptioner},
     "llm": {"fake": fakes.FakeLLM, "gemini-flash": GeminiLLM},
     "face": {"stub": fakes.StubFaceEmbedder, "mobilefacenet-onnx": OnnxFaceEmbedder},

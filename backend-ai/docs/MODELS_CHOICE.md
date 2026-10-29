@@ -162,7 +162,7 @@ A 32-second WhatsApp voice note (two people, one voice much quieter; heavily com
 |---|---|---|---|
 | Speech-to-text | Deepgram Nova-3 `ar-EG` + diarization, volume boosted first | WhisperX (self-hosted) | **decided** (measured, §7); speaker separation still open |
 | LLM | Gemini Flash (`gemini-3.8-flash`, **paid tier**; `clients/llm.py`, phase 7.5) | Qwen3.8-27B via Groq | **decided for consolidation** (measured, §7.5); `/assist` open (Phase 9) |
-| Vision | Gemini Flash (paid) | Qwen2.5-VL | to confirm |
+| Vision | Gemini Flash (paid; `clients/vision.py`, phase 8.3) | Qwen2.5-VL | **decided, implemented** (checked on a portrait and a receipt: fields read right, ~7 s per photo; not measured on a test set yet) |
 | Text embeddings | Voyage `voyage-4`, 1024-d (`clients/embeddings.py`, migration 0006) | Qwen3-Embedding | **decided (D15, changed 26 Oct), implemented** |
 
 Keys go in `backend-ai/.env` locally and in the server's environment, **never in git**.

@@ -233,13 +233,13 @@ Build in the order the Flutter screens need them (spec §12: Caregiver Mode firs
 |---|---|
 | 8.1 `ai/inference/face.py` | the server-side face embedder (model file inside backend-ai, per spec D14 compatibility with the edge). Loaded once per process. **Done:** `ai/inference/face_onnx.py`: InsightFace `buffalo_s` (SCRFD `det_500m` detector + `w600k_mbf`), numpy + Pillow only; matches InsightFace's reference code (cosine 0.9991). Files downloaded and SHA-256-checked at image build (`scripts/download_face_models.py`), loaded once per process; provider `mobilefacenet-onnx`. Research-only license (fine for the project) |
 | 8.2 Enrollment | `POST /people` now computes embeddings, rejects photos with zero or several faces (C4 error state), and backfills seeded people. **Done:** every photo runs the face pipeline; `NO_FACE` / `MULTIPLE_FACES` per photo slot (C4 "Photo 3: no face found"; faces under a quarter of the main face's width are background), real embedding + model version stored. No seeded people have photos, so the backfill is task `faces.reembed_stub`: run once after deploy, it re-embeds `stub-0` photos and reports people whose photos need a retake |
-| 8.3 Task `review` | blur non-enrolled faces → `ai/clients/vision.py` → keep/discard/tags/OCR → `captured_documents` + retention (spec §7.4, §8) |
+| 8.3 Task `review` | blur non-enrolled faces → `ai/clients/vision.py` → keep/discard/tags/OCR → `captured_documents` + retention (spec §7.4, §8). **Done:** `services/review_service.py`: faces matching no enrolled person (cosine < 0.40) are pixelated before the photo leaves the server; one Gemini Flash call (`clients/vision.py`, prompt `vision_review.v1`) returns the D29 contract + room/objects/actions (kept in `events.metadata.vision` for 8.5); discard → files deleted, document → `captured_documents`, other people → `auto_expire` 30 days, the event re-embedded with the new tags. Tasks `review.media` (queued after upload) and `review.backfill` (every 10 min). Needs the `cloud_processing` consent |
 | 8.4 Task `cluster` | unknown encounters → `ai/clustering.py` → caregiver alert at 3 distinct days |
 | 8.5 Consolidation from vision | after `review`: **object sightings/states** and the **action log** from kept frames and frame embeddings; entity index updated (spec D40) |
 
 **Done when (M6):** enrolled people sync to the glasses with real embeddings, and photos and documents are reviewed for real.
 
-**Status (26 Oct 2026):** 8.1 done (the server face pipeline), 8.2 done (real enrollment, `faces.reembed_stub`). Decided: face model files downloaded at image build from InsightFace's release (checked by SHA-256), onnxruntime as the only new library, Gemini Flash (paid) for photo review. **Next: 8.3** (photo review: blur unknown faces → Gemini).
+**Status (26 Oct 2026):** 8.1 done (the server face pipeline), 8.2 done (real enrollment, `faces.reembed_stub`), 8.3 done (photo review). Decided: face model files downloaded at image build from InsightFace's release (checked by SHA-256), onnxruntime as the only new library, Gemini Flash (paid) for photo review. **Next: 8.4** (unknown-face clustering).
 
 ---
 
