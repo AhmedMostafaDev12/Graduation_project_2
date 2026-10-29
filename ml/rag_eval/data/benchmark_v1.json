@@ -1,0 +1,306 @@
+{
+  "description": "RAG benchmark v1, dev slice: 10 questions over synthetic_days.json (record format: docs/RESEARCH_PLAN.md §6.3). LLM-drafted, not yet verified. evidence_event_ids and expected_plan are dev-set additions for scoring the query planner.",
+  "days_file": "synthetic_days.json",
+  "questions": [
+    {
+      "id": "Q-001",
+      "session": "D1",
+      "split": "dev",
+      "category": "object_location",
+      "question_ar": "الشال البني اللي جابته سارة امبارح حطته فين؟",
+      "question_en": "Where did Sara put the brown shawl she brought yesterday?",
+      "language": "ar",
+      "asked_at": "2026-11-02T21:00",
+      "answerable": true,
+      "false_premise": false,
+      "multi_moment": false,
+      "evidence": [
+        {"event_id": "d0-e03", "note": "Sara says she put the brown shawl in the big wardrobe, second shelf"}
+      ],
+      "evidence_event_ids": ["d0-e03"],
+      "expected_plan": {
+        "window_start": "2026-11-01T00:00",
+        "window_end": "2026-11-02T00:00",
+        "person_ids": ["p-sara"],
+        "event_types": null
+      },
+      "involves_person": true,
+      "people": ["p-sara"],
+      "reference_open_answer": "سارة حطته في الدولاب الكبير، في الرف التاني",
+      "safety_weight": 1,
+      "author": "claude-draft",
+      "llm_drafted": true,
+      "verified_by": ["abdelrahman"]
+    },
+    {
+      "id": "Q-002",
+      "session": "D1",
+      "split": "dev",
+      "category": "intent_recall",
+      "question_ar": "أنا خدت حباية السكر النهارده؟",
+      "question_en": "Did I take my diabetes pill today?",
+      "language": "ar",
+      "asked_at": "2026-11-02T21:00",
+      "answerable": true,
+      "false_premise": false,
+      "multi_moment": false,
+      "evidence": [
+        {"event_id": "d1-e14", "note": "evening diabetes-pill reminder at 20:00 is missed: never confirmed"}
+      ],
+      "evidence_event_ids": ["d1-e14"],
+      "expected_plan": {
+        "window_start": "2026-11-02T00:00",
+        "window_end": "2026-11-02T21:00",
+        "person_ids": [],
+        "event_types": ["reminder"]
+      },
+      "involves_person": false,
+      "people": [],
+      "reference_open_answer": "مفيش تأكيد إنك خدتي حباية السكر. التذكير فات الساعة 8 من غير ما يتأكد. اسألي أحمد أو منى قبل ما تاخديها.",
+      "safety_weight": 2,
+      "author": "claude-draft",
+      "llm_drafted": true,
+      "verified_by": ["abdelrahman"]
+    },
+    {
+      "id": "Q-003",
+      "session": "D1",
+      "split": "dev",
+      "category": "intent_recall",
+      "question_ar": "ميعاد دكتور هاني امتى؟",
+      "question_en": "When is my appointment with Dr. Hany?",
+      "language": "ar",
+      "asked_at": "2026-11-02T21:00",
+      "answerable": true,
+      "false_premise": false,
+      "multi_moment": true,
+      "evidence": [
+        {"event_id": "d1-e03", "note": "Mona says Dr. Hany wants to see her Thursday at 6"},
+        {"event_id": "d1-e07", "note": "Ahmed says he will pick her up Thursday at 5 to go to Dr. Hany"}
+      ],
+      "evidence_event_ids": ["d1-e03", "d1-e07"],
+      "expected_plan": {
+        "window_start": null,
+        "window_end": "2026-11-02T21:00",
+        "person_ids": [],
+        "event_types": ["conversation_segment"]
+      },
+      "involves_person": true,
+      "people": ["p-hany", "p-mona", "p-ahmed"],
+      "reference_open_answer": "يوم الخميس الساعة 6، وأحمد هيعدي عليكي الساعة 5",
+      "safety_weight": 1,
+      "author": "claude-draft",
+      "llm_drafted": true,
+      "verified_by": ["abdelrahman"]
+    },
+    {
+      "id": "Q-004",
+      "session": "D1",
+      "split": "dev",
+      "category": "conversational",
+      "question_ar": "أحمد قالي إيه النهارده؟",
+      "question_en": "What did Ahmed tell me today?",
+      "language": "ar",
+      "asked_at": "2026-11-02T12:00",
+      "answerable": true,
+      "false_premise": false,
+      "multi_moment": false,
+      "evidence": [
+        {"event_id": "d1-e07", "note": "Ahmed: Thursday at 5 to Dr. Hany; spare key with Umm Mohamed"}
+      ],
+      "evidence_event_ids": ["d1-e07"],
+      "expected_plan": {
+        "window_start": "2026-11-02T00:00",
+        "window_end": "2026-11-02T12:00",
+        "person_ids": ["p-ahmed"],
+        "event_types": ["conversation_segment"]
+      },
+      "involves_person": true,
+      "people": ["p-ahmed"],
+      "reference_open_answer": "قالك إنه هيعدي عليكي الخميس الساعة 5 عشان تروحوا لدكتور هاني، وإن المفتاح الاحتياطي مع أم محمد جارتكم",
+      "safety_weight": 1,
+      "author": "claude-draft",
+      "llm_drafted": true,
+      "verified_by": ["abdelrahman"]
+    },
+    {
+      "id": "Q-005",
+      "session": "D1",
+      "split": "dev",
+      "category": "in_context_retrieval",
+      "question_ar": "منى قالتلي إيه عن الضغط الصبح؟",
+      "question_en": "What did Mona tell me about my blood pressure this morning?",
+      "language": "ar",
+      "asked_at": "2026-11-02T10:00",
+      "answerable": true,
+      "false_premise": false,
+      "multi_moment": false,
+      "evidence": [
+        {"event_id": "d1-e03", "note": "Mona: 140 over 90, a bit higher than yesterday, cut down on salt"}
+      ],
+      "evidence_event_ids": ["d1-e03"],
+      "expected_plan": {
+        "window_start": "2026-11-02T05:00",
+        "window_end": "2026-11-02T10:00",
+        "person_ids": ["p-mona"],
+        "event_types": ["conversation_segment"]
+      },
+      "involves_person": true,
+      "people": ["p-mona"],
+      "reference_open_answer": "قالتلك الضغط 140 على 90، أعلى شوية من امبارح، وقللي الملح",
+      "safety_weight": 1,
+      "author": "claude-draft",
+      "llm_drafted": true,
+      "verified_by": ["abdelrahman"]
+    },
+    {
+      "id": "Q-006",
+      "session": "D1",
+      "split": "dev",
+      "category": "timeline",
+      "question_ar": "مين جالي النهارده وبالترتيب؟",
+      "question_en": "Who came to see me today, and in what order?",
+      "language": "en",
+      "asked_at": "2026-11-02T21:00",
+      "answerable": true,
+      "false_premise": false,
+      "multi_moment": true,
+      "evidence": [
+        {"event_id": "d1-e02", "note": "Mona (nurse) visits 09:10-09:50"},
+        {"event_id": "d1-e06", "note": "Ahmed (son) visits 11:15-11:55"}
+      ],
+      "evidence_event_ids": ["d1-e02", "d1-e06"],
+      "expected_plan": {
+        "window_start": "2026-11-02T00:00",
+        "window_end": "2026-11-02T21:00",
+        "person_ids": [],
+        "event_types": ["encounter"]
+      },
+      "involves_person": true,
+      "people": ["p-mona", "p-ahmed"],
+      "reference_open_answer": "منى الممرضة جت الساعة 9 وعشرة، وبعدين أحمد الساعة 11 وربع",
+      "safety_weight": 1,
+      "author": "claude-draft",
+      "llm_drafted": true,
+      "verified_by": ["abdelrahman"]
+    },
+    {
+      "id": "Q-007",
+      "session": "D1",
+      "split": "dev",
+      "category": "visual_recall",
+      "question_ar": "دفعت كام في الصيدلية النهارده؟",
+      "question_en": "How much did I pay at the pharmacy today?",
+      "language": "en",
+      "asked_at": "2026-11-02T21:00",
+      "answerable": true,
+      "false_premise": false,
+      "multi_moment": false,
+      "evidence": [
+        {"event_id": "d1-e12", "note": "receipt photo: El Ezaby pharmacy, total 245 EGP"}
+      ],
+      "evidence_event_ids": ["d1-e12"],
+      "expected_plan": {
+        "window_start": "2026-11-02T00:00",
+        "window_end": "2026-11-02T21:00",
+        "person_ids": [],
+        "event_types": ["document_captured"]
+      },
+      "involves_person": false,
+      "people": [],
+      "reference_open_answer": "245 جنيه في صيدلية العزبي",
+      "safety_weight": 1,
+      "author": "claude-draft",
+      "llm_drafted": true,
+      "verified_by": ["abdelrahman"]
+    },
+    {
+      "id": "Q-008",
+      "session": "D1",
+      "split": "dev",
+      "category": "intent_recall",
+      "question_ar": "كنت ناوية أكلم سارة، كلمتها؟",
+      "question_en": "I planned to call Sara. Did I?",
+      "language": "ar",
+      "asked_at": "2026-11-02T21:00",
+      "answerable": true,
+      "false_premise": false,
+      "multi_moment": false,
+      "evidence": [
+        {"event_id": "d1-e08", "note": "Fatma says she will call Sara tonight; no later contact with Sara"}
+      ],
+      "evidence_event_ids": ["d1-e08"],
+      "expected_plan": {
+        "window_start": "2026-11-02T00:00",
+        "window_end": "2026-11-02T21:00",
+        "person_ids": [],
+        "event_types": null
+      },
+      "involves_person": true,
+      "people": ["p-sara"],
+      "reference_open_answer": "قلتي النهارده إنك هتكلميها بالليل، ومفيش في ذاكرتي إنك كلمتيها.",
+      "safety_weight": 1,
+      "author": "claude-draft",
+      "llm_drafted": true,
+      "verified_by": ["abdelrahman"]
+    },
+    {
+      "id": "Q-009",
+      "session": "D1",
+      "split": "dev",
+      "category": "timeline",
+      "question_ar": "سارة جت الساعة كام النهارده؟",
+      "question_en": "What time did Sara come today?",
+      "language": "ar",
+      "asked_at": "2026-11-02T21:00",
+      "answerable": true,
+      "false_premise": true,
+      "multi_moment": false,
+      "evidence": [
+        {"event_id": "d0-e02", "note": "Sara visited yesterday 11:00-11:40, not today"}
+      ],
+      "evidence_event_ids": ["d0-e02"],
+      "expected_plan": {
+        "window_start": null,
+        "window_end": "2026-11-02T21:00",
+        "person_ids": ["p-sara"],
+        "event_types": ["encounter"]
+      },
+      "involves_person": true,
+      "people": ["p-sara"],
+      "reference_open_answer": "سارة مجتش النهارده، هي جت امبارح الساعة 11",
+      "safety_weight": 1,
+      "author": "claude-draft",
+      "llm_drafted": true,
+      "verified_by": ["abdelrahman"]
+    },
+    {
+      "id": "Q-010",
+      "session": "D1",
+      "split": "dev",
+      "category": "conversational",
+      "question_ar": "دكتور هاني كلمني النهارده؟",
+      "question_en": "Did Dr. Hany call me today?",
+      "language": "en",
+      "asked_at": "2026-11-02T21:00",
+      "answerable": false,
+      "false_premise": false,
+      "multi_moment": false,
+      "evidence": [],
+      "evidence_event_ids": [],
+      "expected_plan": {
+        "window_start": "2026-11-02T00:00",
+        "window_end": "2026-11-02T21:00",
+        "person_ids": ["p-hany"],
+        "event_types": null
+      },
+      "involves_person": true,
+      "people": ["p-hany"],
+      "reference_open_answer": "مفيش في ذاكرتي إن ده حصل",
+      "safety_weight": 1,
+      "author": "claude-draft",
+      "llm_drafted": true,
+      "verified_by": ["abdelrahman"]
+    }
+  ]
+}
