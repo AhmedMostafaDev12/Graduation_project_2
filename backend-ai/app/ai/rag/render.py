@@ -88,9 +88,9 @@ _AR = {
     "query_empty": "{t} سألت سؤال",
     "med": {
         "completed": "{t} خدت الدوا",
-        "missed": "{t} ما خدتش الدوا",
+        "missed": "{t} فات ميعاد الدوا من غير تأكيد",
         "snoozed": "{t} أجلت الدوا",
-        "pending": "{t} لسه ما خدتش الدوا",
+        "pending": "{t} ميعاد الدوا لسه ما اتأكدش",
         None: "{t} تذكير الدوا",
     },
     "reminder": {
@@ -149,9 +149,9 @@ _EN = {
     "query_empty": "{t} asked a question",
     "med": {
         "completed": "{t} took medication",
-        "missed": "{t} did not take medication",
+        "missed": "{t} medication was due, no confirmation it was taken",
         "snoozed": "{t} postponed medication",
-        "pending": "{t} medication not taken yet",
+        "pending": "{t} medication due, not confirmed yet",
         None: "{t} medication reminder",
     },
     "reminder": {
