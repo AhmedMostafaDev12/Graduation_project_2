@@ -29,7 +29,7 @@ app/ai/
 ├── clients/          # real providers, one module per capability, each implementing its interface
 │   ├── stt.py        #   transcribe(audio) -> Transcript       (Deepgram Nova-3, ar-EG + speaker labels, D36)
 │   ├── llm.py        #   complete(messages, json_schema) -> text (Gemini Flash, paid tier; built in 7.5)
-│   ├── vision.py     #   review(image) -> ReviewResult          (keep/discard + tags + OCR, spec D20)
+│   ├── vision.py     #   review(image) -> ReviewResult          (Gemini Flash: keep/discard + tags + OCR + room/objects/actions, spec D20, D29; built in 8.3)
 │   └── embeddings.py #   embed(texts) -> list[vector]           (Voyage voyage-4, 1024-d, spec D15; built in 7.3, Voyage since 0006)
 ├── inference/
 │   ├── face.py       #   enrollment stub 'stub-0' (until 8.2 switches enrollment) + the glasses' wire format
@@ -41,7 +41,7 @@ app/ai/
 │   ├── retriever.py  #   SQL time window + person filter, then pgvector ranking (spec D22)
 │   └── answer.py     #   build prompt from top-k events, call llm, return answer + source_event_ids (STUB: fixed answer until 9.1)
 ├── clustering.py     #   assign an unknown embedding to the nearest cluster (spec D23)
-└── prompts/          #   *.txt templates, versioned (memory_extract.v1.txt, memory_settle.v1.txt)
+└── prompts/          #   *.txt templates, versioned (memory_extract.v1.txt, memory_settle.v1.txt, vision_review.v1.txt)
 ```
 
 ---
@@ -81,7 +81,7 @@ The vision prompt (Phase 7) must return `ReviewResult` from [`app/ai/review_cont
 | Feature (spec) | Client / module | Runs in |
 |---|---|---|
 | Transcribe speech segments (§7.3) | `clients/stt.py` | task `transcribe` (queue `ai_io`) |
-| Smart review + OCR (§7.4) | `clients/vision.py`, output shape in `review_contract.py` | task `review` (queue `ai_io`) |
+| Smart review + OCR (§7.4) | `services/review_service.py` (blur strangers) + `clients/vision.py`, output shape in `review_contract.py` | task `review.media` (queue `ai_io`) |
 | Embed events for RAG | `rag/render.py` + `clients/embeddings.py` | task `embed` (queue `ai_io`) |
 | Facts + intentions from speech (D40) | `memory/extract.py` + `clients/llm.py` | task `memory.consolidate` (queue `ai_io`) |
 | Answer a question (`/assist`) | `rag/retriever.py` + `rag/answer.py` + `clients/llm.py` | request (user waiting) |

@@ -131,7 +131,8 @@ def complete_upload(
         db.commit()
         # rule 1: enqueue only after the commit, so the worker finds the row
         _enqueue_thumbnail(asset.id)
-        # Phase 7: enqueue review(asset) here when pending_review
+        if asset.status == "pending_review" and asset.asset_type == "image":
+            _enqueue_review(asset.id)
     return UploadDone(id=upload_id, kind="media", status=asset.status)
 
 
@@ -144,6 +145,17 @@ def _enqueue_thumbnail(media_id: uuid.UUID) -> None:
         make_thumbnail.delay(str(media_id))  # IDs only (rule 2)
     except (KombuOperationalError, RedisError):
         logger.warning("thumbnail not queued; the backfill sweep will retry")
+
+
+def _enqueue_review(media_id: uuid.UUID) -> None:
+    """Never fails the upload: if Redis is down, the review.backfill sweep picks the photo
+    up later (phase 8.3)."""
+    from app.workers.tasks.review import review_media
+
+    try:
+        review_media.delay(str(media_id))  # IDs only (rule 2)
+    except (KombuOperationalError, RedisError):
+        logger.warning("review not queued; the backfill sweep will retry")
 
 
 def _enqueue_transcription(segment_id: uuid.UUID) -> None:

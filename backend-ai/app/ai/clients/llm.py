@@ -55,33 +55,36 @@ class GeminiLLM:
             body["generationConfig"]["responseMimeType"] = "application/json"
             body["generationConfig"]["responseJsonSchema"] = json_schema
 
-        try:
-            response = httpx.post(
-                GEMINI_URL,
-                headers={"x-goog-api-key": self.api_key},
-                json=body,
-                timeout=self.timeout_s,
-            )
-        except (httpx.TimeoutException, httpx.TransportError) as exc:
-            raise TransientError(f"Gemini unreachable: {type(exc).__name__}") from exc
+        return generate(self.api_key, body, self.timeout_s)
 
-        if response.status_code == 429 or response.status_code >= 500:
-            raise TransientError(f"Gemini returned {response.status_code}")
-        if response.status_code >= 400:
-            # the body is Google's error message, never our prompt
-            raise LLMError(
-                f"Gemini rejected the request ({response.status_code}): {response.text[:200]}"
-            )
 
-        candidates = response.json().get("candidates") or []
-        if not candidates:
-            raise LLMError(
-                "Gemini returned no answer (the prompt may have been blocked)"
-            )
-        candidate = candidates[0]
-        parts = (candidate.get("content") or {}).get("parts") or []
-        text = "".join(p.get("text", "") for p in parts)
-        if not text:
-            reason = candidate.get("finishReason", "unknown")
-            raise LLMError(f"Gemini returned an empty answer (finishReason {reason})")
-        return text
+def generate(api_key: str, body: dict, timeout_s: float) -> str:
+    """One generateContent call → the answer's text (shared with clients/vision.py)."""
+    try:
+        response = httpx.post(
+            GEMINI_URL,
+            headers={"x-goog-api-key": api_key},
+            json=body,
+            timeout=timeout_s,
+        )
+    except (httpx.TimeoutException, httpx.TransportError) as exc:
+        raise TransientError(f"Gemini unreachable: {type(exc).__name__}") from exc
+
+    if response.status_code == 429 or response.status_code >= 500:
+        raise TransientError(f"Gemini returned {response.status_code}")
+    if response.status_code >= 400:
+        # the body is Google's error message, never our prompt
+        raise LLMError(
+            f"Gemini rejected the request ({response.status_code}): {response.text[:200]}"
+        )
+
+    candidates = response.json().get("candidates") or []
+    if not candidates:
+        raise LLMError("Gemini returned no answer (the prompt may have been blocked)")
+    candidate = candidates[0]
+    parts = (candidate.get("content") or {}).get("parts") or []
+    text = "".join(p.get("text", "") for p in parts)
+    if not text:
+        reason = candidate.get("finishReason", "unknown")
+        raise LLMError(f"Gemini returned an empty answer (finishReason {reason})")
+    return text
