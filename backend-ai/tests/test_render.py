@@ -202,12 +202,12 @@ def test_generic_reminder():
         (
             "ar",
             "09:15 خدت الدوا: حباية الضغط (اتأكد بالصوت)",
-            "09:15 ما خدتش الدوا: حباية الضغط",
+            "09:15 فات ميعاد الدوا من غير تأكيد: حباية الضغط",
         ),
         (
             "en",
             "09:15 took medication: Blood pressure pill (confirmed by voice)",
-            "09:15 did not take medication: Blood pressure pill",
+            "09:15 medication was due, no confirmation it was taken: Blood pressure pill",
         ),
     ],
 )
@@ -238,6 +238,25 @@ def test_medication_statuses_are_all_distinct(lang):
         for s in ("completed", "missed", "snoozed", "pending", None)
     }
     assert len(sentences) == 5
+
+
+@pytest.mark.parametrize("lang", ["ar", "en"])
+def test_medication_never_claims_dose_not_taken(lang):
+    """missed/pending only mean "not confirmed": saying "not taken" could cause a double dose."""
+    title = "حباية الضغط" if lang == "ar" else "Blood pressure pill"
+    for status in ("completed", "missed", "snoozed", "pending", None):
+        for extra in ({}, {"reminder_title": title, "reminder_confirmed_via": "app"}):
+            sentence = render_event(
+                make(
+                    "reminder",
+                    lang,
+                    reminder_type="medication",
+                    reminder_status=status,
+                    **extra,
+                )
+            )
+            for claim in ("ما خدتش", "did not take", "not taken"):
+                assert claim not in sentence
 
 
 def test_mind_game_unknown_type_and_no_score():
