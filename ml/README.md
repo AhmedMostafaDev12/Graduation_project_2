@@ -17,6 +17,7 @@ ml/
 │                    # evaluation (FAR/FRR, threshold choice), export of MobileFaceNet w600k_mbf to ONNX/INT8
 ├── intent/          # push-to-talk intent classifier (spec D17): dataset scripts, training, export
 ├── capture_gate/    # gate v1 tuning + stage-2 classifier training on the dev set (spec D33)
+│   └── important_objects/  # small-object detector for the Pi (spec D42): training guide in its README
 ├── edge/            # the EDGE ENGINE (D38): gate rules, frame embedder, audio events; light, runs on the Pi
 ├── replay/          # research: replay harness + baselines (docs/RESEARCH_PLAN.md)
 ├── rag_eval/        # question/answer evaluation sets for the RAG pipeline
