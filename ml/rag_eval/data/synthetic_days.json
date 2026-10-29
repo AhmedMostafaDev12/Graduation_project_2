@@ -1,0 +1,226 @@
+{
+  "description": "Two synthetic journal days for the RAG evaluation (track R1, first slice). Fictional people, generated text. Fields map 1:1 to backend-ai RenderInput; person_id / metadata.present_person_ids refer to the people list.",
+  "timezone": "Africa/Cairo",
+  "patient": {"name": "Fatma", "language": "ar"},
+  "people": [
+    {"id": "p-ahmed", "name": "أحمد", "relationship": "ابن"},
+    {"id": "p-mona", "name": "منى", "relationship": "ممرضة"},
+    {"id": "p-sara", "name": "سارة", "relationship": "بنت"},
+    {"id": "p-hany", "name": "هاني", "relationship": "دكتور"}
+  ],
+  "days": [
+    {
+      "session": "D0",
+      "date": "2026-11-01",
+      "events": [
+        {
+          "id": "d0-e01",
+          "event_type": "reminder",
+          "local_datetime": "2026-11-01T08:30",
+          "reminder_title": "دوا الضغط",
+          "reminder_type": "medication",
+          "reminder_status": "completed",
+          "reminder_confirmed_via": "voice"
+        },
+        {
+          "id": "d0-e02",
+          "event_type": "encounter",
+          "local_datetime": "2026-11-01T11:00",
+          "local_end": "2026-11-01T11:40",
+          "person_id": "p-sara",
+          "place_name": "البيت"
+        },
+        {
+          "id": "d0-e03",
+          "event_type": "conversation_segment",
+          "local_datetime": "2026-11-01T11:05",
+          "local_end": "2026-11-01T11:07",
+          "event_language": "ar",
+          "place_name": "البيت",
+          "transcript_text": "جبتلك الشال البني اللي كنتي عايزاه، حطيته في الدولاب الكبير في الرف التاني. تسلم إيدك يا حبيبتي.",
+          "metadata": {
+            "present_person_ids": ["p-sara"],
+            "segments": [
+              {"speaker": "A", "text": "جبتلك الشال البني اللي كنتي عايزاه، حطيته في الدولاب الكبير في الرف التاني."},
+              {"speaker": "B", "text": "تسلم إيدك يا حبيبتي."}
+            ]
+          }
+        },
+        {
+          "id": "d0-e04",
+          "event_type": "mind_game_session",
+          "local_datetime": "2026-11-01T17:10",
+          "game_type": "card_match",
+          "game_score": 8
+        },
+        {
+          "id": "d0-e05",
+          "event_type": "reminder",
+          "local_datetime": "2026-11-01T20:00",
+          "reminder_title": "حباية السكر",
+          "reminder_type": "medication",
+          "reminder_status": "completed",
+          "reminder_confirmed_via": "app"
+        }
+      ]
+    },
+    {
+      "session": "D1",
+      "date": "2026-11-02",
+      "events": [
+        {
+          "id": "d1-e01",
+          "event_type": "reminder",
+          "local_datetime": "2026-11-02T08:30",
+          "reminder_title": "دوا الضغط",
+          "reminder_type": "medication",
+          "reminder_status": "completed",
+          "reminder_confirmed_via": "voice"
+        },
+        {
+          "id": "d1-e02",
+          "event_type": "encounter",
+          "local_datetime": "2026-11-02T09:10",
+          "local_end": "2026-11-02T09:50",
+          "person_id": "p-mona",
+          "place_name": "البيت"
+        },
+        {
+          "id": "d1-e03",
+          "event_type": "conversation_segment",
+          "local_datetime": "2026-11-02T09:15",
+          "local_end": "2026-11-02T09:17",
+          "event_language": "ar",
+          "place_name": "البيت",
+          "transcript_text": "الضغط النهارده 140 على 90، أعلى شوية من امبارح. قللي الملح، ودكتور هاني عايز يشوفك يوم الخميس الساعة 6. حاضر.",
+          "metadata": {
+            "present_person_ids": ["p-mona"],
+            "segments": [
+              {"speaker": "A", "text": "الضغط النهارده 140 على 90، أعلى شوية من امبارح."},
+              {"speaker": "A", "text": "قللي الملح، ودكتور هاني عايز يشوفك يوم الخميس الساعة 6."},
+              {"speaker": "B", "text": "حاضر."}
+            ]
+          }
+        },
+        {
+          "id": "d1-e04",
+          "event_type": "conversation_segment",
+          "local_datetime": "2026-11-02T09:40",
+          "local_end": "2026-11-02T09:41",
+          "event_language": "ar",
+          "place_name": "البيت",
+          "transcript_text": "النضارة بتاعتك حطيتها في درج الكومودينو جنب السرير. ماشي، شكرا يا منى.",
+          "metadata": {
+            "present_person_ids": ["p-mona"],
+            "segments": [
+              {"speaker": "A", "text": "النضارة بتاعتك حطيتها في درج الكومودينو جنب السرير."},
+              {"speaker": "B", "text": "ماشي، شكرا يا منى."}
+            ]
+          }
+        },
+        {
+          "id": "d1-e05",
+          "event_type": "document_captured",
+          "local_datetime": "2026-11-02T10:30",
+          "document_type": "medication_label",
+          "document_fields": {
+            "medication_name": "Concor",
+            "strength": "5 mg",
+            "instructions": "قرص واحد الصبح بعد الفطار"
+          },
+          "media_type": "image"
+        },
+        {
+          "id": "d1-e06",
+          "event_type": "encounter",
+          "local_datetime": "2026-11-02T11:15",
+          "local_end": "2026-11-02T11:55",
+          "person_id": "p-ahmed",
+          "place_name": "البيت"
+        },
+        {
+          "id": "d1-e07",
+          "event_type": "conversation_segment",
+          "local_datetime": "2026-11-02T11:20",
+          "local_end": "2026-11-02T11:22",
+          "event_language": "ar",
+          "place_name": "البيت",
+          "transcript_text": "يا ماما هعدي عليكي الخميس الساعة 5 ونروح لدكتور هاني سوا. والمفتاح الاحتياطي سبته مع أم محمد جارتنا. طيب يا حبيبي.",
+          "metadata": {
+            "present_person_ids": ["p-ahmed"],
+            "segments": [
+              {"speaker": "A", "text": "يا ماما هعدي عليكي الخميس الساعة 5 ونروح لدكتور هاني سوا."},
+              {"speaker": "A", "text": "والمفتاح الاحتياطي سبته مع أم محمد جارتنا."},
+              {"speaker": "B", "text": "طيب يا حبيبي."}
+            ]
+          }
+        },
+        {
+          "id": "d1-e08",
+          "event_type": "conversation_segment",
+          "local_datetime": "2026-11-02T11:50",
+          "local_end": "2026-11-02T11:51",
+          "event_language": "ar",
+          "place_name": "البيت",
+          "transcript_text": "هكلم سارة بالليل أطمن عليها. ماشي يا ماما، سلميلي عليها.",
+          "metadata": {
+            "present_person_ids": ["p-ahmed"],
+            "segments": [
+              {"speaker": "B", "text": "هكلم سارة بالليل أطمن عليها."},
+              {"speaker": "A", "text": "ماشي يا ماما، سلميلي عليها."}
+            ],
+            "note": "plan stated but never carried out: no later contact with Sara"
+          }
+        },
+        {
+          "id": "d1-e09",
+          "event_type": "voice_query",
+          "local_datetime": "2026-11-02T12:30",
+          "event_language": "ar",
+          "transcript_text": "أنا خدت دوا الضغط النهارده؟",
+          "query_answer": "أيوه، خدتيه الساعة 8 ونص",
+          "metadata": {"intent": "medication_check", "answered_locally": true}
+        },
+        {
+          "id": "d1-e10",
+          "event_type": "memory_paused",
+          "local_datetime": "2026-11-02T13:00"
+        },
+        {
+          "id": "d1-e11",
+          "event_type": "memory_resumed",
+          "local_datetime": "2026-11-02T14:00"
+        },
+        {
+          "id": "d1-e12",
+          "event_type": "document_captured",
+          "local_datetime": "2026-11-02T15:40",
+          "document_type": "receipt",
+          "document_fields": {
+            "merchant": "صيدلية العزبي",
+            "total": {"amount": 245, "currency": "EGP"},
+            "date": "2026-11-02",
+            "items": ["Glucophage 500 mg x1", "Panadol x1"]
+          },
+          "media_type": "image"
+        },
+        {
+          "id": "d1-e13",
+          "event_type": "notable_moment_captured",
+          "local_datetime": "2026-11-02T17:30",
+          "place_name": "البلكونة",
+          "media_type": "image",
+          "media_tags": ["ورد", "زرع"]
+        },
+        {
+          "id": "d1-e14",
+          "event_type": "reminder",
+          "local_datetime": "2026-11-02T20:00",
+          "reminder_title": "حباية السكر",
+          "reminder_type": "medication",
+          "reminder_status": "missed"
+        }
+      ]
+    }
+  ]
+}
