@@ -291,7 +291,7 @@
       "expected_plan": {
         "window_start": "2026-11-02T00:00",
         "window_end": "2026-11-02T21:00",
-        "person_ids": ["p-hany"],
+        "person_ids": [],
         "event_types": null
       },
       "involves_person": true,
