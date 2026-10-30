@@ -196,3 +196,21 @@ def evaluate(db: Session, now: datetime | None = None) -> int:
     created = _missed_medication(db, now) + _devices(db, now)
     db.commit()
     return created
+
+
+def flag_unknown_face(db: Session, patient_id, cluster_id, days: int) -> int:
+    """A stranger seen on `days` different days (spec D23): every linked caregiver is
+    asked once, and the alert opens the cluster (C7). Called by the clustering sweep;
+    the caller commits."""
+    caregivers = _caregivers(db, {patient_id})
+    sent = _already_sent(db, "unknown_person_flagged", [cluster_id])
+    return _add(
+        db,
+        sent,
+        caregivers,
+        patient_id,
+        "unknown_person_flagged",
+        "unknown_face_cluster",
+        cluster_id,
+        f"A new face has visited on {days} different days.",
+    )

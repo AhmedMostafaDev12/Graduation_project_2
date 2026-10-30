@@ -24,6 +24,7 @@ celery_app = Celery(
         "app.workers.tasks.memory",
         "app.workers.tasks.faces",
         "app.workers.tasks.review",
+        "app.workers.tasks.clustering",
     ],
 )
 
@@ -60,6 +61,7 @@ celery_app.conf.update(
         "memory.*": {"queue": "ai_io"},  # waits on the LLM API
         "faces.*": {"queue": "cpu"},  # face models run on the CPU
         "review.*": {"queue": "ai_io"},  # waits on the vision API
+        "cluster.*": {"queue": "cpu"},  # vector math on the worker
     },
 )
 
@@ -93,6 +95,11 @@ celery_app.conf.beat_schedule = {
     "review-backfill": {
         "task": "review.backfill",
         "schedule": crontab(minute="5-59/10"),
+    },
+    # unknown faces from events:batch → clusters → caregiver asked at 3 days (spec D23)
+    "cluster-unknown-faces": {
+        "task": "cluster.unknown_faces",
+        "schedule": crontab(minute="1-59/10"),
     },
     "memory-expire-intentions": {
         "task": "memory.expire_intentions",

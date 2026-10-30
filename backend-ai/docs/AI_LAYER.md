@@ -40,7 +40,7 @@ app/ai/
 │   ├── render.py     #   event -> one sentence ("09:20 talked with Ahmed (son): ...")
 │   ├── retriever.py  #   SQL time window + person filter, then pgvector ranking (spec D22)
 │   └── answer.py     #   build prompt from top-k events, call llm, return answer + source_event_ids (STUB: fixed answer until 9.1)
-├── clustering.py     #   assign an unknown embedding to the nearest cluster (spec D23)
+├── clustering.py     #   decode the glasses' vector, nearest enrolled person / cluster (spec D23; built in 8.4)
 └── prompts/          #   *.txt templates, versioned (memory_extract.v1.txt, memory_settle.v1.txt, vision_review.v1.txt)
 ```
 
@@ -87,7 +87,7 @@ The vision prompt (Phase 7) must return `ReviewResult` from [`app/ai/review_cont
 | Answer a question (`/assist`) | `rag/retriever.py` + `rag/answer.py` + `clients/llm.py` | request (user waiting) |
 | Daily summary (Phase 2) | `clients/llm.py` | Beat → task `summaries` |
 | Enrollment face embedding | `inference/face_onnx.py` (stub until 8.2) | request |
-| Unknown-face clustering | `clustering.py` | task `cluster` (queue `cpu`) |
+| Unknown-face clustering | `clustering.py` + `services/clustering_service.py` | task `cluster.unknown_faces` (queue `cpu`, every 10 min) |
 
 ---
 
