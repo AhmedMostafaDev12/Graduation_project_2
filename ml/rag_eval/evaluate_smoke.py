@@ -17,6 +17,9 @@ expected_plan (what the query planner should produce, scored later):
   window_end never goes past asked_at: memory can't contain the future.
 - person_ids: the people filter ([] = no filter). An event passes when it involves one of
   them (encounter person_id or conversation present_person_ids).
+  Rule: person_ids lists only people who were PRESENT (they match present_person_ids or the
+  encounter's person_id). A person who is only mentioned ("did Dr. Hany call me?") goes in
+  the search text, never in person_ids: the filter would hide where they were talked about.
 - event_types: the type filter (null = no filter).
 A plan is correct when every evidence event passes all of its filters. Narrower is better
 (fewer events to rank), but losing any evidence event is a failure.
