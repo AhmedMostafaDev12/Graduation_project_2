@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 
 from app.integrations import s3
 from app.models import AudioSegment, AuditLog, MediaAsset
+from app.services import vision_memory
 
 AUDIO_MAX_AGE = timedelta(days=7)
 BATCH = 200  # per run; the next hourly run continues
@@ -39,6 +40,7 @@ def expire_media(db: Session, now: datetime | None = None) -> dict:
         if asset.thumbnail_key:
             s3.delete(asset.thumbnail_key)
         asset.deleted_at = now
+        vision_memory.forget_media(db, [asset.id], now)  # spec §8
         # the system acts on the patient's behalf (audit_log needs a user)
         db.add(
             AuditLog(

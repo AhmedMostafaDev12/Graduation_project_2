@@ -84,6 +84,7 @@ The vision prompt (Phase 7) must return `ReviewResult` from [`app/ai/review_cont
 | Smart review + OCR (§7.4) | `services/review_service.py` (blur strangers) + `clients/vision.py`, output shape in `review_contract.py` | task `review.media` (queue `ai_io`) |
 | Embed events for RAG | `rag/render.py` + `clients/embeddings.py` | task `embed` (queue `ai_io`) |
 | Facts + intentions from speech (D40) | `memory/extract.py` + `clients/llm.py` | task `memory.consolidate` (queue `ai_io`) |
+| Object sightings + action log from photos (D40) | `services/vision_memory.py` (fields from the review call) | inside task `review.media` |
 | Answer a question (`/assist`) | `rag/retriever.py` + `rag/answer.py` + `clients/llm.py` | request (user waiting) |
 | Daily summary (Phase 2) | `clients/llm.py` | Beat → task `summaries` |
 | Enrollment face embedding | `inference/face_onnx.py` (stub until 8.2) | request |

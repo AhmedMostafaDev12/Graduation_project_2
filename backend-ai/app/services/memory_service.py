@@ -123,7 +123,7 @@ def _links(db: Session, patient_id: uuid.UUID, entities: list[extract.EntityRef]
     return links
 
 
-def _upsert_entities(
+def upsert_entities(
     db: Session,
     event: Event,
     entities: list[extract.EntityRef],
@@ -164,7 +164,7 @@ def _upsert_entities(
     return ids
 
 
-def _new_entity_vectors(
+def new_entity_vectors(
     db: Session, patient_id: uuid.UUID, entities: list[extract.EntityRef]
 ) -> dict[extract.EntityRef, list[float]]:
     """Name embeddings for entities not in the index yet ("my glasses" ↔ "النضارة", D15)."""
@@ -244,11 +244,11 @@ def consolidate_event(db: Session, event_id: uuid.UUID) -> str:
             logger.warning("intention check failed permanently for event %s", event.id)
 
     # 3) write everything in one commit
-    entity_ids = _upsert_entities(
+    entity_ids = upsert_entities(
         db,
         event,
         found.entities,
-        _new_entity_vectors(db, event.patient_id, found.entities),
+        new_entity_vectors(db, event.patient_id, found.entities),
     )
     present = (event.metadata_ or {}).get("present_person_ids") or []
     # with a single enrolled person present, "not the patient" can only be them

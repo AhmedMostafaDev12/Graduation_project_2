@@ -2,7 +2,7 @@
 
 Layer 2 of memory: extracted by the consolidation job from conversation transcripts, every
 row linked to the event it came from and the model that extracted it. Object sightings and the
-action log (from photos) arrive with phase 8.5.
+action log from photos are filled by the photo review (phase 8.5).
 """
 
 import uuid
@@ -10,6 +10,7 @@ from datetime import datetime
 
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
+    REAL,
     Enum,
     Index,
     Integer,
@@ -117,4 +118,53 @@ class MemoryIntention(Base):
     settled_at: Mapped[datetime | None] = ts(nullable=True)
     model_id: Mapped[str] = mapped_column(Text)
     updated_at: Mapped[datetime] = updated_at()
+    deleted_at: Mapped[datetime | None] = deleted_at()
+
+
+class ObjectSighting(Base):
+    """Where an object was and in what state (D40), from a reviewed photo (phase 8.5).
+    `scene_segment_id` (spec §6) arrives with the glasses' scene segments."""
+
+    __tablename__ = "object_sightings"
+    __table_args__ = (
+        Index("ix_object_sightings_entity_seen", "entity_id", "seen_at"),
+    )
+
+    id: Mapped[uuid.UUID] = pk()
+    patient_id: Mapped[uuid.UUID] = fk("users.id")
+    entity_id: Mapped[uuid.UUID] = fk("memory_entities.id")
+    state: Mapped[str | None] = mapped_column(Text, nullable=True)  # "on", "in the drawer"
+    room: Mapped[str | None] = mapped_column(Text, nullable=True)  # from the image
+    place_id: Mapped[uuid.UUID | None] = fk("places.id", nullable=True)
+    seen_at: Mapped[datetime] = ts()
+    media_asset_id: Mapped[uuid.UUID | None] = fk("media_assets.id", nullable=True)
+    confidence: Mapped[float | None] = mapped_column(REAL, nullable=True)
+    model_id: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = created_at()
+    deleted_at: Mapped[datetime | None] = deleted_at()
+
+
+class MemoryAction(Base):
+    """One row per action instance, never merged (D40): "took 2 pills", "turned off"."""
+
+    __tablename__ = "memory_actions"
+    __table_args__ = (
+        Index("ix_memory_actions_patient_occurred", "patient_id", "occurred_at"),
+    )
+
+    id: Mapped[uuid.UUID] = pk()
+    patient_id: Mapped[uuid.UUID] = fk("users.id")
+    verb: Mapped[str] = mapped_column(Text)  # normalized: "take_medication", "turn_off"
+    entity_id: Mapped[uuid.UUID | None] = fk("memory_entities.id", nullable=True)
+    quantity: Mapped[float | None] = mapped_column(REAL, nullable=True)
+    unit: Mapped[str | None] = mapped_column(Text, nullable=True)
+    occurred_at: Mapped[datetime] = ts()
+    source: Mapped[str] = mapped_column(
+        Enum("vision", "speech", "sound", "reminder", name="memory_action_source")
+    )
+    evidence_event_id: Mapped[uuid.UUID | None] = fk("events.id", nullable=True)
+    media_asset_id: Mapped[uuid.UUID | None] = fk("media_assets.id", nullable=True)
+    confidence: Mapped[float | None] = mapped_column(REAL, nullable=True)
+    model_id: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = created_at()
     deleted_at: Mapped[datetime | None] = deleted_at()
