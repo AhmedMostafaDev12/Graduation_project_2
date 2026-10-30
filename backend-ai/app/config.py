@@ -42,6 +42,10 @@ class Settings(BaseSettings):
     ai_llm: str | None = None
     ai_face: str | None = None
 
+    # Unknown faces: the caregiver is asked once a stranger is seen on this many
+    # different days (spec D23, "configurable")
+    unknown_face_days: int = 3
+
     # Provider keys (docs/MODELS_CHOICE.md). Only in .env / the server, never in git.
     deepgram_api_key: str | None = None
     openai_api_key: str | None = None
