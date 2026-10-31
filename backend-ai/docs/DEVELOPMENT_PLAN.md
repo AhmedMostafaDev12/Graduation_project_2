@@ -247,7 +247,7 @@ Build in the order the Flutter screens need them (spec §12: Caregiver Mode firs
 
 | Step | Details |
 |---|---|
-| 9.1 `ai/rag/retriever.py` + `answer.py` | wire in Abdelrahman's R4 + R5: route by question type to the memory structures first, then hybrid retrieval (time window + pgvector), premise check against the entity index → LLM → `POST /assist` becomes real (spec D39, D40) |
+| 9.1 `ai/rag/retriever.py` + `answer.py` | wire in Abdelrahman's R4 + R5: route by question type to the memory structures first, then hybrid retrieval (time window + pgvector), premise check against the entity index → LLM → `POST /assist` becomes real (spec D39, D40). **Done (31 Oct 2026):** `rag/retriever.py` (R4): filters first (window, types, people present), then meaning (pgvector, the search text embedded as a Voyage *query*) + words + the memory structures (object sightings, actions, facts, plans → their events, their line put in front of the event's text), fused by reciprocal rank; premise check: a person absent in the window comes back from outside it, marked. `rag/answer.py` runs Abdelrahman's agent loop (R3) with it; `assist_llm` = Gemini Flash with low thinking (about half the time per call). Text questions; the answer follows the question's language; no answer → a kind "not sure"; needs the `cloud_processing` consent. Live on the R1 set: ML `rag_eval/assist_eval.py` |
 | 9.2 Task `summaries.generate_due` | uses Abdelrahman's R7 prompt: nightly summaries + patterns per patient timezone → `GET /daily-summary` becomes real |
 | 9.3 FCM | `integrations/fcm.py`: alerts and daily-summary pushes to caregivers |
 

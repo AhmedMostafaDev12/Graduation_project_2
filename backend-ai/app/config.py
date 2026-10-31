@@ -40,6 +40,7 @@ class Settings(BaseSettings):
     ai_vision: str | None = None
     ai_captioner: str | None = None
     ai_llm: str | None = None
+    ai_assist_llm: str | None = None  # the /assist agent (phase 9.1)
     ai_face: str | None = None
 
     # Unknown faces: the caregiver is asked once a stranger is seen on this many

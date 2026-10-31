@@ -27,6 +27,9 @@ class LLMError(Exception):
 
 class GeminiLLM:
     model_id = MODEL
+    thinking_level: str | None = (
+        None  # None = the model's default (best for extraction)
+    )
 
     def __init__(self, api_key: str | None = None, timeout_s: float = 60.0):
         self.api_key = api_key if api_key is not None else settings.gemini_api_key
@@ -54,8 +57,20 @@ class GeminiLLM:
         if json_schema is not None:
             body["generationConfig"]["responseMimeType"] = "application/json"
             body["generationConfig"]["responseJsonSchema"] = json_schema
+        if self.thinking_level:
+            body["generationConfig"]["thinkingConfig"] = {
+                "thinkingLevel": self.thinking_level
+            }
 
         return generate(self.api_key, body, self.timeout_s)
+
+
+class GeminiFastLLM(GeminiLLM):
+    """The same model, thinking less: for /assist, where the glasses wait at most 20 s
+    (spec D39). Measured on an /assist turn: median 7.9 s → 4.0 s per call."""
+
+    model_id = f"{MODEL}/thinking-low"
+    thinking_level = "low"
 
 
 def generate(api_key: str, body: dict, timeout_s: float) -> str:

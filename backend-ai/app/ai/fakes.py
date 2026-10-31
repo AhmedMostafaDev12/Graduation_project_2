@@ -45,6 +45,9 @@ class FakeTextEmbedder:
     def embed(self, texts: list[str]) -> list[list[float]]:
         return [unit_vector(t.encode("utf-8"), self.dim) for t in texts]
 
+    def embed_query(self, text: str) -> list[float]:
+        return self.embed([text])[0]
+
 
 class FakeVisionReviewer:
     model_id = "fake-vision"

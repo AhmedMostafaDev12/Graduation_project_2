@@ -255,7 +255,7 @@ Errors: `403 DEVICE_ONLY`, `404 DEVICE_NOT_FOUND`.
 | `GET /caregivers/me/alerts?unread_only=&limit=&offset=` · `POST /alerts/{id}/read` | caregiver (own alerts only) | C1, C2 |
 | `POST /me/push-token` | caregiver | (startup) |
 
-**AI stubs until later phases:** `/assist` returns a fixed answer in the final shape (real in 9.1). Daily summaries, documents, unknown faces and media review are produced by worker jobs (Phase 6+), so those lists stay empty until then. Enrollment face embeddings are computed by a stub (`model_version: "stub-0"`) until the real face model is wired in; the glasses can't recognise stub embeddings yet.
+**AI stubs until later phases:** daily summaries documents, unknown faces and media review are produced by worker jobs (Phase 6+), so those lists stay empty until then. Enrollment face embeddings are computed by a stub (`model_version: "stub-0"`) until the real face model is wired in; the glasses can't recognise stub embeddings yet.
 
 **Images: one request per screen, cached by id.** Lists already include signed URLs (people `photo_url`, journal `media[].url` + `thumbnail_url`, documents `url` + `thumbnail_url`, unknown faces `sample_url` + `sample_thumbnail_url`), so never call `GET /media/{id}` per thumbnail. **In lists and grids show `thumbnail_url`** (a ~320 px JPEG, ~30 KB); open `url` (full photo) only on the detail screen. Previews of **uploaded** photos and videos are made in the background a few seconds after `uploads/{id}/complete`: until then (and if one couldn't be made) `thumbnail_url` is `null`, so use `url` for a photo or a video icon, and pick up the preview on the next refresh. Signed URLs change on every response and expire after 10 minutes: cache images **by the item's id**, not by URL (e.g. `CachedNetworkImage(imageUrl: url, cacheKey: id)`), and re-fetch the list if an image fails with 403 (expired).
 
@@ -395,7 +395,7 @@ The day in the **patient's** timezone (default: today), oldest first.
 `200 { "patient_id", "summary_date", "summary_text", "patterns": {}, "generated_at" }` or `404 SUMMARY_NOT_READY`.
 
 #### `POST /patients/{id}/assist` · screen P6
-`{ "question": "مين جالي النهارده؟", "language": "ar" }` (`language` optional, defaults to the patient's) → `200 { "answer": "…", "language": "ar", "source_event_ids": [] }`. **Stub**: a fixed answer for now.
+`{ "question": "مين جالي النهارده؟" }` → `200 { "answer": "…", "language": "ar", "source_event_ids": ["…"] }`. **Real since phase 9.1**: the server searches the patient's memories and answers in the **question's language** (Egyptian Arabic or English; the request's `language` is ignored). `source_event_ids` are the journal events the answer used: show them as "from your memories" (P6). When nothing reliable is found, or the AI is unavailable, the answer is a kind "not sure" sentence with no sources (never an error). Without the `cloud_processing` consent the answer says so. Text questions only for now. Can take up to ~20 s: show a waiting state.
 
 #### Alerts and push · screens C1, C2
 `GET /caregivers/me/alerts` → `[ { "id", "patient_id", "alert_type": "missed_medication | unknown_person_flagged | low_battery | device_offline | daily_summary_ready", "message", "entity_type", "entity_id", "read_at", "created_at" } ]`. `entity_type` + `entity_id` say what to open on tap (`reminder_log`, `unknown_face_cluster`, `device`, `daily_summary`; may be null), newest first. `POST /alerts/{id}/read` → the alert with `read_at` set.
