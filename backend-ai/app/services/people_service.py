@@ -41,7 +41,7 @@ from app.schemas.people import (
     SamplePhoto,
     UnknownFaceOut,
 )
-from app.services import media_service, thumbnail_service
+from app.services import media_service, thumbnail_service, vision_memory
 
 MAX_PHOTOS_PER_REQUEST = 5
 MAX_EMBEDDINGS_PER_PERSON = 20
@@ -431,6 +431,7 @@ def dismiss(
         if media.thumbnail_key:
             s3.delete(media.thumbnail_key)
         media.deleted_at = now
+    vision_memory.forget_media(db, [m.id for m in photos], now)  # spec §8
     media_service.audit(db, access, "media.delete", [m.id for m in photos])
     cluster.status = "dismissed"
     db.commit()

@@ -37,6 +37,7 @@ from app.schemas.media import (
     UploadOut,
     UploadRequest,
 )
+from app.services import vision_memory
 
 logger = logging.getLogger(__name__)
 
@@ -246,5 +247,6 @@ def delete(db: Session, access: PatientAccess, media: MediaAsset) -> None:
     if media.thumbnail_key:
         s3.delete(media.thumbnail_key)
     media.deleted_at = datetime.now(UTC)
+    vision_memory.forget_media(db, [media.id], media.deleted_at)  # spec §8
     _audit(db, access, "media.delete", media)
     db.commit()

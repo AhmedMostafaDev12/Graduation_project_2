@@ -13,8 +13,9 @@ Called by the `review.*` tasks for photos the glasses proposed (`pending_review`
    - keep → `confirmed` with `ai_tags`; a document gets a `captured_documents` row;
      retention: photos with other people expire after 30 days unless pinned (D10), documents
      and the patient's own moments are kept;
-   - the memory fields (room, objects, actions) go to `events.metadata.vision` for the vision
-     consolidation (phase 8.5), and the event is re-embedded so search sees the new tags.
+   - the memory fields (room, objects, actions) become object sightings, actions and entities
+     in the same commit (phase 8.5, services/vision_memory.py), and the event is re-embedded
+     so search sees the new tags.
 
 `reviewed_at` marks a photo as done: a permanent failure leaves it pending (visible to the
 caregiver) but isn't retried. Never logs photos, faces or descriptions (AI_LAYER.md rule 8).
@@ -46,6 +47,7 @@ from app.models import (
     MediaAsset,
     PatientProfile,
 )
+from app.services import vision_memory
 from app.services.memory_service import cloud_allowed
 
 logger = logging.getLogger(__name__)
@@ -167,18 +169,8 @@ def _apply(
         )
 
     event = db.get(Event, media.event_id)
-    meta = dict(event.metadata_ or {})
-    vision = dict(meta.get("vision") or {})
-    vision[str(media.id)] = {
-        "room": result.room,
-        "objects": [o.model_dump() for o in result.objects],
-        "actions": [a.model_dump() for a in result.actions],
-        "model": model_id,
-    }
-    event.metadata_ = {
-        **meta,
-        "vision": vision,
-    }  # a new dict, so the JSONB change is seen
+    # room, objects, actions → object sightings, action log, entity index (phase 8.5)
+    vision_memory.store(db, media, event, result, model_id)
     # the sentence includes the photo's tags: embed.backfill renders and embeds it again
     event.rendered_text, event.embedding = None, None
     db.commit()
@@ -206,6 +198,8 @@ def review_media(db: Session, media_id: uuid.UUID) -> str:
     if not cloud_allowed(db, media.patient_id):
         return "not_allowed"
 
+    if not s3.exists(media.storage_key):
+        return _give_up(db, media, "file missing")
     data = s3.get_bytes(media.storage_key, MAX_PHOTO_BYTES)
     if data is None:
         return _give_up(db, media, "too large")

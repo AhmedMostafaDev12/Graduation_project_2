@@ -30,8 +30,17 @@ from app.ai.inference import face_onnx
 from app.ai.interfaces import Face
 from app.ai.review_contract import DocumentResult, ReviewResult, SeenAction, SeenObject
 from app.errors import TransientError
-from app.models import CapturedDocument, ConsentRecord, Event, MediaAsset
-from app.services import review_service
+from app.models import (
+    CapturedDocument,
+    ConsentRecord,
+    Event,
+    MediaAsset,
+    MemoryAction,
+    MemoryEntity,
+    ObjectSighting,
+    Place,
+)
+from app.services import retention_service, review_service
 from app.workers.tasks import review as review_tasks
 from tests.conftest import create_patient, image_bytes, register_and_login
 
@@ -273,14 +282,20 @@ def test_a_kept_document_is_confirmed_stored_and_kept_forever(
         }  # aliases normalized (D29)
         event = db.get(Event, event_id)
         assert event.metadata_["keep"] == "me"
-        assert event.metadata_["vision"][str(media_id)] == {
-            "room": "pharmacy",
-            "objects": [{"name": "receipt", "state": None}],
-            "actions": [
-                {"verb": "pay", "object": "medicine", "quantity": None, "unit": None}
-            ],
-            "model": "scripted-vision",
-        }
+        # room, objects, actions became memory rows (phase 8.5), not event metadata
+        assert "vision" not in event.metadata_
+        sighting = db.scalars(
+            select(ObjectSighting).where(ObjectSighting.media_asset_id == media_id)
+        ).one()
+        assert (sighting.room, sighting.model_id) == ("pharmacy", "scripted-vision")
+        action = db.scalars(
+            select(MemoryAction).where(MemoryAction.media_asset_id == media_id)
+        ).one()
+        assert (action.verb, action.source, action.evidence_event_id) == (
+            "pay",
+            "vision",
+            event_id,
+        )
         assert (
             event.rendered_text is None and event.embedding is None
         )  # re-embedded later
@@ -399,3 +414,184 @@ def test_a_strangers_face_is_blurred_before_the_vision_call(
     )  # elsewhere: only JPEG noise
     with worker_session() as db:
         assert db.get(MediaAsset, media_id).contains_other_people is True
+
+
+# ----- memory from photos (phase 8.5) -----
+
+
+def test_objects_and_actions_become_sightings_actions_and_entities(
+    client, worker_session, fake_s3, monkeypatch
+):
+    patient_id, event_id, media_id, _ = _photo(client, worker_session, fake_s3)
+    with worker_session() as db:
+        home = Place(
+            patient_id=patient_id,
+            name="Home",
+            latitude=30.05,
+            longitude=31.33,
+            created_by=patient_id,
+        )
+        db.add(home)
+        db.flush()
+        event = db.get(Event, event_id)
+        event.metadata_ = {**event.metadata_, "place_id": str(home.id)}
+        db.commit()
+        home_id = home.id
+    _use(
+        monkeypatch,
+        ScriptedVision(
+            _result(
+                room="Kitchen",
+                objects=[
+                    SeenObject(name="Keys", state="on the table"),
+                    SeenObject(name="Stove", state="off"),
+                    SeenObject(name="  "),  # nothing to name: skipped
+                ],
+                actions=[
+                    SeenAction(
+                        verb="Take Medication",
+                        object="pill box",
+                        quantity=2,
+                        unit="pills",
+                    ),
+                    SeenAction(verb="!!!"),  # no verb left: skipped
+                ],
+            )
+        ),
+    )
+    assert review_tasks.review_media.delay(str(media_id)).get() == "kept"
+
+    with worker_session() as db:
+        sightings = {
+            db.get(MemoryEntity, s.entity_id).name: s
+            for s in db.scalars(
+                select(ObjectSighting).where(ObjectSighting.media_asset_id == media_id)
+            )
+        }
+        assert set(sightings) == {"keys", "stove"}
+        keys = sightings["keys"]
+        assert (keys.state, keys.room, keys.place_id) == (
+            "on the table",
+            "Kitchen",
+            home_id,
+        )
+        assert keys.seen_at == db.get(Event, event_id).occurred_at
+        action = db.scalars(
+            select(MemoryAction).where(MemoryAction.media_asset_id == media_id)
+        ).one()
+        assert (action.verb, action.quantity, action.unit) == (
+            "take_medication",
+            2.0,
+            "pills",
+        )
+        assert db.get(MemoryEntity, action.entity_id).name == "pill box"
+        entity = db.get(MemoryEntity, keys.entity_id)
+        assert entity.kind == "object" and len(entity.name_embedding) == 1024
+
+
+def test_the_same_object_in_another_photo_counts_a_mention(
+    client, worker_session, fake_s3, monkeypatch
+):
+    _use(monkeypatch, ScriptedVision(_result(objects=[SeenObject(name="glasses")])))
+    patient_id, _, first, _ = _photo(client, worker_session, fake_s3)
+    review_tasks.review_media.delay(str(first)).get()
+    # a second photo of the same patient
+    second_event, second = uuid.uuid4(), uuid.uuid4()
+    key = f"patients/{patient_id}/media/{second}.jpg"
+    fake_s3.put_bytes(key, image_bytes(), "image/jpeg")
+    with worker_session() as db:
+        db.add(
+            Event(
+                id=second_event,
+                patient_id=patient_id,
+                source="glasses",
+                event_type="notable_moment_captured",
+                occurred_at=datetime.now(UTC) + timedelta(hours=1),
+            )
+        )
+        db.flush()
+        db.add(
+            MediaAsset(
+                id=second,
+                patient_id=patient_id,
+                event_id=second_event,
+                asset_type="image",
+                storage_key=key,
+                trigger="salient_frame",
+                status="pending_review",
+            )
+        )
+        db.commit()
+    review_tasks.review_media.delay(str(second)).get()
+    with worker_session() as db:
+        glasses = db.scalars(
+            select(MemoryEntity).where(
+                MemoryEntity.patient_id == patient_id, MemoryEntity.name == "glasses"
+            )
+        ).one()
+        assert glasses.mention_count == 2
+        assert (
+            len(
+                db.scalars(
+                    select(ObjectSighting).where(ObjectSighting.entity_id == glasses.id)
+                ).all()
+            )
+            == 2
+        )
+
+
+def test_an_expired_photo_takes_its_sightings_and_actions_with_it(
+    client, worker_session, fake_s3, monkeypatch
+):
+    _use(
+        monkeypatch,
+        ScriptedVision(
+            _result(
+                contains_other_people=True,  # → auto_expire after 30 days
+                objects=[SeenObject(name="wallet")],
+                actions=[SeenAction(verb="pay", object="wallet")],
+            )
+        ),
+    )
+    patient_id, _, media_id, _ = _photo(client, worker_session, fake_s3)
+    review_tasks.review_media.delay(str(media_id)).get()
+    with worker_session() as db:
+        db.execute(
+            update(MediaAsset)
+            .where(MediaAsset.id == media_id)
+            .values(expires_at=datetime.now(UTC) - timedelta(minutes=1))
+        )
+        db.commit()
+        retention_service.expire_media(db)
+
+    with worker_session() as db:
+        assert db.get(MediaAsset, media_id).deleted_at is not None
+        for table in (ObjectSighting, MemoryAction):
+            row = db.scalars(
+                select(table).where(table.media_asset_id == media_id)
+            ).one()
+            assert row.deleted_at is not None  # spec §8
+        # the entity stays: other evidence may mention it
+        assert db.scalars(
+            select(MemoryEntity).where(
+                MemoryEntity.patient_id == patient_id, MemoryEntity.name == "wallet"
+            )
+        ).one()
+
+
+def test_a_discarded_photo_leaves_no_memory(
+    client, worker_session, fake_s3, monkeypatch
+):
+    _use(
+        monkeypatch,
+        ScriptedVision(_result(keep=False, objects=[SeenObject(name="keys")])),
+    )
+    _, _, media_id, _ = _photo(client, worker_session, fake_s3)
+    review_tasks.review_media.delay(str(media_id)).get()
+    with worker_session() as db:
+        assert (
+            db.scalars(
+                select(ObjectSighting).where(ObjectSighting.media_asset_id == media_id)
+            ).first()
+            is None
+        )
