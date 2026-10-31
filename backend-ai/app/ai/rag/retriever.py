@@ -85,9 +85,12 @@ class MemorySearch:
         tz: str,
         embedder: TextEmbedder,
         top_k: int = TOP_K,
+        use_structures: bool = True,
     ):
         self.db, self.patient_id, self.tz = db, patient_id, ZoneInfo(tz)
         self.embedder, self.top_k = embedder, top_k
+        # False = flat memory: event sentences only (the H6 ablation, spec D40)
+        self.use_structures = use_structures
 
     async def search(self, plan: QueryPlan) -> list[Evidence]:
         # the session belongs to this thread; the loop awaits searches one at a time
@@ -99,7 +102,8 @@ class MemorySearch:
         lines: dict[uuid.UUID, list[str]] = {}
         if plan.search_text.strip():
             query = self.embedder.embed_query(plan.search_text)
-            lines = self._structures(conditions, tokens, query, plan)
+            if self.use_structures:
+                lines = self._structures(plan, tokens, query)
             ranked = fuse(
                 [
                     (list(lines), STRUCTURE_WEIGHT),
@@ -157,6 +161,18 @@ class MemorySearch:
                 )
             )
         return conditions
+
+    def _window(self, plan: QueryPlan) -> list:
+        """Only the patient and the time window (for the structures)."""
+        return self._filters(
+            QueryPlan(
+                window_start=plan.window_start,
+                window_end=plan.window_end,
+                person_ids=[],
+                event_types=None,
+                search_text="",
+            )
+        )
 
     def _candidates(self, conditions: list):
         return select(Event.id).where(*conditions)
@@ -223,18 +239,23 @@ class MemorySearch:
         return found
 
     def _structures(
-        self, conditions: list, tokens: list[str], query: list[float], plan: QueryPlan
+        self, plan: QueryPlan, tokens: list[str], query: list[float]
     ) -> dict[uuid.UUID, list[str]]:
-        """event id → lines from the structures that match, best first."""
+        """event id → lines from the five structures (D40), best first.
+
+        Only the patient and the time window apply here, not the model's type or person
+        filters: a sighting from a photo or a fact said *about* someone must not be hidden
+        because the model narrowed the event search."""
         entities = self._entities(tokens, query)
-        candidates = self._candidates(conditions)
-        lines: dict[uuid.UUID, list[str]] = defaultdict(list)
         ids = list(entities)
+        window = self._candidates(self._window(plan))
+        lines: dict[uuid.UUID, list[str]] = defaultdict(list)
 
         def add(event_id, line):
             if event_id is not None and line not in lines[event_id]:
                 lines[event_id].append(line)
 
+        # object sightings: "where is X?" → the newest one is marked "last seen"
         if ids:
             sightings = self.db.execute(
                 select(ObjectSighting, MediaAsset.event_id)
@@ -242,27 +263,46 @@ class MemorySearch:
                 .where(
                     ObjectSighting.entity_id.in_(ids),
                     ObjectSighting.deleted_at.is_(None),
-                    MediaAsset.event_id.in_(candidates),
+                    MediaAsset.event_id.in_(window),
                 )
                 .order_by(ObjectSighting.seen_at.desc())
                 .limit(PER_RANKING)
             ).all()
+            newest: set[uuid.UUID] = set()
             for sighting, event_id in sightings:
                 where = ", ".join(x for x in (sighting.state, sighting.room) if x)
+                first = sighting.entity_id not in newest
+                newest.add(sighting.entity_id)
+                label = "last seen" if first else "seen"
                 name = entities[sighting.entity_id]
-                add(event_id, f"{name} seen" + (f": {where}" if where else ""))
+                add(event_id, f"{name} {label}" + (f": {where}" if where else ""))
 
+        # actions: each instance, plus how many times in the window ("how many times?")
         action_match = [MemoryAction.entity_id.in_(ids)] if ids else []
         action_match += [MemoryAction.verb.contains(t) for t in tokens]
         if action_match:
+            matching = and_(
+                or_(*action_match),
+                MemoryAction.deleted_at.is_(None),
+                MemoryAction.evidence_event_id.in_(window),
+            )
+            counts = {
+                (verb, entity_id): (n, last)
+                for verb, entity_id, n, last in self.db.execute(
+                    select(
+                        MemoryAction.verb,
+                        MemoryAction.entity_id,
+                        func.count(),
+                        func.max(MemoryAction.occurred_at),
+                    )
+                    .where(matching)
+                    .group_by(MemoryAction.verb, MemoryAction.entity_id)
+                )
+            }
             actions = self.db.execute(
                 select(MemoryAction, MemoryEntity.name)
                 .outerjoin(MemoryEntity, MemoryEntity.id == MemoryAction.entity_id)
-                .where(
-                    or_(*action_match),
-                    MemoryAction.deleted_at.is_(None),
-                    MemoryAction.evidence_event_id.in_(candidates),
-                )
+                .where(matching)
                 .order_by(MemoryAction.occurred_at.desc())
                 .limit(PER_RANKING)
             ).all()
@@ -272,12 +312,16 @@ class MemorySearch:
                     if action.quantity
                     else ""
                 )
-                verb = action.verb.replace("_", " ")
-                add(
-                    action.evidence_event_id,
-                    f"action: {verb} {name or ''}".rstrip() + amount,
-                )
+                what = f"{action.verb.replace('_', ' ')} {name or ''}".rstrip()
+                add(action.evidence_event_id, f"action: {what}{amount}")
+                n, last = counts.get((action.verb, action.entity_id), (1, None))
+                if n > 1 and last == action.occurred_at:
+                    add(
+                        action.evidence_event_id,
+                        f"count: {what} ×{n} in the time searched",
+                    )
 
+        # facts: the exact words, with their typed values
         fact_match = [func.lower(MemoryFact.quote).contains(t) for t in tokens]
         if ids:
             fact_match.append(
@@ -291,7 +335,7 @@ class MemorySearch:
                 .where(
                     or_(*fact_match),
                     MemoryFact.deleted_at.is_(None),
-                    MemoryFact.event_id.in_(candidates),
+                    MemoryFact.event_id.in_(window),
                 )
                 .order_by(MemoryFact.said_at.desc())
                 .limit(PER_RANKING)
@@ -305,6 +349,7 @@ class MemorySearch:
                     f"said: «{fact.quote}»" + (f" ({values})" if values else ""),
                 )
 
+        # plans: their status, and the event that settled them ("did I call the doctor?")
         plan_match = [
             or_(
                 func.lower(MemoryIntention.description).contains(t),
@@ -313,26 +358,37 @@ class MemorySearch:
             for t in tokens
         ]
         if plan_match:
-            plans = self.db.scalars(
+            intentions = self.db.scalars(
                 select(MemoryIntention)
                 .where(
                     or_(*plan_match),
                     MemoryIntention.deleted_at.is_(None),
-                    MemoryIntention.source_event_id.in_(candidates),
+                    MemoryIntention.source_event_id.in_(window),
                 )
                 .order_by(MemoryIntention.stated_at.desc())
                 .limit(PER_RANKING)
             ).all()
-            for intention in plans:
+            for intention in intentions:
                 due = (
                     f", due {intention.due_at.astimezone(self.tz):%Y-%m-%d %H:%M}"
                     if intention.due_at
                     else ""
                 )
+                settled = (
+                    f", settled {intention.settled_at.astimezone(self.tz):%Y-%m-%d %H:%M}"
+                    if intention.settled_at and intention.status != "open"
+                    else ""
+                )
                 add(
                     intention.source_event_id,
-                    f"plan: {intention.description} (status: {intention.status}{due})",
+                    f"plan: {intention.description} "
+                    f"(status: {intention.status}{due}{settled})",
                 )
+                for proof in intention.settled_by_event_ids or []:
+                    add(
+                        proof,
+                        f"settles the plan «{intention.description}»: {intention.status}",
+                    )
         return {k: v for k, v in lines.items() if v}
 
     # ----- results -----

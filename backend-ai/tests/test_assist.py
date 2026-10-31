@@ -9,7 +9,7 @@ import uuid
 from datetime import UTC, datetime, timedelta
 
 import pytest
-from sqlalchemy import update
+from sqlalchemy import select, update
 
 from app.ai import fakes
 from app.ai.rag import answer as answer_module
@@ -21,6 +21,7 @@ from app.models import (
     EnrolledPerson,
     Event,
     MediaAsset,
+    MemoryAction,
     MemoryEntity,
     MemoryFact,
     MemoryIntention,
@@ -204,7 +205,9 @@ def test_words_and_structures_rank_and_explain(client, worker_session):
 
         keys = search.search_now(_plan("where are my keys"))
         assert _ids(keys)[0] == ids["photo"]
-        assert keys[0].text.startswith("[keys seen: on the table, kitchen] a photo")
+        assert keys[0].text.startswith(
+            "[keys last seen: on the table, kitchen] a photo"
+        )
 
         dose = search.search_now(_plan("what dose did the doctor say"))
         top = {r.event_id: r.text for r in dose}
@@ -232,6 +235,61 @@ def test_a_person_absent_in_the_window_comes_back_from_outside_it(
         # with results in the window, nothing is added
         inside = search.search_now(_plan("Sara", hours=24, people=[ids["sara"]]))
         assert not any(r.text.startswith("[outside") for r in inside)
+
+
+def test_plans_bring_their_proof_and_actions_their_count(client, worker_session):
+    _, patient_id, ids = _memories(client, worker_session)
+    with worker_session() as db:
+        # the plan was settled by the later conversation
+        plan = db.scalars(
+            select(MemoryIntention).where(MemoryIntention.patient_id == patient_id)
+        ).one()
+        plan.status, plan.settled_at = "done", NOW - timedelta(hours=2)
+        plan.settled_by_event_ids = [ids["talk"]]
+        # the pill was taken twice, seen on the photo
+        pills = MemoryEntity(
+            patient_id=patient_id,
+            kind="object",
+            name="pill box",
+            first_seen_at=NOW,
+            last_seen_at=NOW,
+        )
+        db.add(pills)
+        db.flush()
+        for hours in (5, 1):
+            db.add(
+                MemoryAction(
+                    patient_id=patient_id,
+                    verb="take_medication",
+                    entity_id=pills.id,
+                    quantity=1,
+                    unit="pill",
+                    occurred_at=NOW - timedelta(hours=hours),
+                    source="vision",
+                    evidence_event_id=ids["pill" if hours == 5 else "photo"],
+                    model_id="m",
+                )
+            )
+        db.commit()
+
+        search = MemorySearch(db, patient_id, "Africa/Cairo", EMBED)
+        called = {
+            r.event_id: r.text for r in search.search_now(_plan("call the doctor"))
+        }
+        assert "status: done" in called[str(ids["pill"])]
+        assert "settles the plan «call the doctor»: done" in called[str(ids["talk"])]
+
+        # the model narrowed to reminders: the photo's action still counts (window only)
+        taken = search.search_now(_plan("take medication pill box", types=["reminder"]))
+        texts = {r.event_id: r.text for r in taken}
+        assert (
+            "count: take medication pill box ×2 in the time searched"
+            in texts[str(ids["photo"])]
+        )
+
+        # flat memory (the H6 ablation): no structure lines at all
+        flat = MemorySearch(db, patient_id, "Africa/Cairo", EMBED, use_structures=False)
+        assert not any(r.text.startswith("[") for r in flat.search_now(_plan("keys")))
 
 
 # ----- /assist end to end -----

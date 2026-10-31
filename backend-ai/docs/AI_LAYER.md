@@ -38,7 +38,7 @@ app/ai/
 │   └── extract.py    #   facts, intentions, entities from a transcript: prompts, schemas, validation (7.5)
 ├── rag/
 │   ├── render.py     #   event -> one sentence ("09:20 talked with Ahmed (son): ...")
-│   ├── retriever.py  #   filters, then meaning + words + memory structures, fused; premise check (D22, D39, D40; 9.1)
+│   ├── retriever.py  #   filters, then meaning + words + the five structures (last seen, counts, quotes, plans + proof), fused; premise check; flat switch for H6 (9.1)
 │   ├── planner.py    #   validate the agent's search arguments (track R3)
 │   ├── assist_loop.py #  the bounded search-then-answer agent (track R3)
 │   └── answer.py     #   /assist: the loop + the retriever + assist_llm → answer + source_event_ids (9.1)

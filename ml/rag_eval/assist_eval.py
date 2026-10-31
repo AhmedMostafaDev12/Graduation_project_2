@@ -9,6 +9,10 @@ then asks every question of data/benchmark_v1.json at its own `asked_at` through
 - abstention: for questions with no answer, whether it cited nothing;
 - time per question.
 
+Before asking, the conversations go through the real consolidation (phase 7.5: facts, plans,
+entities), and every question is asked twice: with the five memory structures (D40) and
+without them (flat memory: event sentences only), the H6 comparison on the same data.
+
     docker compose -f docker-compose.dev.yml up -d db       # local Postgres, never Supabase
     cd backend-ai
     DATABASE_URL=postgresql+psycopg://remori:remori@localhost:5434/remori_test \\
@@ -25,6 +29,7 @@ import sys
 import time
 import uuid
 from datetime import UTC, datetime
+from functools import partial
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -33,9 +38,10 @@ BACKEND = HERE.parents[1] / "backend-ai"
 sys.path[:0] = [str(BACKEND), str(HERE)]
 
 import evaluate_smoke as smoke
-from sqlalchemy import delete
+from sqlalchemy import delete, func, select
 
 from app.ai.rag import answer as answer_module
+from app.ai.rag.retriever import MemorySearch
 from app.ai.registry import build
 from app.config import settings
 from app.database import SessionLocal
@@ -43,9 +49,15 @@ from app.models import (
     ConsentRecord,
     EnrolledPerson,
     Event,
+    MemoryAction,
+    MemoryEntity,
+    MemoryFact,
+    MemoryIntention,
+    ObjectSighting,
     PatientProfile,
     User,
 )
+from app.services import memory_service
 
 NAMESPACE = uuid.UUID("0b8f6c1e-4d3a-4c2b-9a7e-5f1d2c3b4a59")  # eval ids → stable uuids
 
@@ -125,13 +137,86 @@ def seed(db, days: dict, ai) -> tuple[uuid.UUID, uuid.UUID, dict, dict]:
     return patient.id, caregiver.id, to_uuid, from_uuid
 
 
+def consolidate(db, patient_id, ai) -> dict:
+    """Facts, plans and entities from every conversation, oldest first (phase 7.5), so the
+    structures exist and later conversations can settle earlier plans."""
+    memory_service.get_ai = lambda: ai
+    ids = db.scalars(
+        select(Event.id)
+        .where(
+            Event.patient_id == patient_id,
+            Event.event_type == "conversation_segment",
+        )
+        .order_by(Event.occurred_at)
+    ).all()
+    outcomes = [memory_service.consolidate_event(db, event_id) for event_id in ids]
+    return {
+        "conversations": len(ids),
+        "consolidated": outcomes.count("consolidated"),
+        "facts": db.scalar(
+            select(func.count()).where(MemoryFact.patient_id == patient_id)
+        ),
+        "plans": db.scalar(
+            select(func.count()).where(MemoryIntention.patient_id == patient_id)
+        ),
+        "entities": db.scalar(
+            select(func.count()).where(MemoryEntity.patient_id == patient_id)
+        ),
+    }
+
+
 def cleanup(db, patient_id, caregiver_id) -> None:
+    for table in (MemoryFact, MemoryIntention, MemoryAction, ObjectSighting):
+        db.execute(delete(table).where(table.patient_id == patient_id))
+    db.execute(delete(MemoryEntity).where(MemoryEntity.patient_id == patient_id))
     db.execute(delete(Event).where(Event.patient_id == patient_id))
     db.execute(delete(EnrolledPerson).where(EnrolledPerson.patient_id == patient_id))
     db.execute(delete(ConsentRecord).where(ConsentRecord.patient_id == patient_id))
     db.execute(delete(PatientProfile).where(PatientProfile.user_id == patient_id))
     db.execute(delete(User).where(User.id.in_([patient_id, caregiver_id])))
     db.commit()
+
+
+def ask_all(db, patient_id, questions, tz, from_uuid, *, structures: bool) -> dict:
+    """Every question through the real /assist, with the five structures on or off (H6)."""
+    answer_module.MemorySearch = partial(MemorySearch, use_structures=structures)
+    totals = {"recall": [], "abstain": [], "seconds": []}
+    label = "structured" if structures else "flat"
+    for q in questions:
+        text = q["question_ar"] if q["language"] == "ar" else q["question_en"]
+        asked_at = datetime.fromisoformat(q["asked_at"]).replace(tzinfo=tz)
+        started = time.perf_counter()
+        out = answer_module.answer(db, patient_id, text, asked_at=asked_at)
+        seconds = time.perf_counter() - started
+        cited = [from_uuid.get(i, "?") for i in out["source_event_ids"]]
+        expected = q.get("evidence_event_ids", [])
+        totals["seconds"].append(seconds)
+        if q["answerable"]:
+            hit = len(set(cited) & set(expected)) / len(expected) if expected else 1.0
+            totals["recall"].append(hit)
+            score = f"evidence {hit:.0%}"
+        else:
+            ok = not cited
+            totals["abstain"].append(ok)
+            score = f"abstained {'yes' if ok else 'NO'}"
+        print(f"\n[{label}] {q['id']} [{q['category']}] {seconds:.1f}s, {score}")
+        print(f"  Q: {text}")
+        print(f"  A: {out['answer']}")
+        print(f"  reference: {q.get('reference_open_answer', '')}")
+        print(f"  cited {cited} / expected {expected}")
+    return totals
+
+
+def summary(label: str, totals: dict, n: int) -> str:
+    def mean(xs):
+        return sum(xs) / len(xs) if xs else float("nan")
+
+    return (
+        f"{label:10s} {n} questions · evidence recall {mean(totals['recall']):.0%} "
+        f"({len(totals['recall'])} answerable) · abstention {mean(totals['abstain']):.0%} "
+        f"({len(totals['abstain'])} unanswerable) · {mean(totals['seconds']):.1f}s avg, "
+        f"{max(totals['seconds'], default=0):.1f}s max"
+    )
 
 
 def main() -> int:
@@ -163,45 +248,17 @@ def main() -> int:
 
     db = SessionLocal()
     patient_id, caregiver_id, _, from_uuid = seed(db, days, ai)
-    totals = {"recall": [], "abstain": [], "seconds": []}
     try:
-        for q in questions:
-            text = q["question_ar"] if q["language"] == "ar" else q["question_en"]
-            asked_at = datetime.fromisoformat(q["asked_at"]).replace(tzinfo=tz)
-            started = time.perf_counter()
-            out = answer_module.answer(db, patient_id, text, asked_at=asked_at)
-            seconds = time.perf_counter() - started
-            cited = [from_uuid.get(i, "?") for i in out["source_event_ids"]]
-            expected = q.get("evidence_event_ids", [])
-            totals["seconds"].append(seconds)
-            if q["answerable"]:
-                hit = (
-                    len(set(cited) & set(expected)) / len(expected) if expected else 1.0
-                )
-                totals["recall"].append(hit)
-                score = f"evidence {hit:.0%}"
-            else:
-                ok = not cited
-                totals["abstain"].append(ok)
-                score = f"abstained {'yes' if ok else 'NO'}"
-            print(f"\n{q['id']} [{q['category']}] {seconds:.1f}s, {score}")
-            print(f"  Q: {text}")
-            print(f"  A: {out['answer']}")
-            print(f"  reference: {q.get('reference_open_answer', '')}")
-            print(f"  cited {cited} / expected {expected}")
+        print("memory from speech:", consolidate(db, patient_id, ai))
+        structured = ask_all(db, patient_id, questions, tz, from_uuid, structures=True)
+        flat = ask_all(db, patient_id, questions, tz, from_uuid, structures=False)
     finally:
         cleanup(db, patient_id, caregiver_id)
         db.close()
 
-    def mean(xs):
-        return sum(xs) / len(xs) if xs else float("nan")
-
-    print(
-        f"\n{len(questions)} questions · evidence recall {mean(totals['recall']):.0%} "
-        f"({len(totals['recall'])} answerable) · abstention {mean(totals['abstain']):.0%} "
-        f"({len(totals['abstain'])} unanswerable) · {mean(totals['seconds']):.1f}s avg, "
-        f"{max(totals['seconds'], default=0):.1f}s max"
-    )
+    print()
+    print(summary("structured", structured, len(questions)))
+    print(summary("flat", flat, len(questions)))
     return 0
 
 
