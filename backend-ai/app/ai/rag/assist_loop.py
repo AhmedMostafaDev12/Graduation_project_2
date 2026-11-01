@@ -58,7 +58,7 @@ from app.ai.rag.planner import (
 from app.errors import TransientError
 
 PROMPTS_DIR = Path(__file__).resolve().parent.parent / "prompts"
-ASSIST_PROMPT = "assist_agent.v2"
+ASSIST_PROMPT = "assist_agent.v4"
 
 TOP_K = 8  # results per search the model sees
 MAX_EVIDENCE_TEXT = 400  # characters of one result's text
