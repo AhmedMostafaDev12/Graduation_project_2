@@ -16,6 +16,12 @@ from functools import lru_cache
 
 from app.ai import fakes
 from app.ai.clients.embeddings import OpenAITextEmbedder, VoyageTextEmbedder
+from app.ai.clients.groq import (
+    GroqLLM,
+    GroqVisionReviewer,
+    SelfHostedLLM,
+    SelfHostedVisionReviewer,
+)
 from app.ai.clients.llm import GeminiFastLLM, GeminiLLM
 from app.ai.clients.stt import DeepgramSpeechToText
 from app.ai.clients.vision import GeminiVisionReviewer
@@ -79,14 +85,26 @@ PROVIDERS: dict[str, dict[str, type]] = {
         "voyage-4": VoyageTextEmbedder,
         "openai-text-embedding-3-small": OpenAITextEmbedder,
     },
-    "vision": {"fake": fakes.FakeVisionReviewer, "gemini-flash": GeminiVisionReviewer},
+    "vision": {
+        "fake": fakes.FakeVisionReviewer,
+        "gemini-flash": GeminiVisionReviewer,
+        "groq-qwen": GroqVisionReviewer,
+        "selfhosted-qwen": SelfHostedVisionReviewer,
+    },
     "captioner": {"fake": fakes.FakeCaptioner},
-    "llm": {"fake": fakes.FakeLLM, "gemini-flash": GeminiLLM},
+    "llm": {
+        "fake": fakes.FakeLLM,
+        "gemini-flash": GeminiLLM,
+        "groq-qwen": GroqLLM,
+        "selfhosted-qwen": SelfHostedLLM,
+    },
     # the /assist agent: speed matters (the glasses wait at most 20 s, spec D39)
     "assist_llm": {
         "fake": fakes.FakeLLM,
         "gemini-flash": GeminiLLM,
         "gemini-flash-fast": GeminiFastLLM,
+        "groq-qwen": GroqLLM,
+        "selfhosted-qwen": SelfHostedLLM,
     },
     "face": {"stub": fakes.StubFaceEmbedder, "mobilefacenet-onnx": OnnxFaceEmbedder},
 }
