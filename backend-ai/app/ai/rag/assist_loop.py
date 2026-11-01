@@ -58,7 +58,7 @@ from app.ai.rag.planner import (
 from app.errors import TransientError
 
 PROMPTS_DIR = Path(__file__).resolve().parent.parent / "prompts"
-ASSIST_PROMPT = "assist_agent.v2"
+ASSIST_PROMPT = "assist_agent.v4"
 
 TOP_K = 8  # results per search the model sees
 MAX_EVIDENCE_TEXT = 400  # characters of one result's text
@@ -239,11 +239,15 @@ def question_language(question: str) -> str:
 
 
 def build_messages(
-    question: str, asked_at: datetime, tz: str, people: list[Person]
+    question: str,
+    asked_at: datetime,
+    tz: str,
+    people: list[Person],
+    prompt_name: str = ASSIST_PROMPT,
 ) -> list[dict[str, str]]:
     now_local = asked_at.astimezone(ZoneInfo(tz))
     system = fill(
-        load_prompt(),
+        load_prompt(prompt_name),
         {
             "now_local": f"{now_local:%Y-%m-%d %H:%M}, {_weekday(now_local)}",
             "timezone": tz,
@@ -346,13 +350,14 @@ async def run_assist(
     max_searches: int = 3,
     search_budget_s: float = SEARCH_BUDGET_S,
     plan_only: bool = False,
+    prompt_name: str = ASSIST_PROMPT,
 ) -> AssistResult:
     fallback = fallback_plan(
         question, asked_at, tz
     )  # ValueError: naive asked_at, bad tz
     began = monotonic()
     budget_end = began + search_budget_s
-    messages = build_messages(question, asked_at, tz, people)
+    messages = build_messages(question, asked_at, tz, people, prompt_name)
     allowed = [p.id for p in people]
     trace: list[Step] = []
     seen: list[str] = []  # result ids the model has seen

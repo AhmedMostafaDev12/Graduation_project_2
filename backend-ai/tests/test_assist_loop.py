@@ -17,6 +17,7 @@ from app.ai.clients.llm import LLMError
 from app.ai.rag import assist_loop
 from app.ai.rag.assist_loop import (
     ANSWER_NOW,
+    ASSIST_PROMPT,
     MAX_EVIDENCE_TEXT,
     PLACEHOLDER,
     SEARCH_BUDGET_S,
@@ -517,6 +518,47 @@ def test_prompt_has_no_unfilled_placeholders():
     assert "2026-01-15 21:00, Thursday / الخميس" in system
 
 
+def test_v4_prompt_adds_only_answer_language():
+    v1 = set(PLACEHOLDER.findall(load_prompt("assist_agent.v1")))
+    v4 = set(PLACEHOLDER.findall(load_prompt("assist_agent.v4")))
+    assert v4 == v1 | {"answer_language"}
+    system = build_messages(
+        QUESTION, ASKED, CAIRO, PEOPLE, prompt_name="assist_agent.v4"
+    )[0]["content"]
+    assert PLACEHOLDER.findall(system) == []
+    assert "Answer in Egyptian Arabic" in system
+
+
+def test_v4_example_replies_parse():
+    replies = [
+        line.removeprefix("reply: ")
+        for line in load_prompt("assist_agent.v4").splitlines()
+        if line.startswith("reply: ")
+    ]
+    assert replies
+    for raw in replies:  # the search arguments are validated as RawSearchArgs
+        assist_loop._parse_turn(raw, final=json.loads(raw)["action"] == "answer")
+
+
+def test_the_default_prompt_is_v4():
+    assert ASSIST_PROMPT == "assist_agent.v4"
+    default = build_messages(QUESTION, ASKED, CAIRO, PEOPLE)[0]["content"]
+    named = build_messages(QUESTION, ASKED, CAIRO, PEOPLE, ASSIST_PROMPT)[0]["content"]
+    assert default == named
+    llm = ScriptedLLM(search(search_text="x"), answer("ok", ["e1"]))
+    run(llm, FakeBackend([E1]))
+    assert llm.calls[0][0][0]["content"] == default
+
+
+def test_run_assist_uses_the_prompt_it_is_given():
+    llm = ScriptedLLM(search(search_text="x"), answer("ok", ["e1"]))
+    run(llm, FakeBackend([E1]), prompt_name="assist_agent.v2")
+    sent = llm.calls[0][0][0]["content"]
+    default = build_messages(QUESTION, ASKED, CAIRO, PEOPLE)[0]["content"]
+    v2 = build_messages(QUESTION, ASKED, CAIRO, PEOPLE, "assist_agent.v2")[0]["content"]
+    assert sent == v2 and sent != default
+
+
 def test_calendar_is_14_days_with_arabic_weekdays():
     rows = calendar_rows(ASKED)
     assert len(rows) == 14
@@ -555,7 +597,9 @@ def test_question_language(question, language):
 
 
 def test_answer_language_is_passed_to_the_prompt(monkeypatch):
-    monkeypatch.setattr(assist_loop, "load_prompt", lambda: "[{{answer_language}}]")
+    monkeypatch.setattr(
+        assist_loop, "load_prompt", lambda name: "[{{answer_language}}]"
+    )
     english = build_messages("What did Ahmed say?", ASKED, CAIRO, PEOPLE)
     arabic = build_messages(QUESTION, ASKED, CAIRO, PEOPLE)
     assert english[0]["content"] == "[English]"
