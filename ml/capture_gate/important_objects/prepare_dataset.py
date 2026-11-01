@@ -302,9 +302,14 @@ def egohands(root: Path, limit: int, splits) -> dict:
     import numpy as np
     from scipy.io import loadmat
 
-    hits = list(root.rglob("_LABELLED_SAMPLES"))
+    # Kaggle doesn't always mount an input under its slug: search every input if needed
+    hits = list(root.rglob("_LABELLED_SAMPLES")) if root.exists() else []
+    if not hits and Path("/kaggle/input").exists():
+        hits = list(Path("/kaggle/input").rglob("_LABELLED_SAMPLES"))
     if not hits:
-        raise SystemExit(f"EgoHands not found under {root}: add the Kaggle dataset 'himaniishah/egohands' as an input")
+        raise SystemExit("EgoHands not found under /kaggle/input: add the Kaggle dataset 'himaniishah/egohands' "
+                         "as an input (right panel → Add Input), then re-run this cell")
+    print(f"EgoHands found at {hits[0]}", flush=True)
     videos = sorted(p for p in hits[0].iterdir() if (p / "polygons.mat").exists())
     by_activity = defaultdict(list)
     for v in videos:
