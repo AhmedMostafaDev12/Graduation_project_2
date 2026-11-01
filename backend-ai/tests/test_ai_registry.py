@@ -3,6 +3,7 @@
 import pytest
 
 from app.ai import registry
+from app.ai.clients.llm import GeminiFastLLM
 from app.ai.inference import face
 from app.ai.registry import ProviderNotAvailable, build, choose_providers
 from app.ai.review_contract import ReviewResult
@@ -63,6 +64,14 @@ def test_unimplemented_provider_names_the_capability(monkeypatch):
     monkeypatch.setattr("app.ai.clients.vision.settings.gemini_api_key", "test-key")
     with pytest.raises(ProviderNotAvailable, match="'captioner' isn't implemented yet"):
         build("production")
+
+
+def test_assist_llm_has_a_30_s_timeout(monkeypatch):
+    monkeypatch.setattr("app.ai.clients.llm.settings.gemini_api_key", "test-key")
+    ai = build("stub", {"assist_llm": "gemini-flash-fast", "llm": "gemini-flash"})
+    assert isinstance(ai.assist_llm, GeminiFastLLM)
+    assert ai.assist_llm.timeout_s == registry.ASSIST_LLM_TIMEOUT_S == 30.0
+    assert ai.llm.timeout_s == 60.0  # the general LLM keeps the client's default
 
 
 def test_provider_without_its_key_fails_clearly(monkeypatch):
