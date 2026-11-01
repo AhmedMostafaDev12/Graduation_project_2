@@ -4,12 +4,15 @@ never run by CI (it costs money and needs the key). Synthetic data only.
     cd backend-ai
     AI_PROFILE=production .venv/Scripts/python ../ml/rag_eval/evaluate_planner.py
     ... --mode full --runs 1
+    ... --slot llm                      # the general LLM instead of assist_llm (default)
     ... --model gemini-2.5-flash        # override, for this process only (no config change)
     ... --prompt assist_agent.v1        # prompt file to evaluate (default: ASSIST_PROMPT)
     ... --out C:/somewhere/outside/the/repo/run.json
 
 Refuses to run when AI_PROFILE=stub (or the LLM is the fake). Only the LLM is built, so the
-other providers' keys are not needed. The key is never printed.
+other providers' keys are not needed. The key is never printed. --slot assist (default)
+builds the registry's assist_llm, as /assist does (AI_ASSIST_LLM overrides it); --model
+then only swaps the Gemini model in the URL, the slot's other settings (thinking) stay.
 
 --mode plan (default): run_assist(plan_only=True), the first validated search plan per run.
   valid        the model's own plan (no fallback needed)
@@ -113,21 +116,25 @@ class TimedLLM:
         return reply
 
 
-def build_llm(model: str | None):
+def build_llm(model: str | None, slot: str = "assist"):
+    """slot "assist": the registry's assist_llm (what /assist runs); "llm": the general LLM."""
     if settings.ai_profile == "stub":
         sys.exit("Refusing to run: AI_PROFILE=stub. Set AI_PROFILE=production.")
-    provider = choose_providers(settings.ai_profile, overrides_from_settings())["llm"]
+    capability = "assist_llm" if slot == "assist" else "llm"
+    provider = choose_providers(settings.ai_profile, overrides_from_settings())[
+        capability
+    ]
     if provider == "fake":
         sys.exit("Refusing to run: the LLM provider is the fake.")
-    llm = PROVIDERS["llm"][provider]()
-    label = llm.model_id
+    llm = PROVIDERS[capability][provider]()
+    label = f"{llm.model_id} (slot {capability}: {provider})"
     if model:
         # for this process only: generate() reads the module's GEMINI_URL at call time
         llm_client.GEMINI_URL = llm_client.GEMINI_URL.replace(
             f"/models/{llm_client.MODEL}:", f"/models/{model}:"
         )
         llm.model_id = model
-        label = f"{model} (override)"
+        label = f"{model} (override; slot {capability}: {provider})"
     return llm, label
 
 
@@ -294,7 +301,7 @@ async def evaluate(args) -> int:
     }
     people = [Person(p["id"], p["name"], p["relationship"]) for p in days["people"]]
 
-    real, label = build_llm(args.model)
+    real, label = build_llm(args.model, args.slot)
     llm = TimedLLM(real)
     print(
         f"Model: {label}   prompt: {args.prompt}   mode: {args.mode}   "
@@ -492,6 +499,7 @@ async def evaluate(args) -> int:
             json.dumps(
                 {
                     "model": label,
+                    "slot": args.slot,
                     "prompt": args.prompt,
                     "mode": args.mode,
                     "person_filter": args.person_filter,
@@ -512,6 +520,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--mode", choices=("plan", "full"), default="plan")
     parser.add_argument("--runs", type=int, default=3)
+    parser.add_argument(
+        "--slot",
+        choices=("assist", "llm"),
+        default="assist",
+        help="assist: the registry's assist_llm, what /assist runs (default); llm: the "
+        "general LLM",
+    )
     parser.add_argument("--model", help="override the Gemini model for this run only")
     parser.add_argument(
         "--prompt", default=ASSIST_PROMPT, help="prompt file name in app/ai/prompts"
