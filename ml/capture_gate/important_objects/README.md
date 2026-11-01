@@ -100,7 +100,7 @@ Two sources, in this order: **public datasets now** (enough for a first model), 
 **Where each comes from** (the notebook fetches them; nothing goes through your laptop):
 - LVIS, COCO annotations, COCO-Text: their official download links.
 - COCO-WholeBody: the official Google Drive files (from its GitHub page). If Drive refuses (its daily download limit), the train file falls back to a Hugging Face mirror (`hngan/cocowholebody`); otherwise re-run later.
-- EgoHands: its original link is dead (it redirects to the lab's home page). A complete copy of the original release (48 folders × 100 frames + `polygons.mat`, checked by its file list) is on Kaggle as **`himaniishah/egohands`**: add it as a notebook **input**.
+- EgoHands: its original link is dead (it redirects to the lab's home page). A complete copy of the original release (48 folders × 100 frames + `polygons.mat`, checked by its file list) is on Kaggle as **`himaniishah/egohands`**. The script uses it if it's attached as a notebook input, and otherwise downloads it with `kagglehub` on the Kaggle machine (Kaggle's "Add Input" search doesn't always list it).
 - COCO photos: one by one from `images.cocodataset.org`, only the ones we use.
 
 Tools used to fill gaps (not datasets): **EasyOCR's CRAFT** text detector (auto-labels `text`) and **stock `yolo11n.pt`** (auto-labels the 80 COCO classes on EgoHands frames, which have no COCO labels).

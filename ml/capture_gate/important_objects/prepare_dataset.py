@@ -26,6 +26,8 @@ import csv
 import json
 import random
 import shutil
+import subprocess
+import sys
 import urllib.request
 import zipfile
 from collections import Counter, defaultdict
@@ -39,7 +41,9 @@ COCO_TEXT = "https://github.com/bgshih/cocotext/releases/download/dl/cocotext.v2
 # COCO-WholeBody v1.0, official Google Drive files (github.com/jin-s13/COCO-WholeBody); the train
 # file also has a Hugging Face mirror, used when Drive refuses (its daily quota).
 WHOLEBODY_DRIVE = {"train": "1thErEToRbmM9uLNi1JXXfOsaS5VK2FXf", "val": "1N6VgwKnj8DeyGXCvp1eYgNbRmw6jdfrb"}
-WHOLEBODY_MIRROR = {"train": "https://huggingface.co/hngan/cocowholebody/resolve/main/coco_wholebody_train_v1.0.json"}
+# EgoHands' original link is dead; a full copy of the original release lives on Kaggle
+EGOHANDS_KAGGLE = "himaniishah/egohands"
+WHOLEBODY_MIRROR ={"train": "https://huggingface.co/hngan/cocowholebody/resolve/main/coco_wholebody_train_v1.0.json"}
 
 # our classes after COCO's 80 (README §1); LVIS names for the five objects
 OURS = {80: ("keys", "key"), 81: ("glasses", "spectacles"), 82: ("wallet", "wallet"),
@@ -268,27 +272,45 @@ def add_coco_text(records: dict, cache: Path) -> Counter:
     return stats
 
 
+def extract_hands(part: str, cache: Path) -> None:
+    """Runs in its own process: the WholeBody train file is 3.2 GB and needs ~20 GB of RAM to load,
+    so only the valid hand boxes are kept (a few MB) and the process exits, freeing all of it."""
+    wb = wholebody(part, cache)
+    hands = defaultdict(list)
+    for a in wb["annotations"]:
+        if a.get("iscrowd"):
+            continue
+        for side in ("lefthand", "righthand"):
+            if a.get(f"{side}_valid"):
+                hands[a["image_id"]].append(a[f"{side}_box"])
+    out = {"images": [img["id"] for img in wb["images"]], "hands": hands}
+    (cache / f"hands_{part}.json").write_text(json.dumps(out), encoding="utf-8")
+
+
+def hands_of(part: str, cache: Path) -> dict:
+    path = cache / f"hands_{part}.json"
+    if not path.exists():
+        print(f"extracting COCO-WholeBody {part} hands in a separate process …", flush=True)
+        subprocess.run([sys.executable, __file__, "--extract-hands", part, "--cache", str(cache)], check=True)
+    return load_json(path)
+
+
 def add_wholebody(records: dict, cache: Path) -> Counter:
     stats = Counter()
     for part in ("train", "val"):
         if not any(f"{part}2017" in r["url"] for r in records.values()):
             continue
-        wb = wholebody(part, cache)
-        seen = {img["id"] for img in wb["images"]}
-        for a in wb["annotations"]:
-            record = records.get(a["image_id"])
-            if record is None or a.get("iscrowd"):
+        wb = hands_of(part, cache)
+        for iid in wb["images"]:
+            record = records.get(iid)
+            if record is None:
                 continue
-            for side in ("lefthand", "righthand"):
-                if a.get(f"{side}_valid"):
-                    box = clip(a[f"{side}_box"], record["w"], record["h"])
-                    if box:
-                        record["boxes"].append((HAND, box))
-                        stats["hand boxes from COCO-WholeBody"] += 1
-        for iid, record in records.items():
-            if iid in seen:
-                record["labels"]["hand"] = "wholebody"
-        del wb
+            record["labels"]["hand"] = "wholebody"
+            for raw in wb["hands"].get(str(iid), []):
+                box = clip(raw, record["w"], record["h"])
+                if box:
+                    record["boxes"].append((HAND, box))
+                    stats["hand boxes from COCO-WholeBody"] += 1
     with_person = [r for r in records.values() if any(c == 0 for c, _ in r["boxes"])]
     stats["COCO photos with a person"] = len(with_person)
     stats["…of those with at least one hand box"] = sum(1 for r in with_person if any(c == HAND for c, _ in r["boxes"]))
@@ -302,9 +324,19 @@ def egohands(root: Path, limit: int, splits) -> dict:
     import numpy as np
     from scipy.io import loadmat
 
-    hits = list(root.rglob("_LABELLED_SAMPLES"))
+    # Kaggle doesn't always mount an input under its slug: search every input if needed
+    hits = list(root.rglob("_LABELLED_SAMPLES")) if root.exists() else []
+    if not hits and Path("/kaggle/input").exists():
+        hits = list(Path("/kaggle/input").rglob("_LABELLED_SAMPLES"))
     if not hits:
-        raise SystemExit(f"EgoHands not found under {root}: add the Kaggle dataset 'himaniishah/egohands' as an input")
+        # not attached: fetch it with kagglehub (on the Kaggle machine; preinstalled in Kaggle notebooks)
+        import kagglehub
+
+        print(f"EgoHands not attached; downloading {EGOHANDS_KAGGLE} with kagglehub (~1.3 GB) …", flush=True)
+        hits = list(Path(kagglehub.dataset_download(EGOHANDS_KAGGLE)).rglob("_LABELLED_SAMPLES"))
+    if not hits:
+        raise SystemExit(f"EgoHands not found: open kaggle.com/datasets/{EGOHANDS_KAGGLE} and check it still exists")
+    print(f"EgoHands found at {hits[0]}", flush=True)
     videos = sorted(p for p in hits[0].iterdir() if (p / "polygons.mat").exists())
     by_activity = defaultdict(list)
     for v in videos:
@@ -500,9 +532,13 @@ def main() -> None:
     parser.add_argument("--workers", type=int, default=64)
     parser.add_argument("--accept-low-counts", action="store_true", help="write the data even if a class is thin")
     parser.add_argument("--coco-val", type=Path, default=None, help="only build COCO val2017 for the forgetting check")
+    parser.add_argument("--extract-hands", choices=["train", "val"], help=argparse.SUPPRESS)  # internal, see hands_of
     args = parser.parse_args()
     cache = args.cache or args.out / "annotations"
     cache.mkdir(parents=True, exist_ok=True)
+    if args.extract_hands:
+        extract_hands(args.extract_hands, cache)
+        return
     if args.coco_val:
         coco_val_check(args.coco_val, cache)
         return
