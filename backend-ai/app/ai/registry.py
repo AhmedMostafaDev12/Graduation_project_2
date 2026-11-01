@@ -11,8 +11,9 @@ never a provider SDK.
 Adding a provider = a class implementing the interface + one entry in PROVIDERS.
 """
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from functools import lru_cache
+from functools import lru_cache, partial
 
 from app.ai import fakes
 from app.ai.clients.embeddings import OpenAITextEmbedder, VoyageTextEmbedder
@@ -77,8 +78,12 @@ PROFILES: dict[str, dict[str, str]] = {
     },
 }
 
+# /assist: a hung call must end well before the client's default 60 s. The answer turn is
+# retried once (assist_loop), so the worst case is the search budget + 2 × this.
+ASSIST_LLM_TIMEOUT_S = 30.0
+
 # the implementations that exist today; real clients are added from Phase 7.1 on
-PROVIDERS: dict[str, dict[str, type]] = {
+PROVIDERS: dict[str, dict[str, Callable[[], object]]] = {
     "stt": {"fake": fakes.FakeSpeechToText, "deepgram-nova-3": DeepgramSpeechToText},
     "text_embedder": {
         "fake": fakes.FakeTextEmbedder,
@@ -102,7 +107,7 @@ PROVIDERS: dict[str, dict[str, type]] = {
     "assist_llm": {
         "fake": fakes.FakeLLM,
         "gemini-flash": GeminiLLM,
-        "gemini-flash-fast": GeminiFastLLM,
+        "gemini-flash-fast": partial(GeminiFastLLM, timeout_s=ASSIST_LLM_TIMEOUT_S),
         "groq-qwen": GroqLLM,
         "selfhosted-qwen": SelfHostedLLM,
     },
