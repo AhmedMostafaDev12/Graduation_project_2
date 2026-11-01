@@ -50,7 +50,13 @@ class TextEmbedder(Protocol):
     model_id: str
     dim: int
 
-    def embed(self, texts: list[str]) -> list[list[float]]: ...
+    def embed(self, texts: list[str]) -> list[list[float]]:
+        """Journal sentences and names, as stored for search ("document" side)."""
+        ...
+
+    def embed_query(self, text: str) -> list[float]:
+        """A question or search text, to compare with stored vectors ("query" side)."""
+        ...
 
 
 class VisionReviewer(Protocol):

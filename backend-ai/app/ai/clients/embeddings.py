@@ -4,8 +4,8 @@ Implements the `TextEmbedder` interface (app/ai/interfaces.py). One request embe
 sentences. Two providers, both asked for TEXT_DIM dimensions so they fit the same columns:
 
 - `VoyageTextEmbedder` (production): free allowance of 200M tokens, data not used for
-  training once opted out in the Voyage dashboard. Sentences are embedded as "document";
-  questions (Phase 9, /assist) will be embedded as "query".
+  training once opted out in the Voyage dashboard. Sentences are embedded as "document",
+  questions and search texts (/assist, phase 9.1) as "query".
 - `OpenAITextEmbedder`: `text-embedding-3-small` shortened to TEXT_DIM, kept as an alternative.
 
 Vectors from different models can't be compared: changing provider means re-embedding
@@ -84,13 +84,20 @@ class VoyageTextEmbedder:
         self.timeout_s = timeout_s
 
     def embed(self, texts: list[str]) -> list[list[float]]:
+        return self._embed(texts, "document")
+
+    def embed_query(self, text: str) -> list[float]:
+        """Questions use Voyage's "query" side, matched against stored "document" vectors."""
+        return self._embed([text], "query")[0]
+
+    def _embed(self, texts: list[str], input_type: str) -> list[list[float]]:
         if not texts:
             return []
         _check(texts)
         body = {
             "model": self.model_id,
             "input": texts,
-            "input_type": "document",
+            "input_type": input_type,
             "output_dimension": self.dim,
         }
         return _post(
@@ -113,6 +120,9 @@ class OpenAITextEmbedder:
             "OPENAI_API_KEY",
         )
         self.timeout_s = timeout_s
+
+    def embed_query(self, text: str) -> list[float]:
+        return self.embed([text])[0]  # OpenAI has one side for both
 
     def embed(self, texts: list[str]) -> list[list[float]]:
         if not texts:

@@ -1,4 +1,4 @@
-"""Mind games, daily summary, alerts, push tokens and the /assist stub (Phase 5)."""
+"""Mind games, daily summary, alerts, push tokens and /assist without a usable model."""
 
 import uuid
 from datetime import UTC, date, datetime
@@ -124,7 +124,8 @@ def test_push_token_moves_to_the_latest_caregiver(client, migrated_engine):
     assert [str(o) for o in owners] == [second["id"]]
 
 
-def test_assist_stub_answers_in_the_patients_language(client):
+def test_assist_without_a_usable_model_answers_not_sure(client):
+    # the stub profile's fake LLM can't drive the /assist agent: a kind fallback answer
     manager, patient, base = _setup(client)
     phone = pair_device(client, manager, patient["id"])
     response = client.post(

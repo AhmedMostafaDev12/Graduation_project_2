@@ -16,7 +16,7 @@ from functools import lru_cache
 
 from app.ai import fakes
 from app.ai.clients.embeddings import OpenAITextEmbedder, VoyageTextEmbedder
-from app.ai.clients.llm import GeminiLLM
+from app.ai.clients.llm import GeminiFastLLM, GeminiLLM
 from app.ai.clients.stt import DeepgramSpeechToText
 from app.ai.clients.vision import GeminiVisionReviewer
 from app.ai.inference.face_onnx import OnnxFaceEmbedder
@@ -30,7 +30,15 @@ from app.ai.interfaces import (
 )
 from app.config import settings
 
-CAPABILITIES = ("stt", "text_embedder", "vision", "captioner", "llm", "face")
+CAPABILITIES = (
+    "stt",
+    "text_embedder",
+    "vision",
+    "captioner",
+    "llm",
+    "assist_llm",
+    "face",
+)
 
 # provider name for every capability, per profile
 PROFILES: dict[str, dict[str, str]] = {
@@ -40,6 +48,7 @@ PROFILES: dict[str, dict[str, str]] = {
         "vision": "fake",
         "captioner": "fake",
         "llm": "fake",
+        "assist_llm": "fake",
         "face": "stub",
     },
     "production": {
@@ -48,6 +57,7 @@ PROFILES: dict[str, dict[str, str]] = {
         "vision": "gemini-flash",
         "captioner": "cloud-vision",
         "llm": "gemini-flash",
+        "assist_llm": "gemini-flash-fast",
         "face": "mobilefacenet-onnx",
     },
     "small": {
@@ -56,6 +66,7 @@ PROFILES: dict[str, dict[str, str]] = {
         "vision": "local-qwen2.5-vl",
         "captioner": "local-qwen2.5-vl",
         "llm": "local-llm",
+        "assist_llm": "local-llm",
         "face": "mobilefacenet-onnx",
     },
 }
@@ -71,6 +82,12 @@ PROVIDERS: dict[str, dict[str, type]] = {
     "vision": {"fake": fakes.FakeVisionReviewer, "gemini-flash": GeminiVisionReviewer},
     "captioner": {"fake": fakes.FakeCaptioner},
     "llm": {"fake": fakes.FakeLLM, "gemini-flash": GeminiLLM},
+    # the /assist agent: speed matters (the glasses wait at most 20 s, spec D39)
+    "assist_llm": {
+        "fake": fakes.FakeLLM,
+        "gemini-flash": GeminiLLM,
+        "gemini-flash-fast": GeminiFastLLM,
+    },
     "face": {"stub": fakes.StubFaceEmbedder, "mobilefacenet-onnx": OnnxFaceEmbedder},
 }
 
@@ -86,6 +103,7 @@ class AIModels:
     vision: VisionReviewer
     captioner: Captioner
     llm: LLM
+    assist_llm: LLM
     face: FaceEmbedder
 
 
@@ -131,6 +149,7 @@ def overrides_from_settings() -> dict[str, str | None]:
         "vision": settings.ai_vision,
         "captioner": settings.ai_captioner,
         "llm": settings.ai_llm,
+        "assist_llm": settings.ai_assist_llm,
         "face": settings.ai_face,
     }
 

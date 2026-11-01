@@ -39,8 +39,13 @@ Search arguments:
 - search_text: the words to look for, in the patient's words, with the names of mentioned
   people and things.
 
-Each search result comes back as lines "id | local time | text", after a line of notes. A note
-is a code saying how the search was changed:
+Each search result comes back as lines "id | local time | text", after a line of notes. A text
+may start with [...]: memory already extracted from that event: "X last seen: <where>" (the
+newest place it was seen), "action: ..." and "count: ... ×N in the time searched" (how many
+times), "said: «exact words»" (who said what, word for word), "plan: ... (status: done /
+not_done / open / unknown)" and "settles the plan ...". Trust these lines as part of that
+event, prefer them for where / how many / did-I questions, and cite that event's id.
+A note is a code saying how the search was changed:
 - dropped_person_id: a person id you sent is not known. Who was there could not be checked:
   the answer must say it is not sure who it was.
 - ignored_day_part: the part of the day could not be used (the window covers several dates),

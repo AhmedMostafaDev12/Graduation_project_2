@@ -161,7 +161,7 @@ A 32-second WhatsApp voice note (two people, one voice much quieter; heavily com
 | Capability | Recommended `production` | Recommended `small` | Decided? |
 |---|---|---|---|
 | Speech-to-text | Deepgram Nova-3 `ar-EG` + diarization, volume boosted first | WhisperX (self-hosted) | **decided** (measured, §7); speaker separation still open |
-| LLM | Gemini Flash (`gemini-3.8-flash`, **paid tier**; `clients/llm.py`, phase 7.5) | Qwen3.8-27B via Groq | **decided for consolidation** (measured, §7.5); `/assist` open (Phase 9) |
+| LLM | Gemini Flash (`gemini-3.8-flash`, **paid tier**; `clients/llm.py`, phase 7.5) | Qwen3.8-27B via Groq | **decided for consolidation** (measured, §7.5). `/assist` (9.1): the same model with **low thinking** (`gemini-flash-fast`): median 7.9 → 4.0 s per call; Groq Qwen stays the candidate if 20 s isn't met |
 | Vision | Gemini Flash (paid; `clients/vision.py`, phase 8.3) | Qwen2.5-VL | **decided, implemented** (checked on a portrait and a receipt: fields read right, ~7 s per photo; not measured on a test set yet) |
 | Text embeddings | Voyage `voyage-4`, 1024-d (`clients/embeddings.py`, migration 0006) | Qwen3-Embedding | **decided (D15, changed 26 Oct), implemented** |
 

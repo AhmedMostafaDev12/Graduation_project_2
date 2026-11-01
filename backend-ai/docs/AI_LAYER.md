@@ -38,8 +38,10 @@ app/ai/
 │   └── extract.py    #   facts, intentions, entities from a transcript: prompts, schemas, validation (7.5)
 ├── rag/
 │   ├── render.py     #   event -> one sentence ("09:20 talked with Ahmed (son): ...")
-│   ├── retriever.py  #   SQL time window + person filter, then pgvector ranking (spec D22)
-│   └── answer.py     #   build prompt from top-k events, call llm, return answer + source_event_ids (STUB: fixed answer until 9.1)
+│   ├── retriever.py  #   filters, then meaning + words + the five structures (last seen, counts, quotes, plans + proof), fused; premise check; flat switch for H6 (9.1)
+│   ├── planner.py    #   validate the agent's search arguments (track R3)
+│   ├── assist_loop.py #  the bounded search-then-answer agent (track R3)
+│   └── answer.py     #   /assist: the loop + the retriever + assist_llm → answer + source_event_ids (9.1)
 ├── clustering.py     #   decode the glasses' vector, nearest enrolled person / cluster (spec D23; built in 8.4)
 └── prompts/          #   *.txt templates, versioned (memory_extract.v1.txt, memory_settle.v1.txt, vision_review.v1.txt)
 ```
@@ -85,7 +87,7 @@ The vision prompt (Phase 7) must return `ReviewResult` from [`app/ai/review_cont
 | Embed events for RAG | `rag/render.py` + `clients/embeddings.py` | task `embed` (queue `ai_io`) |
 | Facts + intentions from speech (D40) | `memory/extract.py` + `clients/llm.py` | task `memory.consolidate` (queue `ai_io`) |
 | Object sightings + action log from photos (D40) | `services/vision_memory.py` (fields from the review call) | inside task `review.media` |
-| Answer a question (`/assist`) | `rag/retriever.py` + `rag/answer.py` + `clients/llm.py` | request (user waiting) |
+| Answer a question (`/assist`) | `rag/answer.py` + `rag/assist_loop.py` + `rag/retriever.py`, model `assist_llm` | request (user waiting, glasses give up at 20 s) |
 | Daily summary (Phase 2) | `clients/llm.py` | Beat → task `summaries` |
 | Enrollment face embedding | `inference/face_onnx.py` (stub until 8.2) | request |
 | Unknown-face clustering | `clustering.py` + `services/clustering_service.py` | task `cluster.unknown_faces` (queue `cpu`, every 10 min) |
@@ -100,7 +102,7 @@ The vision prompt (Phase 7) must return `ReviewResult` from [`app/ai/review_cont
 | Interface | Method | Production (cloud) | Small (open) |
 |---|---|---|---|
 | `SpeechToText` | `transcribe(audio, content_type, language_hint) -> Transcript` (segments with times and speaker labels) | Deepgram Nova-3 (`ar-EG`) + diarization, `clients/stt.py` | WhisperX |
-| `TextEmbedder` | `embed(texts) -> list[vector]` | Voyage `voyage-4` (1024-d, D15) | a multilingual open embedder |
+| `TextEmbedder` | `embed(texts) -> list[vector]` (stored sentences), `embed_query(text) -> vector` (questions) | Voyage `voyage-4` (1024-d, D15; document / query sides) | a multilingual open embedder |
 | `VisionReviewer` | `review(image, language) -> dict` (shaped by `review_contract`) | cloud vision model | Qwen2.5-VL |
 | `Captioner` | `caption(images, transcript, language) -> str` | cloud vision model | small VLM |
 | `LLM` | `complete(messages, json_schema=None) -> str` | Haiku / 4o-mini class | Qwen / Gemma via a local server |
@@ -109,7 +111,7 @@ The vision prompt (Phase 7) must return `ReviewResult` from [`app/ai/review_cont
 Every implementation exposes `model_id`, and anything it produces is stored with that id (for example, which model embedded an event).
 
 ### 6.2 Profiles and the registry (`app/ai/registry.py`)
-- `AI_PROFILE=production | small | stub` picks an implementation for every capability. One capability can be overridden: `AI_STT`, `AI_TEXT_EMBEDDER`, `AI_VISION`, `AI_CAPTIONER`, `AI_LLM`, `AI_FACE`.
+- `AI_PROFILE=production | small | stub` picks an implementation for every capability. One capability can be overridden: `AI_STT`, `AI_TEXT_EMBEDDER`, `AI_VISION`, `AI_CAPTIONER`, `AI_LLM`, `AI_ASSIST_LLM` (the /assist agent: `gemini-flash-fast` = the same Gemini with low thinking, for speed), `AI_FACE`.
 - `get_ai()` builds the models **once per process** (rule 4) and caches them. Services call `get_ai().stt.transcribe(...)`, never a provider SDK.
 - A provider that isn't implemented yet fails with a clear error naming the capability. The default profile stays `stub` until the real clients exist.
 - `stub` uses `app/ai/fakes.py`: deterministic fakes with the right shapes and dimensions, for tests and local work without API keys.

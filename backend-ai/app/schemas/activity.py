@@ -60,7 +60,8 @@ class PushTokenIn(BaseModel):
 class AssistRequest(BaseModel):
     question: str = Field(min_length=1, max_length=1000)
     language: Literal["ar", "en"] | None = Field(
-        default=None, description="Defaults to the patient's preferred language"
+        default=None,
+        description="Ignored since phase 9.1: the answer follows the question's language",
     )
 
 
