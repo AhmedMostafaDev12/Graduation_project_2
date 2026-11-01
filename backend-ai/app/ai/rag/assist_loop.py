@@ -24,7 +24,8 @@ it used. Code drives the loop:
   errors);
 - used_event_ids not among the results the model saw are dropped;
 - the answer language comes from the question's letters (question_language) and is passed
-  to the prompt as {{answer_language}} (v1 does not use it).
+  to the prompt as {{answer_language}} (used since v2: models drifted to Arabic on English
+  questions in the SuperMemory-VQA replay).
 
 The retriever (SearchBackend) comes in R4. Privacy: nothing here is logged; the trace is
 returned in memory only and holds no question or result text.
@@ -57,7 +58,7 @@ from app.ai.rag.planner import (
 from app.errors import TransientError
 
 PROMPTS_DIR = Path(__file__).resolve().parent.parent / "prompts"
-ASSIST_PROMPT = "assist_agent.v1"
+ASSIST_PROMPT = "assist_agent.v2"
 
 TOP_K = 8  # results per search the model sees
 MAX_EVIDENCE_TEXT = 400  # characters of one result's text
