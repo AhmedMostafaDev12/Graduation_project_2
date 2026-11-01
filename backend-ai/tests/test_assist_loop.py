@@ -510,6 +510,7 @@ def test_prompt_has_no_unfilled_placeholders():
         "timezone",
         "calendar",
         "people",
+        "answer_language",
     }
     system = build_messages(QUESTION, ASKED, CAIRO, PEOPLE)[0]["content"]
     assert PLACEHOLDER.findall(system) == []

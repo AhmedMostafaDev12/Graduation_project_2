@@ -70,7 +70,7 @@ def store(
             ObjectSighting(
                 patient_id=media.patient_id,
                 entity_id=ids[EntityRef("object", name)],
-                state=(state or "").strip()[:80] or None,
+                state=(state or "").strip()[:300] or None,  # may hold printed text
                 room=room,
                 place_id=place_id,
                 seen_at=event.occurred_at,

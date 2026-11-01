@@ -20,7 +20,7 @@ from app.ai.memory.extract import load_prompt
 from app.ai.review_contract import ReviewResult
 from app.config import settings
 
-PROMPT = "vision_review.v1"
+PROMPT = "vision_review.v2"  # v2: printed text on objects, where they sit
 MAX_SIDE = 1600  # pixels; enough to read a label, and fewer image tokens
 
 _TEXT = {"type": "string"}
@@ -115,11 +115,11 @@ class VisionError(LLMError):
     """A permanent failure (bad request, blocked photo, unreadable answer): not retried."""
 
 
-def to_jpeg(image: bytes | Image.Image) -> bytes:
-    """The photo as a JPEG whose longest side is at most MAX_SIDE pixels."""
+def to_jpeg(image: bytes | Image.Image, max_side: int = MAX_SIDE) -> bytes:
+    """The photo as a JPEG whose longest side is at most `max_side` pixels."""
     photo = image if isinstance(image, Image.Image) else Image.open(io.BytesIO(image))
     photo = photo.convert("RGB")
-    photo.thumbnail((MAX_SIDE, MAX_SIDE))
+    photo.thumbnail((max_side, max_side))
     out = io.BytesIO()
     photo.save(out, "JPEG", quality=88)
     return out.getvalue()

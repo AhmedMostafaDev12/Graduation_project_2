@@ -71,7 +71,7 @@ class SeenObject(BaseModel):
 
     name: str = Field(max_length=80)
     state: str | None = Field(
-        default=None, max_length=80
+        default=None, max_length=300
     )  # "on", "open", "in the drawer"
 
 

@@ -56,6 +56,13 @@ class Settings(BaseSettings):
     # Locally: backend-ai/models (gitignored). Docker: /code/models.
     face_models_dir: str = str(Path(__file__).resolve().parents[1] / "models")
     gemini_api_key: str | None = None
+    groq_api_key: str | None = None
+    # the Groq model for text and photos (clients/groq.py); must read images for vision
+    groq_model: str = "qwen/qwen3.6-27b"
+    # our own OpenAI-compatible vLLM server (research runs; ml/replay/LIGHTNING.md)
+    selfhosted_base_url: str | None = None
+    selfhosted_api_key: str | None = None
+    selfhosted_model: str = "Qwen/Qwen3.6-27B-FP8"
 
     @model_validator(mode="after")
     def _real_secret_outside_local(self):
