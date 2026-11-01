@@ -39,7 +39,9 @@ COCO_TEXT = "https://github.com/bgshih/cocotext/releases/download/dl/cocotext.v2
 # COCO-WholeBody v1.0, official Google Drive files (github.com/jin-s13/COCO-WholeBody); the train
 # file also has a Hugging Face mirror, used when Drive refuses (its daily quota).
 WHOLEBODY_DRIVE = {"train": "1thErEToRbmM9uLNi1JXXfOsaS5VK2FXf", "val": "1N6VgwKnj8DeyGXCvp1eYgNbRmw6jdfrb"}
-WHOLEBODY_MIRROR = {"train": "https://huggingface.co/hngan/cocowholebody/resolve/main/coco_wholebody_train_v1.0.json"}
+# EgoHands' original link is dead; a full copy of the original release lives on Kaggle
+EGOHANDS_KAGGLE = "himaniishah/egohands"
+WHOLEBODY_MIRROR ={"train": "https://huggingface.co/hngan/cocowholebody/resolve/main/coco_wholebody_train_v1.0.json"}
 
 # our classes after COCO's 80 (README §1); LVIS names for the five objects
 OURS = {80: ("keys", "key"), 81: ("glasses", "spectacles"), 82: ("wallet", "wallet"),
@@ -307,8 +309,13 @@ def egohands(root: Path, limit: int, splits) -> dict:
     if not hits and Path("/kaggle/input").exists():
         hits = list(Path("/kaggle/input").rglob("_LABELLED_SAMPLES"))
     if not hits:
-        raise SystemExit("EgoHands not found under /kaggle/input: add the Kaggle dataset 'himaniishah/egohands' "
-                         "as an input (right panel → Add Input), then re-run this cell")
+        # not attached: fetch it with kagglehub (on the Kaggle machine; preinstalled in Kaggle notebooks)
+        import kagglehub
+
+        print(f"EgoHands not attached; downloading {EGOHANDS_KAGGLE} with kagglehub (~1.3 GB) …", flush=True)
+        hits = list(Path(kagglehub.dataset_download(EGOHANDS_KAGGLE)).rglob("_LABELLED_SAMPLES"))
+    if not hits:
+        raise SystemExit(f"EgoHands not found: open kaggle.com/datasets/{EGOHANDS_KAGGLE} and check it still exists")
     print(f"EgoHands found at {hits[0]}", flush=True)
     videos = sorted(p for p in hits[0].iterdir() if (p / "polygons.mat").exists())
     by_activity = defaultdict(list)
