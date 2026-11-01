@@ -24,6 +24,13 @@ other providers' keys are not needed. The key is never printed.
 --mode full: the whole loop over a small in-memory backend (filter by plan, rank by token
   overlap with the rendered sentence, TOP_K). Prints answer, used_event_ids, searches and
   seconds, plus auto-checks; whether the answer is right is read by a human.
+  Like app/ai/rag/retriever.py it always returns the top results that pass the filters (no
+  relevance threshold) and runs the premise check (D39): an empty search with person_ids
+  and a window returns each person's last presence, marked OUTSIDE_WINDOW. It has no memory
+  structures (no "[...]" lines): the synthetic days are not consolidated here.
+  --person-filter off: the backend ignores person_ids (the model still sends them), which
+  also turns the premise check off, since that needs the person filter.
+  --budget: run_assist's search_budget_s (soft; loops over it are reported, not failures).
 """
 
 import argparse
@@ -57,6 +64,8 @@ from app.ai.rag.assist_loop import (
     Person,
     run_assist,
 )
+from app.ai.rag.planner import QueryPlan
+from app.ai.rag.retriever import OUTSIDE_WINDOW
 from app.ai.registry import PROVIDERS, choose_providers, overrides_from_settings
 from app.config import settings
 
@@ -164,24 +173,58 @@ def tokens(text: str) -> set[str]:
 
 
 class MemoryBackend:
-    def __init__(self, events: dict, sentences: dict):
+    def __init__(self, events: dict, sentences: dict, person_filter: str = "hard"):
         self.events = events
         self.sentences = sentences
+        self.person_filter = person_filter
         self.returned: set[str] = set()
+        self.premise_found: list[str] = []  # ids the premise check returned
+
+    def _evidence(self, e: dict, line: str | None = None) -> Evidence:
+        text = self.sentences[e["id"]]
+        return Evidence(
+            e["id"],
+            e["start"].strftime("%Y-%m-%d %H:%M"),
+            f"[{line}] {text}" if line else text,
+        )
 
     async def search(self, plan) -> list[Evidence]:
+        if self.person_filter == "off":
+            plan = plan.model_copy(update={"person_ids": []})
         wanted = tokens(plan.search_text)
         hits = [e for e in self.events.values() if passes(e, plan)]
         hits.sort(
             key=lambda e: (-len(wanted & tokens(self.sentences[e["id"]])), e["start"])
         )
-        found = [
-            Evidence(
-                e["id"], e["start"].strftime("%Y-%m-%d %H:%M"), self.sentences[e["id"]]
-            )
-            for e in hits[:TOP_K]
-        ]
+        found = [self._evidence(e) for e in hits[:TOP_K]]
+        # as retriever.MemorySearch.search_now (lines 117-118)
+        if not found and plan.person_ids and (plan.window_start or plan.window_end):
+            found = self._premise(plan)
+            self.premise_found += [ev.event_id for ev in found]
         self.returned |= {ev.event_id for ev in found}
+        return found
+
+    def _premise(self, plan) -> list[Evidence]:
+        """retriever.MemorySearch._premise (lines 121-138): each person's newest presence
+        outside the window, with the same event types."""
+        found, seen = [], set()
+        for person in plan.person_ids:
+            outside = QueryPlan(
+                window_start=None,
+                window_end=plan.window_end if plan.window_start is None else None,
+                person_ids=[person],
+                event_types=plan.event_types,
+                search_text="",
+            )
+            newest = sorted(
+                (e for e in self.events.values() if passes(e, outside)),
+                key=lambda e: e["start"],
+                reverse=True,
+            )
+            for e in newest[:1]:
+                if e["id"] not in seen:
+                    seen.add(e["id"])
+                    found.append(self._evidence(e, OUTSIDE_WINDOW))
         return found
 
 
@@ -255,7 +298,8 @@ async def evaluate(args) -> int:
     llm = TimedLLM(real)
     print(
         f"Model: {label}   prompt: {args.prompt}   mode: {args.mode}   "
-        f"runs: {args.runs}   events: {len(events)}"
+        f"runs: {args.runs}   events: {len(events)}   "
+        f"person filter: {args.person_filter}   budget: {args.budget:g} s"
     )
 
     questions = [q for q in bench["questions"] if q["split"] == "dev"]
@@ -268,7 +312,7 @@ async def evaluate(args) -> int:
         print(f"\n### {q['id']} {q['category']} [{q['language']}] {question}")
         print(f"evidence {evidence or 'none'}")
         for n in range(1, args.runs + 1):
-            backend = MemoryBackend(events, sentences)
+            backend = MemoryBackend(events, sentences, args.person_filter)
             llm.run = (q["id"], n)
             started = time.perf_counter()
             result = await run_assist(
@@ -278,6 +322,7 @@ async def evaluate(args) -> int:
                 asked_at=asked_at,
                 tz=tz_name,
                 people=people,
+                search_budget_s=args.budget,
                 plan_only=args.mode == "plan",
                 prompt_name=args.prompt,
             )
@@ -352,6 +397,10 @@ async def evaluate(args) -> int:
                     "searches_found_all_evidence": set(evidence) <= backend.returned,
                     "used_cover_evidence": set(evidence) <= set(used),
                     "cites_nothing": not used,
+                    "premise_found": backend.premise_found,
+                    # a fallback after a model search: that search turn was cut by the
+                    # budget or its reply was unusable
+                    "turns_cut": sum(s.fallback for s in result.trace[1:]),
                     "plans": [
                         (s.plan.model_dump(mode="json"), list(s.notes), s.n_results)
                         for s in result.trace
@@ -363,6 +412,8 @@ async def evaluate(args) -> int:
                         f"{plan_text(s.plan, tz)} notes {list(s.notes) or '-'} "
                         f"-> {s.n_results}"
                     )
+                if backend.premise_found:
+                    print(f"       premise check returned {backend.premise_found}")
                 print(f"       answer: {result.answer!r}  degraded {result.degraded}")
                 print(
                     f"       used {used} | searches {row['searches']} | "
@@ -401,7 +452,7 @@ async def evaluate(args) -> int:
         f"columns): {running}"
     )
     print(
-        f"loops over budget ({SEARCH_BUDGET_S:.0f} s, soft: still answered, not a "
+        f"loops over budget ({args.budget:g} s, soft: still answered, not a "
         f"failure): {sum(over)} of {len(over)} ({pct(over)})"
     )
     if args.mode == "full":
@@ -411,6 +462,12 @@ async def evaluate(args) -> int:
             f"\nsearches found all evidence {pct([r['searches_found_all_evidence'] for r in with_ev])}"
             f" | used cover evidence {pct([r['used_cover_evidence'] for r in with_ev])}"
             f" | evidence-less cite nothing {pct([r['cites_nothing'] for r in without])}"
+        )
+        print(
+            f"search turns cut or unusable (fallback after a model search): "
+            f"{sum(r['turns_cut'] for r in rows)} in "
+            f"{sum(r['turns_cut'] > 0 for r in rows)} runs | premise check fired in "
+            f"{sum(bool(r['premise_found']) for r in rows)} runs"
         )
         print("\n## Answers (full)")
         print("| id | run | searches | found all evidence | used_event_ids | answer |")
@@ -433,7 +490,14 @@ async def evaluate(args) -> int:
     if args.out:
         args.out.write_text(
             json.dumps(
-                {"model": label, "mode": args.mode, "rows": rows},
+                {
+                    "model": label,
+                    "prompt": args.prompt,
+                    "mode": args.mode,
+                    "person_filter": args.person_filter,
+                    "budget": args.budget,
+                    "rows": rows,
+                },
                 indent=1,
                 ensure_ascii=False,
             ),
@@ -451,6 +515,18 @@ def main() -> int:
     parser.add_argument("--model", help="override the Gemini model for this run only")
     parser.add_argument(
         "--prompt", default=ASSIST_PROMPT, help="prompt file name in app/ai/prompts"
+    )
+    parser.add_argument(
+        "--person-filter",
+        choices=("hard", "off"),
+        default="hard",
+        help="off: the in-memory backend ignores person_ids (no premise check either)",
+    )
+    parser.add_argument(
+        "--budget",
+        type=float,
+        default=SEARCH_BUDGET_S,
+        help="run_assist search_budget_s (soft)",
     )
     parser.add_argument("--out", type=Path, help="JSON dump, outside the repo")
     args = parser.parse_args()
