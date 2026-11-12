@@ -9,10 +9,10 @@ Guide: README.md §4.2 (the steps), §4.3 (the counts it prints) and §5 (what i
 Classes (README §1, a contract with the glasses): 0–79 COCO in the standard order, 80 keys,
 81 glasses, 82 wallet, 83 pill_box, 84 stove, 85 text, 86 hand.
 
-Sources, joined by COCO image id (LVIS, COCO, COCO-Text and COCO-WholeBody label the same photos):
+Sources, joined by COCO image id (LVIS, COCO and COCO-WholeBody label the same photos):
 - LVIS v1: our five objects (80–84); picks the images we keep.
 - COCO 2017 instances: the 80 COCO classes on every COCO photo we use.
-- COCO-Text v2: legible text (85) where it covers an image; EasyOCR's CRAFT labels the rest.
+- Text (85): EasyOCR's CRAFT draws line boxes on every photo (one definition of text everywhere).
 - COCO-WholeBody: valid hand boxes (86) on COCO photos.
 - EgoHands (a Kaggle input): Google Glass frames with hand polygons; the stock yolo11n labels
   their 80 COCO classes and CRAFT their text.
@@ -49,7 +49,6 @@ from pathlib import Path, PurePosixPath
 LVIS = "https://dl.fbaipublicfiles.com/LVIS/lvis_v1_{split}.json.zip"
 COCO = "http://images.cocodataset.org/annotations/annotations_trainval2017.zip"
 COCO_VAL_IMAGES = "http://images.cocodataset.org/zips/val2017.zip"
-COCO_TEXT = "https://github.com/bgshih/cocotext/releases/download/dl/cocotext.v2.zip"
 # COCO-WholeBody v1.0, official Google Drive files (github.com/jin-s13/COCO-WholeBody); the train
 # file also has a Hugging Face mirror, used when Drive refuses (its daily quota).
 WHOLEBODY_DRIVE = {"train": "1thErEToRbmM9uLNi1JXXfOsaS5VK2FXf", "val": "1N6VgwKnj8DeyGXCvp1eYgNbRmw6jdfrb"}
@@ -185,13 +184,6 @@ def coco_instances(part: str, cache: Path) -> dict:
     return load_json(target)
 
 
-def coco_text(cache: Path) -> dict:
-    target = cache / "cocotext.v2.json"
-    if not target.exists():
-        unzip_one(fetch(COCO_TEXT, cache / "cocotext.v2.zip"), "cocotext.v2.json", target)
-    return load_json(target)
-
-
 def wholebody(part: str, cache: Path) -> dict:
     target = cache / f"coco_wholebody_{part}_v1.0.json"
     if not target.exists():
@@ -318,24 +310,6 @@ def drop_doubles(record: dict) -> None:
             continue
         keep.append((cls, b))
     record["boxes"] = keep
-
-
-def add_coco_text(records: dict, cache: Path) -> Counter:
-    ct = coco_text(cache)
-    covered = {int(i) for i in ct["imgs"]}
-    stats = Counter()
-    for a in ct["anns"].values():
-        record = records.get(a["image_id"])
-        if record is None or a.get("legibility") != "legible":
-            continue
-        if a["bbox"][3] >= MIN_TEXT * record["h"]:
-            record["boxes"].append((TEXT, tuple(a["bbox"])))
-            stats["text boxes from COCO-Text"] += 1
-    for iid, record in records.items():
-        if iid in covered:
-            record["labels"]["text"] = "coco-text"
-            stats["images covered by COCO-Text"] += 1
-    return stats
 
 
 def extract_hands(part: str, cache: Path) -> None:
@@ -697,7 +671,8 @@ def egohands(root: Path, limit: int, splits) -> dict:
 # ---------- 8. auto-labels (GPU) ----------
 
 def auto_text(records: list) -> int:
-    """CRAFT text boxes for images COCO-Text doesn't cover (§4.2 step 5)."""
+    """CRAFT text boxes on every photo, one box per line of writing (EasyOCR groups words into lines). One
+    definition everywhere: COCO-Text's word boxes are not used, they'd contradict these (§4.2 step 5)."""
     import easyocr
 
     reader = easyocr.Reader(["en"], gpu=True, recognizer=False, verbose=False)
@@ -962,7 +937,6 @@ def main() -> None:
     print(add_coco(photos, cache, names), flush=True)
     for r in photos.values():
         drop_doubles(r)
-    print(dict(add_coco_text(photos, cache)), flush=True)
     if "wholebody" not in skip:
         print(dict(add_wholebody(photos, cache)), flush=True)
     records = {f"coco_{iid:012d}": r for iid, r in photos.items()}

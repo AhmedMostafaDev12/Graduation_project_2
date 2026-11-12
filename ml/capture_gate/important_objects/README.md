@@ -13,7 +13,7 @@ How the ml team builds the small detector the glasses run on every frame: **COCO
 - **Why one merged model, not a 6-class one:** the six objects were meant to *enhance* a general detector, not replace it. A model fine-tuned on new classes alone **forgets** the 80 it knew. So the training data always keeps COCO images with their full COCO labels (the **reminder set**, §4.2).
 - **Why `text` and `hand`:** many benchmark questions failed on **writing** (a pizza box, a label) and on **moments of handling** (taking cans from the fridge). A `text` box keeps the frame *and* shows where the text is, so a zoomed crop can be sent for reading. A `hand` box overlapping an object marks a pick-up or put-down.
 - **It's the eyes of several gate rules, not the whole gate.** The detector only says what is in view. The rules in `ml/edge/` decide "keep this frame" (§10), together with the face, novelty and audio rules, the **stage-2 classifier** and the look-back buffer (spec D33, D42). It doesn't need perfect boxes. The kept frame goes to the cloud review, which describes it (phase 8.3). So **recall** (not missing a moment) matters far more than box precision.
-- **Data, in this order:** public datasets **now** (COCO, LVIS, COCO-Text, COCO-WholeBody, EgoHands, §4); then **fine-tune and test** on a smaller set of our own glasses-view footage (§4.4), because the test must look like the real glasses.
+- **Data, in this order:** public datasets **now** (COCO, LVIS, Objects365, Roboflow sets, COCO-WholeBody, EgoHands, §4); then **fine-tune and test** on a smaller set of our own glasses-view footage (§4.4), because the test must look like the real glasses.
 - **Deliverables:** a trained model, an INT8 export in `ml/models/` with a model card, measured accuracy on our own footage, and the rule code in `ml/edge/` (§11).
 
 ---
@@ -33,7 +33,7 @@ Class ids are shared with the glasses' code, so their **order is fixed**. Adding
 | 82 | `wallet` | LVIS `wallet` | a wallet, a purse, a coin purse, a card holder | a handbag or backpack (those are COCO's `handbag`, `backpack`) |
 | 83 | `pill_box` | LVIS `medicine` | any medicine container: a weekly pill organiser, a medicine box or bottle, a blister strip | vitamins or food in jars, a tissue box |
 | 84 | `stove` | LVIS `stove` | a gas stove / cooktop (the burners area), any state | the oven door alone (COCO `oven`), a microwave, a kettle |
-| 85 | `text` | COCO-Text v2 + auto-labels (§4.2 step 5) | a **legible** region of writing: a word or line on packaging, a label, a sign, a page, a screen | illegible scribbles, text too small to read even in a zoomed crop |
+| 85 | `text` | CRAFT auto-labels on every photo (§4.2 step 5) | a **line** of legible writing: on packaging, a label, a sign, a page, a screen (one box per line, not per word) | illegible scribbles, text too small to read even in a zoomed crop |
 | 86 | `hand` | COCO-WholeBody + EgoHands (§4.2 step 6) | a human hand from the wrist to the fingertips, the wearer's own or another person's, empty or holding something | an arm without a visible hand, a glove lying alone |
 
 - **Phone is not a new class:** COCO's `cell phone` (67) is our phone. That's why it's 87 and not 88.
@@ -77,7 +77,7 @@ That's why the input stays at 320, planned as INT8 (decision 12): accuracy has t
 | 1 | **Ultralytics YOLO11n** for stage 1 | fastest to train and export; AGPL-3.0 accepted for the graduation project. NanoDet-Plus-m (Apache 2.0) stays the licence-clean option to compare later (§7.5) |
 | 2 | **One merged 87-class model**: COCO 80 + keys, glasses, wallet, pill_box, stove + text + hand (§1) | the six were meant to extend a general detector; one model per frame fits the Pi |
 | 3 | **Reminder set** (option A): ~5,000 extra COCO images with their full COCO labels in training | measured: our LVIS images cover the household classes well but **18 of 80 COCO classes have fewer than 10 images** (§4.3). Without the reminder set those are forgotten |
-| 4 | **Text from COCO-Text, gaps auto-labelled** (option A): where COCO-Text doesn't cover an image, a ready text detector (EasyOCR's CRAFT, on the Kaggle GPU) draws the text boxes | measured: COCO-Text covers only **31 %** of our LVIS images and **17 %** of the val set with the reminder. The rest would teach "text = background" |
+| 4 | ~~Text from COCO-Text, gaps auto-labelled~~ → **replaced by decision 14** | COCO-Text covered only 17–31 % of our photos, and its word boxes contradicted CRAFT's line boxes |
 | 5 | **Hands from EgoHands (main) + COCO-WholeBody (for the COCO photos)** | EgoHands is filmed with **Google Glass**, our viewpoint. COCO-WholeBody labels the hands **in our COCO photos**, which contain people about 70 % of the time; unlabelled, those hands would teach "hand = background" |
 | 6 | **Hand counts are measured in the Kaggle notebook**, before training, not assumed | COCO-WholeBody doesn't publish how many valid hand boxes fall in our subset (§4.3) |
 | 7 | **Public data first, own footage after**; never record before the public model exists | public data gives the first model now; our footage fine-tunes and tests it (§4.4) |
@@ -87,6 +87,7 @@ That's why the input stays at 320, planned as INT8 (decision 12): accuracy has t
 | 11 | **MediaPipe labels the hands on the Objects365 photos** (12 Nov 2026) | Objects365 has no hand class; photos of keys and wallets often show the hand holding them. MediaPipe (Google, Apache 2.0) is a ready hand detector |
 | 12 | **The input stays 320 px, planned as INT8** (12 Nov 2026, §2) | estimated on the Pi Zero 2W: 416 needs ~520–600 ms (FP32), far over the ~300 ms budget; 320 INT8 ~190–260 ms. To be confirmed on the Pi |
 | 13 | **Roboflow Universe sets** (12 Nov 2026, §4.2 step 6c): pill boxes from `andre-anrfr/pill-box` (442 photos of weekly pill organisers, mostly in hands at home) and `fernando-vela-rdnuo/medicineboxes` (572 of 1,085: medicine boxes in hands and on tables); **keys** from `obj-detection-kd5zb/objects_v2` (~1,200 photos of keys on floors, carpets and tables in real homes; its `bag` boxes dropped); **wallets** from `senior-project-final-datasets/wallets-cskty` (~1,100 close-up product photos) | no other public dataset has pill boxes, and LVIS/Objects365 keys are tiny background details. Checked through Roboflow's API: 40 candidate sets, counts, licences, sample photos. Rejected: clip-art key sets, one-scene sets, and other wallet sets (the same kind of shop photos) |
+| 14 | **Text = CRAFT line boxes on every photo; COCO-Text not used** (12 Nov 2026, §4.2 step 5) | the first run mixed two definitions: COCO-Text boxes single **words**, CRAFT (as used here) whole **lines**; the same sign was 4 small boxes in one photo and 1 long box in another. Text recall 0.16. Lines are also big enough at 320 px, and they're what the gate needs ("readable writing here, send a zoomed crop") |
 
 ### 3.2 Still open (ask the lead)
 
@@ -110,14 +111,13 @@ Two sources, in this order: **public datasets now** (enough for a first model), 
 |---|---|---|---|---|
 | **COCO 2017** (instances) | boxes for the **80 COCO classes** (ids 0–79) | 118K train + 5K val | annotations CC BY 4.0; images Flickr licences (research use) | the 80-class labels on every COCO photo we use, and the **reminder set** |
 | **LVIS v1** | boxes for keys, spectacles, wallet, medicine, stove (ids 80–84) on **COCO's own photos** (same image ids) | ~100K train + ~20K val | CC BY 4.0 | the source of our five object classes |
-| **COCO-Text v2** | text boxes on COCO photos, marked legible / illegible | 53,686 images, 201K boxes (81K legible) | CC BY 4.0 | `text` (85) where it covers an image |
 | **COCO-WholeBody** v1.0 | a left-hand and right-hand box for each **keypoint-annotated person** in COCO, valid only when the hand is clear enough to place keypoints | 200K images, 250K people | CC BY 4.0, **research and non-commercial only** | `hand` (86) on our COCO photos |
 | **EgoHands** | hand polygons, the wearer's vs the other person's, left and right | 48 Google Glass videos, **4,800 frames, 15,000+ hands** | CC BY 4.0 | `hand` (86) from **our viewpoint** |
 | **Objects365** v2 (subset) | boxes for **all 365 classes in every photo**, incl. Key, Wallet/Purse, Glasses, Gas stove, Cell Phone (no pills, no hands) | 1.74 M train photos; we take ~12,000 | research use (list it in the model card) | more keys (6×) and wallets (29×) than LVIS; its other classes mapped onto COCO's 80 |
 | **Roboflow Universe** (4 community sets) | pill organisers and medicine boxes; keys at home; wallets | ~3,300 photos kept | CC BY 4.0 / public domain as published; many `andre` photos are **watermarked stock photos** (iStock, Getty, photocase): research use only, never redistributed | `pill_box` (83), `keys` (80), `wallet` (82) |
 
 **Where each comes from** (the notebook fetches them; nothing goes through your laptop):
-- LVIS, COCO annotations, COCO-Text: their official download links.
+- LVIS, COCO annotations: their official download links (LVIS from a Kaggle copy when Meta's server fails).
 - COCO-WholeBody: the official Google Drive files (from its GitHub page). If Drive refuses (its daily download limit), the train file falls back to a Hugging Face mirror (`hngan/cocowholebody`); otherwise re-run later.
 - EgoHands: its original link is dead (it redirects to the lab's home page). A complete copy of the original release (48 folders × 100 frames + `polygons.mat`, checked by its file list) is on Kaggle as **`himaniishah/egohands`**. The script uses it if it's attached as a notebook input, and otherwise downloads it with `kagglehub` on the Kaggle machine (Kaggle's "Add Input" search doesn't always list it).
 - COCO photos: one by one from `images.cocodataset.org`, only the ones we use.
@@ -125,13 +125,13 @@ Two sources, in this order: **public datasets now** (enough for a first model), 
 - Roboflow: needs a free account's private API key, as the Kaggle Secret `ROBOFLOW_API_KEY` (locally the `ROBOFLOW_API_KEY` environment variable); never printed, never in git. The script reads the **original photos and boxes** through Roboflow's API, because the sets' ready-made exports are stretched to squares (640 / 416 / 600 px) and partly augmented. Without the key, the step is skipped.
 - MediaPipe's hand model (`hand_landmarker.task`, 7.8 MB) from Google's model storage. The notebook installs MediaPipe **without** its own OpenCV (`--no-deps`), which would clash with Ultralytics'; Kaggle's OpenCV and matplotlib are enough (tested).
 
-Tools used to fill gaps (not datasets): **EasyOCR's CRAFT** text detector (auto-labels `text`) and **stock `yolo11n.pt`** (auto-labels the 80 COCO classes on EgoHands frames, which have no COCO labels).
+Tools used to fill gaps (not datasets): **EasyOCR's CRAFT** text detector (labels `text` on every photo) and **stock `yolo11n.pt`** (auto-labels the 80 COCO classes on EgoHands frames, which have no COCO labels).
 
 **Later, if a class stays weak:** EgoObjects (Meta, egocentric, 368 classes; research licence: read it first), ADL (egocentric, 20 homes), and Roboflow Universe sets (licence differs per set). Never use a dataset whose licence you haven't read.
 
 ### 4.2 Building the merged dataset, step by step
 
-Everything below runs in the Kaggle notebook. **LVIS, COCO, COCO-Text and COCO-WholeBody all label the same COCO photos**, joined by the COCO **image id**. EgoHands is the only source with other photos.
+Everything below runs in the Kaggle notebook. **LVIS, COCO and COCO-WholeBody all label the same COCO photos**, joined by the COCO **image id**. EgoHands is the only source with other photos.
 
 1. **Pick the images with our objects (LVIS).** LVIS doesn't check every class in every image: for each image it lists the checked classes (annotated, `neg_category_ids` = checked and absent, `not_exhaustive_category_ids` = only some instances boxed).
    - A strict rule ("all five of ours checked") leaves **zero images** (measured), so the practical rule is: keep an image when **every one of our classes labelled in it is labelled exhaustively**. Our other classes are unchecked there and may rarely appear unlabelled (accepted noise).
@@ -142,8 +142,7 @@ Everything below runs in the Kaggle notebook. **LVIS, COCO, COCO-Text and COCO-W
 3. **Keep every glasses box**, worn or not (decision 8). The first version removed the worn ones; see §1 for why that failed.
 4. **Remove double labels.** Some objects get two labels from two datasets: a cooktop is COCO `oven` and LVIS `stove`; a pill bottle is COCO `bottle` and LVIS `medicine`. When a box of ours (80–84) and a COCO box overlap with **IoU > 0.7**, keep **ours** (the more specific one) and drop the COCO box. Measured on LVIS val: 131 COCO boxes dropped. Lower overlaps stay (an oven door under a cooktop is both).
 5. **Add `text` (85).**
-   - Images covered by COCO-Text: its **legible** boxes become `text`; illegible ones are dropped.
-   - Images not covered (**83 %** of the val set, reminder included) and every EgoHands frame: **CRAFT** auto-labels the text.
+   - **Every photo**, from every source: **CRAFT** draws one box per **line** of writing (EasyOCR groups the words of a line). Decision 14: COCO-Text's word boxes are no longer used.
    - From both sources, boxes lower than **1.5 % of the image height** are dropped: too small to read.
    - Spot-check auto-labels (§6.2): they're a machine's guess.
 6. **Add `hand` (86).**
@@ -155,7 +154,7 @@ Everything below runs in the Kaggle notebook. **LVIS, COCO, COCO-Text and COCO-W
    - Labels: Key → `keys`, Glasses → `glasses`, Wallet/Purse → `wallet`, Gas stove → `stove`, and all 80 of COCO's classes from their Objects365 names (e.g. car ← Car / SUV / Sports Car / Van, dining table ← Dining Table / Desk / Coffee Table). Boxes Objects365 marks as fake or reflected are dropped (rule §6.2.6). The double-label rule (step 4) applies.
    - The black bars are cut off and the boxes scaled to the photo (long side 384 px).
    - **Hands:** MediaPipe's hand detector, up to 6 hands per photo, box from the 21 landmarks widened by 10 %. It misses some small or partly hidden hands (seen on samples): accepted noise, counted in the manifest (`mediapipe-auto`).
-   - **Text:** CRAFT, as for every photo without COCO-Text (step 5).
+   - **Text:** CRAFT, as for every photo (step 5).
    - Purses inside Wallet/Purse are noise for `wallet`: spot-check (§6.2).
 6c. **Add the Roboflow pill boxes** (decision 13).
    - `andre-anrfr/pill-box`: all 442 photos; its train split → train, valid + test → val. `andre-anrfr/pillboxdetection` is listed too, but all its 379 photos are the same files (same names) and are dropped as duplicates.
@@ -184,11 +183,11 @@ The script is [`prepare_dataset.py`](prepare_dataset.py). The notebook contains 
 | COCO labels for the kept images | all found by id (checked on the first 6-class selection: 1,094 / 1,094) | merging is a plain lookup |
 | COCO classes in the LVIS images alone (first selection) | **25 of 80** have ≥ 50 images; **18 have < 10** (mostly outdoor and animals: zebra 3, bear 3, airplane 4…). Household classes are plentiful | the reminder set (decision 3) |
 | Rarest COCO classes in the val set **with** the reminder (1,195 images) | hair drier 2, bear 4, parking meter 5, toaster 5, snowboard 8… | train is ~9× larger; the train counts are printed |
-| Our classes in the val set (images) | stove 206, phone 89, text 61 (COCO-Text only, before CRAFT), glasses 48, keys 40, wallet 24, **pill_box 12** | pill_box and wallet are the weak classes, as expected |
+| Our classes in the val set (images) | stove 206, phone 89, text 61 (COCO-Text, first version), glasses 48, keys 40, wallet 24, **pill_box 12** | pill_box and wallet are the weak classes, as expected |
 | Double labels dropped (val) | **131** | §4.2 step 4 |
 | **First training run** (12 Nov 2026, 320 px, LVIS-based val), recall | hand 0.72, stove 0.42, wallet 0.24, text 0.16, cell phone 0.12, **glasses 0.02, keys 0.01, pill_box 0.00**; mAP50 all 87 classes 0.35 | the data was the problem, not the training (next row) |
 | Size and count of our objects (all LVIS boxes; train), median long side at 320 px | keys **13.4 px** (38 % under 10 px), pill_box **11.2 px** (42 %), glasses 17.6 px (30 %), wallet 47 px, stove 117 px; boxes: stove 1,133, keys 447, glasses 363 (+ **2,677 worn**, removed in the first run), pill_box 243, wallet 123 | decisions 8 and 9. Pictures: most LVIS keys are background details, and half the pill-box samples come from one pharmacy photo |
-| COCO-Text coverage | first selection: **334 / 1,094** (31 %); val set with the reminder: **208 / 1,195** (17 %) | auto-label the rest (decision 4) |
+| COCO-Text coverage | first selection: **334 / 1,094** (31 %); val set with the reminder: **208 / 1,195** (17 %) | first version; replaced by CRAFT on every photo (decision 14) |
 | Stock `yolo11n.pt` on COCO val2017 (5,000 photos) by input size | 320: mAP50 **0.419**, mAP50-95 0.288, cell phone recall 0.26 · 416: 0.478 / 0.334 / 0.32 · 480: 0.508 / 0.357 / 0.33 · 640: 0.547 / 0.389 / 0.43 (Ultralytics publishes 0.395 mAP50-95 at 640: our check matches) | the reference for the forgetting check: ours must be within ~3 points at the same size (§8). Part of every "low" number is the price of 320 px |
 | Objects365 train, our classes (photos / boxes, median long side at 320) | Key 2,444 / 2,765, 13.8 px (31 % under 10 px) · Wallet/Purse 3,134 / 3,597, 25.2 px · Gas stove 8,897 / 9,268, 63 px · Cell Phone 48,137 / 60,771, 13 px · Glasses 424,323 / 674,621, 14.5 px | keys 6× and wallets 29× LVIS, but keys just as small: zoomed crops still matter (decisions 9–10) |
 | Roboflow candidates (via its API) | pill boxes: 16 sets, most 26–140 real photos; kept andre pill-box 442 (pillboxdetection = the same photos), fernando 1,085 → 572. Keys: 11 sets; kept objects_v2 (1,600 → ~1,200 after thinning frames). Wallets: 13 sets, all shop photos; kept wallets-cskty (1,195) | pill_box from 243 LVIS boxes to ~1,000 photos; keys gain ~1,200 real-home photos with large keys |
@@ -283,7 +282,7 @@ data/
   ```
 - **`manifest.csv`** columns: `image, split, source, coco_labels, lvis_labels, text_labels, hand_labels, boxes_dropped`.
   - `source`: `lvis` / `reminder` / `objects365` / `roboflow` / `zoom` / `egohands` / `own`. A `zoom` row's label columns are its photo's.
-  - The label columns say where each group of labels came from: `coco` / `objects365` / `yolo11n-auto` for 0–79; `lvis` / `objects365` / `roboflow` / `none` for 80–84; `coco-text` / `craft-auto` for 85; `wholebody` / `egohands` / `mediapipe-auto` / `none` for 86.
+  - The label columns say where each group of labels came from: `coco` / `objects365` / `yolo11n-auto` for 0–79; `lvis` / `objects365` / `roboflow` / `none` for 80–84; `craft-auto` for 85; `wholebody` / `egohands` / `mediapipe-auto` / `none` for 86.
   - `boxes_dropped`: double labels (§4.2 step 4) and crowd boxes.
   - It lets anyone trace a box back to its source, count auto-labels for the model card, and check later results by source.
 
@@ -291,8 +290,8 @@ data/
 
 | Image source | 0–79 COCO | 80–84 ours | 85 text | 86 hand |
 |---|---|---|---|---|
-| LVIS kept (COCO photos) | COCO | LVIS | COCO-Text, else CRAFT | COCO-WholeBody |
-| Reminder set (COCO photos) | COCO | none (prefer images LVIS checked absent) | COCO-Text, else CRAFT | COCO-WholeBody |
+| LVIS kept (COCO photos) | COCO | LVIS | CRAFT | COCO-WholeBody |
+| Reminder set (COCO photos) | COCO | none (prefer images LVIS checked absent) | CRAFT | COCO-WholeBody |
 | Objects365 photos | Objects365, mapped | Objects365 (keys, glasses, wallet, stove; no pill box) | CRAFT | MediaPipe (auto) |
 | Roboflow photos | stock yolo11n (auto) | Roboflow (pill box only) | CRAFT | MediaPipe (auto) |
 | Zoomed crops (train) | the photo's boxes inside the crop | same | same | same |
