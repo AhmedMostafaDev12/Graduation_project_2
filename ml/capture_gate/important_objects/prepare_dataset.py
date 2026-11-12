@@ -18,6 +18,7 @@ Sources, joined by COCO image id (LVIS, COCO, COCO-Text and COCO-WholeBody label
   their 80 COCO classes and CRAFT their text.
 - Objects365 (two Hugging Face copies): every photo with a key or a wallet, plus samples with glasses,
   phones and gas stoves; its classes mapped onto ours and COCO's; MediaPipe labels their hands.
+- Roboflow Universe (needs ROBOFLOW_API_KEY): pill organisers and medicine boxes → pill_box (83).
 - The reminder set: ~5,000 more COCO photos with all their labels, so the 80 classes aren't forgotten.
 - Zoomed crops: small objects of ours (and phones) cut out of the full-size photo, train only.
 
@@ -29,6 +30,7 @@ import argparse
 import csv
 import io
 import json
+import os
 import random
 import shutil
 import struct
@@ -90,6 +92,13 @@ O365_TO_COCO = {
     "Refrigerator": "refrigerator", "Book": "book", "Clock": "clock", "Vase": "vase", "Scissors": "scissors",
     "Stuffed Toy": "teddy bear", "Hair Dryer": "hair drier", "Toothbrush": "toothbrush",
 }
+# Roboflow Universe sets for pill_box (README §4.2 step 6c), all CC BY 4.0. The original photos and boxes
+# come from Roboflow's API (its exports are stretched and augmented); needs ROBOFLOW_API_KEY
+ROBOFLOW_SETS = ["andre-anrfr/pill-box", "andre-anrfr/pillboxdetection", "fernando-vela-rdnuo/medicineboxes"]
+ROBOFLOW_TRAIN_ONLY = {"fernando-vela-rdnuo/medicineboxes"}  # neighbouring video frames would leak into val
+ROBOFLOW_SKIP_PREFIXES = ("IMG_", "mix")  # fernando's shelf / mix photos: only some of their boxes are labelled
+ROBOFLOW_FRAME_EVERY = 5  # fernando's video frames: keep every 5th, neighbours are near-identical
+ROBOFLOW_SIDE = 1024      # originals are up to 5,632 px: shrink to this long side
 # MediaPipe's hand detector labels the hands Objects365 doesn't (README §4.2 step 6b)
 MEDIAPIPE_HANDS = "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task"
 HAND_PAD = 0.1          # landmarks are joints: widen their box by 10 % on each side to cover the whole hand
@@ -501,6 +510,96 @@ def objects365(out: Path, cache: Path, names: dict, splits, limit: int, workers:
     return records
 
 
+# ---------- Roboflow Universe: pill organisers and medicine boxes ----------
+
+def roboflow_key():
+    key = os.environ.get("ROBOFLOW_API_KEY")
+    if not key:
+        try:  # on Kaggle: Add-ons → Secrets
+            from kaggle_secrets import UserSecretsClient
+
+            key = UserSecretsClient().get_secret("ROBOFLOW_API_KEY")
+        except Exception:  # noqa: BLE001 (not on Kaggle, or no such secret)
+            key = None
+    return key
+
+
+def roboflow(out: Path, key: str, splits, limit: int, workers: int) -> dict:
+    """Pill boxes from ROBOFLOW_SETS: original photos (shrunk to ROBOFLOW_SIDE) with their boxes → pill_box.
+    Their other objects, text and hands are auto-labelled later, like EgoHands. → {name: record}."""
+    from PIL import Image
+
+    def api(path: str, body=None):
+        data = json.dumps(body).encode() if body is not None else None
+        request = urllib.request.Request(f"https://api.roboflow.com/{path}?api_key={key}", data=data,
+                                         headers={"Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(request, timeout=60) as r:
+                return json.load(r)
+        except urllib.error.HTTPError as e:  # never show the URL: it holds the key
+            raise OSError(f"Roboflow API: HTTP {e.code}") from None
+
+    jobs, seen_names = [], set()
+    for ref in ROBOFLOW_SETS:
+        rows, offset = [], 0
+        while True:
+            page = api(f"{ref}/search", {"limit": 250, "offset": offset, "fields": ["id", "name", "split"]})
+            rows += page["results"]
+            offset += 250
+            if offset >= page["total"]:
+                break
+        frames = sorted((r for r in rows if r["name"].startswith("frame_")), key=lambda r: r["name"])
+        drop = {r["id"] for i, r in enumerate(frames) if i % ROBOFLOW_FRAME_EVERY}
+        kept = 0
+        for r in rows:
+            if r["name"] in seen_names or r["id"] in drop or r["name"].startswith(ROBOFLOW_SKIP_PREFIXES):
+                continue  # same photo in andre's two sets, a near-identical frame, or a shelf photo
+            split = "train" if ref in ROBOFLOW_TRAIN_ONLY or r.get("split") == "train" else "val"
+            if split in splits:
+                seen_names.add(r["name"])
+                jobs.append((ref, r["id"], split))
+                kept += 1
+        print(f"Roboflow {ref}: {len(rows)} photos, {kept} kept", flush=True)
+    if limit:
+        jobs = jobs[:limit]
+
+    def fetch(job):
+        ref, image_id, split = job
+        name = f"rf_{ref.split('/')[1]}_{image_id}"
+        target = out / "images" / split / f"{name}.jpg"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            image = api(f"{ref}/images/{image_id}")["image"]
+            annotation = image["annotation"]
+            W, H = float(annotation["width"]), float(annotation["height"])
+            s = min(1.0, ROBOFLOW_SIDE / max(W, H))
+            w, h = round(W * s), round(H * s)
+            if not target.exists():
+                with urllib.request.urlopen(image["urls"]["original"], timeout=60) as r:
+                    raw = r.read()
+                with Image.open(io.BytesIO(raw)) as photo:
+                    photo.convert("RGB").resize((w, h)).save(target, quality=92)
+        except (OSError, KeyError, ValueError):
+            return None
+        boxes = []
+        for b in annotation.get("boxes", []):
+            x, y, bw, bh = (float(b[k]) * s for k in ("x", "y", "width", "height"))  # x, y = the box centre
+            box = clip((x - bw / 2, y - bh / 2, bw, bh), w, h)
+            if box:
+                boxes.append((83, box))
+        if not boxes:
+            return None
+        return name, {"split": split, "source": "roboflow", "file": target, "w": w, "h": h, "boxes": boxes,
+                      "dropped": 0, "labels": {"coco": "none", "lvis": "roboflow", "text": "none", "hand": "none"}}
+
+    records = {}
+    with ThreadPoolExecutor(min(workers, 16)) as pool:
+        for got in pool.map(fetch, jobs):
+            if got:
+                records[got[0]] = got[1]
+    return records
+
+
 # ---------- 7. EgoHands ----------
 
 def egohands(root: Path, limit: int, splits) -> dict:
@@ -580,7 +679,7 @@ def auto_text(records: list) -> int:
 
 
 def auto_hands(records: list, cache: Path) -> int:
-    """MediaPipe's hand detector labels the hands on Objects365 photos (they have no hand class)."""
+    """MediaPipe's hand detector labels the hands on Objects365 and Roboflow photos (they have no hand class)."""
     import mediapipe as mp
     import numpy as np
     from mediapipe.tasks.python import vision
@@ -609,7 +708,7 @@ def auto_hands(records: list, cache: Path) -> int:
 
 
 def auto_coco(records: list) -> int:
-    """The stock yolo11n labels the 80 COCO classes on EgoHands frames (§4.2 step 7)."""
+    """The stock yolo11n labels the 80 COCO classes on EgoHands and Roboflow photos (§4.2 steps 6c, 7)."""
     from ultralytics import YOLO
 
     model = YOLO("yolo11n.pt")
@@ -784,7 +883,7 @@ def main() -> None:
     parser.add_argument("--egohands", type=Path, default=Path("/kaggle/input/egohands"))
     parser.add_argument("--split", choices=["train", "val", "both"], default="both")
     parser.add_argument("--limit", type=int, default=0, help="at most N images per split and source (testing)")
-    parser.add_argument("--skip", default="", help="comma list of: wholebody, objects365, egohands, auto (testing)")
+    parser.add_argument("--skip", default="", help="comma list of: wholebody, objects365, roboflow, egohands, auto (testing)")
     parser.add_argument("--workers", type=int, default=64)
     parser.add_argument("--accept-low-counts", action="store_true", help="write the data even if a class is thin")
     parser.add_argument("--coco-val", type=Path, default=None, help="only build COCO val2017 for the forgetting check")
@@ -833,6 +932,16 @@ def main() -> None:
         print(f"Objects365: {len(o365)} photos, {sum(len(r['boxes']) for r in o365.values())} boxes", flush=True)
         records.update(o365)
 
+    # Roboflow: pill organisers and medicine boxes (needs ROBOFLOW_API_KEY; skipped without it)
+    if "roboflow" not in skip:
+        key = roboflow_key()
+        if key:
+            rf = roboflow(args.out, key, splits, args.limit, args.workers)
+            print(f"Roboflow: {len(rf)} photos, {sum(len(r['boxes']) for r in rf.values())} pill boxes", flush=True)
+            records.update(rf)
+        else:
+            print("Roboflow skipped: no ROBOFLOW_API_KEY (Kaggle: Add-ons → Secrets)", flush=True)
+
     # 7. EgoHands
     if "egohands" not in skip:
         ego = egohands(args.egohands, args.limit, splits)
@@ -845,12 +954,12 @@ def main() -> None:
     if "auto" not in skip:
         need_text = [r for r in records.values() if r["labels"]["text"] == "none"]
         print(f"CRAFT text boxes: {auto_text(need_text)} on {len(need_text)} images", flush=True)
-        ego_records = [r for r in records.values() if r["source"] == "egohands"]
-        if ego_records:
-            print(f"yolo11n COCO boxes on EgoHands: {auto_coco(ego_records)}", flush=True)
-        o365_records = [r for r in records.values() if r["source"] == "objects365"]
-        if o365_records:
-            print(f"MediaPipe hand boxes on Objects365: {auto_hands(o365_records, cache)} on {len(o365_records)} photos",
+        no_coco = [r for r in records.values() if r["source"] in ("egohands", "roboflow")]
+        if no_coco:
+            print(f"yolo11n COCO boxes on EgoHands + Roboflow: {auto_coco(no_coco)} on {len(no_coco)} photos", flush=True)
+        no_hands = [r for r in records.values() if r["source"] in ("objects365", "roboflow")]
+        if no_hands:
+            print(f"MediaPipe hand boxes on Objects365 + Roboflow: {auto_hands(no_hands, cache)} on {len(no_hands)} photos",
                   flush=True)
 
     # 9. zoomed crops (after the auto-labels, so the crops carry the text boxes too)
