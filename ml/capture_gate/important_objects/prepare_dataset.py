@@ -805,6 +805,42 @@ def place_images(records: dict, out: Path, workers: int) -> None:
                 records[name]["file"] = target
 
 
+def boxes_from_lines(lines: list, w: float, h: float, wanted) -> list:
+    """YOLO label lines (class, centre x, centre y, width, height as fractions) → [(class, (x, y, w, h) in pixels)]."""
+    boxes = []
+    for c, cx, cy, bw, bh in lines:
+        if wanted(int(c)):
+            bw, bh = float(bw) * w, float(bh) * h
+            boxes.append((int(c), (float(cx) * w - bw / 2, float(cy) * h - bh / 2, bw, bh)))
+    return boxes
+
+
+def reuse_auto_labels(records: dict, out: Path) -> Counter:
+    """A re-run reuses the previous run's machine-made labels (CRAFT text, MediaPipe hands, yolo11n COCO boxes)
+    from its label files, instead of hours of GPU work again. Only for photos the previous manifest marks as
+    auto-labelled, in the same split; everything else (and every new photo) is labelled as usual."""
+    manifest = out / "manifest.csv"
+    if not manifest.exists():
+        return Counter()
+    with open(manifest, encoding="utf-8") as f:
+        previous = {row["image"]: row for row in csv.DictReader(f)}
+    reused = Counter()
+    for name, r in records.items():
+        row = previous.get(f"{name}.jpg")
+        label_file = out / "labels" / r["split"] / f"{name}.txt"
+        if not row or row["split"] != r["split"] or not label_file.exists():
+            continue
+        lines = [line.split() for line in label_file.read_text(encoding="utf-8").splitlines() if line.strip()]
+        for group, value, wanted in (("text", "craft-auto", lambda c: c == TEXT),
+                                     ("hand", "mediapipe-auto", lambda c: c == HAND),
+                                     ("coco", "yolo11n-auto", lambda c: c < 80)):
+            if row[f"{group}_labels"] == value and r["labels"][group] == "none":
+                r["boxes"] += boxes_from_lines(lines, r["w"], r["h"], wanted)
+                r["labels"][group] = value
+                reused[group] += 1
+    return reused
+
+
 def write_labels(records: dict, out: Path) -> None:
     for name, r in records.items():
         folder = out / "labels" / r["split"]
@@ -965,14 +1001,18 @@ def main() -> None:
 
     place_images(records, args.out, args.workers)
 
-    # 8. auto-labels
+    # 8. auto-labels (a re-run first reuses the previous run's, so only new photos go through the GPU)
+    reused = reuse_auto_labels(records, args.out)
+    if reused:
+        print(f"reused from the previous run: text on {reused['text']}, hands on {reused['hand']}, "
+              f"COCO boxes on {reused['coco']} photos", flush=True)
     if "auto" not in skip:
         need_text = [r for r in records.values() if r["labels"]["text"] == "none"]
         print(f"CRAFT text boxes: {auto_text(need_text)} on {len(need_text)} images", flush=True)
-        no_coco = [r for r in records.values() if r["source"] in ("egohands", "roboflow")]
+        no_coco = [r for r in records.values() if r["source"] in ("egohands", "roboflow") and r["labels"]["coco"] == "none"]
         if no_coco:
             print(f"yolo11n COCO boxes on EgoHands + Roboflow: {auto_coco(no_coco)} on {len(no_coco)} photos", flush=True)
-        no_hands = [r for r in records.values() if r["source"] in ("objects365", "roboflow")]
+        no_hands = [r for r in records.values() if r["source"] in ("objects365", "roboflow") and r["labels"]["hand"] == "none"]
         if no_hands:
             print(f"MediaPipe hand boxes on Objects365 + Roboflow: {auto_hands(no_hands, cache)} on {len(no_hands)} photos",
                   flush=True)
