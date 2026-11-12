@@ -9,7 +9,7 @@ How the ml team builds the small detector the glasses run on every frame: **COCO
 ## 0. In one minute
 
 - **Why:** "Where did I put my keys?" is the weakest question type. The scene embedding the glasses compute every second barely notices small objects, so the moment the keys are put down is usually thrown away. This detector makes the glasses **keep that frame**, and the 30-second look-back buffer keeps the frames just before it.
-- **What:** **one** YOLO11n model with **87 classes**. It **keeps** the 80 COCO classes the pretrained model already knows (person, cup, bottle, chair, phone, laptop, fridge…) and **adds** 7 of ours: `keys`, `glasses` (not worn), `wallet`, `pill_box`, `stove`, `text`, `hand`. It's small enough for a **Raspberry Pi Zero 2W** on **every frame (1 per second)** next to the face models.
+- **What:** **one** YOLO11n model with **87 classes**. It **keeps** the 80 COCO classes the pretrained model already knows (person, cup, bottle, chair, phone, laptop, fridge…) and **adds** 7 of ours: `keys`, `glasses`, `wallet`, `pill_box`, `stove`, `text`, `hand`. It's small enough for a **Raspberry Pi Zero 2W** on **every frame (1 per second)** next to the face models.
 - **Why one merged model, not a 6-class one:** the six objects were meant to *enhance* a general detector, not replace it. A model fine-tuned on new classes alone **forgets** the 80 it knew. So the training data always keeps COCO images with their full COCO labels (the **reminder set**, §4.2).
 - **Why `text` and `hand`:** many benchmark questions failed on **writing** (a pizza box, a label) and on **moments of handling** (taking cans from the fridge). A `text` box keeps the frame *and* shows where the text is, so a zoomed crop can be sent for reading. A `hand` box overlapping an object marks a pick-up or put-down.
 - **It's the eyes of several gate rules, not the whole gate.** The detector only says what is in view. The rules in `ml/edge/` decide "keep this frame" (§10), together with the face, novelty and audio rules, the **stage-2 classifier** and the look-back buffer (spec D33, D42). It doesn't need perfect boxes. The kept frame goes to the cloud review, which describes it (phase 8.3). So **recall** (not missing a moment) matters far more than box precision.
@@ -29,7 +29,7 @@ Class ids are shared with the glasses' code, so their **order is fixed**. Adding
 | id | name | Source of labels | What counts | What doesn't |
 |---|---|---|---|---|
 | 80 | `keys` | LVIS `key` | a key, a bunch of keys, a key ring, a car key fob | a key-shaped toy, a lock on a door |
-| 81 | `glasses` | LVIS `spectacles` | a pair of glasses **not on anyone's face**: on a table, in a hand, in an open case, on a bed | glasses being worn (the patient's own, or a visitor's) |
+| 81 | `glasses` | LVIS `spectacles` | any pair of glasses, **worn or not**: on a table, in a hand, in an open case, on a bed, on a face | sunglasses-shaped toys, a drawing of glasses |
 | 82 | `wallet` | LVIS `wallet` | a wallet, a purse, a coin purse, a card holder | a handbag or backpack (those are COCO's `handbag`, `backpack`) |
 | 83 | `pill_box` | LVIS `medicine` | any medicine container: a weekly pill organiser, a medicine box or bottle, a blister strip | vitamins or food in jars, a tissue box |
 | 84 | `stove` | LVIS `stove` | a gas stove / cooktop (the burners area), any state | the oven door alone (COCO `oven`), a microwave, a kettle |
@@ -37,7 +37,7 @@ Class ids are shared with the glasses' code, so their **order is fixed**. Adding
 | 86 | `hand` | COCO-WholeBody + EgoHands (§4.2 step 6) | a human hand from the wrist to the fingertips, the wearer's own or another person's, empty or holding something | an arm without a visible hand, a glove lying alone |
 
 - **Phone is not a new class:** COCO's `cell phone` (67) is our phone. That's why it's 87 and not 88.
-- **Why "glasses not worn":** the useful question is "where did I put my glasses?". A visitor wearing glasses would fire the rule all day for nothing.
+- **Why worn glasses are labelled too (decided 12 Nov 2026):** the useful question is "where did I put my glasses?", so a pair on a face mustn't fire the rule. But at 320 px a pair on a face and a pair on a table look almost the same. The first version removed worn pairs from the labels, so the model saw "glasses = background" 7× more often than "glasses = glasses" and learned neither (recall 0.02). Now the model finds **all** glasses, and the **gate rule** skips a pair sitting on a face (§10).
 - **Medication:** `pill_box` also serves the **medication rule**, so the Pi runs one model for both.
 - Public datasets use their own names (`spectacles`, `medicine`…). They're mapped onto these ids (§4.2), and every other class in those datasets is ignored.
 
@@ -56,6 +56,16 @@ Class ids are shared with the glasses' code, so their **order is fixed**. Adding
 
 The week-1 **hardware spike** (spec §12, step 0) measures the real speed on the Pi. Until then the numbers above are targets.
 
+**Estimated speed of YOLO11n on the Pi Zero 2W** (12 Nov 2026; to be replaced by the real measurement). Ultralytics measured YOLO11n with NCNN on a Pi 5 at 640 px: **94 ms**. NCNN's own benchmark runs the same networks on a Pi 5 and a Pi Zero 2W: the Zero 2W is **13–15× slower** (nanodet_m 14.9×, yolov4-tiny 14.0×, mobilenet_ssd 13.8×, mobilenetv2_yolov3 13.0×). Compute scales with the number of pixels, so:
+
+| Input | Zero 2W, FP32 | Zero 2W, INT8 (≈1.3–1.8× faster on these cores, per NCNN) | Within ≤ 300 ms? |
+|---|---|---|---|
+| **320** | ~300–350 ms | **~190–260 ms** | only with INT8 |
+| 416 | ~520–600 ms | ~330–450 ms | no |
+| 480 | ~690–790 ms | ~430–600 ms | no |
+
+That's why the input stays at 320, planned as INT8 (decision 12): accuracy has to come from data, not size. What 320 costs, measured on COCO val2017 with the stock `yolo11n.pt`: mAP50 **0.419** at 320, 0.478 at 416, 0.508 at 480, 0.547 at 640 (§4.3).
+
 ---
 
 ## 3. Decisions
@@ -71,6 +81,11 @@ The week-1 **hardware spike** (spec §12, step 0) measures the real speed on the
 | 5 | **Hands from EgoHands (main) + COCO-WholeBody (for the COCO photos)** | EgoHands is filmed with **Google Glass**, our viewpoint. COCO-WholeBody labels the hands **in our COCO photos**, which contain people about 70 % of the time; unlabelled, those hands would teach "hand = background" |
 | 6 | **Hand counts are measured in the Kaggle notebook**, before training, not assumed | COCO-WholeBody doesn't publish how many valid hand boxes fall in our subset (§4.3) |
 | 7 | **Public data first, own footage after**; never record before the public model exists | public data gives the first model now; our footage fine-tunes and tests it (§4.4) |
+| 8 | **Glasses are labelled worn or not** (12 Nov 2026); the gate rule skips worn ones (§1, §10) | the first run's labels contradicted each other: 2,677 worn pairs left unlabelled vs 363 labelled, and the worn rule missed some, so worn pairs were also labelled. Glasses recall 0.02 (§4.3) |
+| 9 | **Zoomed crops of small objects** in training (12 Nov 2026, §4.2 step 9) | measured: keys and pill boxes are a median **13 px / 11 px** at 320, 38–42 % under 10 px; recall 0.01 / 0.00 in the first run (§4.3) |
+| 10 | **An Objects365 subset** (12 Nov 2026, §4.2 step 6b): every photo with a key or a wallet, ~3,000 each with glasses, phones, gas stoves | measured: Objects365 has **2,765 keys** (LVIS 447) and **3,597 wallets/purses** (LVIS 123), and labels all 365 of its classes in every photo |
+| 11 | **MediaPipe labels the hands on the Objects365 photos** (12 Nov 2026) | Objects365 has no hand class; photos of keys and wallets often show the hand holding them. MediaPipe (Google, Apache 2.0) is a ready hand detector |
+| 12 | **The input stays 320 px, planned as INT8** (12 Nov 2026, §2) | estimated on the Pi Zero 2W: 416 needs ~520–600 ms (FP32), far over the ~300 ms budget; 320 INT8 ~190–260 ms. To be confirmed on the Pi |
 
 ### 3.2 Still open (ask the lead)
 
@@ -96,12 +111,15 @@ Two sources, in this order: **public datasets now** (enough for a first model), 
 | **COCO-Text v2** | text boxes on COCO photos, marked legible / illegible | 53,686 images, 201K boxes (81K legible) | CC BY 4.0 | `text` (85) where it covers an image |
 | **COCO-WholeBody** v1.0 | a left-hand and right-hand box for each **keypoint-annotated person** in COCO, valid only when the hand is clear enough to place keypoints | 200K images, 250K people | CC BY 4.0, **research and non-commercial only** | `hand` (86) on our COCO photos |
 | **EgoHands** | hand polygons, the wearer's vs the other person's, left and right | 48 Google Glass videos, **4,800 frames, 15,000+ hands** | CC BY 4.0 | `hand` (86) from **our viewpoint** |
+| **Objects365** v2 (subset) | boxes for **all 365 classes in every photo**, incl. Key, Wallet/Purse, Glasses, Gas stove, Cell Phone (no pills, no hands) | 1.74 M train photos; we take ~12,000 | research use (list it in the model card) | more keys (6×) and wallets (29×) than LVIS; its other classes mapped onto COCO's 80 |
 
 **Where each comes from** (the notebook fetches them; nothing goes through your laptop):
 - LVIS, COCO annotations, COCO-Text: their official download links.
 - COCO-WholeBody: the official Google Drive files (from its GitHub page). If Drive refuses (its daily download limit), the train file falls back to a Hugging Face mirror (`hngan/cocowholebody`); otherwise re-run later.
 - EgoHands: its original link is dead (it redirects to the lab's home page). A complete copy of the original release (48 folders × 100 frames + `polygons.mat`, checked by its file list) is on Kaggle as **`himaniishah/egohands`**. The script uses it if it's attached as a notebook input, and otherwise downloads it with `kagglehub` on the Kaggle machine (Kaggle's "Add Input" search doesn't always list it).
 - COCO photos: one by one from `images.cocodataset.org`, only the ones we use.
+- Objects365: the official download is 712 GB, so two Hugging Face copies are used. Annotations from **`jxu124/objects365`** (sharded parquet, 1.6 GB, original pixel coordinates, read in a separate process). Photos from **`hieupth/objects365_384_squared`** (letterboxed to 384 × 384, centred, black bars; 20 zips of ~4.6 GB), fetched **one photo at a time by byte range**, so only the ~12,000 we use are downloaded. Measured locally: 1,972 photos in 96 s.
+- MediaPipe's hand model (`hand_landmarker.task`, 7.8 MB) from Google's model storage. The notebook installs MediaPipe **without** its own OpenCV (`--no-deps`), which would clash with Ultralytics'; Kaggle's OpenCV and matplotlib are enough (tested).
 
 Tools used to fill gaps (not datasets): **EasyOCR's CRAFT** text detector (auto-labels `text`) and **stock `yolo11n.pt`** (auto-labels the 80 COCO classes on EgoHands frames, which have no COCO labels).
 
@@ -117,7 +135,7 @@ Everything below runs in the Kaggle notebook. **LVIS, COCO, COCO-Text and COCO-W
    - About 15 % extra **negatives**: images where LVIS checked our classes absent.
    - Measured on LVIS val: **591 images with our objects + 104 negatives = 695 kept**. LVIS train gives about 5× more; the script prints the exact counts.
 2. **Add the COCO labels (ids 0–79)** to each image, by image id (every LVIS image is found in COCO). "Crowd" boxes (dense groups COCO doesn't box one by one) are skipped.
-3. **Remove worn-glasses boxes.** A `spectacles` box whose centre lies in the top 35 % of a COCO `person` box is treated as worn: **its box is removed and the photo kept**. Worn glasses aren't our class, so leaving them unlabelled teaches the model **not** to fire on faces. (Measured on LVIS val: 412 boxes removed. An earlier draft dropped the whole photo, which threw away 288 of 695 images.) Labellers spot-check what the rule misses (§6.2).
+3. **Keep every glasses box**, worn or not (decision 8). The first version removed the worn ones; see §1 for why that failed.
 4. **Remove double labels.** Some objects get two labels from two datasets: a cooktop is COCO `oven` and LVIS `stove`; a pill bottle is COCO `bottle` and LVIS `medicine`. When a box of ours (80–84) and a COCO box overlap with **IoU > 0.7**, keep **ours** (the more specific one) and drop the COCO box. Measured on LVIS val: 131 COCO boxes dropped. Lower overlaps stay (an oven door under a cooktop is both).
 5. **Add `text` (85).**
    - Images covered by COCO-Text: its **legible** boxes become `text`; illegible ones are dropped.
@@ -128,9 +146,20 @@ Everything below runs in the Kaggle notebook. **LVIS, COCO, COCO-Text and COCO-W
    - COCO photos: COCO-WholeBody's **valid** left and right-hand boxes.
    - EgoHands frames: the mask of each hand → its bounding box.
    - Hands of people COCO didn't annotate with keypoints (usually small, far people) stay unlabelled: accepted noise. The notebook prints how many COCO photos with a person got at least one hand box.
+6b. **Add the Objects365 subset** (decisions 10–11).
+   - Which photos: **every** photo with a Key or a Wallet/Purse, plus a random sample (same every run) of 3,000 each with Glasses, Cell Phone and Gas stove; 1/10 of that from its validation split for val. Measured on its val split: 1,972 photos (keys in 603, wallets in 611).
+   - Labels: Key → `keys`, Glasses → `glasses`, Wallet/Purse → `wallet`, Gas stove → `stove`, and all 80 of COCO's classes from their Objects365 names (e.g. car ← Car / SUV / Sports Car / Van, dining table ← Dining Table / Desk / Coffee Table). Boxes Objects365 marks as fake or reflected are dropped (rule §6.2.6). The double-label rule (step 4) applies.
+   - The black bars are cut off and the boxes scaled to the photo (long side 384 px).
+   - **Hands:** MediaPipe's hand detector, up to 6 hands per photo, box from the 21 landmarks widened by 10 %. It misses some small or partly hidden hands (seen on samples): accepted noise, counted in the manifest (`mediapipe-auto`).
+   - **Text:** CRAFT, as for every photo without COCO-Text (step 5).
+   - Purses inside Wallet/Purse are noise for `wallet`: spot-check (§6.2).
 7. **Label the EgoHands frames' other classes.** They have only hands. The stock `yolo11n.pt` auto-labels the 80 COCO classes on them (score ≥ 0.5), and CRAFT labels their text (step 5). Our five LVIS classes stay unlabelled there (rare in those card and board games).
 8. **Add the reminder set:** ~5,000 random COCO images (4,500 train + 500 val) that aren't already in the set and have none of our five labelled, with all their labels (COCO + text + hands, steps 2–6). The script prefers images where LVIS checked our classes absent, so they double as **negatives** for ours. (In practice it picks them first; on LVIS val all 500 were such images.)
-9. **Split** (§4.5) and **write** the YOLO files and the manifest (§5). If one of our classes has **fewer than 50 training images**, the script stops with "STOP, tell the lead". `--accept-low-counts` overrides it, only with the lead's OK.
+9. **Add zoomed crops** (decision 9), **train only**: for each photo with a small key, pair of glasses, wallet, pill box or phone (long side under 1/8 of the photo, i.e. under 40 px at 320), up to 2 square crops of the **full-size** photo around it.
+   - The crop's side is 5× the object (at least 160 px of the photo), placed at random so the object isn't always centred. Seen at 320, a 13 px key becomes about 40–65 px, with the photo's real detail. That's how an object in your hand looks through the glasses.
+   - Every label inside the crop comes with it: a box cut by the edge stays if half of it is inside, or if it covers a fifth of the crop (a person filling the view).
+   - Val stays natural photos, so the scores aren't flattered.
+10. **Split** (§4.5) and **write** the YOLO files and the manifest (§5). If one of our classes has **fewer than 50 training photos** (crops don't count), the script stops with "STOP, tell the lead". `--accept-low-counts` overrides it, only with the lead's OK.
 
 The script is [`prepare_dataset.py`](prepare_dataset.py). The notebook contains a copy and runs it. Quick local test without a GPU: `python prepare_dataset.py --out test --split val --limit 30 --skip wholebody,egohands,auto`.
 
@@ -144,8 +173,12 @@ The script is [`prepare_dataset.py`](prepare_dataset.py). The notebook contains 
 | COCO classes in the LVIS images alone (first selection) | **25 of 80** have ≥ 50 images; **18 have < 10** (mostly outdoor and animals: zebra 3, bear 3, airplane 4…). Household classes are plentiful | the reminder set (decision 3) |
 | Rarest COCO classes in the val set **with** the reminder (1,195 images) | hair drier 2, bear 4, parking meter 5, toaster 5, snowboard 8… | train is ~9× larger; the train counts are printed |
 | Our classes in the val set (images) | stove 206, phone 89, text 61 (COCO-Text only, before CRAFT), glasses 48, keys 40, wallet 24, **pill_box 12** | pill_box and wallet are the weak classes, as expected |
-| Worn-glasses boxes removed / double labels dropped (val) | **412 / 131** | §4.2 steps 3–4 |
+| Double labels dropped (val) | **131** | §4.2 step 4 |
+| **First training run** (12 Nov 2026, 320 px, LVIS-based val), recall | hand 0.72, stove 0.42, wallet 0.24, text 0.16, cell phone 0.12, **glasses 0.02, keys 0.01, pill_box 0.00**; mAP50 all 87 classes 0.35 | the data was the problem, not the training (next row) |
+| Size and count of our objects (all LVIS boxes; train), median long side at 320 px | keys **13.4 px** (38 % under 10 px), pill_box **11.2 px** (42 %), glasses 17.6 px (30 %), wallet 47 px, stove 117 px; boxes: stove 1,133, keys 447, glasses 363 (+ **2,677 worn**, removed in the first run), pill_box 243, wallet 123 | decisions 8 and 9. Pictures: most LVIS keys are background details, and half the pill-box samples come from one pharmacy photo |
 | COCO-Text coverage | first selection: **334 / 1,094** (31 %); val set with the reminder: **208 / 1,195** (17 %) | auto-label the rest (decision 4) |
+| Stock `yolo11n.pt` on COCO val2017 (5,000 photos) by input size | 320: mAP50 **0.419**, mAP50-95 0.288, cell phone recall 0.26 · 416: 0.478 / 0.334 / 0.32 · 480: 0.508 / 0.357 / 0.33 · 640: 0.547 / 0.389 / 0.43 (Ultralytics publishes 0.395 mAP50-95 at 640: our check matches) | the reference for the forgetting check: ours must be within ~3 points at the same size (§8). Part of every "low" number is the price of 320 px |
+| Objects365 train, our classes (photos / boxes, median long side at 320) | Key 2,444 / 2,765, 13.8 px (31 % under 10 px) · Wallet/Purse 3,134 / 3,597, 25.2 px · Gas stove 8,897 / 9,268, 63 px · Cell Phone 48,137 / 60,771, 13 px · Glasses 424,323 / 674,621, 14.5 px | keys 6× and wallets 29× LVIS, but keys just as small: zoomed crops still matter (decisions 9–10) |
 | COCO-WholeBody hand boxes in our subset | **not published**; only 200K images / 250K people overall | **counted in the notebook** before training (decision 6) |
 | EgoHands | 4,800 Glass frames, 15,000+ hands | the egocentric hand source |
 
@@ -204,6 +237,8 @@ data/
 ├── images/
 │   ├── train/
 │   │   ├── coco_000000123456.jpg       # any COCO photo (LVIS kept or reminder): COCO image id, 12 digits
+│   │   ├── coco_000000123456_zoom0.jpg # a zoomed crop of that photo around a small object (train only)
+│   │   ├── o365_objects365_v1_00420917.jpg  # an Objects365 photo, black bars cut off (long side 384 px)
 │   │   └── egohands_CARDS_COURTYARD_B_T_0042.jpg   # EgoHands: video name + frame
 │   └── val/
 │       └── …
@@ -215,7 +250,7 @@ data/
         └── …
 ```
 
-- **File names carry the source:** `coco_<id>` (LVIS images are COCO images, so they share the prefix), `egohands_<video>_<frame>`, and later `det_<home>_<date>_<n>_<frame>` for our own footage (never in a public place, §6.4).
+- **File names carry the source:** `coco_<id>` (LVIS images are COCO images, so they share the prefix), `coco_<id>_zoom<k>` (crop k of that photo), `o365_<Objects365 file name>` (and its `_zoom<k>` crops), `egohands_<video>_<frame>`, and later `det_<home>_<date>_<n>_<frame>` for our own footage (never in a public place, §6.4).
 - **A label file** has one line per box: `<class_id> <x_center> <y_center> <width> <height>`, all four as fractions of the image size (0–1). Example: `80 0.512 0.633 0.041 0.028` is a small key near the centre. **An empty file** means "nothing of the 87 here": a valid negative.
 - **`remori_objects.yaml`:**
   ```yaml
@@ -234,8 +269,8 @@ data/
     86: hand
   ```
 - **`manifest.csv`** columns: `image, split, source, coco_labels, lvis_labels, text_labels, hand_labels, boxes_dropped`.
-  - `source`: `lvis` / `reminder` / `egohands` / `own`.
-  - The label columns say where each group of labels came from: `coco` / `yolo11n-auto` for 0–79; `lvis` / `none` for 80–84; `coco-text` / `craft-auto` for 85; `wholebody` / `egohands` / `none` for 86.
+  - `source`: `lvis` / `reminder` / `objects365` / `zoom` / `egohands` / `own`. A `zoom` row's label columns are its photo's.
+  - The label columns say where each group of labels came from: `coco` / `objects365` / `yolo11n-auto` for 0–79; `lvis` / `objects365` / `none` for 80–84; `coco-text` / `craft-auto` for 85; `wholebody` / `egohands` / `mediapipe-auto` / `none` for 86.
   - `boxes_dropped`: double labels (§4.2 step 4) and crowd boxes.
   - It lets anyone trace a box back to its source, count auto-labels for the model card, and check later results by source.
 
@@ -245,6 +280,8 @@ data/
 |---|---|---|---|---|
 | LVIS kept (COCO photos) | COCO | LVIS | COCO-Text, else CRAFT | COCO-WholeBody |
 | Reminder set (COCO photos) | COCO | none (prefer images LVIS checked absent) | COCO-Text, else CRAFT | COCO-WholeBody |
+| Objects365 photos | Objects365, mapped | Objects365 (keys, glasses, wallet, stove; no pill box) | CRAFT | MediaPipe (auto) |
+| Zoomed crops (train) | the photo's boxes inside the crop | same | same | same |
 | EgoHands frames | stock yolo11n (auto) | none | CRAFT | EgoHands |
 | Our footage (stage 2) | pre-labelled by the stage-1 model, **corrected by people** | people | people | people |
 
@@ -275,7 +312,7 @@ Rules (everyone labels the same way):
 5. **`text`:** one box per line or block of writing that a person could read in a zoomed crop. Not single unreadable letters.
 6. **Reflections, photos of objects, objects on a TV screen:** don't label (text on a screen *is* labelled as `text`).
 7. **When unsure, tag the image "check"** instead of guessing; the reviewer decides.
-8. **Public data:** spot-check **5 %** of each source, and **10 % of the auto-labels** (CRAFT text, yolo11n on EgoHands). Look for worn glasses that slipped through and missing hands. Write the error rate in the model card.
+8. **Public data:** spot-check **5 %** of each source, and **10 % of the auto-labels** (CRAFT text, yolo11n on EgoHands). Look for glasses and hands left without a box. Write the error rate in the model card.
 
 ### 6.3 Quality control
 - A **second person reviews 10 %** of each labeller's frames, and every "check" frame.
@@ -365,7 +402,7 @@ Look at the **misses**: they tell you what to record or add next. Then repeat §
 
   | Rule | Fires when | `gate_rule` | Status |
   |---|---|---|---|
-  | Important object | keys, glasses, wallet, `cell phone` or stove is detected | `important_object` | decided (D42) |
+  | Important object | keys, glasses, wallet, `cell phone` or stove is detected; **except glasses being worn**: a glasses box whose centre lies in the top 35 % of a `person` box doesn't fire (decision 8; the same test the first data version used) | `important_object` | decided (D42) |
   | Medication | `pill_box` is detected | `medication` | decided (D33) |
   | Text | a `text` box above a minimum size; the box goes with the frame so a **zoomed crop** can be read | `text` | decided (D33: the rule exists; this model now runs it) |
   | New object | a COCO class not seen in the last ~30 s appears | to define | **proposed** |
@@ -438,6 +475,8 @@ A realistic pace: **week 1** merged public dataset + stage-1 model, consent and 
 - **Two labels on one object** (oven + stove, bottle + pill box). Keep ours, drop COCO's (§4.2 step 4).
 - **The same image in train and val.** LVIS val contains COCO train2017 images: split by image id (§4.5).
 - **Assuming a dataset has enough of something.** Count it first (§4.3).
+- **Training before looking at the data.** Measure the object sizes and look at samples at the model's input size first (§4.3). The first run lost 4–5 hours to tiny keys and contradictory glasses labels that a 10-minute check would have shown.
+- **Asking the model for a distinction it can't see.** "Worn vs not worn" at 320 px is the gate rule's job, not a class (§1).
 - **Train/test from the same video.** Split by session (§7.2), EgoHands by video.
 - **Benchmark footage in training.** Never (§4.4).
 - **Scoring on public data only.** It flatters the model: the targets are judged on our own footage (§7.1).
