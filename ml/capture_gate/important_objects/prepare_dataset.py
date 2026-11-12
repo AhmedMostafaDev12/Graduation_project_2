@@ -17,8 +17,10 @@ Sources, joined by COCO image id (LVIS, COCO, COCO-Text and COCO-WholeBody label
 - EgoHands (a Kaggle input): Google Glass frames with hand polygons; the stock yolo11n labels
   their 80 COCO classes and CRAFT their text.
 - The reminder set: ~5,000 more COCO photos with all their labels, so the 80 classes aren't forgotten.
+- Zoomed crops: small objects of ours (and phones) cut out of the full-size photo, train only.
 
-Needs: numpy, scipy (EgoHands), gdown (WholeBody), easyocr and ultralytics (the auto-labels, GPU).
+Needs: numpy, scipy (EgoHands), gdown (WholeBody), Pillow (crops), easyocr and ultralytics (the
+auto-labels, GPU).
 """
 
 import argparse
@@ -28,6 +30,7 @@ import random
 import shutil
 import subprocess
 import sys
+import urllib.error
 import urllib.request
 import zipfile
 from collections import Counter, defaultdict
@@ -43,15 +46,15 @@ COCO_TEXT = "https://github.com/bgshih/cocotext/releases/download/dl/cocotext.v2
 WHOLEBODY_DRIVE = {"train": "1thErEToRbmM9uLNi1JXXfOsaS5VK2FXf", "val": "1N6VgwKnj8DeyGXCvp1eYgNbRmw6jdfrb"}
 # EgoHands' original link is dead; a full copy of the original release lives on Kaggle
 EGOHANDS_KAGGLE = "himaniishah/egohands"
-WHOLEBODY_MIRROR ={"train": "https://huggingface.co/hngan/cocowholebody/resolve/main/coco_wholebody_train_v1.0.json"}
+# a Kaggle copy of the LVIS v1 annotations (its val file has the original's exact size, 201,235,232 bytes)
+LVIS_KAGGLE = ("alexanderyyy/lvis-v1", {"train": "lvis_v1_train.json/lvis_v1_train.json", "val": "lvis_v1_val/lvis_v1_val.json"})
+WHOLEBODY_MIRROR = {"train": "https://huggingface.co/hngan/cocowholebody/resolve/main/coco_wholebody_train_v1.0.json"}
 
 # our classes after COCO's 80 (README §1); LVIS names for the five objects
 OURS = {80: ("keys", "key"), 81: ("glasses", "spectacles"), 82: ("wallet", "wallet"),
         83: ("pill_box", "medicine"), 84: ("stove", "stove")}
 TEXT, HAND = 85, 86
-GLASSES = 81
 
-WORN_TOP = 0.35         # a spectacles box centred in the top 35 % of a person box = worn (§4.2 step 3)
 NEGATIVE_SHARE = 0.15   # LVIS images where our objects were checked absent
 DOUBLE_IOU = 0.7        # ours vs a COCO box on the same object: keep ours (§4.2 step 4)
 MIN_TEXT = 0.015        # text boxes lower than 1.5 % of the image height are too small to read
@@ -60,6 +63,14 @@ EGO_VAL_PER_ACTIVITY = 2  # 8 of the 48 EgoHands videos go to val, 2 per activit
 AUTO_COCO_CONF = 0.5    # stock yolo11n labels on EgoHands frames
 # a class with fewer train images than this stops the run (README §4.3: tell the lead)
 MIN_TRAIN_IMAGES = 50
+# zoomed crops (README §4.2 step 9): small objects seen up close, from the full-size photo
+ZOOM_CLASSES = {67, 80, 81, 82, 83, 84}  # cell phone + our five objects
+ZOOM_SMALL = 0.125      # an object is small when its long side is under 1/8 of the image's (40 px at 320)
+ZOOM_CONTEXT = 5        # the crop's side is 5× the object's long side …
+ZOOM_MIN_SIDE = 160     # … but at least 160 px of the original photo
+ZOOM_PER_IMAGE = 2      # at most 2 crops per photo
+ZOOM_KEEP_BOX = 0.5     # a box cut by the crop stays if half of it is inside …
+ZOOM_KEEP_FILL = 0.2    # … or if what's inside covers a fifth of the crop (a person filling the view)
 
 
 # ---------- downloads ----------
@@ -89,8 +100,16 @@ def load_json(path: Path):
 def lvis(split: str, cache: Path) -> dict:
     target = cache / f"lvis_v1_{split}.json"
     if not target.exists():
-        z = fetch(LVIS.format(split=split), cache / f"lvis_v1_{split}.json.zip")
-        unzip_one(z, f"lvis_v1_{split}.json", target)
+        try:
+            z = fetch(LVIS.format(split=split), cache / f"lvis_v1_{split}.json.zip")
+            unzip_one(z, f"lvis_v1_{split}.json", target)
+        except urllib.error.URLError as e:
+            # Meta's server failed (Nov 2026: an expired certificate): use the Kaggle copy instead
+            import kagglehub
+
+            handle, paths = LVIS_KAGGLE
+            print(f"LVIS server failed ({e.reason}); using the Kaggle copy {handle}", flush=True)
+            shutil.copy(kagglehub.dataset_download(handle, path=paths[split]), target)
     return load_json(target)
 
 
@@ -137,12 +156,6 @@ def iou(a, b) -> float:
     inter = ix * iy
     union = aw * ah + bw * bh - inter
     return inter / union if union > 0 else 0.0
-
-
-def worn(glasses_box, person_boxes) -> bool:
-    x, y, w, h = glasses_box
-    cx, cy = x + w / 2, y + h / 2
-    return any(px <= cx <= px + pw and py <= cy <= py + ph * WORN_TOP for px, py, pw, ph in person_boxes)
 
 
 def clip(box, w, h):
@@ -209,8 +222,8 @@ def pick_reminder(pool, split: str, n: int, seed: int = 0) -> dict:
 # ---------- 2–6. merge the labels of the COCO photos ----------
 
 def add_coco(records: dict, cache: Path, names: dict) -> dict:
-    """Adds the 80 COCO classes (ids 0–79), drops worn glasses. → {coco category id: our id}."""
-    persons = defaultdict(list)
+    """Adds the 80 COCO classes (ids 0–79). Every pair of glasses stays labelled, worn or not: telling
+    a worn pair apart is the gate rule's job, not the model's (README §1, §10)."""
     order = {}
     for part in ("train2017", "val2017"):
         coco = coco_instances(part, cache)
@@ -225,20 +238,9 @@ def add_coco(records: dict, cache: Path, names: dict) -> dict:
             if a.get("iscrowd"):
                 record["dropped"] += 1
                 continue
-            cls = order[a["category_id"]]
-            record["boxes"].append((cls, tuple(a["bbox"])))
-            if cls == 0:
-                persons[a["image_id"]].append(a["bbox"])
+            record["boxes"].append((order[a["category_id"]], tuple(a["bbox"])))
         del coco
-
-    # worn glasses aren't our class: remove their box, keep the photo (a worn pair left unlabeled
-    # teaches the model not to fire on faces, README §1)
-    removed = 0
-    for iid, r in records.items():
-        keep = [(cls, b) for cls, b in r["boxes"] if not (cls == GLASSES and worn(b, persons.get(iid, [])))]
-        removed += len(r["boxes"]) - len(keep)
-        r["boxes"] = keep
-    return {"worn-glasses boxes removed": removed}
+    return {"COCO boxes added": sum(1 for r in records.values() for c, _ in r["boxes"] if c < 80)}
 
 
 def drop_doubles(record: dict) -> None:
@@ -410,6 +412,48 @@ def auto_coco(records: list) -> int:
     return added
 
 
+# ---------- 9. zoomed crops ----------
+
+def zoom_crops(records: dict, out: Path, seed: int = 0) -> dict:
+    """Small objects (keys, pill boxes… a few pixels at 320) seen up close: a square crop of the
+    full-size photo around the object, with every label inside it. Train only; val stays natural.
+    → {name: record} of the new crops."""
+    from PIL import Image
+
+    rng = random.Random(seed)
+    crops = {}
+    for name, r in sorted(records.items()):
+        if r["split"] != "train" or r["source"] == "egohands":
+            continue
+        W, H = r["w"], r["h"]
+        small = [b for c, b in r["boxes"] if c in ZOOM_CLASSES and max(b[2], b[3]) < ZOOM_SMALL * max(W, H)]
+        if not small:
+            continue
+        rng.shuffle(small)
+        with Image.open(r["file"]) as image:
+            image = image.convert("RGB")
+            for k, (x, y, w, h) in enumerate(small[:ZOOM_PER_IMAGE]):
+                side = int(min(max(ZOOM_CONTEXT * max(w, h), ZOOM_MIN_SIDE), W, H))
+                # a random position that keeps the whole object inside, so it isn't always centred
+                x0 = int(rng.uniform(max(0.0, x + w - side), min(x, W - side)))
+                y0 = int(rng.uniform(max(0.0, y + h - side), min(y, H - side)))
+                boxes = []
+                for c, (bx, by, bw, bh) in r["boxes"]:
+                    ix0, iy0 = max(bx, x0), max(by, y0)
+                    ix1, iy1 = min(bx + bw, x0 + side), min(by + bh, y0 + side)
+                    if ix1 <= ix0 or iy1 <= iy0:
+                        continue
+                    inside = (ix1 - ix0) * (iy1 - iy0)
+                    if inside >= ZOOM_KEEP_BOX * bw * bh or inside >= ZOOM_KEEP_FILL * side * side:
+                        boxes.append((c, (ix0 - x0, iy0 - y0, ix1 - ix0, iy1 - iy0)))
+                crop_name = f"{name}_zoom{k}"
+                target = out / "images" / "train" / f"{crop_name}.jpg"
+                image.crop((x0, y0, x0 + side, y0 + side)).save(target, quality=92)
+                crops[crop_name] = {"split": "train", "source": "zoom", "file": target, "w": side, "h": side,
+                                    "boxes": boxes, "dropped": 0, "labels": dict(r["labels"])}
+    return crops
+
+
 # ---------- writing ----------
 
 def place_images(records: dict, out: Path, workers: int) -> None:
@@ -484,9 +528,10 @@ def report(records: dict, names: dict) -> list:
         print(f"[{split}] label sources: " + "; ".join(
             f"{k} {dict(Counter(r['labels'][k] for r in rs))}" for k in ("coco", "lvis", "text", "hand")))
         print(f"[{split}] boxes dropped (crowd + double labels): {sum(r['dropped'] for r in rs)}")
-        if split == "train":
-            problems += [f"{names[c]}: only {imgs[c]} train images" for c in (*OURS, TEXT, HAND)
-                         if imgs[c] < MIN_TRAIN_IMAGES]
+        if split == "train":  # zoomed crops repeat photos, so they don't count here
+            real = Counter(c for r in rs if r["source"] != "zoom" for c in {c for c, _ in r["boxes"]})
+            problems += [f"{names[c]}: only {real[c]} train photos" for c in (*OURS, TEXT, HAND)
+                         if real[c] < MIN_TRAIN_IMAGES]
     return problems
 
 
@@ -582,6 +627,11 @@ def main() -> None:
         ego_records = [r for r in records.values() if r["source"] == "egohands"]
         if ego_records:
             print(f"yolo11n COCO boxes on EgoHands: {auto_coco(ego_records)}", flush=True)
+
+    # 9. zoomed crops (after the auto-labels, so the crops carry the text boxes too)
+    crops = zoom_crops(records, args.out)
+    print(f"zoomed crops of small objects: {len(crops)}", flush=True)
+    records.update(crops)
 
     names = all_names(names)
     problems = report(records, names)
