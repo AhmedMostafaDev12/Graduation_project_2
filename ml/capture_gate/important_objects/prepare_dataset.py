@@ -18,7 +18,8 @@ Sources, joined by COCO image id (LVIS, COCO, COCO-Text and COCO-WholeBody label
   their 80 COCO classes and CRAFT their text.
 - Objects365 (two Hugging Face copies): every photo with a key or a wallet, plus samples with glasses,
   phones and gas stoves; its classes mapped onto ours and COCO's; MediaPipe labels their hands.
-- Roboflow Universe (needs ROBOFLOW_API_KEY): pill organisers and medicine boxes → pill_box (83).
+- Roboflow Universe (needs ROBOFLOW_API_KEY): pill organisers and medicine boxes → pill_box, keys at home →
+  keys, close-up wallets → wallet; near-duplicate photos removed by image embedding.
 - The reminder set: ~5,000 more COCO photos with all their labels, so the 80 classes aren't forgotten.
 - Zoomed crops: small objects of ours (and phones) cut out of the full-size photo, train only.
 
@@ -92,11 +93,20 @@ O365_TO_COCO = {
     "Refrigerator": "refrigerator", "Book": "book", "Clock": "clock", "Vase": "vase", "Scissors": "scissors",
     "Stuffed Toy": "teddy bear", "Hair Dryer": "hair drier", "Toothbrush": "toothbrush",
 }
-# Roboflow Universe sets for pill_box (README §4.2 step 6c), all CC BY 4.0. The original photos and boxes
-# come from Roboflow's API (its exports are stretched and augmented); needs ROBOFLOW_API_KEY
-ROBOFLOW_SETS = ["andre-anrfr/pill-box", "andre-anrfr/pillboxdetection", "fernando-vela-rdnuo/medicineboxes"]
+# Roboflow Universe sets (README §4.2 step 6c), CC BY 4.0 or public domain as published. The original photos
+# and boxes come from Roboflow's API (its exports are stretched and augmented); needs ROBOFLOW_API_KEY.
+# Each set: its label → our id ("*" = every label); boxes with other labels are dropped.
+ROBOFLOW_SETS = {
+    "andre-anrfr/pill-box": {"*": 83},                    # pill organisers, mostly in hands
+    "andre-anrfr/pillboxdetection": {"*": 83},            # the same photos (dropped as duplicates); kept for safety
+    "fernando-vela-rdnuo/medicineboxes": {"*": 83},       # medicine boxes in hands and on tables
+    "obj-detection-kd5zb/objects_v2": {"keys": 80},       # keys in real homes; its "bag" boxes: yolo11n labels bags
+    "senior-project-final-datasets/wallets-cskty": {"Wallet": 82},  # close-up product photos of wallets
+}
+ROBOFLOW_DUPLICATE = 0.95  # image-embedding cosine above this = the same photo (measured: repeats ≤ 0.975, others ≤ 0.905)
 ROBOFLOW_TRAIN_ONLY = {"fernando-vela-rdnuo/medicineboxes"}  # neighbouring video frames would leak into val
-ROBOFLOW_SKIP_PREFIXES = ("IMG_", "mix")  # fernando's shelf / mix photos: only some of their boxes are labelled
+# fernando's shelf / mix photos: only some of their boxes are labelled
+ROBOFLOW_SKIP_PREFIXES = {"fernando-vela-rdnuo/medicineboxes": ("IMG_", "mix")}
 ROBOFLOW_FRAME_EVERY = 5  # fernando's video frames: keep every 5th, neighbours are near-identical
 ROBOFLOW_SIDE = 1024      # originals are up to 5,632 px: shrink to this long side
 # MediaPipe's hand detector labels the hands Objects365 doesn't (README §4.2 step 6b)
@@ -510,7 +520,7 @@ def objects365(out: Path, cache: Path, names: dict, splits, limit: int, workers:
     return records
 
 
-# ---------- Roboflow Universe: pill organisers and medicine boxes ----------
+# ---------- Roboflow Universe: pill boxes, keys, wallets ----------
 
 def roboflow_key():
     key = os.environ.get("ROBOFLOW_API_KEY")
@@ -525,8 +535,10 @@ def roboflow_key():
 
 
 def roboflow(out: Path, key: str, splits, limit: int, workers: int) -> dict:
-    """Pill boxes from ROBOFLOW_SETS: original photos (shrunk to ROBOFLOW_SIDE) with their boxes → pill_box.
-    Their other objects, text and hands are auto-labelled later, like EgoHands. → {name: record}."""
+    """ROBOFLOW_SETS: original photos (shrunk to ROBOFLOW_SIDE) with their boxes mapped to our ids, near-duplicate
+    photos removed by image embedding. Their other objects, text and hands are auto-labelled later, like EgoHands.
+    → {name: record}."""
+    import numpy as np
     from PIL import Image
 
     def api(path: str, body=None):
@@ -552,7 +564,7 @@ def roboflow(out: Path, key: str, splits, limit: int, workers: int) -> dict:
         drop = {r["id"] for i, r in enumerate(frames) if i % ROBOFLOW_FRAME_EVERY}
         kept = 0
         for r in rows:
-            if r["name"] in seen_names or r["id"] in drop or r["name"].startswith(ROBOFLOW_SKIP_PREFIXES):
+            if r["name"] in seen_names or r["id"] in drop or r["name"].startswith(ROBOFLOW_SKIP_PREFIXES.get(ref, ())):
                 continue  # same photo in andre's two sets, a near-identical frame, or a shelf photo
             split = "train" if ref in ROBOFLOW_TRAIN_ONLY or r.get("split") == "train" else "val"
             if split in splits:
@@ -563,40 +575,69 @@ def roboflow(out: Path, key: str, splits, limit: int, workers: int) -> dict:
     if limit:
         jobs = jobs[:limit]
 
-    def fetch(job):
-        ref, image_id, split = job
+    # 1. each photo's boxes, size, address and embedding (one API call each)
+    def details(job):
+        ref, image_id, _ = job
+        try:
+            image = api(f"{ref}/images/{image_id}")["image"]
+            return job, image["annotation"], image["urls"]["original"], image.get("embedding")
+        except (OSError, KeyError, ValueError):
+            return None
+
+    with ThreadPoolExecutor(min(workers, 16)) as pool:
+        found = [d for d in pool.map(details, jobs) if d]
+
+    # 2. the same photo in several sets (scraped shop photos, repeated shots): keep the first
+    kept, n = [], 0
+    vectors = np.zeros((len(found), max((len(d[3]) for d in found if d[3]), default=1)))
+    for d in found:
+        if d[3]:
+            v = np.asarray(d[3], dtype=float)
+            v /= np.linalg.norm(v)
+            if n and float(np.max(vectors[:n] @ v)) > ROBOFLOW_DUPLICATE:
+                continue
+            vectors[n] = v
+            n += 1
+        kept.append(d)
+    print(f"Roboflow: {len(found)} photos, {len(found) - len(kept)} near-duplicates removed", flush=True)
+
+    # 3. download the kept photos, shrink them, map their boxes
+    def fetch(d):
+        (ref, image_id, split), annotation, url, _ = d
         name = f"rf_{ref.split('/')[1]}_{image_id}"
         target = out / "images" / split / f"{name}.jpg"
         target.parent.mkdir(parents=True, exist_ok=True)
         try:
-            image = api(f"{ref}/images/{image_id}")["image"]
-            annotation = image["annotation"]
             W, H = float(annotation["width"]), float(annotation["height"])
             s = min(1.0, ROBOFLOW_SIDE / max(W, H))
             w, h = round(W * s), round(H * s)
             if not target.exists():
-                with urllib.request.urlopen(image["urls"]["original"], timeout=60) as r:
+                with urllib.request.urlopen(url, timeout=60) as r:
                     raw = r.read()
                 with Image.open(io.BytesIO(raw)) as photo:
                     photo.convert("RGB").resize((w, h)).save(target, quality=92)
         except (OSError, KeyError, ValueError):
             return None
+        mapping = ROBOFLOW_SETS[ref]
         boxes = []
         for b in annotation.get("boxes", []):
+            cls = mapping.get(str(b.get("label")), mapping.get("*"))
+            if cls is None:
+                continue  # a label we don't use (e.g. objects_v2's "bag"): the auto-labels cover it
             x, y, bw, bh = (float(b[k]) * s for k in ("x", "y", "width", "height"))  # x, y = the box centre
             box = clip((x - bw / 2, y - bh / 2, bw, bh), w, h)
             if box:
-                boxes.append((83, box))
-        if not boxes:
-            return None
+                boxes.append((cls, box))
         return name, {"split": split, "source": "roboflow", "file": target, "w": w, "h": h, "boxes": boxes,
                       "dropped": 0, "labels": {"coco": "none", "lvis": "roboflow", "text": "none", "hand": "none"}}
 
     records = {}
     with ThreadPoolExecutor(min(workers, 16)) as pool:
-        for got in pool.map(fetch, jobs):
+        for got in pool.map(fetch, kept):
             if got:
                 records[got[0]] = got[1]
+    per_class = Counter(c for r in records.values() for c, _ in r["boxes"])
+    print(f"Roboflow boxes: keys {per_class[80]}, wallet {per_class[82]}, pill_box {per_class[83]}", flush=True)
     return records
 
 
@@ -932,12 +973,12 @@ def main() -> None:
         print(f"Objects365: {len(o365)} photos, {sum(len(r['boxes']) for r in o365.values())} boxes", flush=True)
         records.update(o365)
 
-    # Roboflow: pill organisers and medicine boxes (needs ROBOFLOW_API_KEY; skipped without it)
+    # Roboflow: pill organisers, medicine boxes, keys at home, wallets (needs ROBOFLOW_API_KEY; skipped without it)
     if "roboflow" not in skip:
         key = roboflow_key()
         if key:
             rf = roboflow(args.out, key, splits, args.limit, args.workers)
-            print(f"Roboflow: {len(rf)} photos, {sum(len(r['boxes']) for r in rf.values())} pill boxes", flush=True)
+            print(f"Roboflow: {len(rf)} photos kept", flush=True)
             records.update(rf)
         else:
             print("Roboflow skipped: no ROBOFLOW_API_KEY (Kaggle: Add-ons → Secrets)", flush=True)
