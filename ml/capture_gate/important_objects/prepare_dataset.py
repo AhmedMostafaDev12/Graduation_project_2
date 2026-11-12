@@ -28,6 +28,7 @@ import random
 import shutil
 import subprocess
 import sys
+import urllib.error
 import urllib.request
 import zipfile
 from collections import Counter, defaultdict
@@ -43,7 +44,9 @@ COCO_TEXT = "https://github.com/bgshih/cocotext/releases/download/dl/cocotext.v2
 WHOLEBODY_DRIVE = {"train": "1thErEToRbmM9uLNi1JXXfOsaS5VK2FXf", "val": "1N6VgwKnj8DeyGXCvp1eYgNbRmw6jdfrb"}
 # EgoHands' original link is dead; a full copy of the original release lives on Kaggle
 EGOHANDS_KAGGLE = "himaniishah/egohands"
-WHOLEBODY_MIRROR ={"train": "https://huggingface.co/hngan/cocowholebody/resolve/main/coco_wholebody_train_v1.0.json"}
+# a Kaggle copy of the LVIS v1 annotations (its val file has the original's exact size, 201,235,232 bytes)
+LVIS_KAGGLE = ("alexanderyyy/lvis-v1", {"train": "lvis_v1_train.json/lvis_v1_train.json", "val": "lvis_v1_val/lvis_v1_val.json"})
+WHOLEBODY_MIRROR = {"train": "https://huggingface.co/hngan/cocowholebody/resolve/main/coco_wholebody_train_v1.0.json"}
 
 # our classes after COCO's 80 (README §1); LVIS names for the five objects
 OURS = {80: ("keys", "key"), 81: ("glasses", "spectacles"), 82: ("wallet", "wallet"),
@@ -89,8 +92,16 @@ def load_json(path: Path):
 def lvis(split: str, cache: Path) -> dict:
     target = cache / f"lvis_v1_{split}.json"
     if not target.exists():
-        z = fetch(LVIS.format(split=split), cache / f"lvis_v1_{split}.json.zip")
-        unzip_one(z, f"lvis_v1_{split}.json", target)
+        try:
+            z = fetch(LVIS.format(split=split), cache / f"lvis_v1_{split}.json.zip")
+            unzip_one(z, f"lvis_v1_{split}.json", target)
+        except urllib.error.URLError as e:
+            # Meta's server failed (Nov 2026: an expired certificate): use the Kaggle copy instead
+            import kagglehub
+
+            handle, paths = LVIS_KAGGLE
+            print(f"LVIS server failed ({e.reason}); using the Kaggle copy {handle}", flush=True)
+            shutil.copy(kagglehub.dataset_download(handle, path=paths[split]), target)
     return load_json(target)
 
 
