@@ -1092,7 +1092,7 @@ def main() -> None:
         if not state.exists():
             records, names = collect(args, cache, splits, skip)
             saved = {"names": names, "records": {n: dict(r, file=str(r["file"])) for n, r in records.items()}}
-            state.write_text(json.dumps(saved), encoding="utf-8")
+            state.write_text(json.dumps(saved, default=str), encoding="utf-8")  # any Path (e.g. EgoHands "path") as text
             print(f"collected {len(records)} photos → {state}", flush=True)
             if args.step == "all":
                 print("restarting in a fresh process to free memory …", flush=True)
