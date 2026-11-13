@@ -990,38 +990,8 @@ def coco_val_check(out: Path, cache: Path) -> None:
     print(f"COCO val2017: {len(size)} images → {out}/coco80.yaml (stock yolo11n), {out}/coco87.yaml (ours)")
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--out", type=Path, default=Path("data"))
-    parser.add_argument("--cache", type=Path, default=None, help="annotation files (default: <out>/annotations)")
-    parser.add_argument("--egohands", type=Path, default=Path("/kaggle/input/egohands"))
-    parser.add_argument("--split", choices=["train", "val", "both"], default="both")
-    parser.add_argument("--limit", type=int, default=0, help="at most N images per split and source (testing)")
-    parser.add_argument("--skip", default="", help="comma list of: wholebody, objects365, roboflow, egohands, auto (testing)")
-    parser.add_argument("--workers", type=int, default=64)
-    parser.add_argument("--accept-low-counts", action="store_true", help="write the data even if a class is thin")
-    parser.add_argument("--coco-val", type=Path, default=None, help="only build COCO val2017 for the forgetting check")
-    parser.add_argument("--extract-hands", choices=["train", "val"], help=argparse.SUPPRESS)  # internal, see hands_of
-    parser.add_argument("--extract-o365", help=argparse.SUPPRESS)  # internal, see objects365
-    parser.add_argument("--auto-stage", choices=list(AUTO_STAGES), help=argparse.SUPPRESS)  # internal, see auto_stage
-    args = parser.parse_args()
-    cache = args.cache or args.out / "annotations"
-    cache.mkdir(parents=True, exist_ok=True)
-    if args.extract_hands:
-        extract_hands(args.extract_hands, cache)
-        return
-    if args.extract_o365:
-        extract_o365(cache, args.extract_o365.split(","))
-        return
-    if args.auto_stage:
-        run_auto_stage(args.auto_stage, cache)
-        return
-    if args.coco_val:
-        coco_val_check(args.coco_val, cache)
-        return
-    skip = {s.strip() for s in args.skip.split(",") if s.strip()}
-    splits = ["train", "val"] if args.split == "both" else [args.split]
-
+def collect(args, cache: Path, splits, skip) -> tuple:
+    """Steps 1-7: pick and download every photo and merge the labels the datasets give. → (records, COCO names)."""
     # 1. LVIS → kept images + the reminder set, per split
     photos = {}
     for split in splits:
@@ -1066,6 +1036,57 @@ def main() -> None:
         records.update(ego)
 
     place_images(records, args.out, args.workers)
+    return records, names
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--out", type=Path, default=Path("data"))
+    parser.add_argument("--cache", type=Path, default=None, help="annotation files (default: <out>/annotations)")
+    parser.add_argument("--egohands", type=Path, default=Path("/kaggle/input/egohands"))
+    parser.add_argument("--split", choices=["train", "val", "both"], default="both")
+    parser.add_argument("--limit", type=int, default=0, help="at most N images per split and source (testing)")
+    parser.add_argument("--skip", default="", help="comma list of: wholebody, objects365, roboflow, egohands, auto (testing)")
+    parser.add_argument("--workers", type=int, default=64)
+    parser.add_argument("--accept-low-counts", action="store_true", help="write the data even if a class is thin")
+    parser.add_argument("--rebuild", action="store_true", help="collect the photos again instead of reusing records.json")
+    parser.add_argument("--coco-val", type=Path, default=None, help="only build COCO val2017 for the forgetting check")
+    parser.add_argument("--extract-hands", choices=["train", "val"], help=argparse.SUPPRESS)  # internal, see hands_of
+    parser.add_argument("--extract-o365", help=argparse.SUPPRESS)  # internal, see objects365
+    parser.add_argument("--auto-stage", choices=list(AUTO_STAGES), help=argparse.SUPPRESS)  # internal, see auto_stage
+    args = parser.parse_args()
+    cache = args.cache or args.out / "annotations"
+    cache.mkdir(parents=True, exist_ok=True)
+    if args.extract_hands:
+        extract_hands(args.extract_hands, cache)
+        return
+    if args.extract_o365:
+        extract_o365(cache, args.extract_o365.split(","))
+        return
+    if args.auto_stage:
+        run_auto_stage(args.auto_stage, cache)
+        return
+    if args.coco_val:
+        coco_val_check(args.coco_val, cache)
+        return
+    skip = {s.strip() for s in args.skip.split(",") if s.strip()}
+    splits = ["train", "val"] if args.split == "both" else [args.split]
+
+    # Steps 1-7 hold big annotation files in memory and Python doesn't give it back, so once the photos are
+    # collected the state goes to records.json and the script restarts as a fresh process (same command):
+    # labelling then runs in a nearly empty process. A later run reuses records.json (--rebuild redoes it).
+    state = cache / "records.json"
+    if args.rebuild and state.exists():
+        state.unlink()
+    if not state.exists():
+        records, names = collect(args, cache, splits, skip)
+        saved = {"names": names, "records": {n: dict(r, file=str(r["file"])) for n, r in records.items()}}
+        state.write_text(json.dumps(saved), encoding="utf-8")
+        print(f"collected {len(records)} photos → {state}; restarting in a fresh process to free memory …", flush=True)
+        os.execv(sys.executable, [sys.executable, os.path.abspath(__file__), *(a for a in sys.argv[1:] if a != "--rebuild")])
+    saved = load_json(state)
+    records, names = saved["records"], {int(k): v for k, v in saved["names"].items()}
+    print(f"loaded {len(records)} collected photos from {state}", flush=True)
 
     # 8. auto-labels (a re-run first reuses the previous run's, so only new photos go through the GPU)
     reused = reuse_auto_labels(records, args.out)
