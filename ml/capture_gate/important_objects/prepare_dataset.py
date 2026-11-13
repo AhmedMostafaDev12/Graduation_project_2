@@ -724,10 +724,10 @@ def run_auto_stage(stage: str, cache: Path) -> None:
     if results.exists():
         for line in results.read_text(encoding="utf-8").splitlines():
             try:
-                done.add(json.loads(line)["file"])
+                done.add(os.path.normpath(json.loads(line)["file"]))
             except (ValueError, KeyError):
                 pass  # a line cut short by a crash: that photo is simply done again
-    todo = [f for f in todo if f not in done]
+    todo = [f for f in todo if os.path.normpath(f) not in done]
     print(f"  {stage}: {len(done)} photos done before, {len(todo)} to do", flush=True)
     if not todo:
         return
@@ -775,6 +775,14 @@ def run_auto_stage(stage: str, cache: Path) -> None:
                     save(i, path, boxes)
 
 
+def stage_records(stage: str, records: dict) -> list:
+    """The photos a stage labels: text on every photo; COCO boxes on EgoHands and Roboflow; hands on Objects365
+    and Roboflow; each only while its labels are still missing."""
+    group = AUTO_STAGES[stage][0]
+    sources = {"text": None, "coco": ("egohands", "roboflow"), "hands": ("objects365", "roboflow")}[stage]
+    return [r for r in records.values() if r["labels"][group] == "none" and (sources is None or r["source"] in sources)]
+
+
 def auto_stage(stage: str, records: list, cache: Path) -> int:
     """Runs one stage in its own process for these photos, then adds its saved results to them."""
     if not records:
@@ -786,12 +794,12 @@ def auto_stage(stage: str, records: list, cache: Path) -> int:
     for line in (cache / f"auto_{stage}.jsonl").read_text(encoding="utf-8").splitlines():
         try:
             d = json.loads(line)
-            results[d["file"]] = d["boxes"]
+            results[os.path.normpath(d["file"])] = d["boxes"]
         except (ValueError, KeyError):
             pass
     added = 0
     for r in records:
-        boxes = results.get(str(r["file"]))
+        boxes = results.get(os.path.normpath(str(r["file"])))
         if boxes is None:
             continue
         r["boxes"] += [(int(c), (x, y, w, h)) for c, x, y, w, h in boxes]
@@ -1050,6 +1058,8 @@ def main() -> None:
     parser.add_argument("--workers", type=int, default=64)
     parser.add_argument("--accept-low-counts", action="store_true", help="write the data even if a class is thin")
     parser.add_argument("--rebuild", action="store_true", help="collect the photos again instead of reusing records.json")
+    parser.add_argument("--step", choices=["all", "collect", *AUTO_STAGES, "finish"], default="all",
+                        help="one step per notebook cell: collect, text, coco, hands, finish")
     parser.add_argument("--coco-val", type=Path, default=None, help="only build COCO val2017 for the forgetting check")
     parser.add_argument("--extract-hands", choices=["train", "val"], help=argparse.SUPPRESS)  # internal, see hands_of
     parser.add_argument("--extract-o365", help=argparse.SUPPRESS)  # internal, see objects365
@@ -1072,18 +1082,28 @@ def main() -> None:
     skip = {s.strip() for s in args.skip.split(",") if s.strip()}
     splits = ["train", "val"] if args.split == "both" else [args.split]
 
-    # Steps 1-7 hold big annotation files in memory and Python doesn't give it back, so once the photos are
-    # collected the state goes to records.json and the script restarts as a fresh process (same command):
-    # labelling then runs in a nearly empty process. A later run reuses records.json (--rebuild redoes it).
+    # One step per notebook cell (each its own process, so memory is freed between them and a failed step is
+    # re-run alone): collect → text → coco → hands → finish. --step all (the default) does them in one go:
+    # it saves the collected photos to records.json and restarts itself fresh before labelling.
     state = cache / "records.json"
-    if args.rebuild and state.exists():
-        state.unlink()
+    if args.step in ("collect", "all"):
+        if args.rebuild and state.exists():
+            state.unlink()
+        if not state.exists():
+            records, names = collect(args, cache, splits, skip)
+            saved = {"names": names, "records": {n: dict(r, file=str(r["file"])) for n, r in records.items()}}
+            state.write_text(json.dumps(saved), encoding="utf-8")
+            print(f"collected {len(records)} photos → {state}", flush=True)
+            if args.step == "all":
+                print("restarting in a fresh process to free memory …", flush=True)
+                argv = [a for a in sys.argv[1:] if a != "--rebuild"]
+                os.execv(sys.executable, [sys.executable, os.path.abspath(__file__), *argv])
+        else:
+            print(f"{state} exists: the photos are already collected (--rebuild collects again)", flush=True)
+        if args.step == "collect":
+            return
     if not state.exists():
-        records, names = collect(args, cache, splits, skip)
-        saved = {"names": names, "records": {n: dict(r, file=str(r["file"])) for n, r in records.items()}}
-        state.write_text(json.dumps(saved), encoding="utf-8")
-        print(f"collected {len(records)} photos → {state}; restarting in a fresh process to free memory …", flush=True)
-        os.execv(sys.executable, [sys.executable, os.path.abspath(__file__), *(a for a in sys.argv[1:] if a != "--rebuild")])
+        raise SystemExit(f"{state} is missing: run --step collect first")
     saved = load_json(state)
     records, names = saved["records"], {int(k): v for k, v in saved["names"].items()}
     print(f"loaded {len(records)} collected photos from {state}", flush=True)
@@ -1093,16 +1113,17 @@ def main() -> None:
     if reused:
         print(f"reused from the previous run: text on {reused['text']}, hands on {reused['hand']}, "
               f"COCO boxes on {reused['coco']} photos", flush=True)
-    if "auto" not in skip:
-        need_text = [r for r in records.values() if r["labels"]["text"] == "none"]
-        added = auto_stage("text", need_text, cache)
-        print(f"CRAFT text boxes: {added} on {len(need_text)} photos", flush=True)
-        no_coco = [r for r in records.values() if r["source"] in ("egohands", "roboflow") and r["labels"]["coco"] == "none"]
-        added = auto_stage("coco", no_coco, cache)
-        print(f"yolo11n COCO boxes on EgoHands + Roboflow: {added} on {len(no_coco)} photos", flush=True)
-        no_hands = [r for r in records.values() if r["source"] in ("objects365", "roboflow") and r["labels"]["hand"] == "none"]
-        added = auto_stage("hands", no_hands, cache)
-        print(f"MediaPipe hand boxes on Objects365 + Roboflow: {added} on {len(no_hands)} photos", flush=True)
+    if args.step in AUTO_STAGES:  # one stage, in this process; finish adds its results
+        todo = stage_records(args.step, records)
+        (cache / f"auto_{args.step}_todo.txt").write_text("\n".join(str(r["file"]) for r in todo), encoding="utf-8")
+        run_auto_stage(args.step, cache)
+        print(f"{args.step}: done; next step, or --step finish", flush=True)
+        return
+    if "auto" not in skip:  # finish / all: runs whatever a stage hasn't done yet, then adds every result
+        for stage, what in (("text", "CRAFT text boxes"), ("coco", "yolo11n COCO boxes on EgoHands + Roboflow"),
+                            ("hands", "MediaPipe hand boxes on Objects365 + Roboflow")):
+            todo = stage_records(stage, records)
+            print(f"{what}: {auto_stage(stage, todo, cache)} on {len(todo)} photos", flush=True)
 
     # 9. zoomed crops (after the auto-labels, so the crops carry the text boxes too)
     crops = zoom_crops(records, args.out)
