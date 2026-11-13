@@ -127,13 +127,15 @@ AUTO_COCO_CONF = 0.5    # stock yolo11n labels on EgoHands frames
 # a class with fewer train images than this stops the run (README §4.3: tell the lead)
 MIN_TRAIN_IMAGES = 50
 # zoomed crops (README §4.2 step 9): small objects seen up close, from the full-size photo
-ZOOM_CLASSES = {67, 80, 81, 82, 83, 84}  # cell phone + our five objects
+ZOOM_CLASSES = {67, 80, 81, 82, 83}  # cell phone, keys, glasses (only when not worn), wallet, pill box
 ZOOM_SMALL = 0.125      # an object is small when its long side is under 1/8 of the image's (40 px at 320)
 ZOOM_CONTEXT = 5        # the crop's side is 5× the object's long side …
 ZOOM_MIN_SIDE = 160     # … but at least 160 px of the original photo
 ZOOM_PER_IMAGE = 2      # at most 2 crops per photo
 ZOOM_KEEP_BOX = 0.5     # a box cut by the crop stays if half of it is inside …
 ZOOM_KEEP_FILL = 0.2    # … or if what's inside covers a fifth of the crop (a person filling the view)
+ZOOM_MAX_PER_CLASS = 3000  # the first version made 18,913 crops, mostly worn glasses and phones in crowds
+WORN_TOP = 0.35         # glasses centred in the top 35 % of a person box are being worn (as in the gate rule)
 
 
 # ---------- downloads ----------
@@ -810,25 +812,43 @@ def auto_stage(stage: str, records: list, cache: Path) -> int:
 
 # ---------- 9. zoomed crops ----------
 
+def worn(glasses, people) -> bool:
+    x, y, w, h = glasses
+    cx, cy = x + w / 2, y + h / 2
+    return any(px <= cx <= px + pw and py <= cy <= py + ph * WORN_TOP for px, py, pw, ph in people)
+
+
 def zoom_crops(records: dict, out: Path, seed: int = 0) -> dict:
-    """Small objects (keys, pill boxes… a few pixels at 320) seen up close: a square crop of the
-    full-size photo around the object, with every label inside it. Train only; val stays natural.
-    → {name: record} of the new crops."""
+    """Small objects (keys, pill boxes… a few pixels at 320) seen up close: a square crop of the full-size photo
+    around the object, with every label inside it. Train only; val stays natural. Not for glasses being worn
+    (that's faces in crowds, not an object put down); at most ZOOM_MAX_PER_CLASS per class, photos taken in a
+    random order so every source gets its share. → {name: record} of the new crops."""
     from PIL import Image
 
+    for folder, pattern in (("images", "*_zoom*.jpg"), ("labels", "*_zoom*.txt")):  # an earlier run's crops
+        for old in (out / folder / "train").glob(pattern):
+            old.unlink()
     rng = random.Random(seed)
+    made = Counter()
     crops = {}
-    for name, r in sorted(records.items()):
-        if r["split"] != "train" or r["source"] == "egohands":
+    order = sorted(records.items())
+    rng.shuffle(order)
+    for name, r in order:
+        if r["split"] != "train" or r["source"] in ("egohands", "zoom"):
             continue
         W, H = r["w"], r["h"]
-        small = [b for c, b in r["boxes"] if c in ZOOM_CLASSES and max(b[2], b[3]) < ZOOM_SMALL * max(W, H)]
+        people = [b for c, b in r["boxes"] if c == 0]
+        small = [(c, b) for c, b in r["boxes"]
+                 if c in ZOOM_CLASSES and max(b[2], b[3]) < ZOOM_SMALL * max(W, H)
+                 and made[c] < ZOOM_MAX_PER_CLASS and not (c == 81 and worn(b, people))]
         if not small:
             continue
         rng.shuffle(small)
         with Image.open(r["file"]) as image:
             image = image.convert("RGB")
-            for k, (x, y, w, h) in enumerate(small[:ZOOM_PER_IMAGE]):
+            for k, (cls, (x, y, w, h)) in enumerate(small[:ZOOM_PER_IMAGE]):
+                if made[cls] >= ZOOM_MAX_PER_CLASS:
+                    continue
                 side = int(min(max(ZOOM_CONTEXT * max(w, h), ZOOM_MIN_SIDE), W, H))
                 # a random position that keeps the whole object inside, so it isn't always centred
                 x0 = int(rng.uniform(max(0.0, x + w - side), min(x, W - side)))
@@ -847,6 +867,8 @@ def zoom_crops(records: dict, out: Path, seed: int = 0) -> dict:
                 image.crop((x0, y0, x0 + side, y0 + side)).save(target, quality=92)
                 crops[crop_name] = {"split": "train", "source": "zoom", "file": target, "w": side, "h": side,
                                     "boxes": boxes, "dropped": 0, "labels": dict(r["labels"])}
+                made[cls] += 1
+    print("zoomed crops per class: " + ", ".join(f"{c} {n}" for c, n in sorted(made.items())), flush=True)
     return crops
 
 
