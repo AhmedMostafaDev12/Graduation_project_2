@@ -669,72 +669,130 @@ def egohands(root: Path, limit: int, splits) -> dict:
 
 
 # ---------- 8. auto-labels (GPU) ----------
+# Each stage runs in its own process (the main process never holds CRAFT, YOLO and MediaPipe at once) and
+# appends every photo's result to <cache>/auto_<stage>.jsonl as it goes: if anything dies, the next run
+# continues where it stopped.
 
-def auto_text(records: list) -> int:
-    """CRAFT text boxes on every photo, one box per line of writing (EasyOCR groups words into lines). One
-    definition everywhere: COCO-Text's word boxes are not used, they'd contradict these (§4.2 step 5)."""
-    import easyocr
-
-    reader = easyocr.Reader(["en"], gpu=True, recognizer=False, verbose=False)
-    added = 0
-    for i, r in enumerate(records):
-        horizontal, free = reader.detect(str(r["file"]), canvas_size=1280)
-        boxes = [(x0, y0, x1 - x0, y1 - y0) for x0, x1, y0, y1 in horizontal[0]]
-        for poly in free[0]:
-            xs, ys = [p[0] for p in poly], [p[1] for p in poly]
-            boxes.append((min(xs), min(ys), max(xs) - min(xs), max(ys) - min(ys)))
-        for box in boxes:
-            box = clip(box, r["w"], r["h"])
-            if box and box[3] >= MIN_TEXT * r["h"]:
-                r["boxes"].append((TEXT, box))
-                added += 1
-        r["labels"]["text"] = "craft-auto"
-        if i % 1000 == 0:
-            print(f"  text auto-labels: {i}/{len(records)}", flush=True)
-    return added
+AUTO_STAGES = {  # stage -> (label group, manifest value)
+    "text": ("text", "craft-auto"),
+    "hands": ("hand", "mediapipe-auto"),
+    "coco": ("coco", "yolo11n-auto"),
+}
 
 
-def auto_hands(records: list, cache: Path) -> int:
-    """MediaPipe's hand detector labels the hands on Objects365 and Roboflow photos (they have no hand class)."""
+def text_boxes(reader, path: str, w: int, h: int) -> list:
+    """CRAFT: one box per line of writing (EasyOCR groups words into lines). One definition everywhere:
+    COCO-Text's word boxes are not used, they'd contradict these (README §4.2 step 5)."""
+    horizontal, free = reader.detect(path, canvas_size=1280)
+    boxes = [(x0, y0, x1 - x0, y1 - y0) for x0, x1, y0, y1 in horizontal[0]]
+    for poly in free[0]:
+        xs, ys = [p[0] for p in poly], [p[1] for p in poly]
+        boxes.append((min(xs), min(ys), max(xs) - min(xs), max(ys) - min(ys)))
+    out = []
+    for box in boxes:
+        box = clip(box, w, h)
+        if box and box[3] >= MIN_TEXT * h:
+            out.append([TEXT, *map(float, box)])
+    return out
+
+
+def hand_boxes(detector, path: str, w: int, h: int) -> list:
+    """MediaPipe: hands on Objects365 and Roboflow photos (they have no hand class); box from the 21 landmarks."""
     import mediapipe as mp
     import numpy as np
-    from mediapipe.tasks.python import vision
-    from mediapipe.tasks.python.core.base_options import BaseOptions
     from PIL import Image
 
-    model = fetch(MEDIAPIPE_HANDS, cache / "hand_landmarker.task")
-    detector = vision.HandLandmarker.create_from_options(vision.HandLandmarkerOptions(
-        base_options=BaseOptions(model_asset_path=str(model)), num_hands=6, min_hand_detection_confidence=0.4))
+    with Image.open(path) as image:
+        rgb = np.ascontiguousarray(np.asarray(image.convert("RGB")))
+    out = []
+    for hand in detector.detect(mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)).hand_landmarks:
+        xs, ys = [p.x * w for p in hand], [p.y * h for p in hand]
+        pw, ph = (max(xs) - min(xs)) * HAND_PAD, (max(ys) - min(ys)) * HAND_PAD
+        box = clip((min(xs) - pw, min(ys) - ph, max(xs) - min(xs) + 2 * pw, max(ys) - min(ys) + 2 * ph), w, h)
+        if box:
+            out.append([HAND, *map(float, box)])
+    return out
+
+
+def run_auto_stage(stage: str, cache: Path) -> None:
+    """In its own process: label every photo in auto_<stage>_todo.txt not already in auto_<stage>.jsonl."""
+    from PIL import Image
+
+    todo = [line for line in (cache / f"auto_{stage}_todo.txt").read_text(encoding="utf-8").splitlines() if line]
+    results = cache / f"auto_{stage}.jsonl"
+    done = set()
+    if results.exists():
+        for line in results.read_text(encoding="utf-8").splitlines():
+            try:
+                done.add(json.loads(line)["file"])
+            except (ValueError, KeyError):
+                pass  # a line cut short by a crash: that photo is simply done again
+    todo = [f for f in todo if f not in done]
+    print(f"  {stage}: {len(done)} photos done before, {len(todo)} to do", flush=True)
+    if not todo:
+        return
+
+    def size(path):
+        with Image.open(path) as image:
+            return image.size
+
+    with open(results, "a", encoding="utf-8") as sink:
+        def save(i, path, boxes):
+            sink.write(json.dumps({"file": path, "boxes": boxes}) + "\n")
+            if i % 200 == 0:
+                sink.flush()
+            if i % 2000 == 0:
+                print(f"  {stage}: {i}/{len(todo)}", flush=True)
+
+        if stage == "text":
+            import easyocr
+
+            reader = easyocr.Reader(["en"], gpu=True, recognizer=False, verbose=False)
+            for i, path in enumerate(todo):
+                save(i, path, text_boxes(reader, path, *size(path)))
+        elif stage == "hands":
+            from mediapipe.tasks.python import vision
+            from mediapipe.tasks.python.core.base_options import BaseOptions
+
+            model = fetch(MEDIAPIPE_HANDS, cache / "hand_landmarker.task")
+            detector = vision.HandLandmarker.create_from_options(vision.HandLandmarkerOptions(
+                base_options=BaseOptions(model_asset_path=str(model)), num_hands=6, min_hand_detection_confidence=0.4))
+            for i, path in enumerate(todo):
+                save(i, path, hand_boxes(detector, path, *size(path)))
+            detector.close()
+        elif stage == "coco":  # the stock yolo11n labels COCO's 80 on EgoHands and Roboflow photos (steps 6c, 7)
+            from ultralytics import YOLO
+
+            model = YOLO("yolo11n.pt")
+            predictions = model.predict(todo, imgsz=640, conf=AUTO_COCO_CONF, stream=True, verbose=False)
+            for i, (path, result) in enumerate(zip(todo, predictions)):
+                boxes = [[int(c), x0, y0, x1 - x0, y1 - y0]
+                         for c, (x0, y0, x1, y1) in zip(result.boxes.cls.tolist(), result.boxes.xyxy.tolist())]
+                save(i, path, boxes)
+
+
+def auto_stage(stage: str, records: list, cache: Path) -> int:
+    """Runs one stage in its own process for these photos, then adds its saved results to them."""
+    if not records:
+        return 0
+    group, value = AUTO_STAGES[stage]
+    (cache / f"auto_{stage}_todo.txt").write_text("\n".join(str(r["file"]) for r in records), encoding="utf-8")
+    subprocess.run([sys.executable, __file__, "--auto-stage", stage, "--cache", str(cache)], check=True)
+    results = {}
+    for line in (cache / f"auto_{stage}.jsonl").read_text(encoding="utf-8").splitlines():
+        try:
+            d = json.loads(line)
+            results[d["file"]] = d["boxes"]
+        except (ValueError, KeyError):
+            pass
     added = 0
-    for i, r in enumerate(records):
-        with Image.open(r["file"]) as image:
-            rgb = np.ascontiguousarray(np.asarray(image.convert("RGB")))
-        for hand in detector.detect(mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)).hand_landmarks:
-            xs, ys = [p.x * r["w"] for p in hand], [p.y * r["h"] for p in hand]
-            pw, ph = (max(xs) - min(xs)) * HAND_PAD, (max(ys) - min(ys)) * HAND_PAD
-            box = clip((min(xs) - pw, min(ys) - ph, max(xs) - min(xs) + 2 * pw, max(ys) - min(ys) + 2 * ph), r["w"], r["h"])
-            if box:
-                r["boxes"].append((HAND, box))
-                added += 1
-        r["labels"]["hand"] = "mediapipe-auto"
-        if i % 2000 == 0:
-            print(f"  hand auto-labels: {i}/{len(records)}", flush=True)
-    detector.close()
-    return added
-
-
-def auto_coco(records: list) -> int:
-    """The stock yolo11n labels the 80 COCO classes on EgoHands and Roboflow photos (§4.2 steps 6c, 7)."""
-    from ultralytics import YOLO
-
-    model = YOLO("yolo11n.pt")
-    added = 0
-    for r, result in zip(records, model.predict([str(r["file"]) for r in records], imgsz=640,
-                                                conf=AUTO_COCO_CONF, stream=True, verbose=False)):
-        for cls, (x0, y0, x1, y1) in zip(result.boxes.cls.tolist(), result.boxes.xyxy.tolist()):
-            r["boxes"].append((int(cls), (x0, y0, x1 - x0, y1 - y0)))
-            added += 1
-        r["labels"]["coco"] = "yolo11n-auto"
+    for r in records:
+        boxes = results.get(str(r["file"]))
+        if boxes is None:
+            continue
+        r["boxes"] += [(int(c), (x, y, w, h)) for c, x, y, w, h in boxes]
+        r["labels"][group] = value
+        added += len(boxes)
     return added
 
 
@@ -941,6 +999,7 @@ def main() -> None:
     parser.add_argument("--coco-val", type=Path, default=None, help="only build COCO val2017 for the forgetting check")
     parser.add_argument("--extract-hands", choices=["train", "val"], help=argparse.SUPPRESS)  # internal, see hands_of
     parser.add_argument("--extract-o365", help=argparse.SUPPRESS)  # internal, see objects365
+    parser.add_argument("--auto-stage", choices=list(AUTO_STAGES), help=argparse.SUPPRESS)  # internal, see auto_stage
     args = parser.parse_args()
     cache = args.cache or args.out / "annotations"
     cache.mkdir(parents=True, exist_ok=True)
@@ -949,6 +1008,9 @@ def main() -> None:
         return
     if args.extract_o365:
         extract_o365(cache, args.extract_o365.split(","))
+        return
+    if args.auto_stage:
+        run_auto_stage(args.auto_stage, cache)
         return
     if args.coco_val:
         coco_val_check(args.coco_val, cache)
@@ -1008,14 +1070,14 @@ def main() -> None:
               f"COCO boxes on {reused['coco']} photos", flush=True)
     if "auto" not in skip:
         need_text = [r for r in records.values() if r["labels"]["text"] == "none"]
-        print(f"CRAFT text boxes: {auto_text(need_text)} on {len(need_text)} images", flush=True)
+        added = auto_stage("text", need_text, cache)
+        print(f"CRAFT text boxes: {added} on {len(need_text)} photos", flush=True)
         no_coco = [r for r in records.values() if r["source"] in ("egohands", "roboflow") and r["labels"]["coco"] == "none"]
-        if no_coco:
-            print(f"yolo11n COCO boxes on EgoHands + Roboflow: {auto_coco(no_coco)} on {len(no_coco)} photos", flush=True)
+        added = auto_stage("coco", no_coco, cache)
+        print(f"yolo11n COCO boxes on EgoHands + Roboflow: {added} on {len(no_coco)} photos", flush=True)
         no_hands = [r for r in records.values() if r["source"] in ("objects365", "roboflow") and r["labels"]["hand"] == "none"]
-        if no_hands:
-            print(f"MediaPipe hand boxes on Objects365 + Roboflow: {auto_hands(no_hands, cache)} on {len(no_hands)} photos",
-                  flush=True)
+        added = auto_stage("hands", no_hands, cache)
+        print(f"MediaPipe hand boxes on Objects365 + Roboflow: {added} on {len(no_hands)} photos", flush=True)
 
     # 9. zoomed crops (after the auto-labels, so the crops carry the text boxes too)
     crops = zoom_crops(records, args.out)

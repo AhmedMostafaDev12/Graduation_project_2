@@ -131,7 +131,7 @@ Tools used to fill gaps (not datasets): **EasyOCR's CRAFT** text detector (label
 
 ### 4.2 Building the merged dataset, step by step
 
-Everything below runs in the Kaggle notebook. **LVIS, COCO and COCO-WholeBody all label the same COCO photos**, joined by the COCO **image id**. EgoHands is the only source with other photos.
+Everything below runs in the Kaggle notebook. **Resumable:** the GPU labelling (CRAFT, YOLO, MediaPipe) runs stage by stage, each in its own process, and saves every photo's result to `annotations/auto_<stage>.jsonl` as it goes; downloads and annotation extracts are cached too. If the run dies, run the same cell again: it continues where it stopped. **LVIS, COCO and COCO-WholeBody all label the same COCO photos**, joined by the COCO **image id**. EgoHands is the only source with other photos.
 
 1. **Pick the images with our objects (LVIS).** LVIS doesn't check every class in every image: for each image it lists the checked classes (annotated, `neg_category_ids` = checked and absent, `not_exhaustive_category_ids` = only some instances boxed).
    - A strict rule ("all five of ours checked") leaves **zero images** (measured), so the practical rule is: keep an image when **every one of our classes labelled in it is labelled exhaustively**. Our other classes are unchecked there and may rarely appear unlabelled (accepted noise).
