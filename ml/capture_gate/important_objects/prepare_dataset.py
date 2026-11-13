@@ -764,11 +764,15 @@ def run_auto_stage(stage: str, cache: Path) -> None:
             from ultralytics import YOLO
 
             model = YOLO("yolo11n.pt")
-            predictions = model.predict(todo, imgsz=640, conf=AUTO_COCO_CONF, stream=True, verbose=False)
-            for i, (path, result) in enumerate(zip(todo, predictions)):
-                boxes = [[int(c), x0, y0, x1 - x0, y1 - y0]
-                         for c, (x0, y0, x1, y1) in zip(result.boxes.cls.tolist(), result.boxes.xyxy.tolist())]
-                save(i, path, boxes)
+            # small batches: given a whole list, Ultralytics opens every image into memory first
+            # (7,576 photos ≈ 20 GB), which killed the process without an error
+            for start in range(0, len(todo), 32):
+                batch = todo[start:start + 32]
+                results = model.predict(batch, imgsz=640, conf=AUTO_COCO_CONF, verbose=False)
+                for i, (path, result) in enumerate(zip(batch, results), start):
+                    boxes = [[int(c), x0, y0, x1 - x0, y1 - y0]
+                             for c, (x0, y0, x1, y1) in zip(result.boxes.cls.tolist(), result.boxes.xyxy.tolist())]
+                    save(i, path, boxes)
 
 
 def auto_stage(stage: str, records: list, cache: Path) -> int:
