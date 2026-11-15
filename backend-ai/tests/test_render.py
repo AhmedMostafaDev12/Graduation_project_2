@@ -322,6 +322,25 @@ def test_moment_tags():
     assert render_event(inp) == "09:15 تصوير لحظة مهمة: ورد، شمس، قطة"
 
 
+def test_moment_objects_with_printed_text_first():
+    """What the photo review saw goes in the sentence, a name printed on a box first, so
+    "what was the name on the pizza box?" can find it (SuperMemory-VQA replay)."""
+    inp = make(
+        "notable_moment_captured",
+        media_tags=("pizza",),
+        media_objects=(
+            "plate (on the table)",
+            "cup (empty)",
+            "can (open)",
+            'pizza box (held in hands, text: "Luna Pizza Kitchen")',
+        ),
+    )
+    assert render_event(inp) == (
+        '09:15 captured a special moment: pizza, pizza box (held in hands, text: "Luna '
+        'Pizza Kitchen"), plate (on the table), cup (empty)'
+    )
+
+
 # ----- place -----
 
 

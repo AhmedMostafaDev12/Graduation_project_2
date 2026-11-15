@@ -222,6 +222,74 @@ def test_words_and_structures_rank_and_explain(client, worker_session):
         )
 
 
+def test_a_name_printed_on_an_object_is_not_hidden_by_its_later_sightings(
+    client, worker_session
+):
+    """A pizza box seen in 86 photos (SuperMemory-VQA replay): its name was read once, early
+    ("Luna Pizza Kitchen"), then the box lay open on the blanket for an hour. The newest
+    sightings must not crowd that one out, and repeats of one state count once."""
+    _, patient_id, _ = _memories(client, worker_session)
+    with worker_session() as db:
+        box = MemoryEntity(
+            patient_id=patient_id,
+            kind="object",
+            name="pizza box",
+            first_seen_at=NOW,
+            last_seen_at=NOW,
+        )
+        db.add(box)
+        db.flush()
+
+        def sighting(minutes_ago, state):
+            e = Event(
+                id=uuid.uuid4(),
+                patient_id=patient_id,
+                source="glasses",
+                event_type="notable_moment_captured",
+                occurred_at=NOW - timedelta(minutes=minutes_ago),
+                rendered_text="a moment in the living room",
+                embedding=EMBED.embed(["a moment in the living room"])[0],
+            )
+            m = MediaAsset(
+                id=uuid.uuid4(),
+                patient_id=patient_id,
+                event_id=e.id,
+                asset_type="image",
+                storage_key=f"k{minutes_ago}",
+                trigger="salient_frame",
+                status="confirmed",
+            )
+            db.add_all([e, m])
+            db.flush()
+            db.add(
+                ObjectSighting(
+                    patient_id=patient_id,
+                    entity_id=box.id,
+                    state=state,
+                    room="living room",
+                    seen_at=e.occurred_at,
+                    media_asset_id=m.id,
+                    model_id="m",
+                )
+            )
+            return e.id
+
+        named = sighting(90, 'held in hands, text: "Luna Pizza Kitchen"')
+        for minutes in range(1, 40):  # 39 later photos of the same open box
+            sighting(minutes, "open on the floral blanket")
+        db.commit()
+
+        search = MemorySearch(db, patient_id, "Africa/Cairo", EMBED)
+        found = search.search_now(
+            _plan("what name was printed on the pizza box", hours=24)
+        )
+        texts = {r.event_id: r.text for r in found}
+        assert 'text: "Luna Pizza Kitchen"' in texts[str(named)]
+        # the 39 identical states collapse to one line: the newest, marked "last seen"
+        blanket = [t for t in texts.values() if "open on the floral blanket" in t]
+        assert len(blanket) == 1 and "pizza box last seen" in blanket[0]
+
+
 def test_a_person_absent_in_the_window_comes_back_from_outside_it(
     client, worker_session
 ):

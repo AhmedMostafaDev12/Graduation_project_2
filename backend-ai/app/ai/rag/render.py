@@ -25,6 +25,11 @@ from app.ai.review_contract import display
 # Long transcripts drown the time + person part of the vector; the full text stays in
 # events.transcript_text for the answer prompt. 300 chars is about 20-30 s of speech.
 MAX_QUOTE_CHARS = 300
+# Objects a photo review saw, in a moment's sentence: at most this many, printed text first, so
+# a name on a box ("Luna Pizza Kitchen") can be found by words and by meaning.
+MAX_OBJECTS = 3
+# A sighting's state that quotes printed text: `text: "…"`, "…", “…” or «…».
+PRINTED_TEXT = re.compile(r'text:|"[^"]{2,}"|“[^”]{2,}”|«[^»]{2,}»')
 
 _DIACRITICS = re.compile("[ً-ْٰ]")
 _SPACES = re.compile(r"\s+")
@@ -72,6 +77,8 @@ class RenderInput:
     media_type: Literal["image", "video"] | None = None
     media_duration_seconds: int | None = None
     media_tags: tuple[str, ...] = ()
+    # what the photo review saw: "pizza box (held in hands, text: "Luna Pizza Kitchen")"
+    media_objects: tuple[str, ...] = ()
 
 
 # ----- phrases per language -----
@@ -361,7 +368,9 @@ def _document(inp, ph, t, lang):
 def _moment(inp, ph, t, lang):
     head = ph["moment"].format(t=t, place=_place(inp, ph))
     tags = [tag for tag in (clean(x) for x in inp.media_tags) if tag][:3]
-    return _join(ph, head, *tags)
+    found = [o for o in (clean(x) for x in inp.media_objects) if o]
+    found.sort(key=lambda o: not PRINTED_TEXT.search(o))  # printed text first
+    return _join(ph, head, *tags, *found[:MAX_OBJECTS])
 
 
 def _memory_paused(inp, ph, t, lang):
