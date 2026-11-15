@@ -9,7 +9,7 @@ Recordings are replayed through **Remori's real memory pipeline**, the same code
 | Step | What runs |
 |---|---|
 | Speech | the released transcript (no raw audio is public) → conversation events → **consolidation** (facts, plans, entities) |
-| Frames | 1 frame a second, kept only when the scene changed (`--novelty`: colour-histogram difference, at least one every `--max-gap` s; a stand-in for the capture gate, not built yet) → **photo review**: strangers pixelated, vision model, keep / discard, documents, object sightings, actions |
+| Frames | 1 frame a second, kept by the gate stand-in (`--gate`: colour-histogram novelty, at least one every `--max-gap` s, and/or the important-object detector) → **photo review**: strangers pixelated, vision model, keep / discard, documents, object sightings, actions |
 | Memory | every event rendered + embedded (Voyage) |
 | Questions | evidence only in the replayed sessions (+ the unanswerable ones asked in them), asked at their original time through `/assist`; a judge maps the free answer to one of the 4 choices |
 | Score | multiple-choice accuracy, per skill, **with the five structures and without** (flat memory, H6) |
@@ -25,5 +25,8 @@ DATABASE_URL=postgresql+psycopg://remori:remori@localhost:5434/remori_test \
 - Everything written to the database is deleted at the end.
 - Models: `--provider groq` (default: Qwen3.6-27B on Groq for review, consolidation, /assist and the judge; `GROQ_API_KEY`) or `--provider gemini` (`GEMINI_API_KEY`). Embeddings: Voyage (`VOYAGE_API_KEY`). Face models: `scripts/download_face_models.py`.
 - Options: `--every 1` (seconds between frames), `--novelty 0.2` (0 = keep every frame), `--max-gap 10`, `--workers 3` (parallel reviews; mind the provider's tokens-per-minute limit), `--limit N` (questions), `--no-flat`.
+- Capture gate: `--gate novelty|detector|both` (the important-object detector with the gate rules of [`ml/edge`](../edge/), plus the 30 s look-back), `--detector` (ONNX file; its `thresholds.json` is read), `--text-threshold`, `--object-threshold`, `--lookback 3`. **`--plan`** prints how many frames each gate keeps and the reviews not in the cache, with **no API call and no database**: run it before paying.
 
-**Not the same as the glasses yet:** frames are sampled at a fixed rate instead of the capture gate (D33, D42), the transcript comes from the dataset instead of our speech-to-text, and English questions instead of Egyptian Arabic.
+Experiments run so far, results and lessons: [`EXPERIMENTS.md`](EXPERIMENTS.md).
+
+**Not the same as the glasses yet:** the gate is a stand-in (colour-histogram novelty, optionally the detector; no frame embeddings, D34) and the visual memory tier (D41) is not built, the transcript comes from the dataset instead of our speech-to-text, and English questions instead of Egyptian Arabic.
