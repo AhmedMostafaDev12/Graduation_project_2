@@ -9,10 +9,10 @@ Guide: README.md §4.2 (the steps), §4.3 (the counts it prints) and §5 (what i
 Classes (README §1, a contract with the glasses): 0–79 COCO in the standard order, 80 keys,
 81 glasses, 82 wallet, 83 pill_box, 84 stove, 85 text, 86 hand.
 
-Sources, joined by COCO image id (LVIS, COCO, COCO-Text and COCO-WholeBody label the same photos):
+Sources, joined by COCO image id (LVIS, COCO and COCO-WholeBody label the same photos):
 - LVIS v1: our five objects (80–84); picks the images we keep.
 - COCO 2017 instances: the 80 COCO classes on every COCO photo we use.
-- COCO-Text v2: legible text (85) where it covers an image; EasyOCR's CRAFT labels the rest.
+- Text (85): EasyOCR's CRAFT draws line boxes on every photo (one definition of text everywhere).
 - COCO-WholeBody: valid hand boxes (86) on COCO photos.
 - EgoHands (a Kaggle input): Google Glass frames with hand polygons; the stock yolo11n labels
   their 80 COCO classes and CRAFT their text.
@@ -49,7 +49,6 @@ from pathlib import Path, PurePosixPath
 LVIS = "https://dl.fbaipublicfiles.com/LVIS/lvis_v1_{split}.json.zip"
 COCO = "http://images.cocodataset.org/annotations/annotations_trainval2017.zip"
 COCO_VAL_IMAGES = "http://images.cocodataset.org/zips/val2017.zip"
-COCO_TEXT = "https://github.com/bgshih/cocotext/releases/download/dl/cocotext.v2.zip"
 # COCO-WholeBody v1.0, official Google Drive files (github.com/jin-s13/COCO-WholeBody); the train
 # file also has a Hugging Face mirror, used when Drive refuses (its daily quota).
 WHOLEBODY_DRIVE = {"train": "1thErEToRbmM9uLNi1JXXfOsaS5VK2FXf", "val": "1N6VgwKnj8DeyGXCvp1eYgNbRmw6jdfrb"}
@@ -128,13 +127,15 @@ AUTO_COCO_CONF = 0.5    # stock yolo11n labels on EgoHands frames
 # a class with fewer train images than this stops the run (README §4.3: tell the lead)
 MIN_TRAIN_IMAGES = 50
 # zoomed crops (README §4.2 step 9): small objects seen up close, from the full-size photo
-ZOOM_CLASSES = {67, 80, 81, 82, 83, 84}  # cell phone + our five objects
+ZOOM_CLASSES = {67, 80, 81, 82, 83}  # cell phone, keys, glasses (only when not worn), wallet, pill box
 ZOOM_SMALL = 0.125      # an object is small when its long side is under 1/8 of the image's (40 px at 320)
 ZOOM_CONTEXT = 5        # the crop's side is 5× the object's long side …
 ZOOM_MIN_SIDE = 160     # … but at least 160 px of the original photo
 ZOOM_PER_IMAGE = 2      # at most 2 crops per photo
 ZOOM_KEEP_BOX = 0.5     # a box cut by the crop stays if half of it is inside …
 ZOOM_KEEP_FILL = 0.2    # … or if what's inside covers a fifth of the crop (a person filling the view)
+ZOOM_MAX_PER_CLASS = 3000  # the first version made 18,913 crops, mostly worn glasses and phones in crowds
+WORN_TOP = 0.35         # glasses centred in the top 35 % of a person box are being worn (as in the gate rule)
 
 
 # ---------- downloads ----------
@@ -182,13 +183,6 @@ def coco_instances(part: str, cache: Path) -> dict:
     if not target.exists():
         z = fetch(COCO, cache / "annotations_trainval2017.zip")
         unzip_one(z, f"annotations/instances_{part}.json", target)
-    return load_json(target)
-
-
-def coco_text(cache: Path) -> dict:
-    target = cache / "cocotext.v2.json"
-    if not target.exists():
-        unzip_one(fetch(COCO_TEXT, cache / "cocotext.v2.zip"), "cocotext.v2.json", target)
     return load_json(target)
 
 
@@ -318,24 +312,6 @@ def drop_doubles(record: dict) -> None:
             continue
         keep.append((cls, b))
     record["boxes"] = keep
-
-
-def add_coco_text(records: dict, cache: Path) -> Counter:
-    ct = coco_text(cache)
-    covered = {int(i) for i in ct["imgs"]}
-    stats = Counter()
-    for a in ct["anns"].values():
-        record = records.get(a["image_id"])
-        if record is None or a.get("legibility") != "legible":
-            continue
-        if a["bbox"][3] >= MIN_TEXT * record["h"]:
-            record["boxes"].append((TEXT, tuple(a["bbox"])))
-            stats["text boxes from COCO-Text"] += 1
-    for iid, record in records.items():
-        if iid in covered:
-            record["labels"]["text"] = "coco-text"
-            stats["images covered by COCO-Text"] += 1
-    return stats
 
 
 def extract_hands(part: str, cache: Path) -> None:
@@ -695,95 +671,184 @@ def egohands(root: Path, limit: int, splits) -> dict:
 
 
 # ---------- 8. auto-labels (GPU) ----------
+# Each stage runs in its own process (the main process never holds CRAFT, YOLO and MediaPipe at once) and
+# appends every photo's result to <cache>/auto_<stage>.jsonl as it goes: if anything dies, the next run
+# continues where it stopped.
 
-def auto_text(records: list) -> int:
-    """CRAFT text boxes for images COCO-Text doesn't cover (§4.2 step 5)."""
-    import easyocr
-
-    reader = easyocr.Reader(["en"], gpu=True, recognizer=False, verbose=False)
-    added = 0
-    for i, r in enumerate(records):
-        horizontal, free = reader.detect(str(r["file"]), canvas_size=1280)
-        boxes = [(x0, y0, x1 - x0, y1 - y0) for x0, x1, y0, y1 in horizontal[0]]
-        for poly in free[0]:
-            xs, ys = [p[0] for p in poly], [p[1] for p in poly]
-            boxes.append((min(xs), min(ys), max(xs) - min(xs), max(ys) - min(ys)))
-        for box in boxes:
-            box = clip(box, r["w"], r["h"])
-            if box and box[3] >= MIN_TEXT * r["h"]:
-                r["boxes"].append((TEXT, box))
-                added += 1
-        r["labels"]["text"] = "craft-auto"
-        if i % 1000 == 0:
-            print(f"  text auto-labels: {i}/{len(records)}", flush=True)
-    return added
+AUTO_STAGES = {  # stage -> (label group, manifest value)
+    "text": ("text", "craft-auto"),
+    "hands": ("hand", "mediapipe-auto"),
+    "coco": ("coco", "yolo11n-auto"),
+}
 
 
-def auto_hands(records: list, cache: Path) -> int:
-    """MediaPipe's hand detector labels the hands on Objects365 and Roboflow photos (they have no hand class)."""
+def text_boxes(reader, path: str, w: int, h: int) -> list:
+    """CRAFT: one box per line of writing (EasyOCR groups words into lines). One definition everywhere:
+    COCO-Text's word boxes are not used, they'd contradict these (README §4.2 step 5)."""
+    horizontal, free = reader.detect(path, canvas_size=1280)
+    boxes = [(x0, y0, x1 - x0, y1 - y0) for x0, x1, y0, y1 in horizontal[0]]
+    for poly in free[0]:
+        xs, ys = [p[0] for p in poly], [p[1] for p in poly]
+        boxes.append((min(xs), min(ys), max(xs) - min(xs), max(ys) - min(ys)))
+    out = []
+    for box in boxes:
+        box = clip(box, w, h)
+        if box and box[3] >= MIN_TEXT * h:
+            out.append([TEXT, *map(float, box)])
+    return out
+
+
+def hand_boxes(detector, path: str, w: int, h: int) -> list:
+    """MediaPipe: hands on Objects365 and Roboflow photos (they have no hand class); box from the 21 landmarks."""
     import mediapipe as mp
     import numpy as np
-    from mediapipe.tasks.python import vision
-    from mediapipe.tasks.python.core.base_options import BaseOptions
     from PIL import Image
 
-    model = fetch(MEDIAPIPE_HANDS, cache / "hand_landmarker.task")
-    detector = vision.HandLandmarker.create_from_options(vision.HandLandmarkerOptions(
-        base_options=BaseOptions(model_asset_path=str(model)), num_hands=6, min_hand_detection_confidence=0.4))
+    with Image.open(path) as image:
+        rgb = np.ascontiguousarray(np.asarray(image.convert("RGB")))
+    out = []
+    for hand in detector.detect(mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)).hand_landmarks:
+        xs, ys = [p.x * w for p in hand], [p.y * h for p in hand]
+        pw, ph = (max(xs) - min(xs)) * HAND_PAD, (max(ys) - min(ys)) * HAND_PAD
+        box = clip((min(xs) - pw, min(ys) - ph, max(xs) - min(xs) + 2 * pw, max(ys) - min(ys) + 2 * ph), w, h)
+        if box:
+            out.append([HAND, *map(float, box)])
+    return out
+
+
+def run_auto_stage(stage: str, cache: Path) -> None:
+    """In its own process: label every photo in auto_<stage>_todo.txt not already in auto_<stage>.jsonl."""
+    from PIL import Image
+
+    todo = [line for line in (cache / f"auto_{stage}_todo.txt").read_text(encoding="utf-8").splitlines() if line]
+    results = cache / f"auto_{stage}.jsonl"
+    done = set()
+    if results.exists():
+        for line in results.read_text(encoding="utf-8").splitlines():
+            try:
+                done.add(os.path.normpath(json.loads(line)["file"]))
+            except (ValueError, KeyError):
+                pass  # a line cut short by a crash: that photo is simply done again
+    todo = [f for f in todo if os.path.normpath(f) not in done]
+    print(f"  {stage}: {len(done)} photos done before, {len(todo)} to do", flush=True)
+    if not todo:
+        return
+
+    def size(path):
+        with Image.open(path) as image:
+            return image.size
+
+    with open(results, "a", encoding="utf-8") as sink:
+        def save(i, path, boxes):
+            sink.write(json.dumps({"file": path, "boxes": boxes}) + "\n")
+            if i % 200 == 0:
+                sink.flush()
+            if i % 2000 == 0:
+                print(f"  {stage}: {i}/{len(todo)}", flush=True)
+
+        if stage == "text":
+            import easyocr
+
+            reader = easyocr.Reader(["en"], gpu=True, recognizer=False, verbose=False)
+            for i, path in enumerate(todo):
+                save(i, path, text_boxes(reader, path, *size(path)))
+        elif stage == "hands":
+            from mediapipe.tasks.python import vision
+            from mediapipe.tasks.python.core.base_options import BaseOptions
+
+            model = fetch(MEDIAPIPE_HANDS, cache / "hand_landmarker.task")
+            detector = vision.HandLandmarker.create_from_options(vision.HandLandmarkerOptions(
+                base_options=BaseOptions(model_asset_path=str(model)), num_hands=6, min_hand_detection_confidence=0.4))
+            for i, path in enumerate(todo):
+                save(i, path, hand_boxes(detector, path, *size(path)))
+            detector.close()
+        elif stage == "coco":  # the stock yolo11n labels COCO's 80 on EgoHands and Roboflow photos (steps 6c, 7)
+            from ultralytics import YOLO
+
+            model = YOLO("yolo11n.pt")
+            # small batches: given a whole list, Ultralytics opens every image into memory first
+            # (7,576 photos ≈ 20 GB), which killed the process without an error
+            for start in range(0, len(todo), 32):
+                batch = todo[start:start + 32]
+                results = model.predict(batch, imgsz=640, conf=AUTO_COCO_CONF, verbose=False)
+                for i, (path, result) in enumerate(zip(batch, results), start):
+                    boxes = [[int(c), x0, y0, x1 - x0, y1 - y0]
+                             for c, (x0, y0, x1, y1) in zip(result.boxes.cls.tolist(), result.boxes.xyxy.tolist())]
+                    save(i, path, boxes)
+
+
+def stage_records(stage: str, records: dict) -> list:
+    """The photos a stage labels: text on every photo; COCO boxes on EgoHands and Roboflow; hands on Objects365
+    and Roboflow; each only while its labels are still missing."""
+    group = AUTO_STAGES[stage][0]
+    sources = {"text": None, "coco": ("egohands", "roboflow"), "hands": ("objects365", "roboflow")}[stage]
+    return [r for r in records.values() if r["labels"][group] == "none" and (sources is None or r["source"] in sources)]
+
+
+def auto_stage(stage: str, records: list, cache: Path) -> int:
+    """Runs one stage in its own process for these photos, then adds its saved results to them."""
+    if not records:
+        return 0
+    group, value = AUTO_STAGES[stage]
+    (cache / f"auto_{stage}_todo.txt").write_text("\n".join(str(r["file"]) for r in records), encoding="utf-8")
+    subprocess.run([sys.executable, __file__, "--auto-stage", stage, "--cache", str(cache)], check=True)
+    results = {}
+    for line in (cache / f"auto_{stage}.jsonl").read_text(encoding="utf-8").splitlines():
+        try:
+            d = json.loads(line)
+            results[os.path.normpath(d["file"])] = d["boxes"]
+        except (ValueError, KeyError):
+            pass
     added = 0
-    for i, r in enumerate(records):
-        with Image.open(r["file"]) as image:
-            rgb = np.ascontiguousarray(np.asarray(image.convert("RGB")))
-        for hand in detector.detect(mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)).hand_landmarks:
-            xs, ys = [p.x * r["w"] for p in hand], [p.y * r["h"] for p in hand]
-            pw, ph = (max(xs) - min(xs)) * HAND_PAD, (max(ys) - min(ys)) * HAND_PAD
-            box = clip((min(xs) - pw, min(ys) - ph, max(xs) - min(xs) + 2 * pw, max(ys) - min(ys) + 2 * ph), r["w"], r["h"])
-            if box:
-                r["boxes"].append((HAND, box))
-                added += 1
-        r["labels"]["hand"] = "mediapipe-auto"
-        if i % 2000 == 0:
-            print(f"  hand auto-labels: {i}/{len(records)}", flush=True)
-    detector.close()
-    return added
-
-
-def auto_coco(records: list) -> int:
-    """The stock yolo11n labels the 80 COCO classes on EgoHands and Roboflow photos (§4.2 steps 6c, 7)."""
-    from ultralytics import YOLO
-
-    model = YOLO("yolo11n.pt")
-    added = 0
-    for r, result in zip(records, model.predict([str(r["file"]) for r in records], imgsz=640,
-                                                conf=AUTO_COCO_CONF, stream=True, verbose=False)):
-        for cls, (x0, y0, x1, y1) in zip(result.boxes.cls.tolist(), result.boxes.xyxy.tolist()):
-            r["boxes"].append((int(cls), (x0, y0, x1 - x0, y1 - y0)))
-            added += 1
-        r["labels"]["coco"] = "yolo11n-auto"
+    for r in records:
+        boxes = results.get(os.path.normpath(str(r["file"])))
+        if boxes is None:
+            continue
+        r["boxes"] += [(int(c), (x, y, w, h)) for c, x, y, w, h in boxes]
+        r["labels"][group] = value
+        added += len(boxes)
     return added
 
 
 # ---------- 9. zoomed crops ----------
 
+def worn(glasses, people) -> bool:
+    x, y, w, h = glasses
+    cx, cy = x + w / 2, y + h / 2
+    return any(px <= cx <= px + pw and py <= cy <= py + ph * WORN_TOP for px, py, pw, ph in people)
+
+
 def zoom_crops(records: dict, out: Path, seed: int = 0) -> dict:
-    """Small objects (keys, pill boxes… a few pixels at 320) seen up close: a square crop of the
-    full-size photo around the object, with every label inside it. Train only; val stays natural.
-    → {name: record} of the new crops."""
+    """Small objects (keys, pill boxes… a few pixels at 320) seen up close: a square crop of the full-size photo
+    around the object, with every label inside it. Train only; val stays natural. Not for glasses being worn
+    (that's faces in crowds, not an object put down); at most ZOOM_MAX_PER_CLASS per class, photos taken in a
+    random order so every source gets its share. → {name: record} of the new crops."""
     from PIL import Image
 
+    for folder, pattern in (("images", "*_zoom*.jpg"), ("labels", "*_zoom*.txt")):  # an earlier run's crops
+        for old in (out / folder / "train").glob(pattern):
+            old.unlink()
     rng = random.Random(seed)
+    made = Counter()
     crops = {}
-    for name, r in sorted(records.items()):
-        if r["split"] != "train" or r["source"] == "egohands":
+    order = sorted(records.items())
+    rng.shuffle(order)
+    for name, r in order:
+        if r["split"] != "train" or r["source"] in ("egohands", "zoom"):
             continue
         W, H = r["w"], r["h"]
-        small = [b for c, b in r["boxes"] if c in ZOOM_CLASSES and max(b[2], b[3]) < ZOOM_SMALL * max(W, H)]
+        people = [b for c, b in r["boxes"] if c == 0]
+        small = [(c, b) for c, b in r["boxes"]
+                 if c in ZOOM_CLASSES and max(b[2], b[3]) < ZOOM_SMALL * max(W, H)
+                 and made[c] < ZOOM_MAX_PER_CLASS and not (c == 81 and worn(b, people))]
         if not small:
             continue
         rng.shuffle(small)
         with Image.open(r["file"]) as image:
             image = image.convert("RGB")
-            for k, (x, y, w, h) in enumerate(small[:ZOOM_PER_IMAGE]):
+            for k, (cls, (x, y, w, h)) in enumerate(small[:ZOOM_PER_IMAGE]):
+                if made[cls] >= ZOOM_MAX_PER_CLASS:
+                    continue
                 side = int(min(max(ZOOM_CONTEXT * max(w, h), ZOOM_MIN_SIDE), W, H))
                 # a random position that keeps the whole object inside, so it isn't always centred
                 x0 = int(rng.uniform(max(0.0, x + w - side), min(x, W - side)))
@@ -802,6 +867,8 @@ def zoom_crops(records: dict, out: Path, seed: int = 0) -> dict:
                 image.crop((x0, y0, x0 + side, y0 + side)).save(target, quality=92)
                 crops[crop_name] = {"split": "train", "source": "zoom", "file": target, "w": side, "h": side,
                                     "boxes": boxes, "dropped": 0, "labels": dict(r["labels"])}
+                made[cls] += 1
+    print("zoomed crops per class: " + ", ".join(f"{c} {n}" for c, n in sorted(made.items())), flush=True)
     return crops
 
 
@@ -828,6 +895,42 @@ def place_images(records: dict, out: Path, workers: int) -> None:
                 del records[name]
             else:
                 records[name]["file"] = target
+
+
+def boxes_from_lines(lines: list, w: float, h: float, wanted) -> list:
+    """YOLO label lines (class, centre x, centre y, width, height as fractions) → [(class, (x, y, w, h) in pixels)]."""
+    boxes = []
+    for c, cx, cy, bw, bh in lines:
+        if wanted(int(c)):
+            bw, bh = float(bw) * w, float(bh) * h
+            boxes.append((int(c), (float(cx) * w - bw / 2, float(cy) * h - bh / 2, bw, bh)))
+    return boxes
+
+
+def reuse_auto_labels(records: dict, out: Path) -> Counter:
+    """A re-run reuses the previous run's machine-made labels (CRAFT text, MediaPipe hands, yolo11n COCO boxes)
+    from its label files, instead of hours of GPU work again. Only for photos the previous manifest marks as
+    auto-labelled, in the same split; everything else (and every new photo) is labelled as usual."""
+    manifest = out / "manifest.csv"
+    if not manifest.exists():
+        return Counter()
+    with open(manifest, encoding="utf-8") as f:
+        previous = {row["image"]: row for row in csv.DictReader(f)}
+    reused = Counter()
+    for name, r in records.items():
+        row = previous.get(f"{name}.jpg")
+        label_file = out / "labels" / r["split"] / f"{name}.txt"
+        if not row or row["split"] != r["split"] or not label_file.exists():
+            continue
+        lines = [line.split() for line in label_file.read_text(encoding="utf-8").splitlines() if line.strip()]
+        for group, value, wanted in (("text", "craft-auto", lambda c: c == TEXT),
+                                     ("hand", "mediapipe-auto", lambda c: c == HAND),
+                                     ("coco", "yolo11n-auto", lambda c: c < 80)):
+            if row[f"{group}_labels"] == value and r["labels"][group] == "none":
+                r["boxes"] += boxes_from_lines(lines, r["w"], r["h"], wanted)
+                r["labels"][group] = value
+                reused[group] += 1
+    return reused
 
 
 def write_labels(records: dict, out: Path) -> None:
@@ -917,34 +1020,8 @@ def coco_val_check(out: Path, cache: Path) -> None:
     print(f"COCO val2017: {len(size)} images → {out}/coco80.yaml (stock yolo11n), {out}/coco87.yaml (ours)")
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--out", type=Path, default=Path("data"))
-    parser.add_argument("--cache", type=Path, default=None, help="annotation files (default: <out>/annotations)")
-    parser.add_argument("--egohands", type=Path, default=Path("/kaggle/input/egohands"))
-    parser.add_argument("--split", choices=["train", "val", "both"], default="both")
-    parser.add_argument("--limit", type=int, default=0, help="at most N images per split and source (testing)")
-    parser.add_argument("--skip", default="", help="comma list of: wholebody, objects365, roboflow, egohands, auto (testing)")
-    parser.add_argument("--workers", type=int, default=64)
-    parser.add_argument("--accept-low-counts", action="store_true", help="write the data even if a class is thin")
-    parser.add_argument("--coco-val", type=Path, default=None, help="only build COCO val2017 for the forgetting check")
-    parser.add_argument("--extract-hands", choices=["train", "val"], help=argparse.SUPPRESS)  # internal, see hands_of
-    parser.add_argument("--extract-o365", help=argparse.SUPPRESS)  # internal, see objects365
-    args = parser.parse_args()
-    cache = args.cache or args.out / "annotations"
-    cache.mkdir(parents=True, exist_ok=True)
-    if args.extract_hands:
-        extract_hands(args.extract_hands, cache)
-        return
-    if args.extract_o365:
-        extract_o365(cache, args.extract_o365.split(","))
-        return
-    if args.coco_val:
-        coco_val_check(args.coco_val, cache)
-        return
-    skip = {s.strip() for s in args.skip.split(",") if s.strip()}
-    splits = ["train", "val"] if args.split == "both" else [args.split]
-
+def collect(args, cache: Path, splits, skip) -> tuple:
+    """Steps 1-7: pick and download every photo and merge the labels the datasets give. → (records, COCO names)."""
     # 1. LVIS → kept images + the reminder set, per split
     photos = {}
     for split in splits:
@@ -962,7 +1039,6 @@ def main() -> None:
     print(add_coco(photos, cache, names), flush=True)
     for r in photos.values():
         drop_doubles(r)
-    print(dict(add_coco_text(photos, cache)), flush=True)
     if "wholebody" not in skip:
         print(dict(add_wholebody(photos, cache)), flush=True)
     records = {f"coco_{iid:012d}": r for iid, r in photos.items()}
@@ -990,18 +1066,86 @@ def main() -> None:
         records.update(ego)
 
     place_images(records, args.out, args.workers)
+    return records, names
 
-    # 8. auto-labels
-    if "auto" not in skip:
-        need_text = [r for r in records.values() if r["labels"]["text"] == "none"]
-        print(f"CRAFT text boxes: {auto_text(need_text)} on {len(need_text)} images", flush=True)
-        no_coco = [r for r in records.values() if r["source"] in ("egohands", "roboflow")]
-        if no_coco:
-            print(f"yolo11n COCO boxes on EgoHands + Roboflow: {auto_coco(no_coco)} on {len(no_coco)} photos", flush=True)
-        no_hands = [r for r in records.values() if r["source"] in ("objects365", "roboflow")]
-        if no_hands:
-            print(f"MediaPipe hand boxes on Objects365 + Roboflow: {auto_hands(no_hands, cache)} on {len(no_hands)} photos",
-                  flush=True)
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--out", type=Path, default=Path("data"))
+    parser.add_argument("--cache", type=Path, default=None, help="annotation files (default: <out>/annotations)")
+    parser.add_argument("--egohands", type=Path, default=Path("/kaggle/input/egohands"))
+    parser.add_argument("--split", choices=["train", "val", "both"], default="both")
+    parser.add_argument("--limit", type=int, default=0, help="at most N images per split and source (testing)")
+    parser.add_argument("--skip", default="", help="comma list of: wholebody, objects365, roboflow, egohands, auto (testing)")
+    parser.add_argument("--workers", type=int, default=64)
+    parser.add_argument("--accept-low-counts", action="store_true", help="write the data even if a class is thin")
+    parser.add_argument("--rebuild", action="store_true", help="collect the photos again instead of reusing records.json")
+    parser.add_argument("--step", choices=["all", "collect", *AUTO_STAGES, "finish"], default="all",
+                        help="one step per notebook cell: collect, text, coco, hands, finish")
+    parser.add_argument("--coco-val", type=Path, default=None, help="only build COCO val2017 for the forgetting check")
+    parser.add_argument("--extract-hands", choices=["train", "val"], help=argparse.SUPPRESS)  # internal, see hands_of
+    parser.add_argument("--extract-o365", help=argparse.SUPPRESS)  # internal, see objects365
+    parser.add_argument("--auto-stage", choices=list(AUTO_STAGES), help=argparse.SUPPRESS)  # internal, see auto_stage
+    args = parser.parse_args()
+    cache = args.cache or args.out / "annotations"
+    cache.mkdir(parents=True, exist_ok=True)
+    if args.extract_hands:
+        extract_hands(args.extract_hands, cache)
+        return
+    if args.extract_o365:
+        extract_o365(cache, args.extract_o365.split(","))
+        return
+    if args.auto_stage:
+        run_auto_stage(args.auto_stage, cache)
+        return
+    if args.coco_val:
+        coco_val_check(args.coco_val, cache)
+        return
+    skip = {s.strip() for s in args.skip.split(",") if s.strip()}
+    splits = ["train", "val"] if args.split == "both" else [args.split]
+
+    # One step per notebook cell (each its own process, so memory is freed between them and a failed step is
+    # re-run alone): collect → text → coco → hands → finish. --step all (the default) does them in one go:
+    # it saves the collected photos to records.json and restarts itself fresh before labelling.
+    state = cache / "records.json"
+    if args.step in ("collect", "all"):
+        if args.rebuild and state.exists():
+            state.unlink()
+        if not state.exists():
+            records, names = collect(args, cache, splits, skip)
+            saved = {"names": names, "records": {n: dict(r, file=str(r["file"])) for n, r in records.items()}}
+            state.write_text(json.dumps(saved, default=str), encoding="utf-8")  # any Path (e.g. EgoHands "path") as text
+            print(f"collected {len(records)} photos → {state}", flush=True)
+            if args.step == "all":
+                print("restarting in a fresh process to free memory …", flush=True)
+                argv = [a for a in sys.argv[1:] if a != "--rebuild"]
+                os.execv(sys.executable, [sys.executable, os.path.abspath(__file__), *argv])
+        else:
+            print(f"{state} exists: the photos are already collected (--rebuild collects again)", flush=True)
+        if args.step == "collect":
+            return
+    if not state.exists():
+        raise SystemExit(f"{state} is missing: run --step collect first")
+    saved = load_json(state)
+    records, names = saved["records"], {int(k): v for k, v in saved["names"].items()}
+    print(f"loaded {len(records)} collected photos from {state}", flush=True)
+
+    # 8. auto-labels (a re-run first reuses the previous run's, so only new photos go through the GPU)
+    reused = reuse_auto_labels(records, args.out)
+    if reused:
+        print(f"reused from the previous run: text on {reused['text']}, hands on {reused['hand']}, "
+              f"COCO boxes on {reused['coco']} photos", flush=True)
+    if args.step in AUTO_STAGES:  # one stage, in this process; finish adds its results
+        todo = stage_records(args.step, records)
+        (cache / f"auto_{args.step}_todo.txt").write_text("\n".join(str(r["file"]) for r in todo), encoding="utf-8")
+        run_auto_stage(args.step, cache)
+        print(f"{args.step}: done; next step, or --step finish", flush=True)
+        return
+    if "auto" not in skip:  # finish / all: runs whatever a stage hasn't done yet, then adds every result
+        for stage, what in (("text", "CRAFT text boxes"), ("coco", "yolo11n COCO boxes on EgoHands + Roboflow"),
+                            ("hands", "MediaPipe hand boxes on Objects365 + Roboflow")):
+            todo = stage_records(stage, records)
+            print(f"{what}: {auto_stage(stage, todo, cache)} on {len(todo)} photos", flush=True)
 
     # 9. zoomed crops (after the auto-labels, so the crops carry the text boxes too)
     crops = zoom_crops(records, args.out)
