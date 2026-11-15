@@ -14,6 +14,7 @@ from redis.exceptions import RedisError
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.ai.memory import frame_vectors
 from app.errors import Conflict, Forbidden, NotFound
 from app.integrations import s3
 from app.models import (
@@ -22,6 +23,7 @@ from app.models import (
     Encounter,
     EnrolledPerson,
     Event,
+    FrameVectorFile,
     MediaAsset,
     User,
 )
@@ -45,13 +47,15 @@ logger = logging.getLogger(__name__)
 def storage_key(
     patient_id: uuid.UUID, kind: str, upload_id: uuid.UUID, content_type: str
 ) -> str:
-    folder = "media" if kind == "media" else "audio"
+    folder = kind  # media | audio | frame_vectors
     return f"patients/{patient_id}/{folder}/{upload_id}.{CONTENT_TYPES[content_type]}"
 
 
 def request_upload(access: PatientAccess, data: UploadRequest) -> UploadOut:
-    if data.kind == "audio" and access.permission != "device":
-        raise Forbidden("Only the patient's phone uploads audio.", code="DEVICE_ONLY")
+    if data.kind in ("audio", "frame_vectors") and access.permission != "device":
+        raise Forbidden(
+            f"Only the patient's phone uploads {data.kind}.", code="DEVICE_ONLY"
+        )
     key = storage_key(access.patient_id, data.kind, data.id, data.content_type)
     return UploadOut(
         id=data.id,
@@ -103,6 +107,9 @@ def complete_upload(
             _enqueue_transcription(segment.id)
         return UploadDone(id=upload_id, kind="audio", status=status)
 
+    if data.kind == "frame_vectors":
+        return _complete_frame_vectors(db, access, upload_id, key, data)
+
     asset = _already_done(db, MediaAsset, upload_id, patient_id)
     if asset is None:
         event = db.get(Event, data.event_id)
@@ -135,6 +142,61 @@ def complete_upload(
         if asset.status == "pending_review" and asset.asset_type == "image":
             _enqueue_review(asset.id)
     return UploadDone(id=upload_id, kind="media", status=asset.status)
+
+
+def _complete_frame_vectors(
+    db: Session,
+    access: PatientAccess,
+    upload_id: uuid.UUID,
+    key: str,
+    data: UploadComplete,
+) -> UploadDone:
+    """An hour of every frame's vector (spec D41, tier 2): the file is checked, not stored in
+    Postgres; the row points at it. One file per device and hour."""
+    if access.permission != "device":
+        raise Forbidden(
+            "Only the patient's phone uploads frame_vectors.", code="DEVICE_ONLY"
+        )
+    patient_id = access.patient_id
+    row = _already_done(db, FrameVectorFile, upload_id, patient_id)
+    if row is None:
+        content = s3.get_bytes(key, frame_vectors.MAX_BYTES) if s3.exists(key) else None
+        if content is None:
+            raise Conflict(
+                "The file hasn't reached storage yet.", code="UPLOAD_MISSING"
+            )
+        try:
+            found = frame_vectors.unpack(content)
+        except frame_vectors.BadFrameVectorFile as exc:
+            s3.delete(key)
+            raise Conflict(f"Not a frame-vector file: {exc}", code="BAD_FILE") from exc
+        if found.hour_start != data.hour_start:
+            s3.delete(key)
+            raise Conflict("The file's hour doesn't match hour_start.", code="BAD_FILE")
+        device_id = access.principal.device.id
+        taken = db.scalars(
+            select(FrameVectorFile.id).where(
+                FrameVectorFile.patient_id == patient_id,
+                FrameVectorFile.device_id == device_id,
+                FrameVectorFile.hour_start == data.hour_start,
+            )
+        ).first()
+        if taken is not None:
+            raise Conflict("This hour already has a file.", code="HOUR_STORED")
+        db.add(
+            FrameVectorFile(
+                id=upload_id,
+                patient_id=patient_id,
+                device_id=device_id,
+                hour_start=data.hour_start,
+                frame_count=len(found.seconds),
+                model_id=found.model_id,
+                dim=int(found.vectors.shape[1]),
+                storage_key=key,
+            )
+        )
+        db.commit()
+    return UploadDone(id=upload_id, kind="frame_vectors", status="stored")
 
 
 def _enqueue_thumbnail(media_id: uuid.UUID) -> None:

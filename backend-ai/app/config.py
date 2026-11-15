@@ -42,6 +42,7 @@ class Settings(BaseSettings):
     ai_llm: str | None = None
     ai_assist_llm: str | None = None  # the /assist agent (phase 9.1)
     ai_face: str | None = None
+    ai_visual: str | None = None
 
     # Unknown faces: the caregiver is asked once a stranger is seen on this many
     # different days (spec D23, "configurable")
@@ -55,6 +56,7 @@ class Settings(BaseSettings):
     # Face model files (spec D14): downloaded at image build by scripts/download_face_models.py.
     # Locally: backend-ai/models (gitignored). Docker: /code/models.
     face_models_dir: str = str(Path(__file__).resolve().parents[1] / "models")
+    visual_models_dir: str = str(Path(__file__).resolve().parents[1] / "models")
     gemini_api_key: str | None = None
     groq_api_key: str | None = None
     # the Groq model for text and photos (clients/groq.py); must read images for vision

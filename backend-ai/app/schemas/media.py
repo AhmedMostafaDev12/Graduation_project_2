@@ -15,16 +15,29 @@ CONTENT_TYPES = {
     "video/mp4": "mp4",
     "audio/ogg": "ogg",
     "audio/opus": "opus",
+    "application/octet-stream": "rmfv",
 }
 MEDIA_TYPES = {"image/jpeg", "image/png", "video/mp4"}
 AUDIO_TYPES = {"audio/ogg", "audio/opus"}
+FRAME_VECTOR_TYPES = {"application/octet-stream"}  # the hourly file (D41)
 
-UploadKind = Literal["media", "audio"]
-ContentType = Literal["image/jpeg", "image/png", "video/mp4", "audio/ogg", "audio/opus"]
+UploadKind = Literal["media", "audio", "frame_vectors"]
+ContentType = Literal[
+    "image/jpeg",
+    "image/png",
+    "video/mp4",
+    "audio/ogg",
+    "audio/opus",
+    "application/octet-stream",
+]
 
 
 def _check_kind(kind: str, content_type: str) -> None:
-    allowed = MEDIA_TYPES if kind == "media" else AUDIO_TYPES
+    allowed = {
+        "media": MEDIA_TYPES,
+        "audio": AUDIO_TYPES,
+        "frame_vectors": FRAME_VECTOR_TYPES,
+    }[kind]
     if content_type not in allowed:
         raise ValueError(f"{content_type} is not allowed for {kind}")
 
@@ -69,6 +82,10 @@ class UploadComplete(BaseModel):
     # audio
     started_at: AwareDatetime | None = None
     ended_at: AwareDatetime | None = None
+    # frame_vectors: every frame's vector for one hour (spec D41)
+    hour_start: AwareDatetime | None = Field(
+        default=None, description="Frame vectors: the hour the file covers, on the hour"
+    )
 
     @model_validator(mode="after")
     def _fields_for_kind(self):
@@ -77,6 +94,15 @@ class UploadComplete(BaseModel):
             raise ValueError("media needs event_id and trigger")
         if self.kind == "audio" and (self.started_at is None or self.ended_at is None):
             raise ValueError("audio needs started_at and ended_at")
+        if self.kind == "frame_vectors":
+            if self.hour_start is None:
+                raise ValueError("frame_vectors needs hour_start")
+            if (
+                self.hour_start.minute
+                or self.hour_start.second
+                or self.hour_start.microsecond
+            ):
+                raise ValueError("hour_start must be on the hour")
         return self
 
 
@@ -84,7 +110,7 @@ class UploadDone(BaseModel):
     id: uuid.UUID
     kind: UploadKind
     status: str = Field(
-        description="media: pending_review | confirmed; audio: uploaded"
+        description="media: pending_review | confirmed; audio: uploaded; frame_vectors: stored"
     )
 
 

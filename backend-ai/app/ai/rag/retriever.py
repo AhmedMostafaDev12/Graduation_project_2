@@ -27,25 +27,32 @@ Privacy: nothing is logged (search texts, names and ids are private).
 import re
 import uuid
 from collections import defaultdict
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
+import numpy as np
 from sqlalchemy import Text, and_, case, cast, func, literal, or_, select
 from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.orm import Session
 
-from app.ai.interfaces import TextEmbedder
+from app.ai.interfaces import TextEmbedder, VisualTextEmbedder
+from app.ai.memory import frame_vectors
 from app.ai.rag.assist_loop import TOP_K, Evidence
 from app.ai.rag.planner import QueryPlan
 from app.ai.rag.render import PRINTED_TEXT, clean
+from app.integrations import s3
 from app.models import (
     Encounter,
     Event,
+    FrameVectorFile,
     MediaAsset,
     MemoryAction,
     MemoryEntity,
     MemoryFact,
     MemoryIntention,
     ObjectSighting,
+    SceneSegment,
+    SceneVector,
 )
 
 PER_RANKING = 20  # candidates each ranking contributes before fusion
@@ -65,6 +72,16 @@ TEXT_QUESTION = {
 }  # fmt: skip
 MIN_WORD = 3  # shorter words are too common to search for
 OUTSIDE_WINDOW = "outside the time asked: the last time this person was present"
+# Visual memory (D41): the question's words are embedded into the space of the glasses' frame
+# vectors. Tier 1 finds the best scene segments, tier 2 (the hourly per-frame files) finds the
+# best second inside each; a hit is attached to the moment memory has from those seconds.
+VISUAL_SCAN = 60  # tier-1 vectors read, nearest first
+VISUAL_SEGMENTS = 5  # segments kept
+VISUAL_MIN = 0.2  # DRAFT: question ↔ frame cosine for a hit (calibrated on the replay)
+VISUAL_MARGIN = 0.03  # and no further than this below the best segment
+VISUAL_NEAR_S = 120  # a moment this close in time carries a hit when no photo was kept
+VISUAL_WEIGHT = 1.0
+VISUAL_PROMPT = "a photo of {}"  # CLIP matches short captions best
 WORD = re.compile(r"\w+")  # Unicode letters and digits: Arabic too, never "؟" or "،"
 
 
@@ -97,11 +114,14 @@ class MemorySearch:
         embedder: TextEmbedder,
         top_k: int = TOP_K,
         use_structures: bool = True,
+        visual: VisualTextEmbedder | None = None,
     ):
         self.db, self.patient_id, self.tz = db, patient_id, ZoneInfo(tz)
         self.embedder, self.top_k = embedder, top_k
         # False = flat memory: event sentences only (the H6 ablation, spec D40)
         self.use_structures = use_structures
+        # None = no visual memory: the frame vectors aren't searched (D41 off)
+        self.visual = visual
 
     async def search(self, plan: QueryPlan) -> list[Evidence]:
         # the session belongs to this thread; the loop awaits searches one at a time
@@ -115,11 +135,15 @@ class MemorySearch:
             query = self.embedder.embed_query(plan.search_text)
             if self.use_structures:
                 lines = self._structures(plan, tokens, query)
+            seen = self._visual(plan) if self.visual is not None else {}
+            for event_id, extra in seen.items():  # after the structure lines
+                lines.setdefault(event_id, []).extend(extra)
             ranked = fuse(
                 [
                     (list(lines), STRUCTURE_WEIGHT),
                     (self._by_meaning(conditions, query), 1.0),
                     (self._by_words(conditions, tokens), 1.0),
+                    (list(seen), VISUAL_WEIGHT),
                 ]
             )
         else:
@@ -413,6 +437,122 @@ class MemorySearch:
                         f"settles the plan «{intention.description}»: {intention.status}",
                     )
         return {k: v for k, v in lines.items() if v}
+
+    # ----- visual memory (D41) -----
+
+    def _visual(self, plan: QueryPlan) -> dict[uuid.UUID, list[str]]:
+        """event id → "seen around HH:MM:SS" lines, best hit first. Two tiers (D41): the
+        segments' 3 vectors find the candidate minutes, the hourly files find the best second;
+        a hit goes to the photo kept in that segment, else to the closest moment in time."""
+        query = self.visual.embed_text(
+            [VISUAL_PROMPT.format(plan.search_text.strip())]
+        )[0]
+        distance = SceneVector.embedding.cosine_distance(query)
+        where = [SceneVector.patient_id == self.patient_id]
+        if plan.window_start is not None:
+            where.append(SceneVector.captured_at >= plan.window_start)
+        if plan.window_end is not None:
+            where.append(SceneVector.captured_at < plan.window_end)
+        best: dict[uuid.UUID, float] = {}
+        for segment_id, sim in self.db.execute(
+            select(SceneVector.segment_id, (1 - distance).label("sim"))
+            .where(*where)
+            .order_by(distance)
+            .limit(VISUAL_SCAN)
+        ):
+            best.setdefault(segment_id, float(sim))
+        if not best:
+            return {}
+        top = max(best.values())
+        chosen = [
+            k
+            for k, v in sorted(best.items(), key=lambda kv: -kv[1])
+            if v >= VISUAL_MIN and v >= top - VISUAL_MARGIN
+        ][:VISUAL_SEGMENTS]
+        segments = {
+            s.id: s
+            for s in self.db.scalars(
+                select(SceneSegment).where(SceneSegment.id.in_(chosen))
+            )
+        }
+        vector = np.asarray(query, dtype=np.float32)
+        files: dict[uuid.UUID, frame_vectors.FrameVectors | None] = {}
+        lines: dict[uuid.UUID, list[str]] = {}
+        for segment_id in chosen:
+            segment = segments.get(segment_id)
+            if segment is None:
+                continue
+            when, _ = self._best_second(segment, vector, files)
+            line = f"seen around {when.astimezone(self.tz):%H:%M:%S}: looks like «{plan.search_text.strip()}»"
+            for event_id in self._near(segment, when):
+                if line not in lines.setdefault(event_id, []):
+                    lines[event_id].append(line)
+        return lines
+
+    def _best_second(self, segment, vector, files) -> tuple[datetime, float]:
+        """Tier 2: the segment's best frame in the hourly files (its start when none is there)."""
+        best_at, best_sim = segment.started_at, -1.0
+        hour = segment.started_at.replace(minute=0, second=0, microsecond=0)
+        while hour <= segment.ended_at:
+            for row in self.db.scalars(
+                select(FrameVectorFile).where(
+                    FrameVectorFile.patient_id == self.patient_id,
+                    FrameVectorFile.device_id == segment.device_id,
+                    FrameVectorFile.hour_start == hour,
+                )
+            ):
+                if row.id not in files:
+                    data = s3.get_bytes(row.storage_key, frame_vectors.MAX_BYTES)
+                    try:
+                        files[row.id] = frame_vectors.unpack(data) if data else None
+                    except frame_vectors.BadFrameVectorFile:
+                        files[row.id] = None
+                found = files[row.id]
+                if found is None or found.vectors.shape[1] != len(vector):
+                    continue
+                start = (segment.started_at - hour).total_seconds()
+                end = (segment.ended_at - hour).total_seconds()
+                inside = (found.seconds >= start) & (found.seconds <= end)
+                if inside.any():
+                    sims = found.vectors[inside] @ vector
+                    i = int(sims.argmax())
+                    if float(sims[i]) > best_sim:
+                        best_sim = float(sims[i])
+                        best_at = hour + timedelta(
+                            seconds=float(found.seconds[inside][i])
+                        )
+            hour += timedelta(hours=1)
+        return best_at, best_sim
+
+    def _near(self, segment, when: datetime) -> list[uuid.UUID]:
+        """The moment that carries a visual hit: the photo kept in its segment, else the
+        closest event within VISUAL_NEAR_S (a conversation, another photo)."""
+        if segment.kept_media_ids:
+            kept = list(
+                self.db.scalars(
+                    select(MediaAsset.event_id).where(
+                        MediaAsset.id.in_(segment.kept_media_ids),
+                        MediaAsset.patient_id == self.patient_id,
+                        MediaAsset.event_id.is_not(None),
+                        MediaAsset.deleted_at.is_(None),
+                    )
+                )
+            )
+            if kept:
+                return kept[:1]
+        gap = func.abs(func.extract("epoch", Event.occurred_at - when))
+        closest = self.db.scalars(
+            select(Event.id)
+            .where(
+                Event.patient_id == self.patient_id,
+                Event.deleted_at.is_(None),
+                Event.occurred_at >= when - timedelta(seconds=VISUAL_NEAR_S),
+                Event.occurred_at <= when + timedelta(seconds=VISUAL_NEAR_S),
+            )
+            .order_by(gap)
+            .limit(1)
+        ).first()
+        return [closest] if closest else []
 
     # ----- results -----
 

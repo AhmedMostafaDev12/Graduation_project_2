@@ -1,7 +1,8 @@
 """Deleting what the patient's data rules say must go (spec §8, §7.3), hourly via Beat.
 
 - photos with retention `auto_expire` whose `expires_at` has passed and that nobody pinned;
-- audio segments still not transcribed after 7 days (raw audio is never kept, spec D4).
+- audio segments still not transcribed after 7 days (raw audio is never kept, spec D4);
+- scene segments (with their vectors) and hourly frame-vector files after 90 days (D41).
 
 Order: the S3 delete first, then the row. S3 deletes are idempotent, so if the row update
 fails the next run simply deletes again; the other order could leave a file nobody tracks.
@@ -13,10 +14,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.integrations import s3
-from app.models import AudioSegment, AuditLog, MediaAsset
+from app.models import AudioSegment, AuditLog, FrameVectorFile, MediaAsset, SceneSegment
 from app.services import vision_memory
 
 AUDIO_MAX_AGE = timedelta(days=7)
+VISUAL_MAX_AGE = timedelta(days=90)  # spec §8, D41
 BATCH = 200  # per run; the next hourly run continues
 
 
@@ -69,4 +71,31 @@ def expire_media(db: Session, now: datetime | None = None) -> dict:
         segment.status = "deleted"
         db.commit()
 
-    return {"media": len(media), "audio": len(audio)}
+    files = list(
+        db.scalars(
+            select(FrameVectorFile)
+            .where(FrameVectorFile.hour_start < now - VISUAL_MAX_AGE)
+            .limit(BATCH)
+        )
+    )
+    for row in files:
+        s3.delete(row.storage_key)
+        db.delete(row)
+        db.commit()
+    old = list(
+        db.scalars(
+            select(SceneSegment.id)
+            .where(SceneSegment.started_at < now - VISUAL_MAX_AGE)
+            .limit(BATCH)
+        )
+    )
+    for segment_id in old:  # its vectors go with it (ON DELETE CASCADE)
+        db.delete(db.get(SceneSegment, segment_id))
+    db.commit()
+
+    return {
+        "media": len(media),
+        "audio": len(audio),
+        "frame_files": len(files),
+        "segments": len(old),
+    }

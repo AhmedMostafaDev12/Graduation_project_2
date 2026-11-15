@@ -126,14 +126,14 @@ class ObjectSighting(Base):
     `scene_segment_id` (spec §6) arrives with the glasses' scene segments."""
 
     __tablename__ = "object_sightings"
-    __table_args__ = (
-        Index("ix_object_sightings_entity_seen", "entity_id", "seen_at"),
-    )
+    __table_args__ = (Index("ix_object_sightings_entity_seen", "entity_id", "seen_at"),)
 
     id: Mapped[uuid.UUID] = pk()
     patient_id: Mapped[uuid.UUID] = fk("users.id")
     entity_id: Mapped[uuid.UUID] = fk("memory_entities.id")
-    state: Mapped[str | None] = mapped_column(Text, nullable=True)  # "on", "in the drawer"
+    state: Mapped[str | None] = mapped_column(
+        Text, nullable=True
+    )  # "on", "in the drawer"
     room: Mapped[str | None] = mapped_column(Text, nullable=True)  # from the image
     place_id: Mapped[uuid.UUID | None] = fk("places.id", nullable=True)
     seen_at: Mapped[datetime] = ts()

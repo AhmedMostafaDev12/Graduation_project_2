@@ -27,6 +27,7 @@ from app.ai.clients.llm import GeminiFastLLM, GeminiLLM
 from app.ai.clients.stt import DeepgramSpeechToText
 from app.ai.clients.vision import GeminiVisionReviewer
 from app.ai.inference.face_onnx import OnnxFaceEmbedder
+from app.ai.inference.mobileclip_onnx import OnnxMobileClipText
 from app.ai.interfaces import (
     LLM,
     Captioner,
@@ -34,6 +35,7 @@ from app.ai.interfaces import (
     SpeechToText,
     TextEmbedder,
     VisionReviewer,
+    VisualTextEmbedder,
 )
 from app.config import settings
 
@@ -45,6 +47,7 @@ CAPABILITIES = (
     "llm",
     "assist_llm",
     "face",
+    "visual",
 )
 
 # provider name for every capability, per profile
@@ -57,6 +60,7 @@ PROFILES: dict[str, dict[str, str]] = {
         "llm": "fake",
         "assist_llm": "fake",
         "face": "stub",
+        "visual": "fake",
     },
     "production": {
         "stt": "deepgram-nova-3",
@@ -66,6 +70,7 @@ PROFILES: dict[str, dict[str, str]] = {
         "llm": "gemini-flash",
         "assist_llm": "gemini-flash-fast",
         "face": "mobilefacenet-onnx",
+        "visual": "mobileclip-s0-onnx",
     },
     "small": {
         "stt": "local-whisperx",
@@ -75,6 +80,7 @@ PROFILES: dict[str, dict[str, str]] = {
         "llm": "local-llm",
         "assist_llm": "local-llm",
         "face": "mobilefacenet-onnx",
+        "visual": "mobileclip-s0-onnx",
     },
 }
 
@@ -112,6 +118,11 @@ PROVIDERS: dict[str, dict[str, Callable[[], object]]] = {
         "selfhosted-qwen": SelfHostedLLM,
     },
     "face": {"stub": fakes.StubFaceEmbedder, "mobilefacenet-onnx": OnnxFaceEmbedder},
+    # questions → the space of the glasses' frame vectors (spec D34, D41)
+    "visual": {
+        "fake": fakes.FakeVisualTextEmbedder,
+        "mobileclip-s0-onnx": OnnxMobileClipText,
+    },
 }
 
 
@@ -128,6 +139,7 @@ class AIModels:
     llm: LLM
     assist_llm: LLM
     face: FaceEmbedder
+    visual: VisualTextEmbedder
 
 
 def choose_providers(
@@ -174,6 +186,7 @@ def overrides_from_settings() -> dict[str, str | None]:
         "llm": settings.ai_llm,
         "assist_llm": settings.ai_assist_llm,
         "face": settings.ai_face,
+        "visual": settings.ai_visual,
     }
 
 

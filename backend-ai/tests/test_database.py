@@ -9,7 +9,7 @@ import pytest
 from sqlalchemy import create_engine, text
 
 BACKEND = Path(__file__).resolve().parents[1]
-EXPECTED_TABLES = 27  # + object_sightings, memory_actions (0007)
+EXPECTED_TABLES = 30  # + object_sightings, memory_actions (0007); scene_segments, scene_vectors, frame_vector_files (0008)
 
 
 def _run(args: list[str], database_url: str) -> subprocess.CompletedProcess:

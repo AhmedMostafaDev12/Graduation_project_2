@@ -76,7 +76,7 @@ def answer(
     result = asyncio.run(
         run_assist(
             ai.assist_llm,
-            MemorySearch(db, patient_id, tz, ai.text_embedder),
+            MemorySearch(db, patient_id, tz, ai.text_embedder, visual=ai.visual),
             question=question,
             asked_at=asked_at or datetime.now(UTC),
             tz=tz,
