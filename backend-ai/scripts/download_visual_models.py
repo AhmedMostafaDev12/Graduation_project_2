@@ -24,9 +24,10 @@ REVISION = "757d59c9c6870a76a4b0306f05f5061bca15c39f"
 BASE = f"https://huggingface.co/Xenova/mobileclip_s0/resolve/{REVISION}/"
 # local name → (path in the repository, SHA-256)
 FILES = {
-    "mobileclip_s0_text_int8.onnx": (
-        "onnx/text_model_int8.onnx",
-        "fc8d87978623385c17a46331ffb9cb5ab7fe8b61c513c094602b85f08edd0a0b",
+    # float16, 85 MB: the INT8 export is 0.85-0.92 cosine away from it, too far for search
+    "mobileclip_s0_text_fp16.onnx": (
+        "onnx/text_model_fp16.onnx",
+        "2f74b7b3abd9f3a70dcc60115f627bbadb9534606ac841400f9841f49bf980cc",
     ),
     "mobileclip_s0_tokenizer.json": (
         "tokenizer.json",

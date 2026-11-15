@@ -1,8 +1,9 @@
 """MobileCLIP-S0's text half on the server (spec D34, D41; registry: mobileclip-s0-onnx).
 
 The glasses embed every frame with the image half (ml/edge); a question is embedded here with
-the text half, into the same 512-d space, so /assist can search what the glasses saw. The INT8
-ONNX export (Xenova/mobileclip_s0, pinned revision) and its tokenizer come from
+the text half, into the same 512-d space, so /assist can search what the glasses saw. The
+float16 ONNX export (Xenova/mobileclip_s0, pinned revision; its INT8 export loses too much:
+cosine 0.85–0.92 to float16) and its tokenizer come from
 scripts/download_visual_models.py into VISUAL_MODELS_DIR. MobileCLIP is licensed by Apple for
 research use (apple-amlr).
 """
@@ -17,7 +18,7 @@ from app.config import settings
 
 MODEL_ID = "mobileclip-s0@1.0"  # the same string the glasses send with their vectors (spec §7.1)
 VISUAL_DIM = 512
-TEXT_FILE = "mobileclip_s0_text_int8.onnx"
+TEXT_FILE = "mobileclip_s0_text_fp16.onnx"
 TOKENIZER_FILE = "mobileclip_s0_tokenizer.json"
 
 
