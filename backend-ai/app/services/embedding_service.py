@@ -21,7 +21,9 @@ from app.models import (
     EnrolledPerson,
     Event,
     MediaAsset,
+    MemoryEntity,
     MindGameSession,
+    ObjectSighting,
     PatientProfile,
     Place,
     Reminder,
@@ -91,10 +93,23 @@ def render_input(db: Session, event: Event, profile: PatientProfile) -> RenderIn
     ).first()
     if media:
         tags = (media.ai_tags or {}).get("tags") or []
+        # what the photo review saw, with its state: a name printed on a box is searchable
+        seen = db.execute(
+            select(MemoryEntity.name, ObjectSighting.state)
+            .join(MemoryEntity, MemoryEntity.id == ObjectSighting.entity_id)
+            .where(
+                ObjectSighting.media_asset_id == media.id,
+                ObjectSighting.deleted_at.is_(None),
+            )
+            .order_by(ObjectSighting.created_at)
+        ).all()
         fields.update(
             media_type=media.asset_type,
             media_duration_seconds=media.duration_seconds,
             media_tags=tuple(str(t) for t in tags),
+            media_objects=tuple(
+                f"{name} ({state})" if state else name for name, state in seen
+            ),
         )
 
     return RenderInput(

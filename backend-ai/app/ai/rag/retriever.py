@@ -36,6 +36,7 @@ from sqlalchemy.orm import Session
 from app.ai.interfaces import TextEmbedder
 from app.ai.rag.assist_loop import TOP_K, Evidence
 from app.ai.rag.planner import QueryPlan
+from app.ai.rag.render import PRINTED_TEXT, clean
 from app.models import (
     Encounter,
     Event,
@@ -52,6 +53,16 @@ RRF_K = 60  # reciprocal rank fusion constant (the usual value)
 STRUCTURE_WEIGHT = 2.0  # a structure match is precise: it counts twice
 ENTITY_MATCH = 0.45  # DRAFT: query ↔ entity-name cosine to count as "about" that entity
 MAX_LINES = 3  # structure lines put in front of one event's text
+# Sightings: an object seen in many photos (a pizza box in 86) must not fill every slot with the
+# same state. Up to this many newest are read, repeats of one state collapse to the newest, and
+# a question about a name or writing puts the sightings that quote printed text first.
+SIGHTINGS_SCAN = 300
+TEXT_QUESTION = {
+    "name", "named", "called", "printed", "written", "writing", "text", "label", "brand",
+    "title", "website", "address", "number", "says", "sign", "logo",
+    "اسم", "الاسم", "اسمه", "اسمها", "مكتوب", "مكتوبة", "كتابة", "المكتوب", "عنوان", "رقم",
+    "لافتة", "ماركة",
+}  # fmt: skip
 MIN_WORD = 3  # shorter words are too common to search for
 OUTSIDE_WINDOW = "outside the time asked: the last time this person was present"
 WORD = re.compile(r"\w+")  # Unicode letters and digits: Arabic too, never "؟" or "،"
@@ -266,14 +277,26 @@ class MemorySearch:
                     MediaAsset.event_id.in_(window),
                 )
                 .order_by(ObjectSighting.seen_at.desc())
-                .limit(PER_RANKING)
+                .limit(SIGHTINGS_SCAN)
             ).all()
             newest: set[uuid.UUID] = set()
+            states: set[tuple] = set()
+            distinct = []  # (sighting, event id, label): one per state, newest first
             for sighting, event_id in sightings:
-                where = ", ".join(x for x in (sighting.state, sighting.room) if x)
-                first = sighting.entity_id not in newest
+                label = "seen" if sighting.entity_id in newest else "last seen"
                 newest.add(sighting.entity_id)
-                label = "last seen" if first else "seen"
+                state = (
+                    sighting.entity_id,
+                    clean(sighting.state).lower(),
+                    sighting.room,
+                )
+                if state not in states:
+                    states.add(state)
+                    distinct.append((sighting, event_id, label))
+            if TEXT_QUESTION & set(tokens):  # "what name was printed on the box?"
+                distinct.sort(key=lambda d: not PRINTED_TEXT.search(d[0].state or ""))
+            for sighting, event_id, label in distinct[:PER_RANKING]:
+                where = ", ".join(x for x in (sighting.state, sighting.room) if x)
                 name = entities[sighting.entity_id]
                 add(event_id, f"{name} {label}" + (f": {where}" if where else ""))
 
