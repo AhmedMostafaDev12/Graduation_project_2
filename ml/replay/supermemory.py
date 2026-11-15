@@ -17,6 +17,11 @@ For one participant's session(s):
    unanswerable ones asked in them, go through the real /assist (rag/answer.py) at the time
    they were asked. A judge call maps each free answer to one of the 4 choices; the score is
    multiple-choice accuracy, per skill, with the five structures and without them (H6).
+5. **Frames, visual tier (`--visual`):** every 1 fps frame is embedded on this machine with
+   MobileCLIP-S0's image half (ml/edge, as the glasses will), cut into scene segments and
+   stored the way events:batch and the hourly uploads store them (D41), so the search's
+   visual tier runs on real frames. Each question records how close its search text came to
+   the frames of its evidence (calibration of VISUAL_MIN).
 
     docker compose -f docker-compose.dev.yml up -d db     # local Postgres, never Supabase
     cd backend-ai
@@ -57,7 +62,9 @@ from PIL import Image
 from sqlalchemy import delete, func, select
 
 from app.ai.clients import groq as groq_client
+from app.ai.memory import frame_vectors
 from app.ai.rag import answer as answer_module
+from app.ai.rag import retriever as retriever_module
 from app.ai.rag.retriever import MemorySearch
 from app.ai.registry import build
 from app.ai.review_contract import ReviewResult
@@ -67,7 +74,9 @@ from app.integrations import s3
 from app.models import (
     CapturedDocument,
     ConsentRecord,
+    Device,
     Event,
+    FrameVectorFile,
     MediaAsset,
     MemoryAction,
     MemoryEntity,
@@ -75,6 +84,8 @@ from app.models import (
     MemoryIntention,
     ObjectSighting,
     PatientProfile,
+    SceneSegment,
+    SceneVector,
     User,
 )
 from app.services import (
@@ -89,6 +100,12 @@ TIMEZONE = "America/New_York"  # recorded in Ohio
 TALK_GAP_S = 30.0  # a silence this long starts a new conversation event
 TALK_MAX_S = 60.0  # and so does a stretch this long
 UNANSWERABLE = "can not be answered"
+# MobileCLIP-S0's image half for --visual (Xenova/mobileclip_s0, the revision the backend pins)
+VISION_URL = (
+    "https://huggingface.co/Xenova/mobileclip_s0/resolve/"
+    "757d59c9c6870a76a4b0306f05f5061bca15c39f/onnx/vision_model_fp16.onnx"
+)
+VISION_SHA256 = "22b1d36ecc6837e8205aee05003440a25e1c1ee0c7e2945dbb9dd597211c59dc"  # float16: the INT8 export is broken
 
 JUDGE_PROMPT = """You grade a memory assistant on a multiple-choice benchmark. You get a
 question, its numbered choices, and the assistant's free answer. Return the number of the
@@ -417,6 +434,174 @@ def gate_frames(args, video_id: str, every_frame: list) -> tuple[list, dict]:
     return union, stats
 
 
+def vision_model() -> Path:
+    path = CACHE.parent / "models" / "mobileclip_s0_vision_fp16.onnx"
+    if not path.exists():
+        path.parent.mkdir(parents=True, exist_ok=True)
+        print("downloading MobileCLIP-S0 image model …", flush=True)
+        urllib.request.urlretrieve(VISION_URL, path)  # fixed https URL, checked below
+    if hashlib.sha256(path.read_bytes()).hexdigest() != VISION_SHA256:
+        path.unlink()
+        sys.exit("MobileCLIP image model checksum mismatch: refusing to use it")
+    return path
+
+
+def frame_embeddings(
+    video_id: str, frames: list[tuple[float, Path]], every: float
+) -> np.ndarray:
+    """Every frame's MobileCLIP vector, cached per video (the glasses' work, done here)."""
+    from edge.frame_embedder import FrameEmbedder
+
+    cache = CACHE / "frame_vectors" / f"{video_id}_mobileclip-s0_every{every:g}.npy"
+    if cache.exists():
+        return np.load(cache)
+    embedder, out = FrameEmbedder(vision_model(), threads=4), []
+    started = time.perf_counter()
+    for i in range(0, len(frames), 16):
+        batch = [
+            np.asarray(Image.open(p).convert("RGB")) for _, p in frames[i : i + 16]
+        ]
+        out.append(embedder.embed(batch))
+    vectors = np.concatenate(out).astype(np.float32)
+    print(
+        f"  embedded {len(frames)} frames in {time.perf_counter() - started:.0f}s",
+        flush=True,
+    )
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    np.save(cache, vectors)
+    return vectors
+
+
+def seed_device(db, patient_id) -> uuid.UUID:
+    device = Device(
+        patient_id=patient_id,
+        serial_number=f"REPLAY-{uuid.uuid4().hex[:8]}",
+        token_hash=uuid.uuid4().hex,
+        firmware_version="replay",
+        paired_at=datetime.now(UTC),
+    )
+    db.add(device)
+    db.commit()
+    return device.id
+
+
+def store_scenes(
+    db,
+    patient_id,
+    device_id,
+    frames,
+    vectors,
+    start_unix,
+    storage: MemoryStorage,
+    cut: float,
+) -> dict:
+    """What events:batch (scene_segments) and the hourly frame_vectors uploads store (D41):
+    segments with 3 float16 vectors and the photos kept inside them; hourly 8-bit files."""
+    from edge.frame_embedder import MODEL_ID
+    from edge.scenes import segment
+
+    seconds = [offset for offset, _ in frames]
+    at = [datetime.fromtimestamp(start_unix + t, UTC) for t in seconds]
+    kept = db.execute(
+        select(MediaAsset.id, Event.occurred_at)
+        .join(Event, Event.id == MediaAsset.event_id)
+        .where(MediaAsset.patient_id == patient_id, MediaAsset.status == "confirmed")
+    ).all()
+    segments = segment(seconds, vectors, cut)
+    for seg in segments:
+        row = SceneSegment(
+            id=uuid.uuid4(),
+            patient_id=patient_id,
+            device_id=device_id,
+            started_at=at[seg.first],
+            ended_at=at[seg.last],
+            frame_count=seg.last - seg.first + 1,
+            model_id=MODEL_ID,
+            kept_media_ids=[
+                m for m, when in kept if at[seg.first] <= when <= at[seg.last]
+            ],
+        )
+        db.add(row)
+        db.flush()
+        db.add_all(
+            SceneVector(
+                segment_id=row.id,
+                patient_id=patient_id,
+                captured_at=at[i],
+                role=role,
+                # sent as float16 (§7.1)
+                embedding=vectors[i].astype(np.float16).astype(float).tolist(),
+            )
+            for role, i in seg.roles.items()
+        )
+    hours: dict[datetime, list] = collections.defaultdict(list)
+    for when, vector in zip(at, vectors, strict=True):
+        hour = when.replace(minute=0, second=0, microsecond=0)
+        hours[hour].append(((when - hour).total_seconds(), vector))
+    for hour, rows in hours.items():
+        key = f"replay/frame_vectors/{device_id}/{hour:%Y%m%d%H}.rmfv"
+        storage.files[key] = frame_vectors.pack(hour, MODEL_ID, rows)
+        db.add(
+            FrameVectorFile(
+                patient_id=patient_id,
+                device_id=device_id,
+                hour_start=hour,
+                frame_count=len(rows),
+                model_id=MODEL_ID,
+                dim=vectors.shape[1],
+                storage_key=key,
+            )
+        )
+    db.commit()
+    lengths = [s.last - s.first + 1 for s in segments]
+    return {
+        "segments": len(segments),
+        "mean_frames": round(sum(lengths) / len(lengths), 1),
+        "with_kept_photo": sum(
+            1
+            for s in segments
+            if any(at[s.first] <= when <= at[s.last] for _, when in kept)
+        ),
+        "hour_files": len(hours),
+    }
+
+
+class RecordingVisual:
+    """The real text half, recording the last search text so each answer can be calibrated."""
+
+    def __init__(self, inner):
+        self.inner, self.model_id, self.dim = inner, inner.model_id, inner.dim
+        self.last: tuple[str, np.ndarray] | None = None
+
+    def embed_text(self, texts):
+        out = self.inner.embed_text(texts)
+        self.last = (texts[0], np.asarray(out[0], dtype=np.float32))
+        return out
+
+
+def calibration(q: dict, recorded, seen: dict) -> dict | None:
+    """How close the search text came to the frames of the answer's evidence vs anywhere."""
+    if recorded is None:
+        return None
+    text, vector = recorded
+    best_any, best_evidence = -1.0, None
+    for video_id, (offsets, vectors) in seen.items():
+        sims = vectors @ vector
+        best_any = max(best_any, float(sims.max()))
+        for e in (q.get("answer_evidence") or {}).get("evidence_list", []):
+            span = e.get("time_span") or {}
+            if e["video_id"] != video_id or "start_time" not in span:
+                continue
+            inside = (offsets >= span["start_time"]) & (offsets <= span["end_time"])
+            if inside.any():
+                best_evidence = max(best_evidence or -1.0, float(sims[inside].max()))
+    return {
+        "query": text,
+        "best_any": round(best_any, 3),
+        "best_evidence": None if best_evidence is None else round(best_evidence, 3),
+    }
+
+
 def review_frames(
     patient_id, frames, start_unix, storage: MemoryStorage, workers: int
 ) -> dict:
@@ -530,6 +715,9 @@ def memory_counts(db, patient_id) -> dict:
 
 
 def cleanup(db, patient_id, caregiver_id) -> None:
+    db.execute(delete(SceneSegment).where(SceneSegment.patient_id == patient_id))
+    db.execute(delete(FrameVectorFile).where(FrameVectorFile.patient_id == patient_id))
+    db.execute(delete(Device).where(Device.patient_id == patient_id))
     db.execute(
         delete(CapturedDocument).where(
             CapturedDocument.media_asset_id.in_(
@@ -569,11 +757,13 @@ def judge(llm, q: dict, answer: str) -> int:
         return -1
 
 
-def ask(db, patient_id, questions, ai, *, structures: bool) -> list[dict]:
+def ask(db, patient_id, questions, ai, *, structures: bool, seen=None) -> list[dict]:
     answer_module.MemorySearch = partial(MemorySearch, use_structures=structures)
     rows = []
     for q in questions:
         started = time.perf_counter()
+        if isinstance(ai.visual, RecordingVisual):
+            ai.visual.last = None
         out = answer_module.answer(db, patient_id, q["question"], asked_at=asked_at(q))
         seconds = time.perf_counter() - started
         chosen = judge(ai.llm, q, out["answer"])
@@ -592,12 +782,16 @@ def ask(db, patient_id, questions, ai, *, structures: bool) -> list[dict]:
                 "sources": len(out["source_event_ids"]),
             }
         )
+        if seen:
+            rows[-1]["visual"] = calibration(q, ai.visual.last, seen)
         mark = "✓" if correct else "✗"
         print(
             f"  {mark} [{q['metadata']['skill']}] {seconds:.0f}s  {q['question'][:90]}\n"
             f"      → {out['answer'][:160]}",
             flush=True,
         )
+        if rows[-1].get("visual"):
+            print(f"      visual {rows[-1]['visual']}", flush=True)
     return rows
 
 
@@ -690,6 +884,21 @@ def main() -> int:
         help="frames kept from the 30 s before a trigger",
     )
     parser.add_argument(
+        "--visual",
+        action="store_true",
+        help="the visual tier (D41): embed every frame, store scene segments and hourly "
+        "files, search them",
+    )
+    parser.add_argument(
+        "--scene-cut",
+        type=float,
+        default=None,
+        help="cosine to a segment's first frame below which a new scene starts (ml/edge)",
+    )
+    parser.add_argument(
+        "--visual-min", type=float, help="override the search's VISUAL_MIN"
+    )
+    parser.add_argument(
         "--plan",
         action="store_true",
         help="only print how many frames each gate keeps and how many are new to the "
@@ -762,8 +971,20 @@ def main() -> int:
     }[args.provider]
     groq_client.PHOTO_SIDE = args.photo_side
     ai = build(
-        "stub", {**models, "text_embedder": "voyage-4", "face": "mobilefacenet-onnx"}
+        "stub",
+        {
+            **models,
+            "text_embedder": "voyage-4",
+            "face": "mobilefacenet-onnx",
+            "visual": "mobileclip-s0-onnx" if args.visual else "fake",
+        },
     )
+    if args.visual:
+        ai = dataclasses.replace(ai, visual=RecordingVisual(ai.visual))
+        if args.visual_min is not None:
+            retriever_module.VISUAL_MIN = args.visual_min
+    else:
+        ai = dataclasses.replace(ai, visual=None)
     reviewer = CachedReviewer(ai.vision, args.photo_side)
     ai = dataclasses.replace(ai, vision=reviewer)
     for module in (answer_module, review_service, memory_service, embedding_service):
@@ -773,6 +994,9 @@ def main() -> int:
 
     db = SessionLocal()
     patient_id, caregiver_id = seed_patient(db)
+    device_id = seed_device(db, patient_id) if args.visual else None
+    visual_frames: dict = {}  # video → (every frame, vectors, start)
+    seen: dict = {}  # video → (offsets, vectors), for the calibration
     results = {
         "sessions": sorted(videos),
         "every_s": args.every,
@@ -783,6 +1007,9 @@ def main() -> int:
         "object_threshold": args.object_threshold,
         "lookback": args.lookback,
         "provider": args.provider,
+        "visual": args.visual,
+        "scene_cut": args.scene_cut,
+        "visual_min": retriever_module.VISUAL_MIN if args.visual else None,
         "models": {k: getattr(ai, k).model_id for k in ("llm", "assist_llm", "vision")},
     }
     try:
@@ -811,7 +1038,26 @@ def main() -> int:
                 patient_id, frames, start, storage, args.workers
             )
             print("  review:", results["review"][video_id], flush=True)
+            if args.visual:
+                vectors = frame_embeddings(video_id, every_frame, args.every)
+                visual_frames[video_id] = (every_frame, vectors, start)
+                seen[video_id] = (np.array([t for t, _ in every_frame]), vectors)
         results["dropped_discarded"] = drop_discarded(db, patient_id)
+        if args.visual:
+            from edge.scenes import CUT
+
+            for video_id, (every_frame, vectors, start) in visual_frames.items():
+                results.setdefault("scenes", {})[video_id] = store_scenes(
+                    db,
+                    patient_id,
+                    device_id,
+                    every_frame,
+                    vectors,
+                    start,
+                    storage,
+                    args.scene_cut or CUT,
+                )
+            print("scenes:", results["scenes"], flush=True)
         print("embedding …", flush=True)
         results["embedded"] = embed_all(db, patient_id)
         print("consolidating conversations …", flush=True)
@@ -827,7 +1073,9 @@ def main() -> int:
         )
 
         print("\n== structured (the five structures)", flush=True)
-        results["structured"] = ask(db, patient_id, questions, ai, structures=True)
+        results["structured"] = ask(
+            db, patient_id, questions, ai, structures=True, seen=seen
+        )
         if not args.no_flat:
             print("\n== flat (event sentences only)", flush=True)
             results["flat"] = ask(db, patient_id, questions, ai, structures=False)
