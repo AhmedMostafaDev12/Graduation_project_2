@@ -16,26 +16,32 @@ Sources, joined by COCO image id (LVIS, COCO, COCO-Text and COCO-WholeBody label
 - COCO-WholeBody: valid hand boxes (86) on COCO photos.
 - EgoHands (a Kaggle input): Google Glass frames with hand polygons; the stock yolo11n labels
   their 80 COCO classes and CRAFT their text.
+- Objects365 (two Hugging Face copies): every photo with a key or a wallet, plus samples with glasses,
+  phones and gas stoves; its classes mapped onto ours and COCO's; MediaPipe labels their hands.
 - The reminder set: ~5,000 more COCO photos with all their labels, so the 80 classes aren't forgotten.
 - Zoomed crops: small objects of ours (and phones) cut out of the full-size photo, train only.
 
-Needs: numpy, scipy (EgoHands), gdown (WholeBody), Pillow (crops), easyocr and ultralytics (the
-auto-labels, GPU).
+Needs: numpy, scipy (EgoHands), gdown (WholeBody), Pillow, pyarrow + huggingface_hub + remotezip
+(Objects365), easyocr, ultralytics and mediapipe (the auto-labels, GPU for the first two).
 """
 
 import argparse
 import csv
+import io
 import json
 import random
 import shutil
+import struct
 import subprocess
 import sys
+import threading
 import urllib.error
 import urllib.request
 import zipfile
+import zlib
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 LVIS = "https://dl.fbaipublicfiles.com/LVIS/lvis_v1_{split}.json.zip"
 COCO = "http://images.cocodataset.org/annotations/annotations_trainval2017.zip"
@@ -48,6 +54,45 @@ WHOLEBODY_DRIVE = {"train": "1thErEToRbmM9uLNi1JXXfOsaS5VK2FXf", "val": "1N6VgwK
 EGOHANDS_KAGGLE = "himaniishah/egohands"
 # a Kaggle copy of the LVIS v1 annotations (its val file has the original's exact size, 201,235,232 bytes)
 LVIS_KAGGLE = ("alexanderyyy/lvis-v1", {"train": "lvis_v1_train.json/lvis_v1_train.json", "val": "lvis_v1_val/lvis_v1_val.json"})
+# Objects365 (README §4.2 step 6b): annotations from one Hugging Face copy (sharded parquet, original
+# pixels), photos from another (letterboxed to 384 × 384, in 20 zips read by range requests)
+O365_ANN = "jxu124/objects365"
+O365_IMG_URL = "https://huggingface.co/datasets/hieupth/objects365_384_squared/resolve/main/images_part{:03d}.zip"
+O365_PARTS = range(1, 21)
+O365_SIDE = 384
+# photos to take per split: every photo with a key or a wallet (0 = all), a sample of the others
+O365_TAKE = {"train": {"Key": 0, "Wallet/Purse": 0, "Glasses": 3000, "Cell Phone": 3000, "Gas stove": 3000},
+             "val": {"Key": 0, "Wallet/Purse": 0, "Glasses": 300, "Cell Phone": 300, "Gas stove": 300}}
+O365_OURS = {"Key": 80, "Glasses": 81, "Wallet/Purse": 82, "Gas stove": 84}
+# Objects365 names → COCO's (every one of the 80 has a match; checked)
+O365_TO_COCO = {
+    "Person": "person", "Bicycle": "bicycle", "Car": "car", "SUV": "car", "Sports Car": "car", "Van": "car",
+    "Motorcycle": "motorcycle", "Airplane": "airplane", "Bus": "bus", "Train": "train", "Truck": "truck",
+    "Pickup Truck": "truck", "Heavy Truck": "truck", "Fire Truck": "truck", "Boat": "boat", "Sailboat": "boat",
+    "Ship": "boat", "Traffic Light": "traffic light", "Fire Hydrant": "fire hydrant", "Stop Sign": "stop sign",
+    "Parking meter": "parking meter", "Bench": "bench", "Wild Bird": "bird", "Duck": "bird", "Pigeon": "bird",
+    "Goose": "bird", "Swan": "bird", "Parrot": "bird", "Penguin": "bird", "Chicken": "bird", "Cat": "cat",
+    "Dog": "dog", "Horse": "horse", "Sheep": "sheep", "Cow": "cow", "Elephant": "elephant", "Bear": "bear",
+    "Zebra": "zebra", "Giraffe": "giraffe", "Backpack": "backpack", "Umbrella": "umbrella",
+    "Handbag/Satchel": "handbag", "Tie": "tie", "Bow Tie": "tie", "Luggage": "suitcase", "Frisbee": "frisbee",
+    "Skiboard": "skis", "Snowboard": "snowboard", "Soccer": "sports ball", "Basketball": "sports ball",
+    "Baseball": "sports ball", "Volleyball": "sports ball", "Tennis": "sports ball", "Golf Ball": "sports ball",
+    "American Football": "sports ball", "Other Balls": "sports ball", "Kite": "kite", "Baseball Bat": "baseball bat",
+    "Baseball Glove": "baseball glove", "Skateboard": "skateboard", "Surfboard": "surfboard",
+    "Tennis Racket": "tennis racket", "Bottle": "bottle", "Wine Glass": "wine glass", "Cup": "cup", "Fork": "fork",
+    "Knife": "knife", "Spoon": "spoon", "Bowl/Basin": "bowl", "Banana": "banana", "Apple": "apple",
+    "Sandwich": "sandwich", "Hamburger": "sandwich", "Orange/Tangerine": "orange", "Broccoli": "broccoli",
+    "Carrot": "carrot", "Hot dog": "hot dog", "Pizza": "pizza", "Donut": "donut", "Cake": "cake", "Chair": "chair",
+    "Couch": "couch", "Potted Plant": "potted plant", "Bed": "bed", "Dining Table": "dining table",
+    "Desk": "dining table", "Coffee Table": "dining table", "Side Table": "dining table", "Toilet": "toilet",
+    "Monitor/TV": "tv", "Laptop": "laptop", "Mouse": "mouse", "Remote": "remote", "Keyboard": "keyboard",
+    "Cell Phone": "cell phone", "Microwave": "microwave", "Oven": "oven", "Toaster": "toaster", "Sink": "sink",
+    "Refrigerator": "refrigerator", "Book": "book", "Clock": "clock", "Vase": "vase", "Scissors": "scissors",
+    "Stuffed Toy": "teddy bear", "Hair Dryer": "hair drier", "Toothbrush": "toothbrush",
+}
+# MediaPipe's hand detector labels the hands Objects365 doesn't (README §4.2 step 6b)
+MEDIAPIPE_HANDS = "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task"
+HAND_PAD = 0.1          # landmarks are joints: widen their box by 10 % on each side to cover the whole hand
 WHOLEBODY_MIRROR = {"train": "https://huggingface.co/hngan/cocowholebody/resolve/main/coco_wholebody_train_v1.0.json"}
 
 # our classes after COCO's 80 (README §1); LVIS names for the five objects
@@ -319,6 +364,143 @@ def add_wholebody(records: dict, cache: Path) -> Counter:
     return stats
 
 
+# ---------- Objects365: more keys, wallets, glasses, phones and stoves ----------
+
+def extract_o365(cache: Path, splits) -> None:
+    """Runs in its own process (25 M annotations): picks the photos to take (O365_TAKE) and keeps only
+    their mapped boxes, in original pixels. Writes o365_<split>.json."""
+    import pyarrow.parquet as pq
+    from huggingface_hub import HfApi, hf_hub_download
+
+    files = sorted(s.rfilename for s in HfApi().dataset_info(O365_ANN).siblings if s.rfilename.endswith(".parquet"))
+    keep = set(O365_OURS) | set(O365_TO_COCO)
+    for split in splits:
+        take = O365_TAKE[split]
+        take_all = {c for c, k in take.items() if not k}
+        rng = random.Random(0)
+        everything, reservoir, seen = [], {c: [] for c, k in take.items() if k}, Counter()
+        prefix = "data/train" if split == "train" else "data/validation"
+        for f in (f for f in files if f.startswith(prefix)):
+            parquet = pq.ParquetFile(hf_hub_download(O365_ANN, f, repo_type="dataset"))
+            for batch in parquet.iter_batches(batch_size=20000, columns=["image_info", "anns_info"]):
+                for info, anns in zip(batch.column("image_info").to_pylist(), batch.column("anns_info").to_pylist()):
+                    hits = {a["category"] for a in anns} & set(take)
+                    if not hits:
+                        continue
+                    row = {"name": PurePosixPath(info["file_name"]).name, "w": info["width"], "h": info["height"],
+                           "boxes": [[a["category"], *a["bbox"]] for a in anns  # bbox: x0, y0, x1, y1
+                                     if a["category"] in keep and not a.get("isfake") and not a.get("isreflected")]}
+                    if hits & take_all:
+                        everything.append(row)
+                        continue
+                    for c in sorted(hits):  # reservoir sampling: a fair random sample in one pass (sorted: repeatable)
+                        seen[c] += 1
+                        if len(reservoir[c]) < take[c]:
+                            reservoir[c].append(row)
+                        elif (j := rng.randrange(seen[c])) < take[c]:
+                            reservoir[c][j] = row
+            print(f"  Objects365 {split}: read {f}", flush=True)
+        chosen = {r["name"]: r for r in everything}
+        for rows in reservoir.values():
+            chosen.update((r["name"], r) for r in rows)
+        (cache / f"o365_{split}.json").write_text(json.dumps(list(chosen.values())), encoding="utf-8")
+
+
+def objects365(out: Path, cache: Path, names: dict, splits, limit: int, workers: int) -> dict:
+    """The chosen Objects365 photos: fetched one by one out of the 384 px zips, black bars cut off,
+    boxes scaled and mapped to our ids. → {name: record}."""
+    import requests
+    from PIL import Image
+    from remotezip import RemoteZip
+
+    need = [s for s in splits if not (cache / f"o365_{s}.json").exists()]
+    if need:
+        print(f"reading Objects365 annotations ({', '.join(need)}) in a separate process …", flush=True)
+        subprocess.run([sys.executable, __file__, "--extract-o365", ",".join(need), "--cache", str(cache)], check=True)
+    want = {}
+    for split in splits:
+        rows = load_json(cache / f"o365_{split}.json")
+        for r in rows[: limit or None]:
+            want[r["name"]] = (split, r)
+    coco_id = {name: i for i, name in names.items()}
+    classes = {c: O365_OURS.get(c, coco_id.get(O365_TO_COCO.get(c))) for c in set(O365_OURS) | set(O365_TO_COCO)}
+
+    # 1. each zip's file list (its central directory, a few MB) and its direct download address
+    def located(part):
+        url = O365_IMG_URL.format(part)
+        with RemoteZip(url) as z:
+            members = [i for i in z.infolist() if PurePosixPath(i.filename).name in want]
+        return part, (requests.head(url, allow_redirects=True, timeout=60).url, members)
+
+    with ThreadPoolExecutor(8) as pool:
+        parts = dict(pool.map(located, O365_PARTS))
+    jobs, taken = [], set()
+    for part, (url, members) in parts.items():
+        for info in members:
+            if PurePosixPath(info.filename).name not in taken:
+                taken.add(PurePosixPath(info.filename).name)
+                jobs.append((part, info))
+    print(f"Objects365: {len(jobs)} of {len(want)} chosen photos found in the zips; fetching …", flush=True)
+
+    # 2. each photo with one byte-range request (one request per photo instead of redirect + reconnect)
+    local = threading.local()
+
+    def member_bytes(part, info) -> bytes:
+        if not hasattr(local, "session"):
+            local.session = requests.Session()
+        for attempt in range(3):
+            url = parts[part][0]
+            start = info.header_offset
+            size = 30 + len(info.filename.encode()) + 512 + info.compress_size  # 512: room for the local extra field
+            r = local.session.get(url, headers={"Range": f"bytes={start}-{start + size - 1}"}, timeout=60)
+            if r.status_code in (401, 403):  # the signed address expired: get a fresh one
+                parts[part] = (requests.head(O365_IMG_URL.format(part), allow_redirects=True, timeout=60).url, [])
+                continue
+            r.raise_for_status()
+            raw = r.content
+            n, m = struct.unpack("<HH", raw[26:30])
+            data = raw[30 + n + m: 30 + n + m + info.compress_size]
+            if len(data) == info.compress_size:
+                return data if info.compress_type == zipfile.ZIP_STORED else zlib.decompress(data, -15)
+        raise OSError(f"could not read {info.filename} from part {part}")
+
+    def fetch(job):
+        part, info = job
+        base = PurePosixPath(info.filename).name
+        split, r = want[base]
+        name = f"o365_{PurePosixPath(base).stem}"
+        W, H = r["w"], r["h"]
+        s = O365_SIDE / max(W, H)
+        nw, nh = round(W * s), round(H * s)
+        ox, oy = (O365_SIDE - nw) // 2, (O365_SIDE - nh) // 2  # the photo is centred between black bars
+        target = out / "images" / split / f"{name}.jpg"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if not target.exists():
+            try:
+                with Image.open(io.BytesIO(member_bytes(part, info))) as image:
+                    image.convert("RGB").crop((ox, oy, ox + nw, oy + nh)).save(target, quality=92)
+            except (OSError, requests.RequestException):
+                return None
+        boxes = []
+        for c, x0, y0, x1, y1 in r["boxes"]:
+            box = clip((x0 * s, y0 * s, (x1 - x0) * s, (y1 - y0) * s), nw, nh)
+            if box and classes.get(c) is not None:
+                boxes.append((classes[c], box))
+        return name, {"split": split, "source": "objects365", "file": target, "w": nw, "h": nh, "boxes": boxes,
+                      "dropped": 0, "labels": {"coco": "objects365", "lvis": "objects365", "text": "none", "hand": "none"}}
+
+    records = {}
+    with ThreadPoolExecutor(max(workers, 32)) as pool:
+        for i, got in enumerate(pool.map(fetch, jobs)):
+            if got:
+                records[got[0]] = got[1]
+            if i % 2000 == 0:
+                print(f"  Objects365 photos: {i}/{len(jobs)}", flush=True)
+    for r in records.values():
+        drop_doubles(r)
+    return records
+
+
 # ---------- 7. EgoHands ----------
 
 def egohands(root: Path, limit: int, splits) -> dict:
@@ -394,6 +576,35 @@ def auto_text(records: list) -> int:
         r["labels"]["text"] = "craft-auto"
         if i % 1000 == 0:
             print(f"  text auto-labels: {i}/{len(records)}", flush=True)
+    return added
+
+
+def auto_hands(records: list, cache: Path) -> int:
+    """MediaPipe's hand detector labels the hands on Objects365 photos (they have no hand class)."""
+    import mediapipe as mp
+    import numpy as np
+    from mediapipe.tasks.python import vision
+    from mediapipe.tasks.python.core.base_options import BaseOptions
+    from PIL import Image
+
+    model = fetch(MEDIAPIPE_HANDS, cache / "hand_landmarker.task")
+    detector = vision.HandLandmarker.create_from_options(vision.HandLandmarkerOptions(
+        base_options=BaseOptions(model_asset_path=str(model)), num_hands=6, min_hand_detection_confidence=0.4))
+    added = 0
+    for i, r in enumerate(records):
+        with Image.open(r["file"]) as image:
+            rgb = np.ascontiguousarray(np.asarray(image.convert("RGB")))
+        for hand in detector.detect(mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)).hand_landmarks:
+            xs, ys = [p.x * r["w"] for p in hand], [p.y * r["h"] for p in hand]
+            pw, ph = (max(xs) - min(xs)) * HAND_PAD, (max(ys) - min(ys)) * HAND_PAD
+            box = clip((min(xs) - pw, min(ys) - ph, max(xs) - min(xs) + 2 * pw, max(ys) - min(ys) + 2 * ph), r["w"], r["h"])
+            if box:
+                r["boxes"].append((HAND, box))
+                added += 1
+        r["labels"]["hand"] = "mediapipe-auto"
+        if i % 2000 == 0:
+            print(f"  hand auto-labels: {i}/{len(records)}", flush=True)
+    detector.close()
     return added
 
 
@@ -573,16 +784,20 @@ def main() -> None:
     parser.add_argument("--egohands", type=Path, default=Path("/kaggle/input/egohands"))
     parser.add_argument("--split", choices=["train", "val", "both"], default="both")
     parser.add_argument("--limit", type=int, default=0, help="at most N images per split and source (testing)")
-    parser.add_argument("--skip", default="", help="comma list of: wholebody, egohands, auto (testing)")
+    parser.add_argument("--skip", default="", help="comma list of: wholebody, objects365, egohands, auto (testing)")
     parser.add_argument("--workers", type=int, default=64)
     parser.add_argument("--accept-low-counts", action="store_true", help="write the data even if a class is thin")
     parser.add_argument("--coco-val", type=Path, default=None, help="only build COCO val2017 for the forgetting check")
     parser.add_argument("--extract-hands", choices=["train", "val"], help=argparse.SUPPRESS)  # internal, see hands_of
+    parser.add_argument("--extract-o365", help=argparse.SUPPRESS)  # internal, see objects365
     args = parser.parse_args()
     cache = args.cache or args.out / "annotations"
     cache.mkdir(parents=True, exist_ok=True)
     if args.extract_hands:
         extract_hands(args.extract_hands, cache)
+        return
+    if args.extract_o365:
+        extract_o365(cache, args.extract_o365.split(","))
         return
     if args.coco_val:
         coco_val_check(args.coco_val, cache)
@@ -612,6 +827,12 @@ def main() -> None:
         print(dict(add_wholebody(photos, cache)), flush=True)
     records = {f"coco_{iid:012d}": r for iid, r in photos.items()}
 
+    # Objects365: more keys, wallets, glasses, phones and stoves
+    if "objects365" not in skip:
+        o365 = objects365(args.out, cache, names, splits, args.limit, args.workers)
+        print(f"Objects365: {len(o365)} photos, {sum(len(r['boxes']) for r in o365.values())} boxes", flush=True)
+        records.update(o365)
+
     # 7. EgoHands
     if "egohands" not in skip:
         ego = egohands(args.egohands, args.limit, splits)
@@ -627,6 +848,10 @@ def main() -> None:
         ego_records = [r for r in records.values() if r["source"] == "egohands"]
         if ego_records:
             print(f"yolo11n COCO boxes on EgoHands: {auto_coco(ego_records)}", flush=True)
+        o365_records = [r for r in records.values() if r["source"] == "objects365"]
+        if o365_records:
+            print(f"MediaPipe hand boxes on Objects365: {auto_hands(o365_records, cache)} on {len(o365_records)} photos",
+                  flush=True)
 
     # 9. zoomed crops (after the auto-labels, so the crops carry the text boxes too)
     crops = zoom_crops(records, args.out)
