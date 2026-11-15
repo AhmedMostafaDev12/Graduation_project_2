@@ -49,6 +49,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 BACKEND = HERE.parents[1] / "backend-ai"
 sys.path.insert(0, str(BACKEND))
+sys.path.insert(0, str(HERE.parent))  # ml/: the edge engine (gate rules), spec D38
 
 import imageio_ffmpeg
 import numpy as np
@@ -332,6 +333,90 @@ def changed_frames(
     return kept
 
 
+def detector_frames(
+    frames: list[tuple[float, Path]],
+    model: Path,
+    thresholds_json: Path | None,
+    overrides: dict[int, float],
+    lookback: int,
+    cache: Path,
+) -> tuple[list[tuple[float, Path]], dict]:
+    """The important-object detector as the capture gate (spec D42): every frame goes through
+    the model and the gate rules of ml/edge; a frame that fires a rule is kept, with up to
+    `lookback` of the most different frames of the 30 s before it (the look-back buffer;
+    the colour histogram stands in for the frame embedding). Detections are cached per model."""
+    import pickle
+
+    from edge.important_objects import Detector, TextMemory, fires, text_boxes
+    from edge.lookback import WINDOW_S, most_different
+
+    detector = Detector(model, thresholds_json)
+    detector.thresholds.update(overrides)
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    if cache.exists():
+        detections = pickle.loads(cache.read_bytes())
+    else:
+        detections = [
+            detector.detect(np.asarray(Image.open(path).convert("RGB")))
+            for _, path in frames
+        ]
+        cache.write_bytes(pickle.dumps(detections))
+    hists = [histogram(path) for _, path in frames]
+    kept, stats, memory = set(), collections.Counter(), TextMemory()
+    for i, ((offset, _), found) in enumerate(zip(frames, detections, strict=True)):
+        rules = fires(found, detector.thresholds)
+        if (
+            "text" in rules
+        ):  # the same text seen again within 2 minutes doesn't fire again
+            rgb = np.asarray(Image.open(frames[i][1]).convert("RGB"))
+            if not memory.any_new(rgb, text_boxes(found, detector.thresholds), offset):
+                rules.remove("text")
+        if not rules:
+            continue
+        stats.update(rules)
+        kept.add(i)
+        window = [j for j in range(i) if frames[j][0] > offset - WINDOW_S]
+        picks = most_different(
+            [hists[j] for j in window], lookback, anchor=hists[i], min_distance=0.15
+        )
+        before = len(kept)
+        kept.update(window[p] for p in picks)
+        stats["lookback"] += len(kept) - before
+    stats["frames kept"] = len(kept)
+    return [frames[i] for i in sorted(kept)], dict(stats)
+
+
+def gate_frames(args, video_id: str, every_frame: list) -> tuple[list, dict]:
+    """The frames of one video that reach the photo review, per --gate, and the gate's counts."""
+    novelty = changed_frames(every_frame, args.novelty, args.max_gap)
+    if args.gate == "novelty":
+        return novelty, {"novelty frames": len(novelty)}
+    from edge.important_objects import PILL_BOX, RULES, TEXT
+
+    overrides = {}
+    if args.text_threshold is not None:
+        overrides[TEXT] = args.text_threshold
+    if args.object_threshold is not None:
+        for cls in (*RULES["important_object"], PILL_BOX):
+            overrides[cls] = args.object_threshold
+    detected, stats = detector_frames(
+        every_frame,
+        args.detector,
+        args.detector.with_name("thresholds.json"),
+        overrides,
+        args.lookback,
+        CACHE
+        / "detections"
+        / f"{video_id}_{args.detector.stem}_every{args.every:g}.pkl",
+    )
+    if args.gate == "detector":
+        return detected, stats
+    union = sorted(set(novelty) | set(detected))
+    stats["novelty frames"] = len(novelty)
+    stats["new beyond novelty"] = len(union) - len(novelty)
+    return union, stats
+
+
 def review_frames(
     patient_id, frames, start_unix, storage: MemoryStorage, workers: int
 ) -> dict:
@@ -577,6 +662,39 @@ def main() -> int:
     parser.add_argument(
         "--no-flat", action="store_true", help="skip the flat-memory run"
     )
+    parser.add_argument(
+        "--gate",
+        choices=["novelty", "detector", "both"],
+        default="novelty",
+        help="which frames reach the photo review: the novelty stand-in, the important-object "
+        "detector with its gate rules (ml/edge), or both (closest to the real gate)",
+    )
+    parser.add_argument(
+        "--detector",
+        type=Path,
+        default=HERE.parent / "remori_objects_v2" / "remori_objects_v2.onnx",
+        help="the detector's ONNX file (its thresholds.json next to it is read)",
+    )
+    parser.add_argument(
+        "--text-threshold", type=float, help="override the text rule's threshold"
+    )
+    parser.add_argument(
+        "--object-threshold",
+        type=float,
+        help="override the thresholds of keys, glasses, wallet, phone, stove and pill box",
+    )
+    parser.add_argument(
+        "--lookback",
+        type=int,
+        default=3,
+        help="frames kept from the 30 s before a trigger",
+    )
+    parser.add_argument(
+        "--plan",
+        action="store_true",
+        help="only print how many frames each gate keeps and how many are new to the "
+        "review cache (estimated cost), then stop: no API calls, no database",
+    )
     args = parser.parse_args()
     if (
         "localhost" not in settings.database_url
@@ -604,6 +722,30 @@ def main() -> int:
     if args.limit:
         questions = questions[: args.limit]
     print(f"sessions {sorted(videos)} · {len(questions)} questions", flush=True)
+
+    if (
+        args.plan
+    ):  # frame counts and an estimated cost, without any API call or database
+        new_total = 0
+        for video_id in sorted(videos):
+            files = session_files(args.person, video_id)
+            every_frame = extract_frames(
+                files["video"],
+                args.every,
+                CACHE / "frames" / video_id / f"every_{args.every:g}",
+            )
+            frames, stats = gate_frames(args, video_id, every_frame)
+            novelty = changed_frames(every_frame, args.novelty, args.max_gap)
+            new = len(set(frames) - set(novelty))
+            new_total += new
+            print(
+                f"{video_id}: {len(every_frame)} frames · gate {args.gate} keeps {len(frames)} · {stats}"
+            )
+        print(
+            f"photo reviews not done by an earlier novelty run: ~{new_total} "
+            f"(≈ ${new_total * 0.005:.2f} on Groq at 1024 px; earlier novelty frames come from the cache)"
+        )
+        return 0
 
     models = {
         "groq": {"llm": "groq-qwen", "assist_llm": "groq-qwen", "vision": "groq-qwen"},
@@ -635,6 +777,11 @@ def main() -> int:
         "sessions": sorted(videos),
         "every_s": args.every,
         "novelty": args.novelty,
+        "gate": args.gate,
+        "detector": args.detector.name if args.gate != "novelty" else None,
+        "text_threshold": args.text_threshold,
+        "object_threshold": args.object_threshold,
+        "lookback": args.lookback,
         "provider": args.provider,
         "models": {k: getattr(ai, k).model_id for k in ("llm", "assist_llm", "vision")},
     }
@@ -653,9 +800,10 @@ def main() -> int:
                 args.every,
                 CACHE / "frames" / video_id / f"every_{args.every:g}",
             )
-            frames = changed_frames(every_frame, args.novelty, args.max_gap)
+            frames, gate_stats = gate_frames(args, video_id, every_frame)
+            results.setdefault("gate_counts", {})[video_id] = gate_stats
             print(
-                f"{video_id}: {talks} conversation events, "
+                f"{video_id}: {talks} conversation events, gate {args.gate} {gate_stats}, "
                 f"{len(frames)} of {len(every_frame)} frames → photo review …",
                 flush=True,
             )
@@ -670,7 +818,13 @@ def main() -> int:
         results["consolidation"] = consolidate_all(db, patient_id)
         results["memory"] = memory_counts(db, patient_id)
         results["review_cache"] = {"reused": reviewer.hits, "new": reviewer.misses}
-        print("memory:", results["memory"], "· review cache:", results["review_cache"], flush=True)
+        print(
+            "memory:",
+            results["memory"],
+            "· review cache:",
+            results["review_cache"],
+            flush=True,
+        )
 
         print("\n== structured (the five structures)", flush=True)
         results["structured"] = ask(db, patient_id, questions, ai, structures=True)
