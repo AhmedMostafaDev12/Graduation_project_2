@@ -17,6 +17,11 @@ COPY scripts/download_face_models.py scripts/
 RUN python scripts/download_face_models.py /code/models
 ENV FACE_MODELS_DIR=/code/models
 
+# MobileCLIP-S0's text half for visual memory search (spec D34, D41), pinned + SHA-256 checked
+COPY scripts/download_visual_models.py scripts/
+RUN python scripts/download_visual_models.py /code/models
+ENV VISUAL_MODELS_DIR=/code/models
+
 COPY app ./app
 
 # Don't run as root inside the container

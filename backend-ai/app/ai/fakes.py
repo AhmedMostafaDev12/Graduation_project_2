@@ -49,6 +49,28 @@ class FakeTextEmbedder:
         return self.embed([text])[0]
 
 
+VISUAL_DIM = 512
+
+
+def fake_visual_vector(words: str) -> list[float]:
+    """A deterministic bag of words: texts sharing words point the same way, so tests can build
+    frame vectors from words ("pizza box on the blanket") and find them by a question."""
+    total = [0.0] * VISUAL_DIM
+    for word in words.lower().split():
+        for i, x in enumerate(unit_vector(word.encode("utf-8"), VISUAL_DIM)):
+            total[i] += x
+    norm = sum(x * x for x in total) ** 0.5 or 1.0
+    return [x / norm for x in total]
+
+
+class FakeVisualTextEmbedder:
+    model_id = "fake-visual"
+    dim = VISUAL_DIM
+
+    def embed_text(self, texts: list[str]) -> list[list[float]]:
+        return [fake_visual_vector(t) for t in texts]
+
+
 class FakeVisionReviewer:
     model_id = "fake-vision"
 

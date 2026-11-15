@@ -36,6 +36,7 @@ from app.models.people import (
 from app.models.places import Place
 from app.models.privacy import AuditLog, ConsentRecord
 from app.models.reminders import Reminder, ReminderLog
+from app.models.scenes import FrameVectorFile, SceneSegment, SceneVector
 
 __all__ = [
     "FACE_DIM",
@@ -53,19 +54,22 @@ __all__ = [
     "EnrolledPerson",
     "Event",
     "FaceEmbedding",
+    "FrameVectorFile",
     "MediaAsset",
     "MemoryAction",
     "MemoryEntity",
     "MemoryFact",
     "MemoryIntention",
-    "ObjectSighting",
     "MindGameSession",
+    "ObjectSighting",
     "PatientProfile",
     "Place",
     "PushToken",
     "RefreshToken",
     "Reminder",
     "ReminderLog",
+    "SceneSegment",
+    "SceneVector",
     "UnknownFaceCluster",
     "User",
 ]

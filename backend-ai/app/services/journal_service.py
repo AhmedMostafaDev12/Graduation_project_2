@@ -1,10 +1,12 @@
 """The patient's memory timeline: what the glasses and phone recorded (spec D1, §7.2)."""
 
+import base64
 import uuid
 from collections import defaultdict
 from datetime import UTC, date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
+import numpy as np
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -19,6 +21,8 @@ from app.models import (
     PatientProfile,
     Reminder,
     ReminderLog,
+    SceneSegment,
+    SceneVector,
 )
 from app.oauth2 import PatientAccess
 from app.schemas.common import BatchResult
@@ -131,6 +135,42 @@ def upload_batch(db: Session, access: PatientAccess, batch: EventsBatch) -> Batc
         )
         seen[ev.id] = patient_id
         result.accepted.append(ev.id)
+
+    # what the glasses saw (D34, D41): only the glasses send scene segments
+    seen = _existing(db, SceneSegment, [s.id for s in batch.scene_segments])
+    for seg in batch.scene_segments:
+        if not sort(seg.id, seen):
+            continue
+        if device is None:
+            result.rejected.append(seg.id)
+            continue
+        db.add(
+            SceneSegment(
+                id=seg.id,
+                patient_id=patient_id,
+                device_id=device.id,
+                started_at=seg.started_at,
+                ended_at=seg.ended_at,
+                frame_count=seg.frame_count,
+                model_id=seg.model_id,
+                kept_media_ids=seg.kept_media_ids,
+            )
+        )
+        db.flush()
+        db.add_all(
+            SceneVector(
+                segment_id=seg.id,
+                patient_id=patient_id,
+                captured_at=v.captured_at,
+                role=v.role,
+                embedding=np.frombuffer(base64.b64decode(v.embedding), dtype="<f2")
+                .astype(float)
+                .tolist(),
+            )
+            for v in seg.vectors
+        )
+        seen[seg.id] = patient_id
+        result.accepted.append(seg.id)
     db.commit()
     return result
 

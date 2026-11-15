@@ -59,6 +59,18 @@ class TextEmbedder(Protocol):
         ...
 
 
+class VisualTextEmbedder(Protocol):
+    """Words → a vector in the same space as the glasses' frame vectors (spec D34, D41), so a
+    question can search what the glasses saw. The image half runs on the glasses (ml/edge)."""
+
+    model_id: str
+    dim: int
+
+    def embed_text(self, texts: list[str]) -> list[list[float]]:
+        """Unit vectors, one per text (short descriptions work best: "a photo of keys")."""
+        ...
+
+
 class VisionReviewer(Protocol):
     model_id: str
 

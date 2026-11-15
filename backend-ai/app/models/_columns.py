@@ -14,6 +14,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 FACE_DIM = 512  # MobileFaceNet w600k_mbf (spec D14)
 TEXT_DIM = 1024  # Voyage voyage-4 (spec D15)
+VISUAL_DIM = 512  # MobileCLIP-S0 frame vectors (spec D34, D41)
 
 
 def pk() -> Mapped[uuid.UUID]:

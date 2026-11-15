@@ -404,6 +404,7 @@ class ScriptedLLM:
 class Models:
     def __init__(self, llm):
         self.assist_llm, self.text_embedder = llm, EMBED
+        self.visual = None  # no frame memory in these tests
 
 
 def test_assist_answers_from_memory_with_sources(client, worker_session, monkeypatch):
